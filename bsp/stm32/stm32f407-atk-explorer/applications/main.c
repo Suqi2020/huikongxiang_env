@@ -12,7 +12,8 @@
 #include <rtthread.h>
 #include <rtdevice.h>
 #include <board.h>
-
+#define APP_VER     1  //0x0105 表示1.5版本
+//初始化  没有加入版本管理 0V1 20220919
 /* defined the LED0 pin: PE15 */
 #define LED0_PIN    GET_PIN(E, 15)
 
@@ -20,7 +21,7 @@ int main(void)
 {
     /* set LED0 pin mode to output */
     rt_pin_mode(LED0_PIN, PIN_MODE_OUTPUT);
-
+    rt_kprintf("20220919  %d.%d\n",(uint8_t)(APP_VER>>8),(uint8_t)APP_VER);
     while (1)
     {
 			  //rt_kprintf("test\n");
