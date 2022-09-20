@@ -13,7 +13,7 @@
 #include <rtdevice.h>
 #include <board.h>
 #include <string.h>
-#define APP_VER     1  //0x0105 表示1.5版本
+#define APP_VER     2  //0x0105 表示1.5版本
 //初始化  没有加入版本管理 0V1 20220919
 /* defined the LED0 pin: PE15 */
 #define LED0_PIN    GET_PIN(E, 15)
