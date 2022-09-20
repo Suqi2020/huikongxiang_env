@@ -184,6 +184,9 @@
 /* Arduino libraries */
 
 
+/* Projects */
+
+
 /* Sensors */
 
 
@@ -193,7 +196,20 @@
 /* Timing */
 
 
-/* Projects */
+/* Data Processing */
+
+
+/* Data Storage */
+
+/* Communication */
+
+/* Device Control */
+
+/* Other */
+
+/* Signal IO */
+
+/* Uncategorized */
 
 #define SOC_FAMILY_STM32
 #define SOC_SERIES_STM32F4
@@ -212,6 +228,11 @@
 #define BSP_USING_GPIO
 #define BSP_USING_UART
 #define BSP_USING_UART1
+#define BSP_USING_UART2
+#define BSP_USING_UART3
+#define BSP_USING_UART4
+#define BSP_USING_UART5
+#define BSP_USING_UART6
 
 /* Board extended module Drivers */
 

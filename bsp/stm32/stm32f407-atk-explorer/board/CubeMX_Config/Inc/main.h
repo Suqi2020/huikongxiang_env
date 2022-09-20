@@ -78,6 +78,18 @@ void Error_Handler(void);
 /* USER CODE END EFP */
 
 /* Private defines -----------------------------------------------------------*/
+#define UART2_485_Pin GPIO_PIN_1
+#define UART2_485_GPIO_Port GPIOA
+#define LED_Pin GPIO_PIN_15
+#define LED_GPIO_Port GPIOE
+#define UART3_485_Pin GPIO_PIN_10
+#define UART3_485_GPIO_Port GPIOD
+#define UART6_485_Pin GPIO_PIN_8
+#define UART6_485_GPIO_Port GPIOC
+#define UART4_485_Pin GPIO_PIN_9
+#define UART4_485_GPIO_Port GPIOC
+#define UART1_485_Pin GPIO_PIN_11
+#define UART1_485_GPIO_Port GPIOA
 /* USER CODE BEGIN Private defines */
 
 /* USER CODE END Private defines */

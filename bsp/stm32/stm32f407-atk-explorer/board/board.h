@@ -16,6 +16,48 @@
 #include "drv_common.h"
 #include "drv_gpio.h"
 
+
+/* Private defines -----------------------------------------------------------*/
+#define UART2_485_Pin GPIO_PIN_1
+#define UART2_485_GPIO_Port GPIOA
+
+#define LED_Pin GPIO_PIN_15
+#define LED_GPIO_Port GPIOE
+
+#define UART3_485_Pin GPIO_PIN_10
+#define UART3_485_GPIO_Port GPIOD
+
+#define UART6_485_Pin GPIO_PIN_8
+#define UART6_485_GPIO_Port GPIOC
+
+#define UART4_485_Pin GPIO_PIN_9
+#define UART4_485_GPIO_Port GPIOC
+
+#define UART1_485_Pin GPIO_PIN_11
+#define UART1_485_GPIO_Port GPIOA
+
+
+//UART1´®¿ÚdebugÓÃ
+//#define RS485_CTRL1_PIN    GET_PIN(A, 11)
+//#define RS485_1_SEND   rt_pin_write(RS485_CTRL1_PIN, PIN_HIGH);
+//#define RS485_1_REC    rt_pin_write(RS485_CTRL1_PIN, PIN_LOW);
+
+#define UART4_CTRL_PIN    GET_PIN(C, 9)
+#define UART4_485_SEND   rt_pin_write(UART4_CTRL_PIN, PIN_HIGH);
+#define UART4_485_REC    rt_pin_write(UART4_CTRL_PIN, PIN_LOW);
+
+#define UART6_CTRL_PIN    GET_PIN(C, 8)
+#define UART6_485_SEND   rt_pin_write(UART6_CTRL_PIN, PIN_HIGH);
+#define UART6_485_REC    rt_pin_write(RS485_CTRL6_PIN, PIN_LOW);
+
+#define UART3_CTRL_PIN    GET_PIN(D, 10)
+#define UART3_485_SEND   rt_pin_write(UART3_CTRL_PIN, PIN_HIGH);
+#define UART3_485_REC    rt_pin_write(UART3_CTRL_PIN, PIN_LOW);
+
+#define UART2_CTRL_PIN    GET_PIN(A, 1)
+#define UART2_485_SEND   rt_pin_write(UART2_CTRL_PIN, PIN_HIGH);
+#define UART2_485_REC    rt_pin_write(UART2_CTRL_PIN, PIN_LOW);
+
 #ifdef __cplusplus
 extern "C" {
 #endif

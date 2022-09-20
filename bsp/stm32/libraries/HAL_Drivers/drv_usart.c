@@ -16,6 +16,17 @@
 #include "board.h"
 #include "drv_usart.h"
 #include "drv_config.h"
+#include "string.h"
+
+
+extern UART_HandleTypeDef huart4;
+extern UART_HandleTypeDef huart5;
+extern UART_HandleTypeDef huart1;
+extern UART_HandleTypeDef huart2;
+extern UART_HandleTypeDef huart3;
+extern UART_HandleTypeDef huart6;
+
+uint8_t testRecBuf[200];
 
 #ifdef RT_USING_SERIAL
 
@@ -504,6 +515,8 @@ void USART1_IRQHandler(void)
     /* enter interrupt */
     rt_interrupt_enter();
 
+	
+		uint8_t	Res =USART1->DR;//(USART1->DR);	//读取接收到的数据
     uart_isr(&(uart_obj[UART1_INDEX].serial));
 
     /* leave interrupt */
@@ -539,10 +552,26 @@ void UART1_DMA_TX_IRQHandler(void)
 void USART2_IRQHandler(void)
 {
     /* enter interrupt */
+	  //rt_kprintf("irq\n");
     rt_interrupt_enter();
-
-    uart_isr(&(uart_obj[UART2_INDEX].serial));
-
+		static uint8_t Res;
+	  static int i=0;
+  //  uart_isr(&(uart_obj[UART2_INDEX].serial));
+		if((__HAL_UART_GET_FLAG(&huart2,UART_FLAG_RXNE)!=RESET))  //接收中断(接收到的数据必须是0x0d 0x0a结尾)
+		{
+			  //rt_kprintf("read\n");
+				HAL_UART_Receive(&huart2,&Res,1,1000); 
+				testRecBuf[i++]=Res;
+			  if(Res=='\n'){
+			    testRecBuf[i++]=0;
+					UART2_485_SEND;
+					HAL_UART_Transmit(&huart2,(uint8_t *)testRecBuf,(uint16_t)strlen(testRecBuf),1000);
+					UART2_485_REC;
+					i=0;
+				}
+			 
+		}
+		HAL_UART_IRQHandler(&huart2);	
     /* leave interrupt */
     rt_interrupt_leave();
 }
