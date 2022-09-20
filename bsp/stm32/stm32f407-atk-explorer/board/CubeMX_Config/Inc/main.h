@@ -86,10 +86,10 @@ void Error_Handler(void);
 #define UART3_485_GPIO_Port GPIOD
 #define UART6_485_Pin GPIO_PIN_8
 #define UART6_485_GPIO_Port GPIOC
-#define UART4_485_Pin GPIO_PIN_9
-#define UART4_485_GPIO_Port GPIOC
-#define UART1_485_Pin GPIO_PIN_11
-#define UART1_485_GPIO_Port GPIOA
+#define UART1_485_Pin GPIO_PIN_9
+#define UART1_485_GPIO_Port GPIOC
+#define UART4_485_Pin GPIO_PIN_11
+#define UART4_485_GPIO_Port GPIOA
 /* USER CODE BEGIN Private defines */
 
 /* USER CODE END Private defines */
