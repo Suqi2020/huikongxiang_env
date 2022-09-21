@@ -15,9 +15,10 @@
 #include <stm32f4xx.h>
 #include "drv_common.h"
 #include "drv_gpio.h"
-
-
+#include "test_hardware.h"
+#include "main.h"
 /* Private defines -----------------------------------------------------------*/
+/*
 #define UART2_485_Pin GPIO_PIN_1
 #define UART2_485_GPIO_Port GPIOA
 
@@ -36,27 +37,66 @@
 #define UART4_485_Pin GPIO_PIN_11
 #define UART4_485_GPIO_Port GPIOA
 
+#define SENSER_IN8_Pin GPIO_PIN_0
+#define SENSER_IN8_GPIO_Port GPIOC
+#define SENSER_IN7_Pin GPIO_PIN_1
+#define SENSER_IN7_GPIO_Port GPIOC
+#define SENSER_IN6_Pin GPIO_PIN_2
+#define SENSER_IN6_GPIO_Port GPIOC
+#define SENSER_IN5_Pin GPIO_PIN_3
+#define SENSER_IN5_GPIO_Port GPIOC
 
-//UART1串口debug用
-//#define RS485_CTRL1_PIN    GET_PIN(C, 9)
-//#define RS485_1_SEND   rt_pin_write(RS485_CTRL1_PIN, PIN_HIGH);
-//#define RS485_1_REC    rt_pin_write(RS485_CTRL1_PIN, PIN_LOW);
+#define SENSER_IN4_Pin GPIO_PIN_4
+#define SENSER_IN4_GPIO_Port GPIOC
+#define SENSER_IN3_Pin GPIO_PIN_5
+#define SENSER_IN3_GPIO_Port GPIOC
+#define SENSER_IN2_Pin GPIO_PIN_0
+#define SENSER_IN2_GPIO_Port GPIOB
+#define SENSER_IN1_Pin GPIO_PIN_1
+#define SENSER_IN1_GPIO_Port GPIOB
 
-#define UART4_CTRL_PIN    GET_PIN(A, 11)
-#define UART4_485_SEND   rt_pin_write(UART4_CTRL_PIN, PIN_HIGH);
-#define UART4_485_REC    rt_pin_write(UART4_CTRL_PIN, PIN_LOW);
 
-#define UART6_CTRL_PIN    GET_PIN(C, 8)
-#define UART6_485_SEND   rt_pin_write(UART6_CTRL_PIN, PIN_HIGH);
-#define UART6_485_REC    rt_pin_write(UART6_CTRL_PIN, PIN_LOW);
+#define IO_OUT8_Pin GPIO_PIN_12
+#define IO_OUT8_GPIO_Port GPIOA
+#define IO_OUT7_Pin GPIO_PIN_15
+#define IO_OUT7_GPIO_Port GPIOA
+#define IO_OUT6_Pin GPIO_PIN_3
+#define IO_OUT6_GPIO_Port GPIOB
+#define IO_OUT5_Pin GPIO_PIN_4
+#define IO_OUT5_GPIO_Port GPIOB
+#define IO_OUT4_Pin GPIO_PIN_5
+#define IO_OUT4_GPIO_Port GPIOB
+#define IO_OUT3_Pin GPIO_PIN_6
+#define IO_OUT3_GPIO_Port GPIOB
+#define IO_OUT2_Pin GPIO_PIN_7
+#define IO_OUT2_GPIO_Port GPIOB
+#define IO_OUT1_Pin GPIO_PIN_8
+#define IO_OUT1_GPIO_Port GPIOB
 
-#define UART3_CTRL_PIN    GET_PIN(D, 10)
-#define UART3_485_SEND   rt_pin_write(UART3_CTRL_PIN, PIN_HIGH);
-#define UART3_485_REC    rt_pin_write(UART3_CTRL_PIN, PIN_LOW);
 
-#define UART2_CTRL_PIN    GET_PIN(A, 1)
-#define UART2_485_SEND   rt_pin_write(UART2_CTRL_PIN, PIN_HIGH);
-#define UART2_485_REC    rt_pin_write(UART2_CTRL_PIN, PIN_LOW);
+#define IO_IN8_Pin GPIO_PIN_9
+#define IO_IN8_GPIO_Port GPIOB
+#define IO_IN7_Pin GPIO_PIN_0
+#define IO_IN7_GPIO_Port GPIOE
+#define IO_IN6_Pin GPIO_PIN_1
+#define IO_IN6_GPIO_Port GPIOE
+
+#define IO_IN5_Pin GPIO_PIN_2
+#define IO_IN5_GPIO_Port GPIOE
+#define IO_IN4_Pin GPIO_PIN_3
+#define IO_IN4_GPIO_Port GPIOE
+#define IO_IN3_Pin GPIO_PIN_4
+#define IO_IN3_GPIO_Port GPIOE
+#define IO_IN2_Pin GPIO_PIN_5
+#define IO_IN2_GPIO_Port GPIOE
+#define IO_IN1_Pin GPIO_PIN_6
+#define IO_IN1_GPIO_Port GPIOE
+
+
+//增加rt配置IO使用
+#define LED0_PIN    GET_PIN(E, 15)
+*/
+
 
 #ifdef __cplusplus
 extern "C" {
