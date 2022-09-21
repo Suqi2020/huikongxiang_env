@@ -80,6 +80,7 @@
 #define RT_USING_I2C
 #define RT_USING_I2C_BITOPS
 #define RT_USING_PIN
+#define RT_USING_ADC
 
 /* Using USB */
 
@@ -209,6 +210,7 @@
 
 /* Signal IO */
 
+
 /* Uncategorized */
 
 #define SOC_FAMILY_STM32
@@ -225,7 +227,6 @@
 
 /* On-chip Peripheral Drivers */
 
-#define BSP_USING_GPIO
 #define BSP_USING_UART
 #define BSP_USING_UART1
 #define BSP_USING_UART2
@@ -233,6 +234,7 @@
 #define BSP_USING_UART4
 #define BSP_USING_UART5
 #define BSP_USING_UART6
+#define BSP_USING_ADC
 
 /* Board extended module Drivers */
 

@@ -3,11 +3,14 @@
 
 
 //#define TEST_ADC
-//#define TEST_UART
+#define TEST_UART
 //#define  TEST_IOIN
 //#define  TEST_IOOUT
-#define  TEST_SPAKER
+//#define  TEST_SPAKER
 //#define   TEST_RELAY
+
+
+
 #ifdef TEST_UART
 
 extern void uart2SendRecTest(void);

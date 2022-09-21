@@ -176,6 +176,22 @@ extern "C" {
 #define UART2_485_REC    HAL_GPIO_WritePin(UART2_485_GPIO_Port, UART2_485_Pin, GPIO_PIN_RESET)
 
 
+//#define UART4_CTRL_PIN    GET_PIN(C, 9)
+//#define UART4_485_SEND   rt_pin_write(UART4_CTRL_PIN, PIN_HIGH);
+//#define UART4_485_REC    rt_pin_write(UART4_CTRL_PIN, PIN_LOW);
+
+//#define UART6_CTRL_PIN    GET_PIN(C, 8)
+//#define UART6_485_SEND   rt_pin_write(UART6_CTRL_PIN, PIN_HIGH);
+//#define UART6_485_REC    rt_pin_write(RS485_CTRL6_PIN, PIN_LOW);
+
+//#define UART3_CTRL_PIN    GET_PIN(D, 10)
+//#define UART3_485_SEND   rt_pin_write(UART3_CTRL_PIN, PIN_HIGH);
+//#define UART3_485_REC    rt_pin_write(UART3_CTRL_PIN, PIN_LOW);
+
+//#define UART2_CTRL_PIN    GET_PIN(A, 1)
+//#define UART2_485_SEND   rt_pin_write(UART2_CTRL_PIN, PIN_HIGH);
+//#define UART2_485_REC    rt_pin_write(UART2_CTRL_PIN, PIN_LOW);
+
 #define RELAY1_ON				 HAL_GPIO_WritePin(REALAY_CTRL1_GPIO_Port, REALAY_CTRL1_Pin, GPIO_PIN_SET)
 #define RELAY2_ON				 HAL_GPIO_WritePin(REALAY_CTRL2_GPIO_Port, REALAY_CTRL2_Pin, GPIO_PIN_SET)
 #define RELAY3_ON				 HAL_GPIO_WritePin(REALAY_CTRL3_GPIO_Port, REALAY_CTRL3_Pin, GPIO_PIN_SET)

@@ -511,6 +511,113 @@ static void dma_isr(struct rt_serial_device *serial)
 }
 #endif
 
+
+
+////////////////////////////////////////////////////////////
+/*
+#ifdef TEST_UART
+uint8_t testRecBuf[200];
+int testCount=0;
+extern UART_HandleTypeDef huart4;
+extern UART_HandleTypeDef huart5;
+extern UART_HandleTypeDef huart1;
+extern UART_HandleTypeDef huart2;
+extern UART_HandleTypeDef huart3;
+extern UART_HandleTypeDef huart6;
+void uart2SendRecTest()
+{
+		static uint8_t Res;//rt_kprintf("rt_UART\n");
+		if((__HAL_UART_GET_FLAG(&huart2,UART_FLAG_RXNE)!=RESET))  //接收中断(接收到的数据必须是0x0d 0x0a结尾)
+		{
+				HAL_UART_Receive(&huart2,&Res,1,1000); 
+				testRecBuf[testCount++]=Res;
+			  if(Res=='\n'){
+			    testRecBuf[testCount++]=0;
+					UART2_485_SEND;
+					HAL_UART_Transmit(&huart2,(uint8_t *)testRecBuf,(uint16_t)strlen((char *)testRecBuf),1000);
+					UART2_485_REC;
+					testCount = 0;
+				}
+		}
+		HAL_UART_IRQHandler(&huart2);	
+}
+void uart3SendRecTest()
+{
+		static uint8_t Res;rt_kprintf("rt_UART\n");
+		if((__HAL_UART_GET_FLAG(&huart3,UART_FLAG_RXNE)!=RESET))  //接收中断(接收到的数据必须是0x0d 0x0a结尾)
+		{
+				HAL_UART_Receive(&huart3,&Res,1,1000); 
+				testRecBuf[testCount++]=Res;
+			  if(Res=='\n'){
+			    testRecBuf[testCount++]=0;
+					UART3_485_SEND;
+					HAL_UART_Transmit(&huart3,(uint8_t *)testRecBuf,(uint16_t)strlen((char *)testRecBuf),1000);
+					UART3_485_REC;
+					testCount = 0;
+				}
+			 
+		}
+		HAL_UART_IRQHandler(&huart3);	
+}
+void uart4SendRecTest()
+{
+		static uint8_t Res;rt_kprintf("rt_UART\n");
+		if((__HAL_UART_GET_FLAG(&huart4,UART_FLAG_RXNE)!=RESET))  //接收中断(接收到的数据必须是0x0d 0x0a结尾)
+		{
+				HAL_UART_Receive(&huart4,&Res,1,1000); 
+				testRecBuf[testCount++]=Res;
+			  if(Res=='\n'){
+			    testRecBuf[testCount++]=0;
+					UART4_485_SEND;
+					HAL_UART_Transmit(&huart4,(uint8_t *)testRecBuf,(uint16_t)strlen((char *)testRecBuf),1000);
+					UART4_485_REC;
+					testCount = 0;
+				}
+			 
+		}
+		HAL_UART_IRQHandler(&huart4);	
+}
+
+void uart5SendRecTest()
+{
+		static uint8_t Res;rt_kprintf("rt_UART\n");
+		if((__HAL_UART_GET_FLAG(&huart5,UART_FLAG_RXNE)!=RESET))  //接收中断(接收到的数据必须是0x0d 0x0a结尾)
+		{
+				HAL_UART_Receive(&huart5,&Res,1,1000); 
+				testRecBuf[testCount++]=Res;
+			  if(Res=='\n'){
+			    testRecBuf[testCount++]=0;
+		
+					HAL_UART_Transmit(&huart5,(uint8_t *)testRecBuf,(uint16_t)strlen((char *)testRecBuf),1000);
+
+					testCount = 0;
+				}
+			 
+		}
+		HAL_UART_IRQHandler(&huart5);	
+}
+void uart6SendRecTest()
+{
+	 static uint8_t Res;rt_kprintf("rt_UART\n");
+		if((__HAL_UART_GET_FLAG(&huart6,UART_FLAG_RXNE)!=RESET))  //接收中断(接收到的数据必须是0x0d 0x0a结尾)
+		{
+				HAL_UART_Receive(&huart6,&Res,1,1000); 
+				testRecBuf[testCount++]=Res;
+			  if(Res=='\n'){
+			    testRecBuf[testCount++]=0;
+					UART6_485_SEND;
+					HAL_UART_Transmit(&huart6,(uint8_t *)testRecBuf,(uint16_t)strlen((char *)testRecBuf),1000);
+					UART6_485_REC;
+					testCount = 0;
+				}
+			 
+		}
+		HAL_UART_IRQHandler(&huart6);	
+}
+
+#endif
+*/
+
 #if defined(BSP_USING_UART1)
 void USART1_IRQHandler(void)
 {
@@ -549,7 +656,8 @@ void UART1_DMA_TX_IRQHandler(void)
 }
 #endif /* defined(RT_SERIAL_USING_DMA) && defined(BSP_UART1_TX_USING_DMA) */
 #endif /* BSP_USING_UART1 */
-
+char testRecBuf1[200];
+int testCount1;
 #if defined(BSP_USING_UART2)
 void USART2_IRQHandler(void)
 {
@@ -560,18 +668,18 @@ void USART2_IRQHandler(void)
 	uart2SendRecTest();
 //		static uint8_t Res;
 
-//  //  uart_isr(&(uart_obj[UART2_INDEX].serial));
+////  //  uart_isr(&(uart_obj[UART2_INDEX].serial));
 //		if((__HAL_UART_GET_FLAG(&huart2,UART_FLAG_RXNE)!=RESET))  //接收中断(接收到的数据必须是0x0d 0x0a结尾)
 //		{
-//			  //rt_kprintf("read\n");
+//			//  rt_kprintf("read\n");
 //				HAL_UART_Receive(&huart2,&Res,1,1000); 
-//				testRecBuf[testCount++]=Res;
+//				testRecBuf1[testCount1++]=Res;
 //			  if(Res=='\n'){
-//			    testRecBuf[testCount++]=0;
+//			    testRecBuf1[testCount1++]=0;
 //					UART2_485_SEND;
-//					HAL_UART_Transmit(&huart2,(uint8_t *)testRecBuf,(uint16_t)strlen((char *)testRecBuf),1000);
+//					HAL_UART_Transmit(&huart2,(uint8_t *)testRecBuf1,(uint16_t)strlen((char *)testRecBuf1),1000);
 //					UART2_485_REC;
-//					testCount = 0;
+//					testCount1 = 0;
 //				}
 //			 
 //		}

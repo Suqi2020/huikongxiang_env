@@ -13,17 +13,18 @@
 #include <rtdevice.h>
 #include <board.h>
 #include <string.h>
-#define APP_VER     4  //0x0105 表示1.5版本
+#define APP_VER     5  //0x0105 表示1.5版本
 //初始化  没有加入版本管理 0V1 20220919
 // 处了串口4外其他的串口收发都可以 0V3 20220920
 // 所有io口输入输出 adc uart收发已经测试  0V4 20220921
+//去掉menuconfig 配置IO驱动   0V5 20220921
 extern void  hardWareDriverTest(void);
 
 
 int main(void)
 {
 
-    rt_kprintf("\n20220920  ver=%02d.%02d\n",(uint8_t)(APP_VER>>8),(uint8_t)APP_VER);
+    rt_kprintf("\n20220921  ver=%02d.%02d\n",(uint8_t)(APP_VER>>8),(uint8_t)APP_VER);
 	  int i=0;
     while (1)
     {
