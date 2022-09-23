@@ -8,7 +8,7 @@
 //#define  TEST_IOOUT
 //#define  TEST_SPAKER
 //#define   TEST_RELAY
-
+//#define  TEST_W5500
 
 
 #ifdef TEST_UART

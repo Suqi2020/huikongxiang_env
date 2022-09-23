@@ -98,6 +98,8 @@ extern "C" {
 #define SENSER_IN5_GPIO_Port GPIOC
 #define UART2_485_Pin GPIO_PIN_1
 #define UART2_485_GPIO_Port GPIOA
+#define W5500_CS_Pin GPIO_PIN_4
+#define W5500_CS_GPIO_Port GPIOA
 #define SENSER_IN4_Pin GPIO_PIN_4
 #define SENSER_IN4_GPIO_Port GPIOC
 #define SENSER_IN3_Pin GPIO_PIN_5
@@ -106,6 +108,8 @@ extern "C" {
 #define SENSER_IN2_GPIO_Port GPIOB
 #define SENSER_IN1_Pin GPIO_PIN_1
 #define SENSER_IN1_GPIO_Port GPIOB
+#define W5500_RST_Pin GPIO_PIN_2
+#define W5500_RST_GPIO_Port GPIOB
 #define REALAY_CTRL2_Pin GPIO_PIN_11
 #define REALAY_CTRL2_GPIO_Port GPIOE
 #define REALAY_CTRL1_Pin GPIO_PIN_12
@@ -116,6 +120,9 @@ extern "C" {
 #define REALAY_CTRL4_GPIO_Port GPIOE
 #define LED_Pin GPIO_PIN_15
 #define LED_GPIO_Port GPIOE
+#define W5500_IRQ_Pin GPIO_PIN_11
+#define W5500_IRQ_GPIO_Port GPIOB
+#define W5500_IRQ_EXTI_IRQn EXTI15_10_IRQn
 #define SPAKER1_Pin GPIO_PIN_12
 #define SPAKER1_GPIO_Port GPIOB
 #define SPAKER3_Pin GPIO_PIN_13

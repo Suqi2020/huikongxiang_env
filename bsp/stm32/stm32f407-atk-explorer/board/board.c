@@ -15,6 +15,8 @@
 /* Private variables ---------------------------------------------------------*/
 ADC_HandleTypeDef hadc1;
 
+SPI_HandleTypeDef hspi1;
+
 UART_HandleTypeDef huart4;
 UART_HandleTypeDef huart5;
 UART_HandleTypeDef huart1;
@@ -37,6 +39,8 @@ static void MX_USART2_UART_Init(void);
 static void MX_USART3_UART_Init(void);
 static void MX_USART6_UART_Init(void);
 static void MX_ADC1_Init(void);
+static void MX_SPI1_Init(void);
+/* USER CODE BEGIN PFP */
 
 /**
   * @brief  The application entry point.
@@ -55,7 +59,14 @@ int cubeHardWareInit(void)
   MX_USART3_UART_Init();
   MX_USART6_UART_Init();
   MX_ADC1_Init();
-	return 0;
+  MX_SPI1_Init();
+  /* USER CODE BEGIN 2 */
+
+  /* USER CODE END 2 */
+
+  /* Infinite loop */
+  /* USER CODE BEGIN WHILE */
+  /* USER CODE END 3 */
 }
 /**
   * @brief System Clock Configuration
@@ -147,6 +158,44 @@ static void MX_ADC1_Init(void)
   /* USER CODE BEGIN ADC1_Init 2 */
 
   /* USER CODE END ADC1_Init 2 */
+
+}
+
+/**
+  * @brief SPI1 Initialization Function
+  * @param None
+  * @retval None
+  */
+static void MX_SPI1_Init(void)
+{
+
+  /* USER CODE BEGIN SPI1_Init 0 */
+
+  /* USER CODE END SPI1_Init 0 */
+
+  /* USER CODE BEGIN SPI1_Init 1 */
+
+  /* USER CODE END SPI1_Init 1 */
+  /* SPI1 parameter configuration*/
+  hspi1.Instance = SPI1;
+  hspi1.Init.Mode = SPI_MODE_MASTER;
+  hspi1.Init.Direction = SPI_DIRECTION_2LINES;
+  hspi1.Init.DataSize = SPI_DATASIZE_8BIT;
+  hspi1.Init.CLKPolarity = SPI_POLARITY_LOW;
+  hspi1.Init.CLKPhase = SPI_PHASE_1EDGE;
+  hspi1.Init.NSS = SPI_NSS_SOFT;
+  hspi1.Init.BaudRatePrescaler = SPI_BAUDRATEPRESCALER_2;
+  hspi1.Init.FirstBit = SPI_FIRSTBIT_MSB;
+  hspi1.Init.TIMode = SPI_TIMODE_DISABLE;
+  hspi1.Init.CRCCalculation = SPI_CRCCALCULATION_DISABLE;
+  hspi1.Init.CRCPolynomial = 10;
+  if (HAL_SPI_Init(&hspi1) != HAL_OK)
+  {
+    Error_Handler();
+  }
+  /* USER CODE BEGIN SPI1_Init 2 */
+
+  /* USER CODE END SPI1_Init 2 */
 
 }
 
@@ -378,6 +427,13 @@ static void MX_GPIO_Init(void)
   HAL_GPIO_WritePin(GPIOA, UART2_485_Pin|UART4_485_Pin, GPIO_PIN_RESET);
 
   /*Configure GPIO pin Output Level */
+  HAL_GPIO_WritePin(GPIOA, W5500_CS_Pin|IO_OUT8_Pin|IO_OUT7_Pin, GPIO_PIN_SET);
+
+  /*Configure GPIO pin Output Level */
+  HAL_GPIO_WritePin(GPIOB, W5500_RST_Pin|IO_OUT6_Pin|IO_OUT5_Pin|IO_OUT4_Pin
+                          |IO_OUT3_Pin|IO_OUT2_Pin|IO_OUT1_Pin, GPIO_PIN_SET);
+
+  /*Configure GPIO pin Output Level */
   HAL_GPIO_WritePin(GPIOE, REALAY_CTRL2_Pin|REALAY_CTRL1_Pin|REALAY_CTRL3_Pin|REALAY_CTRL4_Pin, GPIO_PIN_RESET);
 
   /*Configure GPIO pin Output Level */
@@ -395,13 +451,6 @@ static void MX_GPIO_Init(void)
   /*Configure GPIO pin Output Level */
   HAL_GPIO_WritePin(UART1_485_GPIO_Port, UART1_485_Pin, GPIO_PIN_SET);
 
-  /*Configure GPIO pin Output Level */
-  HAL_GPIO_WritePin(GPIOA, IO_OUT8_Pin|IO_OUT7_Pin, GPIO_PIN_SET);
-
-  /*Configure GPIO pin Output Level */
-  HAL_GPIO_WritePin(GPIOB, IO_OUT6_Pin|IO_OUT5_Pin|IO_OUT4_Pin|IO_OUT3_Pin
-                          |IO_OUT2_Pin|IO_OUT1_Pin, GPIO_PIN_SET);
-
   /*Configure GPIO pins : IO_IN5_Pin IO_IN4_Pin IO_IN3_Pin IO_IN2_Pin
                            IO_IN1_Pin IO_IN7_Pin IO_IN6_Pin */
   GPIO_InitStruct.Pin = IO_IN5_Pin|IO_IN4_Pin|IO_IN3_Pin|IO_IN2_Pin
@@ -417,6 +466,20 @@ static void MX_GPIO_Init(void)
   GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_HIGH;
   HAL_GPIO_Init(GPIOA, &GPIO_InitStruct);
 
+  /*Configure GPIO pin : W5500_CS_Pin */
+  GPIO_InitStruct.Pin = W5500_CS_Pin;
+  GPIO_InitStruct.Mode = GPIO_MODE_OUTPUT_PP;
+  GPIO_InitStruct.Pull = GPIO_PULLUP;
+  GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_VERY_HIGH;
+  HAL_GPIO_Init(W5500_CS_GPIO_Port, &GPIO_InitStruct);
+
+  /*Configure GPIO pin : W5500_RST_Pin */
+  GPIO_InitStruct.Pin = W5500_RST_Pin;
+  GPIO_InitStruct.Mode = GPIO_MODE_OUTPUT_PP;
+  GPIO_InitStruct.Pull = GPIO_PULLUP;
+  GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_LOW;
+  HAL_GPIO_Init(W5500_RST_GPIO_Port, &GPIO_InitStruct);
+
   /*Configure GPIO pins : REALAY_CTRL2_Pin REALAY_CTRL1_Pin REALAY_CTRL3_Pin REALAY_CTRL4_Pin */
   GPIO_InitStruct.Pin = REALAY_CTRL2_Pin|REALAY_CTRL1_Pin|REALAY_CTRL3_Pin|REALAY_CTRL4_Pin;
   GPIO_InitStruct.Mode = GPIO_MODE_OUTPUT_PP;
@@ -430,6 +493,12 @@ static void MX_GPIO_Init(void)
   GPIO_InitStruct.Pull = GPIO_PULLUP;
   GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_HIGH;
   HAL_GPIO_Init(LED_GPIO_Port, &GPIO_InitStruct);
+
+  /*Configure GPIO pin : W5500_IRQ_Pin */
+  GPIO_InitStruct.Pin = W5500_IRQ_Pin;
+  GPIO_InitStruct.Mode = GPIO_MODE_IT_FALLING;
+  GPIO_InitStruct.Pull = GPIO_PULLUP;
+  HAL_GPIO_Init(W5500_IRQ_GPIO_Port, &GPIO_InitStruct);
 
   /*Configure GPIO pins : SPAKER1_Pin SPAKER3_Pin SPAKER4_Pin SPAKER2_Pin
                            IO_OUT6_Pin IO_OUT5_Pin IO_OUT4_Pin IO_OUT3_Pin
@@ -462,7 +531,10 @@ static void MX_GPIO_Init(void)
   GPIO_InitStruct.Pull = GPIO_PULLUP;
   HAL_GPIO_Init(IO_IN8_GPIO_Port, &GPIO_InitStruct);
 
-}
+  /* EXTI interrupt init*/
+  HAL_NVIC_SetPriority(EXTI15_10_IRQn, 0, 0);
+  HAL_NVIC_EnableIRQ(EXTI15_10_IRQn);
 
+}
 
 

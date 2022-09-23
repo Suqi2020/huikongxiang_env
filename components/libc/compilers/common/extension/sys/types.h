@@ -35,7 +35,7 @@ typedef unsigned long    useconds_t;    /* microseconds (unsigned) */
 
 typedef unsigned long    dev_t;
 
-typedef unsigned int     u_int;
+//typedef unsigned int     u_int;
 typedef unsigned char    u_char;
 typedef unsigned long    u_long;
 

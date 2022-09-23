@@ -649,7 +649,13 @@ void EXTI10_IRQHandler(void)
 void EXTI11_IRQHandler(void)
 {
     rt_interrupt_enter();
-    HAL_GPIO_EXTI_IRQHandler(GPIO_PIN_11);
+   // HAL_GPIO_EXTI_IRQHandler(GPIO_PIN_11);
+	
+	  if(__HAL_GPIO_EXTI_GET_IT(GPIO_PIN_11) != RESET)
+		{
+				__HAL_GPIO_EXTI_CLEAR_IT(GPIO_PIN_11);
+				W5500_Interrupt=1;
+		}
     rt_interrupt_leave();
 }
 

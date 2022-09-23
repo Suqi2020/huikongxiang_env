@@ -17,6 +17,10 @@
 #include "drv_gpio.h"
 #include "test_hardware.h"
 #include "main.h"
+#include "W5500Task.h"
+#include "w5500_conf.h"
+#include "w5500.h"
+#include "socket.h"
 /* Private defines -----------------------------------------------------------*/
 /*
 #define UART2_485_Pin GPIO_PIN_1
@@ -96,7 +100,7 @@
 //增加rt配置IO使用
 #define LED0_PIN    GET_PIN(E, 15)
 */
-
+//#ddfine  rt_kprintf_deb rt_kprintf(const char *fmt, ...)
 
 #ifdef __cplusplus
 extern "C" {

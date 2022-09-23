@@ -13,24 +13,38 @@
 #include <rtdevice.h>
 #include <board.h>
 #include <string.h>
-#define APP_VER     5  //0x0105 表示1.5版本
-//初始化  没有加入版本管理 0V1 20220919
-// 处了串口4外其他的串口收发都可以 0V3 20220920
-// 所有io口输入输出 adc uart收发已经测试  0V4 20220921
-//去掉menuconfig 配置IO驱动   0V5 20220921
-extern void  hardWareDriverTest(void);
+#define APP_VER     6 //0x0105 表示1.5版本
+
+
+static    rt_thread_t tid 	= RT_NULL;
+extern  rt_sem_t  w5500Iqr_semp ;//w5500有数据时候中断来临
+
+
+
+
+extern  void  w5500Task(void *parameter);
+extern  void  hardWareDriverTest(void);
 
 
 int main(void)
 {
 
-    rt_kprintf("\n20220921  ver=%02d.%02d\n",(uint8_t)(APP_VER>>8),(uint8_t)APP_VER);
-	  int i=0;
+    rt_kprintf("\n20220923  ver=%02d.%02d\n",(uint8_t)(APP_VER>>8),(uint8_t)APP_VER);
+	
+	
+	  w5500Iqr_semp = rt_sem_create("w5500Iqr_semp",0, RT_IPC_FLAG_FIFO);
+		if (w5500Iqr_semp == RT_NULL)
+    {
+        rt_kprintf("create w5500Iqr_semp failed\n");
+    }
+    tid =  rt_thread_create("w5500Task",w5500Task,RT_NULL,512,2, 10 );
+		if(tid!=NULL){
+				rt_thread_startup(tid);													 
+				rt_kprintf("RTcreat w5500Task task\r\n");
+		}
+
     while (1)
     {
-			  if(i++%5==0){
-					rt_kprintf("rt_test\n");
-				}
 				hardWareDriverTest();
 				HAL_GPIO_WritePin(LED_GPIO_Port, LED_Pin, GPIO_PIN_SET);
 				rt_thread_mdelay(500);
@@ -39,3 +53,10 @@ int main(void)
 			  
     }
 }
+
+
+
+//void  rt_kprintf(char *str,const char *fmt, ...)
+//{
+//	rt_kprintf(const char *fmt, ...)
+//}

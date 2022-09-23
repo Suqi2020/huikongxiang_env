@@ -292,6 +292,11 @@ static void  relayTest()
 }
 
 #endif
+
+#ifdef   TEST_W5500
+
+
+#endif
 //放在main函数中 while中掉用测试 注意while中的延时会跟本函数叠加
 //IOoutput  
 //adc
@@ -318,6 +323,9 @@ void  hardWareDriverTest(void)
 	
 #ifdef  TEST_SPAKER
    spakerTest();
+#endif
+#ifdef  TEST_W5500
+		w5500Test();
 #endif
 }
 

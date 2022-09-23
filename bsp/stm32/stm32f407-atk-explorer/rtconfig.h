@@ -81,6 +81,7 @@
 #define RT_USING_I2C_BITOPS
 #define RT_USING_PIN
 #define RT_USING_ADC
+#define RT_USING_SPI
 
 /* Using USB */
 
@@ -234,6 +235,8 @@
 #define BSP_USING_UART4
 #define BSP_USING_UART5
 #define BSP_USING_UART6
+#define BSP_USING_SPI
+#define BSP_USING_SPI1
 #define BSP_USING_ADC
 
 /* Board extended module Drivers */
