@@ -784,7 +784,7 @@ void dhcp_timer_init()
 	rt_kprintf("NOTE:add timer later\n");
 	rt_kprintf("***************************************\n");
 }
-void do_dhcp(void)
+int  do_dhcp(void)
 {
 	uint8 dhcpret=0;
 	ip_from=IP_FROM_DHCP;	/*IP配置方法选择为DHCP*/
@@ -809,9 +809,7 @@ void do_dhcp(void)
 		  dhcp_ok=1;                  
 			set_w5500_ip();                                /*将获取到的IP地址写入W5500寄存器*/ 
 			printf(" 已从DHCP服务器成功获得IP地址\r\n");
-      while(1){
-				rt_thread_mdelay(500);
-			}
+      return RT_TRUE;
 	    break;
 		
 		case DHCP_RET_CONFLICT:                          /*IP地址获取冲突*/ 
@@ -824,7 +822,7 @@ void do_dhcp(void)
 		default:
 			break;
 	}
-
+	return RT_FALSE;
 }
 
 

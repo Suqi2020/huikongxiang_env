@@ -166,5 +166,5 @@ typedef struct _RIP_MSG
 void init_dhcp_client(void);
 
 uint8 check_DHCP_state(SOCKET s); // Check the DHCP state
-void do_dhcp(void);
+int do_dhcp(void);
 #endif	/* _DHCP_H_ */

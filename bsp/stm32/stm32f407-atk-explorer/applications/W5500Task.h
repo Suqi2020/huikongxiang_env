@@ -10,10 +10,12 @@
 
 
 
-
-
-
-
+typedef enum
+{
+	 W5500InitEnum=0,
+	 W5500DHCPEnum,
+	 W5500NetOK
+}W5500_enum;
 
 
 

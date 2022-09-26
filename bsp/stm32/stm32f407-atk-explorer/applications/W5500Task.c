@@ -86,75 +86,78 @@ void Load_Net_Parameters(void)
 
 	S0_Mode=TCP_CLIENT;//加载端口0的工作模式,TCP客户端模式
 }
+#if 0
 
 void  w5500Task(void *parameter)
 {
-
-		#if 0
-  reset_w5500();											/*硬复位W5500*/
-	set_w5500_mac();										/*配置MAC地址*/
-	set_w5500_ip();											/*配置IP地址*/
-	
-	socket_buf_init(txsize, rxsize);		/*初始化8个Socket的发送接收缓存大小*/
-	
-  rt_kprintf(" 电脑作为TCP服务器,让W5500作为 TCP客户端去连接 \r\n");
-	rt_kprintf(" 服务器IP:%d.%d.%d.%d\r\n",remote_ip[0],remote_ip[1],remote_ip[2],remote_ip[3]);
-	rt_kprintf(" 监听端口:%d \r\n",remote_port);
-	rt_kprintf(" 连接成功后，服务器发送数据给W5500，W5500将返回对应数据 \r\n");
-	rt_kprintf(" 应用程序执行中……\r\n"); 
-	
-	while(1)                            /*循环执行的函数*/ 
-	{
-		  do_tcp_client();                  /*TCP_Client 数据回环测试程序*/ 
-		  rt_thread_mdelay(500);
-	}
-	#else
-	
-//	ip_from=IP_FROM_DHCP;				///IP_FROM_DHCP
-//	
-//	reset_w5500();											/*硬复位W5500*/
-//	set_w5500_mac();										/*配置MAC地址*/
-//	
-//	socket_buf_init(txsize, rxsize);		/*初始化8个Socket的发送接收缓存大小*/
-
-//	dhcp_timer_init();																 /*初始化DHCP定时器*/
-//	init_dhcp_client();				                       /*初始化DHCP客户端*/ 
-//  rt_kprintf(" 网络已完成初始化……\r\n");
-//  rt_kprintf(" 野火网络适配板作为DHCP客户端，尝试从DHCP服务器获取IP地址 \r\n");
-//	uint32_t test111=0;
-//  while(1) 														/*循环执行的函数*/ 
-//  {
-//    do_dhcp();                        /*DHCP测试程序*/
-//		if(test111++>=10000){
-//			test111=0;
-//			dhcp_time++;
-//			rt_kprintf("test\n");
-//		}
-
-//		//dhcp_time++;
-//  }
-
-
-//////////////////////////////////////////////////////
-ip_from=IP_FROM_DHCP;
+  ip_from=IP_FROM_DHCP;
   reset_w5500();											/*硬复位W5500*/
   set_w5500_mac();										/*配置MAC地址*/
-		set_w5500_ip();											/*配置IP地址*/
+	//set_w5500_ip();											/*配置IP地址*/
   socket_buf_init(txsize, rxsize);		/*初始化8个Socket的发送接收缓存大小*/
 	
   printf(" 网络已完成初始化……\r\n");
   printf(" 野火网络适配板作为DHCP客户端，尝试从DHCP服务器获取IP地址 \r\n");
 	uint32_t test111=0;
+
   while(1) 														/*循环执行的函数*/ 
   {
     do_dhcp();                        /*DHCP测试程序*/
-		if(test111++>=100){
+		if(test111++>=10){
 			test111=0;
 			dhcp_time++;
 			rt_kprintf("test\n");
 		}  
 		rt_thread_mdelay(100);
 	}
+
+}	
+#else
+void  w5500Task(void *parameter)
+{
+
+  #if 0
+
+	#else
+	
+	
+	W5500_enum W5500State=W5500InitEnum;
+  uint8_t dhcpTick=0;
+  while(1) 														/*循环执行的函数*/ 
+  {
+		switch(W5500State)
+		{
+			case W5500InitEnum:
+						ip_from=IP_FROM_DHCP;
+						reset_w5500();											/*硬复位W5500*/
+						set_w5500_mac();										/*配置MAC地址*/
+						socket_buf_init(txsize, rxsize);		/*初始化8个Socket的发送接收缓存大小*/
+			      W5500State=W5500DHCPEnum;
+			      rt_kprintf(" W5500 init……\r\n");
+				break;
+			case W5500DHCPEnum:
+					  if(RT_TRUE == do_dhcp()){                        /*DHCP测试程序*/
+								W5500State=W5500NetOK;
+								printf(" 电脑作为TCP服务器,让W5500作为 TCP客户端去连接 \r\n");
+								printf(" 服务器IP:%d.%d.%d.%d\r\n",remote_ip[0],remote_ip[1],remote_ip[2],remote_ip[3]);
+								printf(" 监听端口:%d \r\n",remote_port);
+								printf(" 连接成功后，服务器发送数据给W5500，W5500将返回对应数据 \r\n");
+							  break;
+						}
+						if(dhcpTick++>=10){
+								dhcpTick=0;
+								dhcp_time++;
+						}  
+						rt_thread_mdelay(100);
+				break;
+			case W5500NetOK:
+						do_tcp_client();
+				break;
+		}
+	}
 	#endif
 
 }	
+#endif
+
+	
