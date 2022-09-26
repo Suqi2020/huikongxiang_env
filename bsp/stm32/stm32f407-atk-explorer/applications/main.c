@@ -13,7 +13,7 @@
 #include <rtdevice.h>
 #include <board.h>
 #include <string.h>
-#define APP_VER     6 //0x0105 表示1.5版本
+#define APP_VER     7//0x0105 表示1.5版本
 
 
 static    rt_thread_t tid 	= RT_NULL;
@@ -29,7 +29,7 @@ extern  void  hardWareDriverTest(void);
 int main(void)
 {
 
-    rt_kprintf("\n20220923  ver=%02d.%02d\n",(uint8_t)(APP_VER>>8),(uint8_t)APP_VER);
+    rt_kprintf("\n20220926  ver=%02d.%02d\n",(uint8_t)(APP_VER>>8),(uint8_t)APP_VER);
 	
 	
 	  w5500Iqr_semp = rt_sem_create("w5500Iqr_semp",0, RT_IPC_FLAG_FIFO);
@@ -37,7 +37,7 @@ int main(void)
     {
         rt_kprintf("create w5500Iqr_semp failed\n");
     }
-    tid =  rt_thread_create("w5500Task",w5500Task,RT_NULL,512,2, 10 );
+    tid =  rt_thread_create("w5500Task",w5500Task,RT_NULL,1024,2, 10 );
 		if(tid!=NULL){
 				rt_thread_startup(tid);													 
 				rt_kprintf("RTcreat w5500Task task\r\n");
@@ -60,3 +60,5 @@ int main(void)
 //{
 //	rt_kprintf(const char *fmt, ...)
 //}
+
+

@@ -1,7 +1,7 @@
 #include "W5500Task.h"
 #include "board.h"
 
-//w5500联网状态的维护
+//w5500联网状态的维护 
 
 
 rt_sem_t  w5500Iqr_semp = RT_NULL;//w5500有数据时候中断来临
@@ -86,113 +86,11 @@ void Load_Net_Parameters(void)
 
 	S0_Mode=TCP_CLIENT;//加载端口0的工作模式,TCP客户端模式
 }
-/*******************************************************************************
-* 函数名  : W5500_Socket_Set
-* 描述    : W5500端口初始化配置
-* 输入    : 无
-* 输出    : 无
-* 返回值  : 无
-* 说明    : 分别设置4个端口,根据端口工作模式,将端口置于TCP服务器、TCP客户端或UDP模式.
-*			从端口状态字节Socket_State可以判断端口的工作情况
-*******************************************************************************/
-void W5500_Socket_Set(void)
-{
-	if(S0_State==0)//端口0初始化配置
-	{
-		if(S0_Mode==TCP_SERVER)//TCP服务器模式 
-		{
-			if(Socket_Listen(0)==RT_TRUE)
-				S0_State=S_INIT;
-			else
-				S0_State=0;
-		}
-		else if(S0_Mode==TCP_CLIENT)//TCP客户端模式 
-		{
-			if(Socket_Connect(0)==RT_TRUE)
-				S0_State=S_INIT;
-			else
-				S0_State=0;
-		}
-		else//UDP模式 
-		{
-			if(Socket_UDP(0)==RT_TRUE)
-				S0_State=S_INIT|S_CONN;
-			else
-				S0_State=0;
-		}
-	}
-}
 
-/*******************************************************************************
-* 函数名  : Process_Socket_Data
-* 描述    : W5500接收并发送接收到的数据
-* 输入    : s:端口号
-* 输出    : 无
-* 返回值  : 无
-* 说明    : 本过程先调用S_rx_process()从W5500的端口接收数据缓冲区读取数据,
-*			然后将读取的数据从Rx_Buffer拷贝到Temp_Buffer缓冲区进行处理。
-*			处理完毕，将数据从Temp_Buffer拷贝到Tx_Buffer缓冲区。调用S_tx_process()
-*			发送数据。
-*******************************************************************************/
-void Process_Socket_Data(uint8_t s)
-{
-	unsigned short size;
-	size=Read_SOCK_Data_Buffer(s, Rx_Buffer);
-	memcpy(Tx_Buffer, Rx_Buffer, size);			
-	Write_SOCK_Data_Buffer(s, Tx_Buffer, size);
-}
-
-
-
-/*******************************************************************************
-* 函数名  : W5500_Initialization
-* 描述    : W5500初始货配置
-* 输入    : 无
-* 输出    : 无
-* 返回值  : 无
-* 说明    : 无
-*******************************************************************************/
-void W5500_Initialization(void)
-{
-	W5500_Init();		//初始化W5500寄存器函数
-	Detect_Gateway();	//检查网关服务器 
-	Socket_Init(0);		//指定Socket(0~7)初始化,初始化端口0
-}
 void  w5500Task(void *parameter)
 {
-	
-	#if 0
-	  static rt_err_t ret;
-		Load_Net_Parameters();		//装载网络参数	
-		W5500_Hardware_Reset();		//硬件复位W5500
-		W5500_Initialization();		//W5500初始货配置
-	  W5500_Socket_Set();//W5500端口初始化配置
-	  rt_kprintf("w5500 init ok\n");
-		while(1)
-		{
-			
-			  ret=rt_sem_take(w5500Iqr_semp, RT_WAITING_FOREVER);
-			  if(ret==RT_EOK){
-					 W5500_Interrupt_Process();//W5500中断处理程序框架
-				}
-				if((S0_Data & S_RECEIVE) == S_RECEIVE)//如果Socket0接收到数据
-				{
-					S0_Data&=~S_RECEIVE;
-					Process_Socket_Data(0);//W5500接收并发送接收到的数据
-				}
-	
-				
-				rt_thread_delay(1000);
-				memcpy(Tx_Buffer, "\r\nWelcome To ChuangWeiElec!\r\n", 27);
-				Write_SOCK_Data_Buffer(0, Tx_Buffer, 27);
 
-			  rt_kprintf("w5500Task  send\n");
-		}
-		
-		#else
-		
-		
-
+		#if 0
   reset_w5500();											/*硬复位W5500*/
 	set_w5500_mac();										/*配置MAC地址*/
 	set_w5500_ip();											/*配置IP地址*/
@@ -207,9 +105,56 @@ void  w5500Task(void *parameter)
 	
 	while(1)                            /*循环执行的函数*/ 
 	{
-		do_tcp_client();                  /*TCP_Client 数据回环测试程序*/ 
-     rt_thread_delay(1000);		
+		  do_tcp_client();                  /*TCP_Client 数据回环测试程序*/ 
+		  rt_thread_mdelay(500);
 	}
-		
-		#endif
+	#else
+	
+//	ip_from=IP_FROM_DHCP;				///IP_FROM_DHCP
+//	
+//	reset_w5500();											/*硬复位W5500*/
+//	set_w5500_mac();										/*配置MAC地址*/
+//	
+//	socket_buf_init(txsize, rxsize);		/*初始化8个Socket的发送接收缓存大小*/
+
+//	dhcp_timer_init();																 /*初始化DHCP定时器*/
+//	init_dhcp_client();				                       /*初始化DHCP客户端*/ 
+//  rt_kprintf(" 网络已完成初始化……\r\n");
+//  rt_kprintf(" 野火网络适配板作为DHCP客户端，尝试从DHCP服务器获取IP地址 \r\n");
+//	uint32_t test111=0;
+//  while(1) 														/*循环执行的函数*/ 
+//  {
+//    do_dhcp();                        /*DHCP测试程序*/
+//		if(test111++>=10000){
+//			test111=0;
+//			dhcp_time++;
+//			rt_kprintf("test\n");
+//		}
+
+//		//dhcp_time++;
+//  }
+
+
+//////////////////////////////////////////////////////
+ip_from=IP_FROM_DHCP;
+  reset_w5500();											/*硬复位W5500*/
+  set_w5500_mac();										/*配置MAC地址*/
+		set_w5500_ip();											/*配置IP地址*/
+  socket_buf_init(txsize, rxsize);		/*初始化8个Socket的发送接收缓存大小*/
+	
+  printf(" 网络已完成初始化……\r\n");
+  printf(" 野火网络适配板作为DHCP客户端，尝试从DHCP服务器获取IP地址 \r\n");
+	uint32_t test111=0;
+  while(1) 														/*循环执行的函数*/ 
+  {
+    do_dhcp();                        /*DHCP测试程序*/
+		if(test111++>=100){
+			test111=0;
+			dhcp_time++;
+			rt_kprintf("test\n");
+		}  
+		rt_thread_mdelay(100);
+	}
+	#endif
+
 }	

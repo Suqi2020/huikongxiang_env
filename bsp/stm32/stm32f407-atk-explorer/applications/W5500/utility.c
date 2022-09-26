@@ -16,8 +16,6 @@
 #include <stdarg.h>
 
 
-static uint8_t  fac_us=0;																										/*us延时倍乘数*/
-static uint16_t fac_ms=0;																										/*ms延时倍乘数*/
 
 						    
 

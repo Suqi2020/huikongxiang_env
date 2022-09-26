@@ -37,7 +37,7 @@ uint8  remote_ip[4]={192,168,1,109};											/*远端IP地址*/
 uint16 remote_port=5000;																/*远端端口号*/
 
 /*IP配置方法选择，请自行选择*/
-uint8	ip_from=IP_FROM_DEFINE;				
+uint8	ip_from=IP_FROM_DHCP;				///IP_FROM_DHCP
 
 uint8   dhcp_ok   = 0;													   			/*dhcp成功获取IP*/
 uint32	ms        = 0;															  	/*毫秒计数*/

@@ -46,7 +46,7 @@ static void MX_SPI1_Init(void);
   * @brief  The application entry point.
   * @retval int
   */
-int cubeHardWareInit(void)
+void cubeHardWareInit(void)
 {
   
 

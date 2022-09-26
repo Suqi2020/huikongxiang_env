@@ -17,8 +17,8 @@
 #include "dhcp.h"
 #include "utility.h"
 #include "w5500_conf.h"
-
-//#define DHCP_DEBUG
+#include "rtthread.h"
+#define DHCP_DEBUG
 
 DHCP_Get DHCP_GET;
 
@@ -42,8 +42,9 @@ uint8		DHCP_timer;
 
 uint8 Conflict_flag = 0;
 uint32  DHCP_XID        = DEFAULT_XID;				
-uint8 EXTERN_DHCPBUF[1024];
-RIP_MSG*  pRIPMSG = (RIP_MSG*)EXTERN_DHCPBUF;			/*DHCP消息指针*/
+//RIP_MSG DHCPBUF[1024];
+uint8  DHCPBUF[1024]  __attribute__ ((aligned (4))) ;
+RIP_MSG*  pRIPMSG = (RIP_MSG*)DHCPBUF;			/*DHCP消息指针*/
 
 
 void  send_DHCP_DISCOVER(void);										/*向DHCP服务器发送发现报文*/
@@ -144,14 +145,17 @@ void send_DHCP_DISCOVER(void)
 	pRIPMSG->OPT[i++] = dhcpT2value;
 	pRIPMSG->OPT[i++] = endOption;
 	
+		rt_kprintf("send discover\r\n ");
 	/* send broadcasting packet */
-	//printf("send dhcp discover %s\r\n",EXTERN_DHCPBUF);
+	for(int j=0;j<i;j++)
+	rt_kprintf("%x ",DHCPBUF[j]);
+		rt_kprintf("\r\n");
 	//for(uint8 i=0; i<3; i++)
 	//Delay_ms(800);
 	sendto(SOCK_DHCP, (uint8 *)pRIPMSG, sizeof(RIP_MSG), ip, DHCP_SERVER_PORT);	
 	
 	#ifdef DHCP_DEBUG	
-	printf("sent DHCP_DISCOVER\r\n");
+	rt_kprintf("sent DHCP_DISCOVER\r\n");
 	#endif	
 }
 
@@ -251,7 +255,7 @@ void send_DHCP_REQUEST(void)
 		memcpy(ip,DHCP_SIP,4);
 		sendto(SOCK_DHCP, (const uint8 *)pRIPMSG, sizeof(RIP_MSG), ip, DHCP_SERVER_PORT);
 	#ifdef DHCP_DEBUG
-		printf("sent DHCP_REQUEST\r\n");
+		rt_kprintf("sent DHCP_REQUEST\r\n");
 	#endif
 }
 
@@ -320,7 +324,7 @@ void send_DHCP_RELEASE_DECLINE(char msgtype)
 	#ifdef DHCP_DEBUG	
 	else
 	{
-	printf("sent DHCP_RELEASE\r\n");
+	rt_kprintf("sent DHCP_RELEASE\r\n");
 	}
 	#endif	
 	
@@ -330,7 +334,7 @@ void send_DHCP_RELEASE_DECLINE(char msgtype)
 	if(msgtype) memset(ip,0xFF,4);
 	else 
 	memcpy(ip,DHCP_SIP,4);
-	//printf("send dhcp decline\r\n");
+	rt_kprintf("send dhcp decline\r\n");
 	sendto(SOCK_DHCP, (uint8 *)pRIPMSG, sizeof(RIP_MSG), ip, DHCP_SERVER_PORT);
 }
 
@@ -352,28 +356,28 @@ uint8 parseDHCPMSG(uint16 length)
 	len = recvfrom(SOCK_DHCP, (uint8 *)pRIPMSG, length, svr_addr, &svr_port);
 	
 	#ifdef DHCP_DEBUG
-		printf("DHCP_SIP:%u.%u.%u.%u\r\n",DHCP_SIP[0],DHCP_SIP[1],DHCP_SIP[2],DHCP_SIP[3]);
-		printf("DHCP_RIP:%u.%u.%u.%u\r\n",DHCP_REAL_SIP[0],DHCP_REAL_SIP[1],DHCP_REAL_SIP[2],DHCP_REAL_SIP[3]);
-		printf("svr_addr:%u.%u.%u.%u\r\n",svr_addr[0],svr_addr[1],svr_addr[2],svr_addr[3]);
+		rt_kprintf("DHCP_SIP:%u.%u.%u.%u\r\n",DHCP_SIP[0],DHCP_SIP[1],DHCP_SIP[2],DHCP_SIP[3]);
+		rt_kprintf("DHCP_RIP:%u.%u.%u.%u\r\n",DHCP_REAL_SIP[0],DHCP_REAL_SIP[1],DHCP_REAL_SIP[2],DHCP_REAL_SIP[3]);
+		rt_kprintf("svr_addr:%u.%u.%u.%u\r\n",svr_addr[0],svr_addr[1],svr_addr[2],svr_addr[3]);
 	#endif	
 	
 	if(pRIPMSG->op != DHCP_BOOTREPLY || svr_port != DHCP_SERVER_PORT)
 	{
 		#ifdef DHCP_DEBUG	   
-		printf("DHCP : NO DHCP MSG\r\n");
+		rt_kprintf("DHCP : NO DHCP MSG\r\n");
 		#endif		
 		return 0;
 	}
 	if(memcmp(pRIPMSG->chaddr,SRC_MAC_ADDR,6) != 0 || pRIPMSG->xid != htonl(DHCP_XID))
 	{
 		#ifdef DHCP_DEBUG
-		printf("No My DHCP Message. This message is ignored.\r\n");
-		printf("\tSRC_MAC_ADDR(%02X.%02X.%02X.",SRC_MAC_ADDR[0],SRC_MAC_ADDR[1],SRC_MAC_ADDR[2]);
-		printf("%02X.%02X.%02X)",SRC_MAC_ADDR[3],SRC_MAC_ADDR[4],SRC_MAC_ADDR[5]);
-		printf(", pRIPMSG->chaddr(%02X.%02X.%02X.",(char)pRIPMSG->chaddr[0],(char)pRIPMSG->chaddr[1],(char)pRIPMSG->chaddr[2]);
-		printf("%02X.%02X.%02X)",pRIPMSG->chaddr[3],pRIPMSG->chaddr[4],pRIPMSG->chaddr[5]);
-		printf("\tpRIPMSG->xid(%08X), DHCP_XID(%08X)",pRIPMSG->xid,(DHCP_XID));
-		printf("\tpRIMPMSG->yiaddr:%d.%d.%d.%d\r\n",pRIPMSG->yiaddr[0],pRIPMSG->yiaddr[1],pRIPMSG->yiaddr[2],pRIPMSG->yiaddr[3]);
+		rt_kprintf("No My DHCP Message. This message is ignored.\r\n");
+		rt_kprintf("\tSRC_MAC_ADDR(%02X.%02X.%02X.",SRC_MAC_ADDR[0],SRC_MAC_ADDR[1],SRC_MAC_ADDR[2]);
+		rt_kprintf("%02X.%02X.%02X)",SRC_MAC_ADDR[3],SRC_MAC_ADDR[4],SRC_MAC_ADDR[5]);
+		rt_kprintf(", pRIPMSG->chaddr(%02X.%02X.%02X.",(char)pRIPMSG->chaddr[0],(char)pRIPMSG->chaddr[1],(char)pRIPMSG->chaddr[2]);
+		rt_kprintf("%02X.%02X.%02X)",pRIPMSG->chaddr[3],pRIPMSG->chaddr[4],pRIPMSG->chaddr[5]);
+		rt_kprintf("\tpRIPMSG->xid(%08X), DHCP_XID(%08X)",pRIPMSG->xid,(DHCP_XID));
+		rt_kprintf("\tpRIMPMSG->yiaddr:%d.%d.%d.%d\r\n",pRIPMSG->yiaddr[0],pRIPMSG->yiaddr[1],pRIPMSG->yiaddr[2],pRIPMSG->yiaddr[3]);
 		#endif				
 		return 0;
 	}
@@ -384,8 +388,8 @@ uint8 parseDHCPMSG(uint16 length)
 		*((uint32*)DHCP_SIP) != *((uint32*)svr_addr) ) 
 		{
 			#ifdef DHCP_DEBUG		
-			printf("Another DHCP sever send a response message. This is ignored.\r\n");
-			printf("\tIP:%u.%u.%u.%u\r\n",svr_addr[0],svr_addr[1],svr_addr[2],svr_addr[3]);
+			rt_kprintf("Another DHCP sever send a response message. This is ignored.\r\n");
+			rt_kprintf("\tIP:%u.%u.%u.%u\r\n",svr_addr[0],svr_addr[1],svr_addr[2],svr_addr[3]);
 			#endif				
 			return 0;								
 		}
@@ -393,15 +397,15 @@ uint8 parseDHCPMSG(uint16 length)
 	memcpy(GET_SIP,pRIPMSG->yiaddr,4);
 	
 	#ifdef DHCP_DEBUG	
-		printf("DHCP MSG received\r\n");
-		printf("yiaddr : %u.%u.%u.%u\r\n",GET_SIP[0],GET_SIP[1],GET_SIP[2],GET_SIP[3]);
+		rt_kprintf("DHCP MSG received\r\n");
+		rt_kprintf("yiaddr : %u.%u.%u.%u\r\n",GET_SIP[0],GET_SIP[1],GET_SIP[2],GET_SIP[3]);
 	#endif	
 	type = 0;
 	p = (uint8 *)(&pRIPMSG->op);
 	p = p + 240;
 	e = p + (len - 240);
 	#ifdef DHCP_DEBUG
-		printf("p : %08X  e : %08X  len : %d\r\n", (uint32)p, (uint32)e, len);
+		rt_kprintf("p : %08X  e : %08X  len : %d\r\n", (uint32)p, (uint32)e, len);
 	#endif
 	while ( p < e ) 
 	{
@@ -417,7 +421,7 @@ uint8 parseDHCPMSG(uint16 length)
 				opt_len = *p++;
 				type = *p;
 				#ifdef DHCP_DEBUG			
-					printf("dhcpMessageType : %02X\r\n", type);
+					rt_kprintf("dhcpMessageType : %02X\r\n", type);
 				#endif			
 				break;
 			
@@ -425,8 +429,8 @@ uint8 parseDHCPMSG(uint16 length)
 				opt_len =* p++;
 				memcpy(GET_SN_MASK,p,4);
 				#ifdef DHCP_DEBUG
-					printf("subnetMask : ");
-					printf("%u.%u.%u.%u\r\n",GET_SN_MASK[0],GET_SN_MASK[1],GET_SN_MASK[2],GET_SN_MASK[3]);
+					rt_kprintf("subnetMask : ");
+					rt_kprintf("%u.%u.%u.%u\r\n",GET_SN_MASK[0],GET_SN_MASK[1],GET_SN_MASK[2],GET_SN_MASK[3]);
 				#endif			
 				break;
 			
@@ -434,8 +438,8 @@ uint8 parseDHCPMSG(uint16 length)
 				opt_len = *p++;
 				memcpy(GET_GW_IP,p,4);
 				#ifdef DHCP_DEBUG
-					printf("routersOnSubnet : ");
-					printf("%u.%u.%u.%u\r\n",GET_GW_IP[0],GET_GW_IP[1],GET_GW_IP[2],GET_GW_IP[3]);
+					rt_kprintf("routersOnSubnet : ");
+					rt_kprintf("%u.%u.%u.%u\r\n",GET_GW_IP[0],GET_GW_IP[1],GET_GW_IP[2],GET_GW_IP[3]);
 				#endif			
 				break;
 			
@@ -448,14 +452,14 @@ uint8 parseDHCPMSG(uint16 length)
 				opt_len = *p++;
 				dhcp_lease_time = ntohl(*((uint32*)p));
 				#ifdef DHCP_DEBUG			
-					printf("dhcpIPaddrLeaseTime : %d\r\n", dhcp_lease_time);
+					rt_kprintf("dhcpIPaddrLeaseTime : %d\r\n", dhcp_lease_time);
 				#endif			
 				break;
 			
 			case dhcpServerIdentifier :
 				opt_len = *p++;
 				#ifdef DHCP_DEBUG						
-					printf("DHCP_SIP : %u.%u.%u.%u\r\n", DHCP_SIP[0], DHCP_SIP[1], DHCP_SIP[2], DHCP_SIP[3]);
+					rt_kprintf("DHCP_SIP : %u.%u.%u.%u\r\n", DHCP_SIP[0], DHCP_SIP[1], DHCP_SIP[2], DHCP_SIP[3]);
 				#endif			
 				if( *((uint32*)DHCP_SIP) == 0 || 
 				*((uint32*)DHCP_REAL_SIP) == *((uint32*)svr_addr) || 
@@ -464,18 +468,18 @@ uint8 parseDHCPMSG(uint16 length)
 					memcpy(DHCP_SIP,p,4);
 					memcpy(DHCP_REAL_SIP,svr_addr,4);	// Copy the real ip address of my DHCP server
 					#ifdef DHCP_DEBUG						
-						printf("My dhcpServerIdentifier : ");
-						printf("%u.%u.%u.%u\r\n", DHCP_SIP[0], DHCP_SIP[1], DHCP_SIP[2], DHCP_SIP[3]);
-						printf("My DHCP server real IP address : ");
-						printf("%u.%u.%u.%u\r\n", DHCP_REAL_SIP[0], DHCP_REAL_SIP[1], DHCP_REAL_SIP[2], DHCP_REAL_SIP[3]);
+						rt_kprintf("My dhcpServerIdentifier : ");
+						rt_kprintf("%u.%u.%u.%u\r\n", DHCP_SIP[0], DHCP_SIP[1], DHCP_SIP[2], DHCP_SIP[3]);
+						rt_kprintf("My DHCP server real IP address : ");
+						rt_kprintf("%u.%u.%u.%u\r\n", DHCP_REAL_SIP[0], DHCP_REAL_SIP[1], DHCP_REAL_SIP[2], DHCP_REAL_SIP[3]);
 					#endif						
 				}
 				else
 				{
 				#ifdef DHCP_DEBUG			   
-					printf("Another dhcpServerIdentifier : \r\n");
-					printf("\tMY(%u.%u.%u.%u) ", DHCP_SIP[0], DHCP_SIP[1], DHCP_SIP[2], DHCP_SIP[3]);
-					printf("Another(%u.%u.%u.%u)\r\n", svr_addr[0], svr_addr[1], svr_addr[2], svr_addr[3]);
+					rt_kprintf("Another dhcpServerIdentifier : \r\n");
+					rt_kprintf("\tMY(%u.%u.%u.%u) ", DHCP_SIP[0], DHCP_SIP[1], DHCP_SIP[2], DHCP_SIP[3]);
+					rt_kprintf("Another(%u.%u.%u.%u)\r\n", svr_addr[0], svr_addr[1], svr_addr[2], svr_addr[3]);
 				#endif				
 				}
 				break;
@@ -483,7 +487,7 @@ uint8 parseDHCPMSG(uint16 length)
 			default :
 				opt_len = *p++;
 				#ifdef DHCP_DEBUG			
-					printf("opt_len : %u\r\n", opt_len);
+					rt_kprintf("opt_len : %u\r\n", opt_len);
 				#endif			
 				break;
 		} // switch
@@ -520,13 +524,13 @@ uint8 check_DHCP_state(SOCKET s)
 		{
 		//init_dhcp_client();
 			#ifdef DHCP_DEBUG			
-				printf("state : STATE_DHCP_READY\r\n");
+				rt_kprintf("state : STATE_DHCP_READY\r\n");
 			#endif	   	
 		}	
 		if(!socket(SOCK_DHCP,Sn_MR_UDP,DHCP_CLIENT_PORT,0x00))/*初始化socket和端口*/
 		{
 			#ifdef DHCP_DEBUG	   
-				printf("Fail to create the DHCPC_SOCK(%u)\r\n",SOCK_DHCP);
+				rt_kprintf("Fail to create the DHCPC_SOCK(%u)\r\n",SOCK_DHCP);
 			#endif   
 			return DHCP_RET_ERR;														/*socket初始化错误*/
 		}
@@ -549,7 +553,7 @@ uint8 check_DHCP_state(SOCKET s)
 				send_DHCP_REQUEST();													/*发送REQUEST包*/
 				dhcp_state = STATE_DHCP_REQUEST;
 				#ifdef DHCP_DEBUG			
-					printf("state : STATE_DHCP_REQUEST\r\n");
+					rt_kprintf("state : STATE_DHCP_REQUEST\r\n");
 				#endif			
 			}
 			else 
@@ -563,7 +567,7 @@ uint8 check_DHCP_state(SOCKET s)
 				if (check_leasedIP()) 
 				{
 					#ifdef DHCP_DEBUG					
-						printf("state : STATE_DHCP_LEASED\r\n");
+						rt_kprintf("state : STATE_DHCP_LEASED\r\n");
 					#endif		
 					dhcp_state = STATE_DHCP_LEASED;
 					return DHCP_RET_UPDATE;
@@ -571,7 +575,7 @@ uint8 check_DHCP_state(SOCKET s)
 				else 
 				{
 					#ifdef DHCP_DEBUG					
-						printf("state : STATE_DHCP_DISCOVER\r\n");
+						rt_kprintf("state : STATE_DHCP_DISCOVER\r\n");
 					#endif				
 					dhcp_state = STATE_DHCP_DISCOVER;
 					return DHCP_RET_CONFLICT;
@@ -582,7 +586,7 @@ uint8 check_DHCP_state(SOCKET s)
 				reset_DHCP_time();														/*复位超时时间*/
 				dhcp_state = STATE_DHCP_DISCOVER;
 				#ifdef DHCP_DEBUG				
-					printf("state : STATE_DHCP_DISCOVER\r\n");
+					rt_kprintf("state : STATE_DHCP_DISCOVER\r\n");
 				#endif			
 			}
 			else 
@@ -598,7 +602,7 @@ uint8 check_DHCP_state(SOCKET s)
 				send_DHCP_REQUEST();
 				dhcp_state = STATE_DHCP_REREQUEST;
 				#ifdef DHCP_DEBUG
-					printf("state : STATE_DHCP_REREQUEST\r\n");
+					rt_kprintf("state : STATE_DHCP_REREQUEST\r\n");
 				#endif
 				reset_DHCP_time();
 			}
@@ -609,16 +613,16 @@ uint8 check_DHCP_state(SOCKET s)
 				if(memcmp(OLD_SIP,GET_SIP,4)!=0)	
 				{
 					#ifdef DHCP_DEBUG
-						printf("The IP address from the DHCP server is updated.\r\n");
-						printf("OLD_SIP=%u.%u.%u.%u",OLD_SIP[0],OLD_SIP[1],OLD_SIP[2],OLD_SIP[3]);
-						printf("GET_SIP=%u.%u.%u.%u\r\n",GET_SIP[0],GET_SIP[1],GET_SIP[2],GET_SIP[3]);
+						rt_kprintf("The IP address from the DHCP server is updated.\r\n");
+						rt_kprintf("OLD_SIP=%u.%u.%u.%u",OLD_SIP[0],OLD_SIP[1],OLD_SIP[2],OLD_SIP[3]);
+						rt_kprintf("GET_SIP=%u.%u.%u.%u\r\n",GET_SIP[0],GET_SIP[1],GET_SIP[2],GET_SIP[3]);
 					#endif
 					return DHCP_RET_UPDATE;
 				}
 				#ifdef DHCP_DEBUG
 				else
 				{
-					printf("state : STATE_DHCP_LEASED : same IP\r\n");
+					rt_kprintf("state : STATE_DHCP_LEASED : same IP\r\n");
 				}
 				#endif
 				reset_DHCP_time();
@@ -629,7 +633,7 @@ uint8 check_DHCP_state(SOCKET s)
 				reset_DHCP_time();
 				dhcp_state = STATE_DHCP_DISCOVER;
 				#ifdef DHCP_DEBUG
-					printf("state : STATE_DHCP_DISCOVER\r\n");
+					rt_kprintf("state : STATE_DHCP_DISCOVER\r\n");
 				#endif
 			} 
 			else 
@@ -667,21 +671,21 @@ void check_DHCP_Timeout(void)
 			{
 				case STATE_DHCP_DISCOVER :
 					#ifdef DHCP_DEBUG			   
-						printf("<<timeout>> state : STATE_DHCP_DISCOVER\r\n");
+						rt_kprintf("<<timeout>> state : STATE_DHCP_DISCOVER\r\n");
 					#endif				
 					send_DHCP_DISCOVER();
 					break;
 				
 				case STATE_DHCP_REQUEST :
 					#ifdef DHCP_DEBUG			   
-						printf("<<timeout>> state : STATE_DHCP_REQUEST\r\n");
+						rt_kprintf("<<timeout>> state : STATE_DHCP_REQUEST\r\n");
 					#endif				
 					send_DHCP_REQUEST();
 					break;		
 				
 				case STATE_DHCP_REREQUEST :
 					#ifdef DHCP_DEBUG			   
-						printf("<<timeout>> state : STATE_DHCP_REREQUEST\r\n");
+						rt_kprintf("<<timeout>> state : STATE_DHCP_REREQUEST\r\n");
 					#endif				
 					send_DHCP_REQUEST();
 					break;
@@ -699,7 +703,7 @@ void check_DHCP_Timeout(void)
 		send_DHCP_DISCOVER();
 		dhcp_state = STATE_DHCP_DISCOVER;
 		#ifdef DHCP_DEBUG		
-			printf("timeout : state : STATE_DHCP_DISCOVER\r\n");
+			rt_kprintf("timeout : state : STATE_DHCP_DISCOVER\r\n");
 		#endif		
 	}
 }
@@ -712,20 +716,20 @@ void check_DHCP_Timeout(void)
  uint8 check_leasedIP(void)
 {
 	#ifdef DHCP_DEBUG
-		printf("<Check the IP Conflict %d.%d.%d.%d: ",GET_SIP[0],GET_SIP[1],GET_SIP[2],GET_SIP[3]);
+		rt_kprintf("<Check the IP Conflict %d.%d.%d.%d: ",GET_SIP[0],GET_SIP[1],GET_SIP[2],GET_SIP[3]);
 	#endif
 	// sendto is complete. that means there is a node which has a same IP.
 
 	if ( sendto(SOCK_DHCP, (const uint8*)"CHECK_IP_CONFLICT", 17, GET_SIP, 5000))
 	{
 		#ifdef DHCP_DEBUG
-			printf(" Conflict>\r\n");
+			rt_kprintf(" Conflict>\r\n");
 		#endif
 		send_DHCP_RELEASE_DECLINE(1);
 		return 0;
 	}
 	#ifdef DHCP_DEBUG
-		printf(" No Conflict>\r\n");
+		rt_kprintf(" No Conflict>\r\n");
 	#endif
 	return 1;
 }
@@ -762,11 +766,11 @@ void init_dhcp_client(void)
 	setSUBR(ip_0);
 	setGAR(ip_0);
 	setSIPR(ip_0);
-	printf("mac=%02x:%02x:%02x:%02x:%02x:%02x\r\n",SRC_MAC_ADDR[0],SRC_MAC_ADDR[1],SRC_MAC_ADDR[2],SRC_MAC_ADDR[3],SRC_MAC_ADDR[4],SRC_MAC_ADDR[5]);  
+	rt_kprintf("mac=%02x:%02x:%02x:%02x:%02x:%02x\r\n",SRC_MAC_ADDR[0],SRC_MAC_ADDR[1],SRC_MAC_ADDR[2],SRC_MAC_ADDR[3],SRC_MAC_ADDR[4],SRC_MAC_ADDR[5]);  
 	
 	dhcp_state = STATE_DHCP_READY;
 	#ifdef DHCP_DEBUG
-		printf("init_dhcp_client:%u\r\n",SOCK_DHCP);
+		rt_kprintf("init_dhcp_client:%u\r\n",SOCK_DHCP);
 	#endif   
 }
 /**	
@@ -782,10 +786,9 @@ void dhcp_timer_init()
 }
 void do_dhcp(void)
 {
-
 	uint8 dhcpret=0;
 	ip_from=IP_FROM_DHCP;	/*IP配置方法选择为DHCP*/
-	dhcp_timer_init();																 /*初始化DHCP定时器*/
+	//dhcp_timer_init();																 /*初始化DHCP定时器*/
 	if(Conflict_flag == 1)
 	{
 		init_dhcp_client();				                       /*初始化DHCP客户端*/ 
@@ -796,7 +799,7 @@ void do_dhcp(void)
 	
 	switch(dhcpret)
 	{
-		case DHCP_RET_NONE:                              /*IP地址获取不成功*/ 
+		case DHCP_RET_NONE:                              /*IP地址获取不成功*/       
 			break;
 		
 		case DHCP_RET_TIMEOUT:                           /*IP地址获取超时*/ 
@@ -806,7 +809,9 @@ void do_dhcp(void)
 		  dhcp_ok=1;                  
 			set_w5500_ip();                                /*将获取到的IP地址写入W5500寄存器*/ 
 			printf(" 已从DHCP服务器成功获得IP地址\r\n");
-
+      while(1){
+				rt_thread_mdelay(500);
+			}
 	    break;
 		
 		case DHCP_RET_CONFLICT:                          /*IP地址获取冲突*/ 

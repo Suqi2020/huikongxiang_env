@@ -15,6 +15,7 @@
 #include "W5500_conf.h"
 #include "w5500.h"
 #include "socket.h"
+#include "board.h"
 
 uint8 buff[2048];				                              	         /*定义一个2KB的缓存*/
 

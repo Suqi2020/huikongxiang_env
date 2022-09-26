@@ -17,10 +17,13 @@
 #include "drv_gpio.h"
 #include "test_hardware.h"
 #include "main.h"
+//#include "W5500p.h"	
 #include "W5500Task.h"
 #include "w5500_conf.h"
 #include "w5500.h"
 #include "socket.h"
+#include "tcp_demo.h"
+#include "dhcp.h"
 /* Private defines -----------------------------------------------------------*/
 /*
 #define UART2_485_Pin GPIO_PIN_1
