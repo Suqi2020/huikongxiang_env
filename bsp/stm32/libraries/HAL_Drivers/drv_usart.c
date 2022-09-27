@@ -625,7 +625,7 @@ void USART1_IRQHandler(void)
     rt_interrupt_enter();
 
 	
-		uint8_t	Res =USART1->DR;//(USART1->DR);	//读取接收到的数据
+		//uint8_t	Res =USART1->DR;//(USART1->DR);	//读取接收到的数据
     uart_isr(&(uart_obj[UART1_INDEX].serial));
 
     /* leave interrupt */
