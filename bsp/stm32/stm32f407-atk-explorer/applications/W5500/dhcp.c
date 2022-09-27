@@ -18,7 +18,7 @@
 #include "utility.h"
 #include "w5500_conf.h"
 #include "rtthread.h"
-#define DHCP_DEBUG
+//#define DHCP_DEBUG
 
 DHCP_Get DHCP_GET;
 
@@ -145,11 +145,11 @@ void send_DHCP_DISCOVER(void)
 	pRIPMSG->OPT[i++] = dhcpT2value;
 	pRIPMSG->OPT[i++] = endOption;
 	
-		rt_kprintf("send discover\r\n ");
-	/* send broadcasting packet */
-	for(int j=0;j<i;j++)
-	rt_kprintf("%x ",DHCPBUF[j]);
-		rt_kprintf("\r\n");
+//		rt_kprintf("send discover\r\n ");
+//	/* send broadcasting packet */
+//	for(int j=0;j<i;j++)
+//	rt_kprintf("%x ",DHCPBUF[j]);
+//		rt_kprintf("\r\n");
 	//for(uint8 i=0; i<3; i++)
 	//Delay_ms(800);
 	sendto(SOCK_DHCP, (uint8 *)pRIPMSG, sizeof(RIP_MSG), ip, DHCP_SERVER_PORT);	
@@ -778,12 +778,7 @@ void init_dhcp_client(void)
 *@param		无
 *@return	无
 */
-void dhcp_timer_init()
-{
-	rt_kprintf("***************************************\n");
-	rt_kprintf("NOTE:add timer later\n");
-	rt_kprintf("***************************************\n");
-}
+
 int  do_dhcp(void)
 {
 	uint8 dhcpret=0;
@@ -808,14 +803,14 @@ int  do_dhcp(void)
 		case DHCP_RET_UPDATE:														 /*成功获取到IP地址*/ 
 		  dhcp_ok=1;                  
 			set_w5500_ip();                                /*将获取到的IP地址写入W5500寄存器*/ 
-			printf(" 已从DHCP服务器成功获得IP地址\r\n");
+			rt_kprintf(" 已从DHCP服务器成功获得IP地址\r\n");
       return RT_TRUE;
 	    break;
 		
 		case DHCP_RET_CONFLICT:                          /*IP地址获取冲突*/ 
-			printf(" 从DHCP获取IP地址失败\r\n");
+			rt_kprintf(" 从DHCP获取IP地址失败\r\n");
       dhcp_state = STATE_DHCP_READY; 
-      printf(" 重试中\r\n");
+      rt_kprintf(" 重试中\r\n");
       dhcp_ok=0; 
 			break;     
 

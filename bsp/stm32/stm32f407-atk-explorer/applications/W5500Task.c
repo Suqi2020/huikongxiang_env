@@ -16,30 +16,16 @@ unsigned char S0_Port[2];	//端口0的端口号(5000)
 unsigned char S0_DIP[4];	//端口0目的IP地址 
 unsigned char S0_DPort[2];	//端口0目的端口号(6000) 
 
-unsigned char UDP_DIPR[4];	//UDP(广播)模式,目的主机IP地址
-unsigned char UDP_DPORT[2];	//UDP(广播)模式,目的主机端口号
+
 
 /***************----- 端口的运行模式 -----***************/
 unsigned char S0_Mode =3;	//端口0的运行模式,0:TCP服务器模式,1:TCP客户端模式,2:UDP(广播)模式
 #define TCP_SERVER	0x00	//TCP服务器模式
 #define TCP_CLIENT	0x01	//TCP客户端模式 
-#define UDP_MODE	0x02	//UDP(广播)模式 
 
-/***************----- 端口的运行状态 -----***************/
-unsigned char S0_State =0;	//端口0状态记录,1:端口完成初始化,2端口完成连接(可以正常传输数据) 
-#define S_INIT		0x01	//端口完成初始化 
-#define S_CONN		0x02	//端口完成连接,可以正常传输数据 
 
-/***************----- 端口收发数据的状态 -----***************/
-unsigned char S0_Data;		//端口0接收和发送数据的状态,1:端口接收到数据,2:端口发送数据完成 
-#define S_RECEIVE	 0x01	//端口接收到一个数据包 
-#define S_TRANSMITOK 0x02	//端口发送一个数据包完成 
 
-/***************----- 端口数据缓冲区 -----***************/
-unsigned char Rx_Buffer[2048];	//端口接收数据缓冲区 
-unsigned char Tx_Buffer[2048];	//端口发送数据缓冲区 
 
-unsigned char W5500_Interrupt;	//W5500中断标志(0:无中断,1:有中断)
 
 /*******************************************************************************
 * 函数名  : Load_Net_Parameters
@@ -88,74 +74,48 @@ void Load_Net_Parameters(void)
 }
 #if 0
 
-void  w5500Task(void *parameter)
-{
-  ip_from=IP_FROM_DHCP;
-  reset_w5500();											/*硬复位W5500*/
-  set_w5500_mac();										/*配置MAC地址*/
-	//set_w5500_ip();											/*配置IP地址*/
-  socket_buf_init(txsize, rxsize);		/*初始化8个Socket的发送接收缓存大小*/
-	
-  printf(" 网络已完成初始化……\r\n");
-  printf(" 野火网络适配板作为DHCP客户端，尝试从DHCP服务器获取IP地址 \r\n");
-	uint32_t test111=0;
-
-  while(1) 														/*循环执行的函数*/ 
-  {
-    do_dhcp();                        /*DHCP测试程序*/
-		if(test111++>=10){
-			test111=0;
-			dhcp_time++;
-			rt_kprintf("test\n");
-		}  
-		rt_thread_mdelay(100);
-	}
-
-}	
 #else
 void  w5500Task(void *parameter)
 {
 
-  #if 0
 
-	#else
 	
-	
+	static rt_err_t ret=0;
 	W5500_enum W5500State=W5500InitEnum;
-  uint8_t dhcpTick=0;
+  static uint8_t dhcpTick=0;
   while(1) 														/*循环执行的函数*/ 
   {
 		switch(W5500State)
 		{
 			case W5500InitEnum:
-						ip_from=IP_FROM_DHCP;
-						reset_w5500();											/*硬复位W5500*/
-						set_w5500_mac();										/*配置MAC地址*/
-						socket_buf_init(txsize, rxsize);		/*初始化8个Socket的发送接收缓存大小*/
+						w5500Init();
 			      W5500State=W5500DHCPEnum;
-			      rt_kprintf(" W5500 init……\r\n");
+			      rt_kprintf("W5500 init……\r\n");
 				break;
 			case W5500DHCPEnum:
 					  if(RT_TRUE == do_dhcp()){                        /*DHCP测试程序*/
 								W5500State=W5500NetOK;
-								printf(" 电脑作为TCP服务器,让W5500作为 TCP客户端去连接 \r\n");
-								printf(" 服务器IP:%d.%d.%d.%d\r\n",remote_ip[0],remote_ip[1],remote_ip[2],remote_ip[3]);
-								printf(" 监听端口:%d \r\n",remote_port);
-								printf(" 连接成功后，服务器发送数据给W5500，W5500将返回对应数据 \r\n");
+
+								rt_kprintf("W5500 服务器IP:%d.%d.%d.%d\r\n",remote_ip[0],remote_ip[1],remote_ip[2],remote_ip[3]);
+								rt_kprintf("W5500 监听端口:%d \r\n",remote_port);
 							  break;
 						}
-						if(dhcpTick++>=10){
+						if(dhcpTick++>=5){
 								dhcpTick=0;
 								dhcp_time++;
 						}  
-						rt_thread_mdelay(100);
+						rt_thread_mdelay(200);
 				break;
 			case W5500NetOK:
-						do_tcp_client();
+			      ret=rt_sem_take(w5500Iqr_semp,RT_WAITING_FOREVER);//阻塞 等中断来
+			      if(ret==RT_EOK){
+								W5500ISR();//w5500
+								loopback_tcpc(SOCK_TCPC, local_port);//W5500内部自动维护网络连接 此处只读寄存器
+						}
 				break;
 		}
 	}
-	#endif
+
 
 }	
 #endif

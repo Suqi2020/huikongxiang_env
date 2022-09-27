@@ -851,16 +851,6 @@
           </Files>
         </Group>
         <Group>
-          <GroupName>BspSoftWare</GroupName>
-          <Files>
-            <File>
-              <FileName>W5500p.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>.\applications\W5500p.c</FilePath>
-            </File>
-          </Files>
-        </Group>
-        <Group>
           <GroupName>W5500FIRE</GroupName>
           <Files>
             <File>
@@ -892,6 +882,11 @@
               <FileName>w5500_conf.c</FileName>
               <FileType>1</FileType>
               <FilePath>.\applications\W5500\w5500_conf.c</FilePath>
+            </File>
+            <File>
+              <FileName>loopback.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>.\applications\W5500\loopback.c</FilePath>
             </File>
           </Files>
         </Group>

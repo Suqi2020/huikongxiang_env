@@ -162,6 +162,8 @@
 #define IR_PPPoE                     0x20 /**< get the PPPoE close message */
 #define IR_MAGIC                     0x10 /**< get the magic packet interrupt */
 
+#define IR_SOCK(ch)	        (0x01 << ch) /**< check socket interrupt */
+
 /* Sn_MR values */
 #define Sn_MR_CLOSE                  0x00     /**< unused socket */
 #define Sn_MR_TCP                    0x01     /**< TCP */

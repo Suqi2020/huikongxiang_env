@@ -16,7 +16,7 @@
 #include "w5500.h"
 #include "socket.h"
 #include "board.h"
-
+#if 0
 uint8 buff[2048];				                              	         /*定义一个2KB的缓存*/
 
 /**
@@ -104,4 +104,6 @@ void do_tcp_client(void)
 	}
   
 }
+
+#endif
 

@@ -15,8 +15,9 @@
 #include <board.h>
 #include "drv_gpio.h"
 
-#ifdef RT_USING_PIN
 
+#ifdef RT_USING_PIN
+extern rt_sem_t  w5500Iqr_semp;
 #define PIN_NUM(port, no) (((((port) & 0xFu) << 4) | ((no) & 0xFu)))
 #define PIN_PORT(pin) ((uint8_t)(((pin) >> 4) & 0xFu))
 #define PIN_NO(pin) ((uint8_t)((pin) & 0xFu))
@@ -649,13 +650,8 @@ void EXTI10_IRQHandler(void)
 void EXTI11_IRQHandler(void)
 {
     rt_interrupt_enter();
-   // HAL_GPIO_EXTI_IRQHandler(GPIO_PIN_11);
-	
-	  if(__HAL_GPIO_EXTI_GET_IT(GPIO_PIN_11) != RESET)
-		{
-				__HAL_GPIO_EXTI_CLEAR_IT(GPIO_PIN_11);
-				W5500_Interrupt=1;
-		}
+    HAL_GPIO_EXTI_IRQHandler(GPIO_PIN_11);
+
     rt_interrupt_leave();
 }
 
@@ -727,6 +723,7 @@ void EXTI4_IRQHandler(void)
 void EXTI9_5_IRQHandler(void)
 {
     rt_interrupt_enter();
+	
     HAL_GPIO_EXTI_IRQHandler(GPIO_PIN_5);
     HAL_GPIO_EXTI_IRQHandler(GPIO_PIN_6);
     HAL_GPIO_EXTI_IRQHandler(GPIO_PIN_7);
@@ -735,9 +732,15 @@ void EXTI9_5_IRQHandler(void)
     rt_interrupt_leave();
 }
 
+
 void EXTI15_10_IRQHandler(void)
 {
     rt_interrupt_enter();
+	  //rt_kprintf("irq:w5500\n");
+	
+	
+	  rt_sem_release(w5500Iqr_semp);
+
     HAL_GPIO_EXTI_IRQHandler(GPIO_PIN_10);
     HAL_GPIO_EXTI_IRQHandler(GPIO_PIN_11);
     HAL_GPIO_EXTI_IRQHandler(GPIO_PIN_12);
