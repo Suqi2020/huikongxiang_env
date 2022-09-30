@@ -13,4 +13,9 @@
 //0V6  W5500参考野火网络通信成功  20220923
 //0V7  w5500 中断接收数据OK  20220927
 //0V9  shell命令行OK        20220927
-*/
+*/V0.11  增加4个主要task    20220930
+	//task1  w5500网络状态的维护，以及接收数据               w5500Task
+	//task2  上行数据发送的维护（包括上行心跳 注册 数据打包 ）
+	//       以及重发 丢给task3                              upKeepStateTask
+	//task3  net网络端的发送                                 netDataSednTask                      
+	//task4  接收完数据的解析与处理                          netDataRecTask

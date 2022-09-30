@@ -98,6 +98,7 @@ void  w5500Task(void *parameter)
 
 								rt_kprintf("W5500 ·þÎñÆ÷IP:%d.%d.%d.%d\r\n",remote_ip[0],remote_ip[1],remote_ip[2],remote_ip[3]);
 								rt_kprintf("W5500 ¼àÌý¶Ë¿Ú:%d \r\n",remote_port);
+							 // rt_sem_release(w5500Iqr_semp);
 							  break;
 						}
 						if(dhcpTick++>=5){
@@ -118,6 +119,10 @@ void  w5500Task(void *parameter)
 
 
 }	
+void netSend(uint8_t *data,int len)
+{
+		send(SOCK_TCPC,	data,len);
+}
 #endif
 
 	

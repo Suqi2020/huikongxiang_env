@@ -2,48 +2,58 @@
 #include   "board.h"
 
 
-
-
-struct rt_mailbox mbNetData;
-
-void   NetJsonTask(void *para)
+struct rt_mailbox mbNetSendData;
+struct rt_mailbox mbNetRecData;
+//网络数据接收的处理 
+void   netDataRecTask(void *para)
 {
 	
-	  char *str;
+	  char *str=RT_NULL;
 		while(1){
-			
-			
-			
-			 if (rt_mb_recv(&mbNetData, (rt_ubase_t *)&str, RT_WAITING_FOREVER) == RT_EOK)
+			 if (rt_mb_recv(&mbNetRecData, (rt_ubase_t *)&str, RT_WAITING_FOREVER) == RT_EOK)
         {
-            rt_kprintf("thread1: get a mail from mailbox, the content:%s  %d\n", str,strlen(str));
-
-            /* ??100ms */
-            rt_thread_mdelay(100);
+            rt_kprintf("thread1: get a mail:%s  %d\r\n", str,strlen(str));
+            
         }
-			  rt_thread_mdelay(1000);
+
 		}
 }
 
-
-void   NetJsonTask2(void *para)
+//上行数据的维护以及重发
+void   upKeepStateTask(void *para)
 {
-	  
-	  volatile uint8_t i=30;
-	  uint8_t  *mb_str1;
+	 
 
-					rt_thread_mdelay(500);
-	char *test="1234567890qwertyuio\n";
 		while(1){
-				while(i--){
-						//rt_thread_mdelay(500);
-						mb_str1=(uint8_t  *)rt_malloc(100);
-						memcpy(mb_str1,test,strlen(test)+1);
-						rt_mb_send_wait(&mbNetData, (rt_uint32_t)&mb_str1,0XFFFFFFFF);
-						rt_kprintf("send %s %d\n",mb_str1,i);
-				}
-				while(1){
 				rt_thread_mdelay(500);
-				}
+
 		}
 }
+
+
+//网络数据的发送
+void   netDataSednTask(void *para)
+{
+		uint8_t *str=RT_NULL;
+		while(1){
+			  if (rt_mb_recv(&mbNetSendData, (rt_ubase_t *)&str, RT_WAITING_FOREVER) == RT_EOK)
+        {
+						if((str[0]==(uint8_t)((uint16_t)HEAD>>8))&&(str[1]==(uint8_t)(HEAD))){
+								int lenth= (str[2]<<8)+str[3]+HEAD_LEN+LENTH_LEN+CRC_LEN+TAIL_LEN;  
+								if(lenth<=2048){
+										extern void netSend(uint8_t *data,int len);
+										netSend(str,lenth);
+										rt_kprintf("net send\r\n");
+								}
+								else{
+										rt_kprintf("lenth  err %d\r\n",lenth);
+								}
+						}
+						else{
+							   rt_kprintf("head  err\r\n");
+						}
+        }
+
+		}
+}
+

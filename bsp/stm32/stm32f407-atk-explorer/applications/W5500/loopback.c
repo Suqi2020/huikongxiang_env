@@ -3,7 +3,13 @@
 
 uint8 I_STATUS[MAX_SOCK_NUM];
 uint8 ch_status[MAX_SOCK_NUM] = {0};/** 0:close, 1:ready, 2:connected */
+#define   NET_LEN  2048
+uint8_t  NetTxBuffer[NET_LEN]={0};
+uint8_t  NetRxBuffer[NET_LEN]={0};
 
+
+//					len = recvfrom(s, data_buf, len,(uint8*)&destip,&destport);/* read the received data */
+//					sendto(s, data_buf, len,(uint8*)&destip,destport) ;
 
 void W5500ISR(void)
 {
@@ -178,7 +184,7 @@ void loopback_tcps(SOCKET s, uint16 port)
 void loopback_tcpc(SOCKET s, uint16 port)
 {
 	uint16 len; 						
-	//uint8 * data_buf = (uint8*) Tx_Buffer;
+	uint8 * data_buf = (uint8*) NetRxBuffer;
 	uint8	tmp = 0;
 	switch (I_STATUS[s])
 	{
@@ -201,11 +207,16 @@ void loopback_tcpc(SOCKET s, uint16 port)
 			if ((len = getSn_RX_RSR(s)) > 0)		/* check Rx data */
 			{
 				if (len > TX_RX_MAX_BUF_SIZE) len = TX_RX_MAX_BUF_SIZE; /* if Rx data size is lager than TX_RX_MAX_BUF_SIZE */
-				uint8_t *data_buf = (uint8_t *)rt_malloc(len);
+				//uint8_t *data_buf = (uint8_t *)rt_malloc(len);
 				len = recv(s, data_buf, len);		/* read the received data */
+				
 				data_buf[len]=0;  //防止多打印
-				rt_kprintf("%s\r\n",data_buf);
-				rt_free(data_buf);
+				
+				
+				extern struct rt_mailbox mbNetRecData;
+				rt_mb_send_wait(&mbNetRecData, (rt_ubase_t)&data_buf,RT_WAITING_FOREVER);  
+//				rt_kprintf("%s\r\n",data_buf);
+//				rt_free(data_buf);
 			}
 			SOCK_DISCON(s);
 			break;
@@ -225,14 +236,14 @@ void loopback_tcpc(SOCKET s, uint16 port)
 				{
 					if (len > TX_RX_MAX_BUF_SIZE) 
 					len = TX_RX_MAX_BUF_SIZE;	/* if Rx data size is lager than TX_RX_MAX_BUF_SIZE */
-					
-					uint8_t *data_buf = rt_malloc(len+1);
+				
 
 					len = recv(s, data_buf, len); /* read the received data */
 					data_buf[len]=0;  //防止多打印
-
+					extern struct rt_mailbox mbNetRecData;
+					//rt_mb_send_wait(&mbNetRecData, (rt_ubase_t)&data_buf,RT_WAITING_FOREVER);  
 					send(s,data_buf,len);//rt_thread_mdelay(500);
-					rt_free(data_buf);
+
 					tmp = I_STATUS[s];
 				}
 			 }
