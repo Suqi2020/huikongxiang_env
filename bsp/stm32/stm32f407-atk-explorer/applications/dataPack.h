@@ -8,23 +8,35 @@
 #define   CRC_LEN    2
 #define   TAIL_LEN   2
 #define   HEAD      0XAACC
-#define   TIAL      0XCCAA
+#define   TAIL      0XCCAA
+
+//需要记录上行的messID用于下行回应的判断
+typedef  struct
+{
+		uint32_t upMessID;
+	  uint32_t upHeartMessID;
+	  uint32_t devRegMessID;
+	  uint32_t repDataMessID;
+	  char  devID[15];
+    	
+}deviceParazStru;
+extern deviceParazStru device;
 /**************************/
 //心跳上行定义
-typedef  struct
-{
-	  char identifier[25];
-		char id[16];
-}heartParaStru;
-typedef  struct
-{
-		uint64_t mid;
-	  char packetype[25];
-	  char timestamp[15];
-	  heartParaStru para;
-}heartUpStru;
+//typedef  struct
+//{
+//	  char identifier[25];
+//		char id[16];
+//}heartParaStru;
+//typedef  struct
+//{
+//		uint64_t mid;
+//	  char packetype[25];
+//	  char timestamp[15];
+//	  heartParaStru para;
+//}heartUpStru;
 
-extern heartUpStru  heartUp;
+//extern heartUpStru  heartUp;
 //typedef  struct
 //{
 //	
@@ -54,7 +66,7 @@ extern heartUpStru  heartUp;
 
 
 
-
+extern uint16_t heartUpPack(void);
 
 
 

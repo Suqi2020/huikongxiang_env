@@ -52,7 +52,7 @@
           <CreateLib>0</CreateLib>
           <CreateHexFile>0</CreateHexFile>
           <DebugInformation>1</DebugInformation>
-          <BrowseInformation>1</BrowseInformation>
+          <BrowseInformation>0</BrowseInformation>
           <ListingPath>.\build\keil\List\</ListingPath>
           <HexFormatSelection>1</HexFormatSelection>
           <Merge32K>0</Merge32K>
@@ -147,7 +147,7 @@
             <RestoreSysVw>1</RestoreSysVw>
           </Target>
           <RunDebugAfterBuild>0</RunDebugAfterBuild>
-          <TargetSelection>11</TargetSelection>
+          <TargetSelection>6</TargetSelection>
           <SimDlls>
             <CpuDll></CpuDll>
             <CpuDllArguments></CpuDllArguments>
@@ -161,7 +161,7 @@
             <PeripheralDll></PeripheralDll>
             <PeripheralDllArguments></PeripheralDllArguments>
             <InitializationFile></InitializationFile>
-            <Driver>STLink\ST-LINKIII-KEIL_SWO.dll</Driver>
+            <Driver>Segger\JL2CM3.dll</Driver>
           </TargetDlls>
         </DebugOption>
         <Utilities>
@@ -365,7 +365,7 @@
               <MiscControls></MiscControls>
               <Define>RT_USING_LIBC, USE_HAL_DRIVER, STM32F407xx, __CLK_TCK=RT_TICK_PER_SECOND, __STDC_LIMIT_MACROS, __RTTHREAD__, RT_USING_ARM_LIBC</Define>
               <Undefine></Undefine>
-              <IncludePath>..\..\..\components\drivers\include;..\libraries\HAL_Drivers;.;..\libraries\STM32F4xx_HAL\CMSIS\Device\ST\STM32F4xx\Include;..\..\..\libcpu\arm\cortex-m4;..\..\..\components\drivers\include;..\..\..\components\drivers\include;..\..\..\include;..\..\..\components\finsh;..\..\..\components\drivers\spi;..\..\..\components\drivers\include;..\..\..\components\libc\posix\io\stdio;board\CubeMX_Config\Inc;..\libraries\HAL_Drivers\CMSIS\Include;..\..\..\components\libc\posix\ipc;..\..\..\components\libc\compilers\common\include;..\..\..\components\drivers\include;..\..\..\libcpu\arm\common;..\libraries\HAL_Drivers\config;board\ports;board;..\..\..\components\libc\posix\io\poll;..\..\..\components\libc\compilers\common\extension;applications;..\..\..\components\libc\compilers\common\extension\fcntl\octal;..\libraries\STM32F4xx_HAL\STM32F4xx_HAL_Driver\Inc;applications\W5500</IncludePath>
+              <IncludePath>..\..\..\components\libc\compilers\common\extension\fcntl\octal;..\libraries\HAL_Drivers;..\..\..\components\libc\posix\io\poll;..\..\..\libcpu\arm\cortex-m4;..\..\..\components\drivers\include;..\libraries\STM32F4xx_HAL\STM32F4xx_HAL_Driver\Inc;.;..\..\..\components\drivers\spi;..\libraries\HAL_Drivers\CMSIS\Include;..\..\..\components\drivers\include;..\..\..\components\libc\compilers\common\include;..\..\..\libcpu\arm\common;..\..\..\components\libc\compilers\common\extension;..\..\..\components\libc\posix\ipc;..\..\..\components\drivers\include;board\CubeMX_Config\Inc;..\..\..\include;board;..\..\..\components\libc\posix\io\stdio;applications;..\..\..\components\drivers\include;..\..\..\components\finsh;..\..\..\components\drivers\include;..\libraries\HAL_Drivers\config;board\ports;..\libraries\STM32F4xx_HAL\CMSIS\Device\ST\STM32F4xx\Include</IncludePath>
             </VariousControls>
           </Cads>
           <Aads>
@@ -409,9 +409,9 @@
           <GroupName>Applications</GroupName>
           <Files>
             <File>
-              <FileName>main.c</FileName>
+              <FileName>loopback.c</FileName>
               <FileType>1</FileType>
-              <FilePath>applications\main.c</FilePath>
+              <FilePath>applications\loopback.c</FilePath>
             </File>
             <File>
               <FileName>test_hardware.c</FileName>
@@ -419,24 +419,69 @@
               <FilePath>applications\test_hardware.c</FilePath>
             </File>
             <File>
-              <FileName>W5500Task.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>.\applications\W5500Task.c</FilePath>
-            </File>
-            <File>
               <FileName>NetJsonDataTask.c</FileName>
               <FileType>1</FileType>
-              <FilePath>.\applications\NetJsonDataTask.c</FilePath>
+              <FilePath>applications\NetJsonDataTask.c</FilePath>
+            </File>
+            <File>
+              <FileName>w5500.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>applications\w5500.c</FilePath>
+            </File>
+            <File>
+              <FileName>main.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>applications\main.c</FilePath>
+            </File>
+            <File>
+              <FileName>W5500Task.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>applications\W5500Task.c</FilePath>
             </File>
             <File>
               <FileName>dataPack.c</FileName>
               <FileType>1</FileType>
-              <FilePath>.\applications\dataPack.c</FilePath>
+              <FilePath>applications\dataPack.c</FilePath>
             </File>
             <File>
-              <FileName>dataPack.h</FileName>
-              <FileType>5</FileType>
-              <FilePath>.\applications\dataPack.h</FilePath>
+              <FileName>tcp_demo.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>applications\tcp_demo.c</FilePath>
+            </File>
+            <File>
+              <FileName>w5500_conf.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>applications\w5500_conf.c</FilePath>
+            </File>
+            <File>
+              <FileName>utility.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>applications\utility.c</FilePath>
+            </File>
+            <File>
+              <FileName>dhcp.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>applications\dhcp.c</FilePath>
+            </File>
+            <File>
+              <FileName>socket.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>applications\socket.c</FilePath>
+            </File>
+            <File>
+              <FileName>cJSON.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>.\applications\cJSON.c</FilePath>
+            </File>
+            <File>
+              <FileName>crc.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>.\applications\crc.c</FilePath>
+            </File>
+            <File>
+              <FileName>dataPhrase.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>.\applications\dataPhrase.c</FilePath>
             </File>
           </Files>
         </Group>
@@ -852,56 +897,6 @@
               <FileName>stm32f4xx_hal_gpio.c</FileName>
               <FileType>1</FileType>
               <FilePath>..\libraries\STM32F4xx_HAL\STM32F4xx_HAL_Driver\Src\stm32f4xx_hal_gpio.c</FilePath>
-            </File>
-          </Files>
-        </Group>
-        <Group>
-          <GroupName>Readme</GroupName>
-          <Files>
-            <File>
-              <FileName>readme.txt</FileName>
-              <FileType>5</FileType>
-              <FilePath>.\applications\readme.txt</FilePath>
-            </File>
-          </Files>
-        </Group>
-        <Group>
-          <GroupName>W5500FIRE</GroupName>
-          <Files>
-            <File>
-              <FileName>dhcp.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>.\applications\W5500\dhcp.c</FilePath>
-            </File>
-            <File>
-              <FileName>socket.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>.\applications\W5500\socket.c</FilePath>
-            </File>
-            <File>
-              <FileName>tcp_demo.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>.\applications\W5500\tcp_demo.c</FilePath>
-            </File>
-            <File>
-              <FileName>utility.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>.\applications\W5500\utility.c</FilePath>
-            </File>
-            <File>
-              <FileName>w5500.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>.\applications\W5500\w5500.c</FilePath>
-            </File>
-            <File>
-              <FileName>w5500_conf.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>.\applications\W5500\w5500_conf.c</FilePath>
-            </File>
-            <File>
-              <FileName>loopback.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>.\applications\W5500\loopback.c</FilePath>
             </File>
           </Files>
         </Group>

@@ -6,6 +6,9 @@
 #include "w5500.h"
 #include "types.h"
 
+
+#define   NET_LEN  2048
+
 #define IINCHIP_ISR_DISABLE()
 #define IINCHIP_ISR_ENABLE()	
 

@@ -3,7 +3,7 @@
 
 uint8 I_STATUS[MAX_SOCK_NUM];
 uint8 ch_status[MAX_SOCK_NUM] = {0};/** 0:close, 1:ready, 2:connected */
-#define   NET_LEN  2048
+
 uint8_t  NetTxBuffer[NET_LEN]={0};
 uint8_t  NetRxBuffer[NET_LEN]={0};
 

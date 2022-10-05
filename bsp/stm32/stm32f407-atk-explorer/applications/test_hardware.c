@@ -330,4 +330,16 @@ void  hardWareDriverTest(void)
 }
 
 
-
+//获取tick值
+int tick()
+{
+	//  rt_kprintf("Hello test_finsh!\n");
+	  
+	  uint32_t tick=rt_tick_get();
+	  extern uint64_t subTimeStampGet();
+		rt_kprintf("[tick]","s[%lu]\r\n", ((uint64_t)(subTimeStampGet()+tick)/1000));//不能同时打印需要分开打印才正确
+		rt_kprintf("[tick]","ms[%d]\r\n", (subTimeStampGet()+tick)%1000);
+	  return 0;
+}
+FINSH_FUNCTION_EXPORT(tick, tick finsh);//FINSH_FUNCTION_EXPORT_CMD
+MSH_CMD_EXPORT(tick,tick stamp);//FINSH_FUNCTION_EXPORT_CMD

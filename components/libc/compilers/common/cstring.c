@@ -182,42 +182,42 @@ char *strndup(const char *s, size_t size)
     return news;
 }
 
-char *strtok_r(char *str, const char *delim, char **saveptr)
-{
-    char *pbegin;
-    char *pend = NULL;
+//char *strtok_r(char *str, const char *delim, char **saveptr)
+//{
+//    char *pbegin;
+//    char *pend = NULL;
 
-    if (str)
-    {
-        pbegin = str;
-    }
-    else if (saveptr && *saveptr)
-    {
-        pbegin = *saveptr;
-    }
-    else
-    {
-        return NULL;
-    }
+//    if (str)
+//    {
+//        pbegin = str;
+//    }
+//    else if (saveptr && *saveptr)
+//    {
+//        pbegin = *saveptr;
+//    }
+//    else
+//    {
+//        return NULL;
+//    }
 
-    for (;*pbegin && strchr(delim, *pbegin) != NULL; pbegin++);
+//    for (;*pbegin && strchr(delim, *pbegin) != NULL; pbegin++);
 
-    if (!*pbegin)
-    {
-        return NULL;
-    }
+//    if (!*pbegin)
+//    {
+//        return NULL;
+//    }
 
-    for (pend = pbegin + 1; *pend && strchr(delim, *pend) == NULL; pend++);
+//    for (pend = pbegin + 1; *pend && strchr(delim, *pend) == NULL; pend++);
 
-    if (*pend)
-    {
-        *pend++ = '\0';
-    }
+//    if (*pend)
+//    {
+//        *pend++ = '\0';
+//    }
 
-    if (saveptr)
-    {
-        *saveptr = pend;
-    }
+//    if (saveptr)
+//    {
+//        *saveptr = pend;
+//    }
 
-    return pbegin;
-}
+//    return pbegin;
+//}
