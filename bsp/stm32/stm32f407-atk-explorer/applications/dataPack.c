@@ -3,7 +3,7 @@
 
 //heartUpStru  heartUp;
 extern uint16_t RTU_CRC(uint8_t *puchMsg , uint16_t usDataLen);
-uint8_t   packBuf[NET_LEN];  //与net发送buff大小一致  通过邮箱传递给NetTxBuffer 进行发送出去
+uint8_t   packBuf[TX_RX_MAX_BUF_SIZE];  //与net发送buff大小一致  通过邮箱传递给NetTxBuffer 进行发送出去
 deviceParazStru  device ={0};
 //上行messageID自增  每次打包后自增1
 uint32_t upMessIdAdd()
@@ -15,7 +15,7 @@ uint32_t upMessIdAdd()
 //后期需要从flash中读取ID
 void  deviceIDRead()
 {
-		rt_strcpy(device.devID,"0000000002");
+		rt_strcpy(device.devID,"1000000000001");
 }
 
 
@@ -45,7 +45,7 @@ uint16_t heartUpPack()
 
 	  packBuf[len]= (uint8_t)(HEAD>>8); len++;
 	  packBuf[len]= (uint8_t)(HEAD);    len++;
-	  len+=2;//json长度最后再填写
+	  len+=LENTH_LEN;//json长度最后再填写
 	  char str[50]={0};//临时使用的数组
 		rt_sprintf(str,"{\"mid\":%lu,",device.upMessID);
 		rt_strcpy((char *)packBuf+len,str);
@@ -66,18 +66,26 @@ uint16_t heartUpPack()
 		rt_sprintf(str,"\"id\":\"%s\"}}",device.devID);
 		rt_strcpy((char *)packBuf+len,str);
     len+=rt_strlen(str);
-	
+	  packBuf[2]=(uint8_t)((len-LENTH_LEN-HEAD_LEN)>>8);//更新crc
+	  packBuf[3]=(uint8_t)(len-LENTH_LEN-HEAD_LEN);
 	  uint16_t jsonBodyCrc=RTU_CRC(packBuf+HEAD_LEN+LENTH_LEN,len-HEAD_LEN-LENTH_LEN);
 	
-	  packBuf[2]=(uint8_t)(jsonBodyCrc>>8);//更新crc
-	  packBuf[3]=(uint8_t)(jsonBodyCrc);
+	  packBuf[len]=(uint8_t)(jsonBodyCrc>>8); len++;//更新crc
+	  packBuf[len]=(uint8_t)(jsonBodyCrc);    len++;
+
 		
 		packBuf[len]= (uint8_t)(TAIL>>8); len++;
 		packBuf[len]= (uint8_t)(TAIL);    len++;
-		packBuf[len] =0;//结尾 补0
-		upMessIdAdd();
+		packBuf[len] =0;//len++;//结尾 补0
+		
 		device.upHeartMessID =device.upMessID;
-		rt_kprintf("heart:%s\r\n",packBuf);
+		upMessIdAdd();
+		rt_kprintf("len:%d\r\n",len);
+		
+		for(int i=0;i<len;i++)
+				rt_kprintf("%02x",packBuf[i]);
+		rt_kprintf("\r\nlen：%d str0:%x str1:%x str[2]:%d  str[3]:%d\r\n",len,packBuf[0],packBuf[1],packBuf[2],packBuf[3]);
+		//rt_kprintf("heart:%s \n",packBuf);
 		return len;
 }
 //上行心跳包 注册信息建立一个task  用来维护

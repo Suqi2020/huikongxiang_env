@@ -4,8 +4,8 @@
 uint8 I_STATUS[MAX_SOCK_NUM];
 uint8 ch_status[MAX_SOCK_NUM] = {0};/** 0:close, 1:ready, 2:connected */
 
-uint8_t  NetTxBuffer[NET_LEN]={0};
-uint8_t  NetRxBuffer[NET_LEN]={0};
+uint8_t  NetTxBuffer[TX_RX_MAX_BUF_SIZE]={0};
+uint8_t  NetRxBuffer[TX_RX_MAX_BUF_SIZE]={0};
 
 
 //					len = recvfrom(s, data_buf, len,(uint8*)&destip,&destport);/* read the received data */
@@ -184,7 +184,7 @@ void loopback_tcps(SOCKET s, uint16 port)
 void loopback_tcpc(SOCKET s, uint16 port)
 {
 	uint16 len; 						
-	uint8 * data_buf = (uint8*) NetRxBuffer;
+	//uint8 * data_buf = (uint8*) NetRxBuffer;
 	uint8	tmp = 0;
 	switch (I_STATUS[s])
 	{
@@ -196,11 +196,13 @@ void loopback_tcpc(SOCKET s, uint16 port)
 				socket(s, Sn_MR_TCP, port, 0x00);  			//connect(SOCK_TCPC,remote_ip,remote_port);                /*socket连接服务器*/ 
 				connect(s, remote_ip, remote_port);
 			}			
+			//rt_kprintf("w5500 cloes\r\n");
 			break;
 		case Sn_IR_CON: 
 			// connected
 			ch_status[s] = 2;
 			I_STATUS[s] &= ~(0x01);
+		  //rt_kprintf("w5500 connected\r\n");
 			break;
 		case Sn_IR_DISCON: 
 			// discon
@@ -208,17 +210,20 @@ void loopback_tcpc(SOCKET s, uint16 port)
 			{
 				if (len > TX_RX_MAX_BUF_SIZE) len = TX_RX_MAX_BUF_SIZE; /* if Rx data size is lager than TX_RX_MAX_BUF_SIZE */
 				//uint8_t *data_buf = (uint8_t *)rt_malloc(len);
-				len = recv(s, data_buf, len);		/* read the received data */
+				len = recv(s, NetRxBuffer, len);		/* read the received data */
 				
-				data_buf[len]=0;  //防止多打印
-				
+				NetRxBuffer[len]=0;  //防止多打印
+				//rt_kprintf("w5500 discon\r\n");
 				
 				extern struct rt_mailbox mbNetRecData;
-				rt_mb_send_wait(&mbNetRecData, (rt_ubase_t)&data_buf,RT_WAITING_FOREVER);  
+				rt_mb_send_wait(&mbNetRecData, (rt_ubase_t)&NetRxBuffer,RT_WAITING_FOREVER);  
 //				rt_kprintf("%s\r\n",data_buf);
 //				rt_free(data_buf);
 			}
 			SOCK_DISCON(s);
+			extern rt_bool_t gbNetState;
+			gbNetState =RT_FALSE;
+			rt_kprintf("w5500 discon\r\n");
 			break;
 		case Sn_IR_RECV: 
 			IINCHIP_WRITE(IMR, 0x00);//开中断屏蔽IP,UNREACH,PPPoE,Magic Packet
@@ -238,11 +243,16 @@ void loopback_tcpc(SOCKET s, uint16 port)
 					len = TX_RX_MAX_BUF_SIZE;	/* if Rx data size is lager than TX_RX_MAX_BUF_SIZE */
 				
 
-					len = recv(s, data_buf, len); /* read the received data */
-					data_buf[len]=0;  //防止多打印
+					len = recv(s, NetRxBuffer, len); /* read the received data */
+					NetRxBuffer[len]=0;  //防止多打印
 					extern struct rt_mailbox mbNetRecData;
-					//rt_mb_send_wait(&mbNetRecData, (rt_ubase_t)&data_buf,RT_WAITING_FOREVER);  
-					send(s,data_buf,len);//rt_thread_mdelay(500);
+					rt_mb_send_wait(&mbNetRecData, (rt_ubase_t)&NetRxBuffer,RT_WAITING_FOREVER);  
+					//send(s,data_buf,len);//rt_thread_mdelay(500);
+					rt_kprintf("data_buf:%d \r\n",len);
+
+//					for(int i=0;i<len;i++)
+//					rt_kprintf("%02x",NetRxBuffer[i]);
+//					rt_kprintf("\r\n");
 
 					tmp = I_STATUS[s];
 				}
@@ -251,7 +261,7 @@ void loopback_tcpc(SOCKET s, uint16 port)
 		case Sn_IR_SEND_OK: 
 			// send ok
 			I_STATUS[s] &= ~(0x10);
-		  rt_kprintf("w5500 send ok\r\n"); //发送接口 send(s,data_buf,len);
+		  //rt_kprintf("w5500 send ok\r\n"); //发送接口 send(s,data_buf,len);
 			break;
 		default:
 			I_STATUS[s] =0;
@@ -322,4 +332,6 @@ void w5500Init()
 		IINCHIP_WRITE(Sn_IMR(7), 0x0F);
 		IINCHIP_WRITE(IMR, 0xF0);
 		IINCHIP_WRITE(SIMR, 0xFE);
+	  extern void rstDhcp();
+	  rstDhcp();
 }

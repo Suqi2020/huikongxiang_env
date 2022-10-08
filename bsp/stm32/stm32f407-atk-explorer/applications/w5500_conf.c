@@ -34,7 +34,7 @@ uint16 local_port=5000;	                       					/*定义本地端口*/
 
 /*定义远端IP信息*/
 uint8  remote_ip[4]={192,168,1,109};											/*远端IP地址*/
-uint16 remote_port=5000;																/*远端端口号*/
+uint16 remote_port=5005;																/*远端端口号*/
 
 //uint8  remote_ip[4]={192,168,16,6};											/*远端IP地址*/
 //uint16 remote_port=6000;																/*远端端口号*/
@@ -159,8 +159,10 @@ void iinchip_cson(void)
 */
 void reset_w5500(void)
 {
+	HAL_GPIO_WritePin(W5500_RST_GPIO_Port, W5500_RST_Pin, GPIO_PIN_SET);
+	rt_thread_mdelay(200);
   HAL_GPIO_WritePin(W5500_RST_GPIO_Port, W5500_RST_Pin, GPIO_PIN_RESET);	
-	rt_thread_mdelay(100);
+	rt_thread_mdelay(2000);
 	HAL_GPIO_WritePin(W5500_RST_GPIO_Port, W5500_RST_Pin, GPIO_PIN_SET);
 	rt_thread_mdelay(1600);
 }

@@ -778,7 +778,10 @@ void init_dhcp_client(void)
 *@param		无
 *@return	无
 */
-
+void rstDhcp()
+{
+	dhcp_state = STATE_DHCP_READY; 
+}
 int  do_dhcp(void)
 {
 	uint8 dhcpret=0;
@@ -794,18 +797,22 @@ int  do_dhcp(void)
 	
 	switch(dhcpret)
 	{
-		case DHCP_RET_NONE:                              /*IP地址获取不成功*/       
+		case DHCP_RET_NONE:                              /*IP地址获取不成功*/ 
+      			//rt_kprintf("DHCP_RET_NONE\r\n");
 			break;
 		
 		case DHCP_RET_TIMEOUT:                           /*IP地址获取超时*/ 
+			    			//rt_kprintf("DHCP_RET_TIMEOUT\r\n");
 			break;
 		
 		case DHCP_RET_UPDATE:														 /*成功获取到IP地址*/ 
 		  dhcp_ok=1;                  
 			set_w5500_ip();                                /*将获取到的IP地址写入W5500寄存器*/ 
 			rt_kprintf(" 已从DHCP服务器成功获得IP地址\r\n");
+			rt_kprintf("W5500 服务器IP:%d.%d.%d.%d\r\n",remote_ip[0],remote_ip[1],remote_ip[2],remote_ip[3]);
+			rt_kprintf("W5500 监听端口:%d \r\n",remote_port);
       return RT_TRUE;
-	    break;
+//	    break;
 		
 		case DHCP_RET_CONFLICT:                          /*IP地址获取冲突*/ 
 			rt_kprintf(" 从DHCP获取IP地址失败\r\n");
@@ -815,6 +822,7 @@ int  do_dhcp(void)
 			break;     
 
 		default:
+			//rt_kprintf(" do_dhcp default\r\n");
 			break;
 	}
 	return RT_FALSE;

@@ -23,10 +23,14 @@ unsigned char S0_Mode =3;	//端口0的运行模式,0:TCP服务器模式,1:TCP客户端模式,2:UD
 #define TCP_SERVER	0x00	//TCP服务器模式
 #define TCP_CLIENT	0x01	//TCP客户端模式 
 
+rt_bool_t  gbNetState =RT_FALSE;   //联网状态  false 断网  true联网
 
 
 
-
+//rt_bool_t  netStateFun(rt_bool_t state)
+//{
+//		return gbNetState;
+//}
 /*******************************************************************************
 * 函数名  : Load_Net_Parameters
 * 描述    : 装载网络参数
@@ -72,17 +76,13 @@ void Load_Net_Parameters(void)
 
 	S0_Mode=TCP_CLIENT;//加载端口0的工作模式,TCP客户端模式
 }
-#if 0
 
-#else
 void  w5500Task(void *parameter)
 {
-
-
-	
 	static rt_err_t ret=0;
 	W5500_enum W5500State=W5500InitEnum;
   static uint8_t dhcpTick=0;
+	static uint8_t rstW5500Ct=0;
   while(1) 														/*循环执行的函数*/ 
   {
 		switch(W5500State)
@@ -95,34 +95,40 @@ void  w5500Task(void *parameter)
 			case W5500DHCPEnum:
 					  if(RT_TRUE == do_dhcp()){                        /*DHCP测试程序*/
 								W5500State=W5500NetOK;
-
-								rt_kprintf("W5500 服务器IP:%d.%d.%d.%d\r\n",remote_ip[0],remote_ip[1],remote_ip[2],remote_ip[3]);
-								rt_kprintf("W5500 监听端口:%d \r\n",remote_port);
+							  gbNetState =RT_TRUE;
 							 // rt_sem_release(w5500Iqr_semp);
 							  break;
 						}
-						if(dhcpTick++>=5){
+						if(dhcpTick++>=5){//1秒基准  200*5
 								dhcpTick=0;
-								dhcp_time++;
+								dhcp_time++;//dhcp计时 模拟定时器
+							  rstW5500Ct++;
 						}  
-						rt_thread_mdelay(200);
+						if(rstW5500Ct>=30){//没联网的话 每隔30秒去重新初始化w5500
+							 rstW5500Ct=0;
+							 W5500State=W5500InitEnum;
+						}
+						rt_thread_mdelay(200);//不要修改 
 				break;
 			case W5500NetOK:
-			      ret=rt_sem_take(w5500Iqr_semp,RT_WAITING_FOREVER);//阻塞 等中断来
+			      ret=rt_sem_take(w5500Iqr_semp,2000);//阻塞2秒 查询中断状态 等中断来//RT_WAITING_FOREVER
 			      if(ret==RT_EOK){
 								W5500ISR();//w5500
 								loopback_tcpc(SOCK_TCPC, local_port);//W5500内部自动维护网络连接 此处只读寄存器
+						}
+						if(gbNetState ==RT_FALSE){//没联网  重新初始化
+								W5500State=W5500InitEnum;
 						}
 				break;
 		}
 	}
 
-
 }	
-void netSend(uint8_t *data,int len)
+//封装外部调用发送 函数接口
+uint16_t netSend(uint8_t *data,int len)
 {
-		send(SOCK_TCPC,	data,len);
+		return send(SOCK_TCPC,	data,len);
 }
-#endif
+
 
 	

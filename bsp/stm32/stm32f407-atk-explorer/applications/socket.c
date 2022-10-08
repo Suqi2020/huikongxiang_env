@@ -193,6 +193,7 @@ uint16 send(SOCKET s, const uint8 * buf, uint16 len)
     if ((status != SOCK_ESTABLISHED) && (status != SOCK_CLOSE_WAIT))
     {
       ret = 0;
+			printf("SEND_ERR\r\n");
       break;
     }
   } while (freesize < ret);

@@ -9,18 +9,24 @@ rt_bool_t dataCheck(char *data,int lenth)
 {
 //	1、解析头尾校验 不对丢弃
 //	2、提取packettype,分别校验
-		uint16_t jsonBodyCrc=RTU_CRC((uint8_t *)data+HEAD_LEN+LENTH_LEN,lenth-HEAD_LEN-LENTH_LEN);
-	  uint16_t dataCrc=(uint16_t)(data[lenth-2]<<8)+data[lenth-1];
+	  if(lenth<=8)
+			return RT_FALSE; //头尾校验至少9个字节
+		uint16_t jsonBodyCrc=RTU_CRC((uint8_t *)data+HEAD_LEN+LENTH_LEN,lenth-HEAD_LEN-LENTH_LEN-TAIL_LEN-CRC_LEN);
+	  uint16_t dataCrc=(uint16_t)(data[lenth-4]<<8)+data[lenth-3];
 	  if(((data[0]<<8)+data[1])!=HEAD){
-				rt_kprintf("head err\r\n");
+				rt_kprintf("head err  %02x %02x\r\n",data[0],data[1]);
 				return RT_FALSE;		
 		}
 		if(((data[lenth-2]<<8)+data[lenth-1])!=TAIL){
 				rt_kprintf("tail err\r\n");
 				return RT_FALSE;		
 		}
+	 if(lenth!=((data[2]<<8)+data[3]+HEAD_LEN+LENTH_LEN+TAIL_LEN+CRC_LEN)){
+				rt_kprintf("lenth err %d %d\r\n",lenth,((data[2]<<8)+data[3]+HEAD_LEN+LENTH_LEN+TAIL_LEN+CRC_LEN));
+				return RT_FALSE;		
+		}
 	  if(jsonBodyCrc!=dataCrc){
-				rt_kprintf("crc err\r\n");
+			  rt_kprintf("crc err r:0x%04x c:0x%04x\r\n",dataCrc,jsonBodyCrc);
 				return RT_FALSE;
 		}
 		return RT_TRUE;
@@ -28,19 +34,21 @@ rt_bool_t dataCheck(char *data,int lenth)
 //分别找出下行数据的类型并分类    
 packTypeEnum  downLinkPackTpyeGet(cJSON  *TYPE)
 {
-	  if(rt_strcmp(TYPE->string,"CMD_HEARTBEAT_RESPONSE")==0){
+	
+	
+	  if(rt_strcmp(TYPE->valuestring,"CMD_HEARTBEAT_RESPONSE")==0){
 				return heartResp;
 		}
-		else if(rt_strcmp(TYPE->string,"CMD_DEVICE_REGISTE_RESPONSE")==0){
+		else if(rt_strcmp(TYPE->valuestring,"CMD_DEVICE_REGISTE_RESPONSE")==0){
 				return devRegResp;
 		}
-		else if(rt_strcmp(TYPE->string,"CMD_REPORTDATA_RESPONSE")==0){
+		else if(rt_strcmp(TYPE->valuestring,"CMD_REPORTDATA_RESPONSE")==0){
 				return repDataResp;
-		}else if(rt_strcmp(TYPE->string,"CMD_REQUESTDATA_RESPONSE")==0){
+		}else if(rt_strcmp(TYPE->valuestring,"CMD_REQUESTDATA_RESPONSE")==0){
 				return CMDRepDataResp;
 		}
 		else{
-				rt_kprintf("err:packetType\r\n");
+				rt_kprintf("err:packetType  %s %d\r\n",TYPE->valuestring,strlen(TYPE->valuestring));
 		}
 		
 		return errResp;
@@ -59,7 +67,10 @@ rt_bool_t heartRespFun(cJSON  *Json)
 		u64getTick_p =atoll(time->valuestring);
 		rt_kprintf("time:[%lu]s \r\n", (uint32_t)((u64getTick_p)/1000));
 
-		rt_kprintf("time:[%u]ms\r\n", (u64getTick_p)%1000);
+		rt_kprintf("time:[%lu]ms\r\n", (uint32_t)(u64getTick_p)%1000);
+	 // uint32_t test_ms=(uint32_t)(u64getTick_p&0xFfff);
+			//rt_kprintf("time:[%lu]ms\r\n", (uint32_t)(test_ms)%1000);
+	
     extern void  subTimeStampSet(uint64_t time);
 		subTimeStampSet(u64getTick_p);
 	
@@ -69,11 +80,11 @@ rt_bool_t heartRespFun(cJSON  *Json)
 			  return RT_FALSE;
 			
 		}
-    if(device.upHeartMessID != mid->valueint){
-				rt_kprintf("heart resp messID err %d\r\n",mid->valueint);
-			  return RT_FALSE;
-			
-		}
+//    if(device.upHeartMessID != mid->valueint){
+//				rt_kprintf("heart resp messID err %d\r\n",mid->valueint);
+//			  return RT_FALSE;
+//			
+//		}
 		cJSON  *devid =cJSON_GetObjectItem(Json,"id");
 		if(strcmp(device.devID,devid->valuestring)!=0){
 				rt_kprintf("heart resp devID err %s\r\n",devid->valuestring);
@@ -85,19 +96,32 @@ rt_bool_t heartRespFun(cJSON  *Json)
 //下行数据解析
 void AllDownPhrase(char *data,int lenth)
 {
-
+		rt_kprintf("len:%d\r\n",lenth);
+		
+		for(int i=0;i<lenth;i++)
+				rt_kprintf("%02x",data[i]);
+				rt_kprintf("\r\n");
 	  if(dataCheck(data,lenth)==RT_FALSE){
 				return;
 		}
 		char *buf=data+HEAD_LEN+LENTH_LEN;//偏移后是真实的json数据
-		int  len=lenth-HEAD_LEN-LENTH_LEN-TAIL_LEN;//获取真实的json数据长度
+		int  len=lenth-HEAD_LEN-LENTH_LEN-TAIL_LEN-CRC_LEN;//获取真实的json数据长度
+		
+				rt_kprintf("Jsonlen: %d\r\n",len);
 		
 		
 		char *Buffer=(char *)rt_malloc(len+1);
 		rt_strncpy(Buffer,buf,len);
     Buffer[len]=0;
+		
+		
+				for(int i=0;i<len;i++)
+				rt_kprintf("%c",Buffer[i]);
+				rt_kprintf("\r\n");
+		
 		//开始解析json
-		rt_kprintf("getJson:%s\r\n",buf);			
+				rt_kprintf("getJson:%s  \r\n",Buffer);	
+		//rt_kprintf("getJson:%.*s  %d\r\n",len,Buffer,len);			
 		cJSON  *Json=NULL;
 		Json = cJSON_Parse(Buffer);
 		
@@ -107,7 +131,7 @@ void AllDownPhrase(char *data,int lenth)
 			  switch(downLinkPackTpyeGet(pkType)){
 					case 	heartResp:
 						if(RT_TRUE==heartRespFun(Json)){//收到心跳回应 怎么通知发送层
-							
+								rt_kprintf("rec heart resp\r\n");
 						}
 						break;
 					case devRegResp:
@@ -133,6 +157,6 @@ void AllDownPhrase(char *data,int lenth)
 		}
 		
 		rt_free(Buffer);
-	
+	  Buffer =RT_NULL;
 		
 }

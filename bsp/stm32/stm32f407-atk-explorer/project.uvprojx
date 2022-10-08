@@ -52,7 +52,7 @@
           <CreateLib>0</CreateLib>
           <CreateHexFile>0</CreateHexFile>
           <DebugInformation>1</DebugInformation>
-          <BrowseInformation>0</BrowseInformation>
+          <BrowseInformation>1</BrowseInformation>
           <ListingPath>.\build\keil\List\</ListingPath>
           <HexFormatSelection>1</HexFormatSelection>
           <Merge32K>0</Merge32K>
@@ -147,7 +147,7 @@
             <RestoreSysVw>1</RestoreSysVw>
           </Target>
           <RunDebugAfterBuild>0</RunDebugAfterBuild>
-          <TargetSelection>6</TargetSelection>
+          <TargetSelection>11</TargetSelection>
           <SimDlls>
             <CpuDll></CpuDll>
             <CpuDllArguments></CpuDllArguments>
@@ -161,7 +161,7 @@
             <PeripheralDll></PeripheralDll>
             <PeripheralDllArguments></PeripheralDllArguments>
             <InitializationFile></InitializationFile>
-            <Driver>Segger\JL2CM3.dll</Driver>
+            <Driver>STLink\ST-LINKIII-KEIL_SWO.dll</Driver>
           </TargetDlls>
         </DebugOption>
         <Utilities>
@@ -409,9 +409,24 @@
           <GroupName>Applications</GroupName>
           <Files>
             <File>
-              <FileName>loopback.c</FileName>
+              <FileName>W5500Task.c</FileName>
               <FileType>1</FileType>
-              <FilePath>applications\loopback.c</FilePath>
+              <FilePath>applications\W5500Task.c</FilePath>
+            </File>
+            <File>
+              <FileName>NetJsonDataTask.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>applications\NetJsonDataTask.c</FilePath>
+            </File>
+            <File>
+              <FileName>NetJsonDataSendTask.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>.\applications\NetJsonDataSendTask.c</FilePath>
+            </File>
+            <File>
+              <FileName>NetJsonDataRecTask.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>.\applications\NetJsonDataRecTask.c</FilePath>
             </File>
             <File>
               <FileName>test_hardware.c</FileName>
@@ -419,9 +434,9 @@
               <FilePath>applications\test_hardware.c</FilePath>
             </File>
             <File>
-              <FileName>NetJsonDataTask.c</FileName>
+              <FileName>loopback.c</FileName>
               <FileType>1</FileType>
-              <FilePath>applications\NetJsonDataTask.c</FilePath>
+              <FilePath>applications\loopback.c</FilePath>
             </File>
             <File>
               <FileName>w5500.c</FileName>
@@ -432,16 +447,6 @@
               <FileName>main.c</FileName>
               <FileType>1</FileType>
               <FilePath>applications\main.c</FilePath>
-            </File>
-            <File>
-              <FileName>W5500Task.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>applications\W5500Task.c</FilePath>
-            </File>
-            <File>
-              <FileName>dataPack.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>applications\dataPack.c</FilePath>
             </File>
             <File>
               <FileName>tcp_demo.c</FileName>
@@ -477,6 +482,11 @@
               <FileName>crc.c</FileName>
               <FileType>1</FileType>
               <FilePath>.\applications\crc.c</FilePath>
+            </File>
+            <File>
+              <FileName>dataPack.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>applications\dataPack.c</FilePath>
             </File>
             <File>
               <FileName>dataPhrase.c</FileName>
