@@ -306,11 +306,11 @@ void  hardWareDriverTest(void)
 {
 		
 #ifdef TEST_IOOUT
-   ioOutTest();//注意调用函数中的延时加上此处的延时
+		ioOutTest();//注意调用函数中的延时加上此处的延时
 #endif
 	
 #ifdef TEST_ADC
-   adcGetTest();
+		adcGetTest();
 #endif
 	
 #ifdef TEST_IOIN
@@ -333,8 +333,6 @@ void  hardWareDriverTest(void)
 //获取tick值
 int tick()
 {
-	//  rt_kprintf("Hello test_finsh!\n");
-	  
 	  uint32_t tick=rt_tick_get();
 	  extern uint64_t subTimeStampGet();
 		rt_kprintf("[tick]","s[%lu]\r\n", ((uint64_t)(subTimeStampGet()+tick)/1000));//不能同时打印需要分开打印才正确

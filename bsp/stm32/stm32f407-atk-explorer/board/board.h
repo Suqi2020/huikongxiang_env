@@ -25,10 +25,11 @@
 #include "tcp_demo.h"
 #include "dhcp.h"
 #include "loopback.h"
-#include   "NetJsonDataTask.h"
+#include "NetJsonDataTask.h"
 #include "dataPack.h"
 #include "dataPhrase.h"
 #include "crc.h"
+
 
 
 //#define  kt_printfP(const char *str,const char *fmt, ...)  rt_kprintf(str);rt_kprintf(fmt, ...)

@@ -17,10 +17,24 @@ typedef  struct
 	  uint32_t upHeartMessID;
 	  uint32_t devRegMessID;
 	  uint32_t repDataMessID;
-	  char  devID[15];
+	  char  devID[16];
     	
-}deviceParazStru;
-extern deviceParazStru device;
+}mcuParazStru;
+
+extern mcuParazStru mcu;
+
+
+typedef  struct
+{
+
+	  char  ID[16];
+	  char  model[16];
+		char  name[20];
+		char  ip[20];
+		char  port[8];
+	  char  type[4];
+    	
+}rs485ParaStru;
 /**************************/
 //心跳上行定义
 //typedef  struct
@@ -67,8 +81,8 @@ extern deviceParazStru device;
 
 
 extern uint16_t heartUpPack(void);
-
-
+extern uint16_t devRegPack(void);
+extern uint16_t rs485_1DataPack(void);
 
 
 #endif

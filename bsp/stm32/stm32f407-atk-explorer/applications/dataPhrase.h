@@ -10,8 +10,8 @@ typedef enum
 		heartResp=0,
 	  devRegResp,
 	  repDataResp,
-	  CMDRepDataResp,
-	  CMDRepEvtResp,
+	  CMDRepData,
+	  CMDRepEvt,
 	  CMDReqData,
 	  CMDReqHis,
 	  errResp=0xff

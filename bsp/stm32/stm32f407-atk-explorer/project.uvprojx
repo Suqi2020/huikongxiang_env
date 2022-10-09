@@ -414,9 +414,9 @@
               <FilePath>applications\W5500Task.c</FilePath>
             </File>
             <File>
-              <FileName>NetJsonDataTask.c</FileName>
+              <FileName>NetJsonDataUpTask.c</FileName>
               <FileType>1</FileType>
-              <FilePath>applications\NetJsonDataTask.c</FilePath>
+              <FilePath>.\applications\NetJsonDataUpTask.c</FilePath>
             </File>
             <File>
               <FileName>NetJsonDataSendTask.c</FileName>
@@ -427,6 +427,11 @@
               <FileName>NetJsonDataRecTask.c</FileName>
               <FileType>1</FileType>
               <FilePath>.\applications\NetJsonDataRecTask.c</FilePath>
+            </File>
+            <File>
+              <FileName>timerEvent.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>.\applications\timerEvent.c</FilePath>
             </File>
             <File>
               <FileName>test_hardware.c</FileName>
@@ -447,11 +452,6 @@
               <FileName>main.c</FileName>
               <FileType>1</FileType>
               <FilePath>applications\main.c</FilePath>
-            </File>
-            <File>
-              <FileName>tcp_demo.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>applications\tcp_demo.c</FilePath>
             </File>
             <File>
               <FileName>w5500_conf.c</FileName>

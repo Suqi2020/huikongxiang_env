@@ -13,7 +13,7 @@
 #include <rtdevice.h>
 #include <board.h>
 #include <string.h>
-#define APP_VER     12//0x0105 表示1.5版本
+#define APP_VER     13//0x0105 表示1.5版本
 //0V1   20220919
 //初始化  没有加入版本管理 
 //0V3   20220920
@@ -40,7 +40,8 @@
 //task4  接收完数据的解析与处理                          netDataRecTask
 //#define RT_CONSOLEBUF_SIZE 2048  //后期需要该小 512
 //V0.12  上行心跳json和回复OK    20221008
-
+//V0.13   加入dataup 和devreg easy timer 20221009
+ 
 static    rt_thread_t tid 	= RT_NULL;
 extern  rt_sem_t  w5500Iqr_semp ;//w5500有数据时候中断来临
 
@@ -61,7 +62,7 @@ static char mbSendPool[20];//发送缓存20条
 int main(void)
 {
 
-    rt_kprintf("\n20221008  ver=%02d.%02d\n",(uint8_t)(APP_VER>>8),(uint8_t)APP_VER);
+    rt_kprintf("\n20221009  ver=%02d.%02d\n",(uint8_t)(APP_VER>>8),(uint8_t)APP_VER);
 	
 	
 	  w5500Iqr_semp = rt_sem_create("w5500Iqr_semp",0, RT_IPC_FLAG_FIFO);
@@ -83,7 +84,6 @@ int main(void)
         rt_kprintf("init mailbox NetRecData failed.\n");
         return -1;
     }
-		
     result = rt_mb_init(&mbNetSendData,
                         "mbSend",                      
                         &mbSendPool[0],                
@@ -115,6 +115,7 @@ int main(void)
 				rt_thread_startup(tid);													 
 				rt_kprintf("RTcreat upKeepStateTask \r\n");
 		}
+		
     while (1)//task用于测试 以及闪灯操作
     {
 				hardWareDriverTest();

@@ -195,6 +195,7 @@ void loopback_tcpc(SOCKET s, uint16 port)
 				ch_status[s] = 1;
 				socket(s, Sn_MR_TCP, port, 0x00);  			//connect(SOCK_TCPC,remote_ip,remote_port);                /*socket连接服务器*/ 
 				connect(s, remote_ip, remote_port);
+				rt_kprintf("w5500 coning\r\n");
 			}			
 			//rt_kprintf("w5500 cloes\r\n");
 			break;
@@ -202,7 +203,14 @@ void loopback_tcpc(SOCKET s, uint16 port)
 			// connected
 			ch_status[s] = 2;
 			I_STATUS[s] &= ~(0x01);
-		  //rt_kprintf("w5500 connected\r\n");
+		  rt_kprintf("w5500 connected\r\n");
+		  extern rt_bool_t  gbNetState;
+			gbNetState =RT_TRUE;	
+		
+			heartUpPack();
+		  extern struct rt_mailbox mbNetSendData;
+		  extern uint8_t   packBuf[TX_RX_MAX_BUF_SIZE];
+			rt_mb_send_wait(&mbNetSendData, (rt_ubase_t)&packBuf,RT_WAITING_FOREVER); 
 			break;
 		case Sn_IR_DISCON: 
 			// discon
@@ -222,7 +230,6 @@ void loopback_tcpc(SOCKET s, uint16 port)
 			}
 			SOCK_DISCON(s);
 			extern rt_bool_t gbNetState;
-			gbNetState =RT_FALSE;
 			rt_kprintf("w5500 discon\r\n");
 			break;
 		case Sn_IR_RECV: 

@@ -94,9 +94,7 @@ void  w5500Task(void *parameter)
 				break;
 			case W5500DHCPEnum:
 					  if(RT_TRUE == do_dhcp()){                        /*DHCP测试程序*/
-								W5500State=W5500NetOK;
-							  gbNetState =RT_TRUE;
-							 // rt_sem_release(w5500Iqr_semp);
+								W5500State=W5500NetOKEnum;
 							  break;
 						}
 						if(dhcpTick++>=5){//1秒基准  200*5
@@ -110,14 +108,20 @@ void  w5500Task(void *parameter)
 						}
 						rt_thread_mdelay(200);//不要修改 
 				break;
-			case W5500NetOK:
-			      ret=rt_sem_take(w5500Iqr_semp,2000);//阻塞2秒 查询中断状态 等中断来//RT_WAITING_FOREVER
-			      if(ret==RT_EOK){
+			case W5500NetOKEnum:
+			      ret=rt_sem_take(w5500Iqr_semp,1000);//阻塞1秒 查询中断状态 等中断来//RT_WAITING_FOREVER
+			      static int count=0;      
+						if(ret==RT_EOK){
 								W5500ISR();//w5500
 								loopback_tcpc(SOCK_TCPC, local_port);//W5500内部自动维护网络连接 此处只读寄存器
 						}
-						if(gbNetState ==RT_FALSE){//没联网  重新初始化
-								W5500State=W5500InitEnum;
+
+					  if(gbNetState ==RT_FALSE){//没联网  重新初始化
+								if(count++>5){ //5秒或者连续中断5次 还没联网 重启
+										W5500State=W5500InitEnum;
+									  count=0;
+								}
+								
 						}
 				break;
 		}
