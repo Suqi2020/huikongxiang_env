@@ -429,11 +429,6 @@
               <FilePath>.\applications\NetJsonDataRecTask.c</FilePath>
             </File>
             <File>
-              <FileName>timerEvent.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>.\applications\timerEvent.c</FilePath>
-            </File>
-            <File>
               <FileName>test_hardware.c</FileName>
               <FileType>1</FileType>
               <FilePath>applications\test_hardware.c</FilePath>

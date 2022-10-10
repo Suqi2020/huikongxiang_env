@@ -21,14 +21,14 @@ static void easyUpTimer()
 	  static uint32_t count = 0;
 	  count++;
 		if((count%heart_timTick)==0){
-				heartUpPack();
-				rt_mb_send_wait(&mbNetSendData, (rt_ubase_t)&packBuf,RT_WAITING_FOREVER); 
+//				heartUpPack();
+//				rt_mb_send_wait(&mbNetSendData, (rt_ubase_t)&packBuf,RT_WAITING_FOREVER); 
 			  rt_kprintf("heart timer out\r\n");
 		}
 		if(gbRegFlag==RT_FALSE){
 				if(((count+1)%reg_timTick)==0){//不能用else 有可能多个定时任务同时到
-						rt_kprintf("reg timer out\r\n");
-					  devRegPack();
+//						rt_kprintf("reg timer out\r\n");
+//					  devRegPack();
 				}
 		}
 		if(((count+3)%rs485_1_timTick)==0){
@@ -52,7 +52,7 @@ void   upKeepStateTask(void *para)
 	 
 	  extern  void devIDRead();
     devIDRead();
-	  uint32_t count=20;
+//	  uint32_t count=20;
 		while(1){
 			  if(gbNetState ==RT_TRUE){
 						easyUpTimer();

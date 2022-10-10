@@ -15,7 +15,7 @@ void netDataCheckp(uint8_t *data)
 						if(lenth<=2048){
 								for(int i=0;i<lenth;i++)
 										rt_kprintf("%02x",data[i]);
-								rt_kprintf("\r\n net rec  %d\r\n",lenth);
+								rt_kprintf("\r\n TASK rec  %d\r\n",lenth);
 							  AllDownPhrase((char *)data+count,lenth);
 						}
 						else{
@@ -34,9 +34,9 @@ uint16_t netDataCheck(uint8_t *data)
 		if((data[0]==(uint8_t)((uint16_t)HEAD>>8))&&(data[1]==(uint8_t)(HEAD))){
 			  lenth = (data[2]<<8)+data[3]+HEAD_LEN+LENTH_LEN+CRC_LEN+TAIL_LEN;  
 				if(lenth<=2048){
-						for(int i=0;i<lenth;i++)
-								rt_kprintf("%02x",data[i]);
-						rt_kprintf("\r\n net rec  %d\r\n",lenth);
+//						for(int i=0;i<lenth;i++)
+//								rt_kprintf("%02x",data[i]);
+//						rt_kprintf("\r\n net rec  %d\r\n",lenth);
 				}
 				else{
 						rt_kprintf("lenth  err£º%d str0:%x str1:%x str[2]:%d  str[3]:%d\r\n",lenth,data[0],data[1],data[2],data[3]);

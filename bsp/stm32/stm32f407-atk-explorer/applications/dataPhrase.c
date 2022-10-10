@@ -112,7 +112,7 @@ rt_bool_t comRespFun(cJSON  *Json)
 
 		cJSON  *mid =cJSON_GetObjectItem(Json,"mid");
     if(mcu.devRegMessID != mid->valueint){
-				rt_kprintf("reg resp messID err %d\r\n",mid->valueint);
+				rt_kprintf("reg resp messID err %d %d\r\n",mid->valueint,mcu.devRegMessID );
 			  return RT_FALSE;
 			
 		}
@@ -128,18 +128,18 @@ rt_bool_t comRespFun(cJSON  *Json)
 //下行数据解析
 void AllDownPhrase(char *data,int lenth)
 {
-		rt_kprintf("len:%d\r\n",lenth);
+		rt_kprintf("phrase len:%d\r\n",lenth);
 		
-		for(int i=0;i<lenth;i++)
-				rt_kprintf("%02x",data[i]);
-		rt_kprintf("\r\n");
+//		for(int i=0;i<lenth;i++)
+//				rt_kprintf("%02x",data[i]);
+//		rt_kprintf("\r\n");
 	  if(dataCheck(data,lenth)==RT_FALSE){
 				return;
 		}
 		char *buf=data+HEAD_LEN+LENTH_LEN;//偏移后是真实的json数据
 		int  len=lenth-HEAD_LEN-LENTH_LEN-TAIL_LEN-CRC_LEN;//获取真实的json数据长度
 		
-		rt_kprintf("Jsonlen: %d\r\n",len);
+//		rt_kprintf("Jsonlen: %d\r\n",len);
 		
 		
 		char *Buffer=(char *)rt_malloc(len+1);
@@ -147,9 +147,9 @@ void AllDownPhrase(char *data,int lenth)
     Buffer[len]=0;
 		
 		
-		for(int i=0;i<len;i++)
-		rt_kprintf("%c",Buffer[i]);
-		rt_kprintf("\r\n");
+//		for(int i=0;i<len;i++)
+//		rt_kprintf("%c",Buffer[i]);
+//		rt_kprintf("\r\n");
 
 		//开始解析json
 		rt_kprintf("getJson:%s  \r\n",Buffer);	

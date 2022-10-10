@@ -2,7 +2,7 @@
 
 
 //heartUpStru  heartUp;
-extern uint16_t RTU_CRC(uint8_t *puchMsg , uint16_t usDataLen);
+extern uint16_t RTU_CRC(uint8_t *puchMsg ,uint16_t usDataLen);
 uint8_t   packBuf[TX_RX_MAX_BUF_SIZE];  //与net发送buff大小一致  通过邮箱传递给NetTxBuffer 进行发送出去
 mcuParazStru mcu ={0};
 #define  NUM  2
@@ -251,6 +251,9 @@ uint16_t devRegPack()
     "timestamp":"1655172531937"
 }
 */
+
+
+//环流 公众公司
 uint16_t rs485_1DataPack()
 {
 	  char num=0;//第1路485

@@ -1,5 +1,5 @@
 #include "test_hardware.h"
-
+#include <stdint.h>
 #include <rtthread.h>
 #include <rtdevice.h>
 #include <board.h>
@@ -331,12 +331,19 @@ void  hardWareDriverTest(void)
 
 
 //获取tick值
+//不能打印 uint64_t 数据  拆分成32位打印
 int tick()
 {
 	  uint32_t tick=rt_tick_get();
 	  extern uint64_t subTimeStampGet();
-		rt_kprintf("[tick]","s[%lu]\r\n", ((uint64_t)(subTimeStampGet()+tick)/1000));//不能同时打印需要分开打印才正确
-		rt_kprintf("[tick]","ms[%d]\r\n", (subTimeStampGet()+tick)%1000);
+	  uint64_t time =subTimeStampGet()+tick;
+
+	  rt_kprintf("[rttick][%lu]\r\n", tick);
+//		rt_kprintf("[utc][%lu]\r\n",time);//打印失败
+	  uint32_t rtc_s=time/1000;
+	  uint32_t rtc_ms=time%1000;
+		rt_kprintf("[tick-s][%lu]\r\n",rtc_s);//不能同时打印需要分开打印才正确
+		rt_kprintf("[tick-ms][%lu]\r\n",rtc_ms);
 	  return 0;
 }
 FINSH_FUNCTION_EXPORT(tick, tick finsh);//FINSH_FUNCTION_EXPORT_CMD

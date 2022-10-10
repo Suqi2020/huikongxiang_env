@@ -197,7 +197,7 @@ void loopback_tcpc(SOCKET s, uint16 port)
 				connect(s, remote_ip, remote_port);
 				rt_kprintf("w5500 coning\r\n");
 			}			
-			//rt_kprintf("w5500 cloes\r\n");
+			rt_kprintf("w5500 cloes %d\r\n",I_STATUS[s]);
 			break;
 		case Sn_IR_CON: 
 			// connected
@@ -230,6 +230,7 @@ void loopback_tcpc(SOCKET s, uint16 port)
 			}
 			SOCK_DISCON(s);
 			extern rt_bool_t gbNetState;
+			gbNetState = RT_FALSE;
 			rt_kprintf("w5500 discon\r\n");
 			break;
 		case Sn_IR_RECV: 
@@ -254,12 +255,13 @@ void loopback_tcpc(SOCKET s, uint16 port)
 					NetRxBuffer[len]=0;  //防止多打印
 					extern struct rt_mailbox mbNetRecData;
 					rt_mb_send_wait(&mbNetRecData, (rt_ubase_t)&NetRxBuffer,RT_WAITING_FOREVER);  
-					//send(s,data_buf,len);//rt_thread_mdelay(500);
-					rt_kprintf("data_buf:%d \r\n",len);
-
+					//send(s,data_buf,len);//
+//					rt_thread_mdelay(500); //延时后边再打印
+//					rt_kprintf("data_buf:%d \r\n",len);
+//					rt_kprintf("[");
 //					for(int i=0;i<len;i++)
-//					rt_kprintf("%02x",NetRxBuffer[i]);
-//					rt_kprintf("\r\n");
+//					   rt_kprintf("%02x",NetRxBuffer[i]);
+//					rt_kprintf("]\r\n");
 
 					tmp = I_STATUS[s];
 				}
