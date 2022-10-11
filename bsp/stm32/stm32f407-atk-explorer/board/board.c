@@ -26,7 +26,14 @@ UART_HandleTypeDef huart6;
 
 
 /* USER CODE BEGIN PV */
-
+void uartIrqEnaAfterQueue()
+{
+	 __HAL_UART_ENABLE_IT(&huart2, UART_IT_RXNE);
+	 __HAL_UART_ENABLE_IT(&huart3, UART_IT_RXNE);
+	 __HAL_UART_ENABLE_IT(&huart4, UART_IT_RXNE);
+	 __HAL_UART_ENABLE_IT(&huart5, UART_IT_RXNE);//´®¿Úping ÆäËümodbu
+	 __HAL_UART_ENABLE_IT(&huart6, UART_IT_RXNE);
+}
 /* USER CODE END PV */
 
 /* Private function prototypes -----------------------------------------------*/
@@ -228,7 +235,7 @@ static void MX_UART4_Init(void)
   }
   /* USER CODE BEGIN UART4_Init 2 */
   /* Enable the UART Data Register not empty Interrupt */
-   __HAL_UART_ENABLE_IT(&huart4, UART_IT_RXNE);
+//   __HAL_UART_ENABLE_IT(&huart4, UART_IT_RXNE);
   /* USER CODE END UART4_Init 2 */
 
 }
@@ -262,7 +269,7 @@ static void MX_UART5_Init(void)
   }
   /* USER CODE BEGIN UART5_Init 2 */
   /* Enable the UART Data Register not empty Interrupt */
-   __HAL_UART_ENABLE_IT(&huart5, UART_IT_RXNE);
+   //__HAL_UART_ENABLE_IT(&huart5, UART_IT_RXNE);
   /* USER CODE END UART5_Init 2 */
 
 }
@@ -334,7 +341,7 @@ static void MX_USART2_UART_Init(void)
 
   /* USER CODE BEGIN USART2_Init 2 */
   /* Enable the UART Data Register not empty Interrupt */
-   __HAL_UART_ENABLE_IT(&huart2, UART_IT_RXNE);
+   //__HAL_UART_ENABLE_IT(&huart2, UART_IT_RXNE);
   /* USER CODE END USART2_Init 2 */
 
 }
@@ -367,7 +374,7 @@ static void MX_USART3_UART_Init(void)
     Error_Handler();
   }
   /* USER CODE BEGIN USART3_Init 2 */
-  __HAL_UART_ENABLE_IT(&huart3, UART_IT_RXNE);
+  //__HAL_UART_ENABLE_IT(&huart3, UART_IT_RXNE);
   /* USER CODE END USART3_Init 2 */
 
 }
@@ -401,7 +408,7 @@ static void MX_USART6_UART_Init(void)
   }
   /* USER CODE BEGIN USART6_Init 2 */
   /* Enable the UART Data Register not empty Interrupt */
-   __HAL_UART_ENABLE_IT(&huart6, UART_IT_RXNE);
+   //__HAL_UART_ENABLE_IT(&huart6, UART_IT_RXNE);
   /* USER CODE END USART6_Init 2 */
 
 }

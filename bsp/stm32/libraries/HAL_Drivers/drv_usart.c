@@ -19,12 +19,6 @@
 #include "string.h"
 
 
-extern UART_HandleTypeDef huart4;
-extern UART_HandleTypeDef huart5;
-extern UART_HandleTypeDef huart1;
-extern UART_HandleTypeDef huart2;
-extern UART_HandleTypeDef huart3;
-extern UART_HandleTypeDef huart6;
 
 
 
@@ -690,6 +684,8 @@ void USART2_IRQHandler(void)
 		{
 			  //rt_kprintf("read\n");
 				HAL_UART_Receive(&huart2,&Res,1,1000); 
+			  rt_mq_send(&rs485_2mque, &Res, 1);  //收到数据后就往队列里丢
+
 		}
 		HAL_UART_IRQHandler(&huart2);	
 		#endif

@@ -3,7 +3,7 @@
 
 
 //#define TEST_ADC
-#define TEST_UART
+//#define TEST_UART
 //#define  TEST_IOIN
 //#define  TEST_IOOUT
 //#define  TEST_SPAKER

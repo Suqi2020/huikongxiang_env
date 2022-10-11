@@ -29,8 +29,24 @@
 #include "dataPack.h"
 #include "dataPhrase.h"
 #include "crc.h"
+#include "modbus.h"
+#include "rs485Circula.h"
 
 
+
+
+extern UART_HandleTypeDef huart4;
+extern UART_HandleTypeDef huart5;
+extern UART_HandleTypeDef huart1;
+extern UART_HandleTypeDef huart2;
+extern UART_HandleTypeDef huart3;
+extern UART_HandleTypeDef huart6;
+
+
+
+extern rt_mutex_t rs485_2Mutex ;
+//队列的定义
+extern struct  rt_messagequeue rs485_2mque;
 
 //#define  kt_printfP(const char *str,const char *fmt, ...)  rt_kprintf(str);rt_kprintf(fmt, ...)
 

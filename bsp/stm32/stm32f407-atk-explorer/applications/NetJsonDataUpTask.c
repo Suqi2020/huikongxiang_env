@@ -33,9 +33,17 @@ static void easyUpTimer()
 		}
 		if(((count+3)%rs485_1_timTick)==0){
 				rt_kprintf("485_1 timer out\r\n");
-			  rs485_1DataPack();
+
 		}
 		if(((count+5)%rs485_2_timTick)==0){
+			  readCirCurrAndWaring();
+			  if(waringcheck()==RT_TRUE){//先发报警状态 再发数据
+						waringEventPack();
+//				rt_mb_send_wait(&mbNetSendData, (rt_ubase_t)&packBuf,RT_WAITING_FOREVER); 
+					  rt_thread_mdelay(1000);
+				}
+				cirCulaDataPack();
+				rt_mb_send_wait(&mbNetSendData, (rt_ubase_t)&packBuf,RT_WAITING_FOREVER);
 				rt_kprintf("485_2 timer out\r\n");
 		}
 		if(((count+7)%rs485_3_timTick)==0){
@@ -43,6 +51,7 @@ static void easyUpTimer()
 		}
 		if(((count+9)%rs485_4_timTick)==0){
 				rt_kprintf("485_4 timer out\r\n");
+				rs485DataPack();
 		}
 		//upDataTimEnum  
 }
@@ -52,11 +61,15 @@ void   upKeepStateTask(void *para)
 	 
 	  extern  void devIDRead();
     devIDRead();
-//	  uint32_t count=20;
+	  uint32_t count=20;
 		while(1){
 			  if(gbNetState ==RT_TRUE){
 						easyUpTimer();
 				}
+//				if((count--)==0){
+//					count=30;
+//				readCirCurrAndWaring();
+//				}
 				rt_thread_mdelay(1000);
 		}
 }

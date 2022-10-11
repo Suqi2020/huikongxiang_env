@@ -5,7 +5,7 @@
 extern uint16_t RTU_CRC(uint8_t *puchMsg ,uint16_t usDataLen);
 uint8_t   packBuf[TX_RX_MAX_BUF_SIZE];  //与net发送buff大小一致  通过邮箱传递给NetTxBuffer 进行发送出去
 mcuParazStru mcu ={0};
-#define  NUM  2
+
 rs485ParaStru dev[NUM];//目前4路485设备
 //上行messageID自增  每次打包后自增1
 uint32_t upMessIdAdd()
@@ -208,9 +208,9 @@ uint16_t devRegPack()
 	  packBuf[len]=(uint8_t)(jsonBodyCrc);    len++;
 
 		//tail
-		packBuf[len]= (uint8_t)(TAIL>>8); len++;
-		packBuf[len]= (uint8_t)(TAIL);    len++;
-		packBuf[len] =0;//len++;//结尾 补0
+		packBuf[len]=(uint8_t)(TAIL>>8); len++;
+		packBuf[len]=(uint8_t)(TAIL);    len++;
+		packBuf[len]=0;//len++;//结尾 补0
 		
 		mcu.devRegMessID =mcu.upMessID;
 		upMessIdAdd();
@@ -253,8 +253,8 @@ uint16_t devRegPack()
 */
 
 
-//环流 公众公司
-uint16_t rs485_1DataPack()
+//test only
+uint16_t rs485DataPack()
 {
 	  char num=0;//第1路485
 	  memset(packBuf,0,sizeof(packBuf));
@@ -269,7 +269,7 @@ uint16_t rs485_1DataPack()
 		rt_strcpy((char *)packBuf+len,str);
     len+=rt_strlen(str);
 		
-		rt_strcpy(str,"\"packetType\":\"CMD_DEVICE_REGISTER\",");
+		rt_strcpy(str,"\"packetType\":\"CMD_REPORTDATA\",");
 		rt_strcpy((char *)packBuf+len,str);
     len+=rt_strlen(str);
 		

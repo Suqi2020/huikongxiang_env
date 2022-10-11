@@ -224,7 +224,7 @@
             <hadIRAM2>1</hadIRAM2>
             <hadIROM2>0</hadIROM2>
             <StupSel>8</StupSel>
-            <useUlib>0</useUlib>
+            <useUlib>1</useUlib>
             <EndSel>0</EndSel>
             <uLtcg>0</uLtcg>
             <RoSelD>3</RoSelD>
@@ -487,6 +487,36 @@
               <FileName>dataPhrase.c</FileName>
               <FileType>1</FileType>
               <FilePath>.\applications\dataPhrase.c</FilePath>
+            </File>
+            <File>
+              <FileName>modbus.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>.\applications\modbus.c</FilePath>
+            </File>
+            <File>
+              <FileName>rs485_2.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>.\applications\rs485_2.c</FilePath>
+            </File>
+            <File>
+              <FileName>rs485_3.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>.\applications\rs485_3.c</FilePath>
+            </File>
+            <File>
+              <FileName>rs485_4.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>.\applications\rs485_4.c</FilePath>
+            </File>
+            <File>
+              <FileName>rs485_5.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>.\applications\rs485_5.c</FilePath>
+            </File>
+            <File>
+              <FileName>rs485Circula.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>.\applications\rs485Circula.c</FilePath>
             </File>
           </Files>
         </Group>

@@ -2,7 +2,7 @@
 #define   __DATAPACK_H__
 
 #include   "board.h"
-
+#define   NUM        2
 #define   HEAD_LEN   2
 #define   LENTH_LEN  2
 #define   CRC_LEN    2
@@ -35,6 +35,9 @@ typedef  struct
 	  char  type[4];
     	
 }rs485ParaStru;
+extern  rs485ParaStru dev[NUM];
+extern  uint32_t  utcTime(void);
+extern  uint32_t upMessIdAdd(void);
 /**************************/
 //心跳上行定义
 //typedef  struct
@@ -82,7 +85,7 @@ typedef  struct
 
 extern uint16_t heartUpPack(void);
 extern uint16_t devRegPack(void);
-extern uint16_t rs485_1DataPack(void);
+extern uint16_t rs485DataPack(void);
 
 
 #endif

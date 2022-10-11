@@ -13,7 +13,7 @@
 #include <rtdevice.h>
 #include <board.h>
 #include <string.h>
-#define APP_VER     (0<<8+14)//0x0105 表示1.5版本
+#define APP_VER       ((0<<8)+15)//0x0105 表示1.5版本
 //0V1   20220919
 //初始化  没有加入版本管理 
 //0V3   20220920
@@ -42,64 +42,81 @@
 //V0.12  上行心跳json和回复OK    20221008
 //V0.13   加入dataup 和devreg easy timer 20221009
 //V0.14   手动测试3条上行数据OK  20221010
+//        串口2346 modbus 串口1 debug 串口5 串口屏
+//V0.15		rs485_公众环流 modbus 初步调式读取数据成功，并能实现上传 20221011
+//        rt_sprintf float类型有问题  使用sprintf代替 
 static    rt_thread_t tid 	= RT_NULL;
+
+//信号量的定义
 extern  rt_sem_t  w5500Iqr_semp ;//w5500有数据时候中断来临
+rt_mutex_t rs485_2Mutex = RT_NULL;
+#define  MSGPOOL_LEN   1024 //485数据最大量  大于1k需要修改此处
+//队列的定义
+struct  rt_messagequeue rs485_2mque;
+uint8_t rs485_1quePool[MSGPOOL_LEN];  //
+//邮箱的定义
+extern struct  rt_mailbox mbNetRecData;
+extern struct  rt_mailbox mbNetSendData;
+static char	 	 mbRecPool[20];//接收缓存20条
+static char 	 mbSendPool[20];//发送缓存20条
+
+//任务的定义
+extern  void   netDataRecTask(void *para);//网络数据接收
+extern  void   netDataSendTask(void *para);//网络数据发送
+extern  void   upKeepStateTask(void *para);//定时打包数据 后期可能加入定时读取modbus
+extern  void   w5500Task(void *parameter);//w5500网络状态的维护
+extern  void   hardWareDriverTest(void);
 
 
-extern struct rt_mailbox mbNetRecData;
-
-extern struct rt_mailbox mbNetSendData;
-
-extern  void   netDataRecTask(void *para);
-extern  void   netDataSendTask(void *para);
-extern  void   upKeepStateTask(void *para);
-extern  void  w5500Task(void *parameter);
-extern  void  hardWareDriverTest(void);
-
-static char mbRecPool[20];//接收缓存20条
-static char mbSendPool[20];//发送缓存20条
 
 int main(void)
 {
 
-    rt_kprintf("\n20221010  ver=%02d.%02d\n",(uint8_t)(APP_VER>>8),(uint8_t)APP_VER);
-	
-	
+    rt_kprintf("\n20221011  ver=%02d.%02d\n",(uint8_t)(APP_VER>>8),(uint8_t)APP_VER);
+	  rt_err_t result;
+//////////////////////////////////////信号量//////////////////////////////
 	  w5500Iqr_semp = rt_sem_create("w5500Iqr_semp",0, RT_IPC_FLAG_FIFO);
 		if (w5500Iqr_semp == RT_NULL)
     {
         rt_kprintf("create w5500Iqr_semp failed\n");
     }
+    rs485_2Mutex = rt_mutex_create("rs485_1Mutex", RT_IPC_FLAG_FIFO);
+    if (rs485_2Mutex == RT_NULL)
+    {
+        rt_kprintf("create rs485_1Mutex failed.\n");
+        return -1;
+    }
 		
+//////////////////////////////////消息队列//////////////////////////////////
 		
-		rt_err_t result;
+		result = rt_mq_init(&rs485_2mque,"rs485_1mque",&rs485_1quePool[0],1,sizeof(rs485_1quePool),RT_IPC_FLAG_FIFO);       
+		if (result != RT_EOK)
+    {
+        rt_kprintf("init rs485_1mque failed.\n");
+        return -1;
+    }
+		 __HAL_UART_ENABLE_IT(&huart2, UART_IT_RXNE);//队列初始化之后再开启串口中断接收
+////////////////////////////////////邮箱//////////////////////////////////
+		
 
-    result = rt_mb_init(&mbNetRecData,
-                        "mbRec",                      
-                        &mbRecPool[0],                
-                        sizeof(mbRecPool) / 4,        
-                        RT_IPC_FLAG_FIFO);         
+    result = rt_mb_init(&mbNetRecData,"mbRec",&mbRecPool[0],sizeof(mbRecPool)/4,RT_IPC_FLAG_FIFO);         
     if (result != RT_EOK)
     {
         rt_kprintf("init mailbox NetRecData failed.\n");
         return -1;
     }
-    result = rt_mb_init(&mbNetSendData,
-                        "mbSend",                      
-                        &mbSendPool[0],                
-                        sizeof(mbSendPool) / 4,        
-                        RT_IPC_FLAG_FIFO);         
+    result = rt_mb_init(&mbNetSendData,"mbSend",&mbSendPool[0],sizeof(mbSendPool)/4,RT_IPC_FLAG_FIFO);         
     if (result != RT_EOK)
     {
         rt_kprintf("init mailbox NetSend failed.\n");
         return -1;
     }
+////////////////////////////////任务////////////////////////////////////
     tid =  rt_thread_create("w5500",w5500Task,RT_NULL,1024,2, 10 );
 		if(tid!=NULL){
 				rt_thread_startup(tid);													 
 				rt_kprintf("RTcreat w5500Task task\r\n");
 		}
-    
 		tid =  rt_thread_create("netRec",netDataRecTask,RT_NULL,1024,2, 10 );
 		if(tid!=NULL){
 				rt_thread_startup(tid);													 
@@ -115,7 +132,9 @@ int main(void)
 				rt_thread_startup(tid);													 
 				rt_kprintf("RTcreat upKeepStateTask \r\n");
 		}
-		
+		extern void uartIrqEnaAfterQueue();
+		uartIrqEnaAfterQueue();//串口中断中用到了队列  开启中断需要放到后边
+//////////////////////////////结束//////////////////////////////////////
     while (1)//task用于测试 以及闪灯操作
     {
 				hardWareDriverTest();

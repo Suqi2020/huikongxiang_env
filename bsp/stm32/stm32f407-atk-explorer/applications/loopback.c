@@ -197,7 +197,7 @@ void loopback_tcpc(SOCKET s, uint16 port)
 				connect(s, remote_ip, remote_port);
 				rt_kprintf("w5500 coning\r\n");
 			}			
-			rt_kprintf("w5500 cloes %d\r\n",I_STATUS[s]);
+//			rt_kprintf("w5500 cloes %d\r\n",I_STATUS[s]);
 			break;
 		case Sn_IR_CON: 
 			// connected
