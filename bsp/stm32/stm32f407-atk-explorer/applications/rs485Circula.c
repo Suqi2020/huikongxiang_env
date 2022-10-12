@@ -1,6 +1,6 @@
 #include "rs485Circula.h"
 
-//<<公众环流>>  目前测试只采集环流值
+//<<公众环流 GY-JDHL03>>  目前测试只采集环流值
 //  1、读取环流值   
 //  2、读取报警标志 
 //  3、配置报警阈值 
@@ -12,7 +12,7 @@
 //迅速切换其它485接口来使用 方法：只需要修改串口发送接口 和中断接收接口即可
 // rs485Circula.c-cirCurrUartSend(uint8_t *buf,int len) 和drv_uart.c-USART2_IRQHandler中
 rt_mutex_t cirCurrMutex = RT_NULL;
-#define  MSGPOOL_LEN   1024 //485数据最大量  大于1k需要修改此处
+#define  MSGPOOL_LEN   200 //485数据最大量  大于1k需要修改此处
 //队列的定义
 struct  rt_messagequeue cirCurrmque;
 uint8_t cirCurrQuePool[MSGPOOL_LEN];  //
@@ -60,12 +60,93 @@ void  cirCurrMutexQueueCreat()
         return ;
     }
 }
+
+////////////////////////////////////读写寄存器以及crc校验/////////////////////////////////////////////////
+// out --输出数据
+//uint8_t modbusReadReg(uint16_t slavAddr,uint16_t regAddr,uint16_t len,uint8_t * out)
+//{
+//		int i=0;
+//	  out[i]=slavAddr;					 			i++;
+//	  out[i]=READ;      					 		i++;
+//	  out[i]=(uint8_t)(regAddr>>8);   i++;
+//	  out[i]=(uint8_t) regAddr;       i++;
+//		out[i]=(uint8_t)(len>>8);       i++;
+//	  out[i]=(uint8_t) len;       		i++;
+//	  uint16_t crcRet=RTU_CRC(out ,i);
+//	  out[i]=(uint8_t)(crcRet>>8);    i++;
+//	  out[i]=crcRet;       						i++;
+//		return i;
+//}
+////写一个寄存器
+//uint8_t modbusWriteOneReg(uint16_t slavAddr,uint16_t regAddr,uint16_t value,uint8_t *out)
+//{
+//		int i=0;
+//	  out[i]=slavAddr;					 			i++;
+//	  out[i]=WRITE;      					 		i++;
+//	  out[i]=(uint8_t)(regAddr>>8);   i++;
+//	  out[i]=(uint8_t) regAddr;       i++;
+//		out[i]=(uint8_t)(value>>8);   	i++;
+//	  out[i]=(uint8_t) value;     		i++;
+//	  uint16_t crcRet=RTU_CRC(out ,i);
+//	  out[i]=(uint8_t)(crcRet>>8);    i++;
+//	  out[i]=crcRet;       						i++;	
+//    return i;	
+//}
+////写多个寄存器  len  数据长度 len/2寄存器个数  OUT-输出数据
+//uint8_t modbusWriteMultReg(uint16_t slavAddr,uint16_t regAddr,uint16_t len,uint8_t *in,uint8_t *out)
+//{
+//		int i=0;
+//	  out[i]=slavAddr;					 			i++;
+//	  out[i]=WRITE_MUL;      					i++;
+//	  out[i]=(uint8_t)(regAddr>>8);   i++;
+//	  out[i]=(uint8_t) regAddr;       i++;
+//		out[i]=(uint8_t)((len/2)>>8);   i++;
+//	  out[i]=(uint8_t) len/2;       	i++; //寄存器个数
+//	  out[i]=(uint8_t) len;       		i++;//数据长度
+//	  for(int j=0;j<len;j++,i++){
+//				out[i]=in[j];
+//		}
+//	  uint16_t crcRet=RTU_CRC(out ,i);
+//	  out[i]=(uint8_t)(crcRet>>8);    i++;
+//	  out[i]=crcRet;       						i++;	
+//    return i;			
+//}
+////modbus回复数据校验   readFLAG TRUE  读  FALSE  写
+//rt_bool_t  modbusRespCheck(uint16_t slavAddr,uint8_t *buf,uint16_t len,rt_bool_t readFlag)
+//{
+//	  if(len<2){
+//				rt_kprintf("ERR:modbus resp\r\n");
+//				return RT_FALSE;
+//		}
+//		if(buf[0]!=slavAddr){
+//				rt_kprintf("ERR:modbus slaveADDR\r\n");
+//				return RT_FALSE;
+//		}
+//		if(readFlag==RT_TRUE){
+//		if((buf[2]+2+1+2)!=len){
+//						rt_kprintf("ERR:modbus 可能连包\r\n");
+//				}
+//				len =buf[2]+2+1+2;//重新刷新长度
+//		}
+//		else{
+//			#define  WR_RESP_LEN  8
+//				len =WR_RESP_LEN;//重新刷新长度
+//		}
+//		uint16_t respCrc=(buf[len-2]<<8)+buf[len-1];
+//	  uint16_t checkCrc= RTU_CRC(buf,len-2);
+//		if(respCrc!=checkCrc){
+//				rt_kprintf("CRC check err 0x%04x  0x%04x\r\n",respCrc,checkCrc);
+//				return RT_FALSE;
+//		}
+//		return RT_TRUE;
+//}
 ///////////////////////////////////////读写寄存器相关操作////////////////////////////////////////
 //读取环流值和报警信息 寄存器地址 0x0023 长度12
 void readCirCurrAndWaring()
 {
 	  uint8_t offset=3;//add+regadd+len
-		uint8_t  *buf = rt_malloc(LENTH);
+	  uint8_t  *buf = RT_NULL;
+		buf = rt_malloc(LENTH);
 	  //uint8_t   buf[100]
 	  uint16_t len = modbusReadReg(SLAVE_ADDR,0x0023,12,buf);
 	  //485发送buf  len  等待modbus回应
@@ -102,7 +183,9 @@ void readCirCurrAndWaring()
 		} 
 
 	  rt_mutex_release(cirCurrMutex);
+		 rt_kprintf("release\r\n");
 		rt_free(buf);
+		 rt_kprintf("free\r\n");
 	  buf=RT_NULL;
 }
 //每次上电后需要从flash中读出存储的值与modbus回复的值进行比较

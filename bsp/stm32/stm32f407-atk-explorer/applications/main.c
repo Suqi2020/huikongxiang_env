@@ -13,7 +13,7 @@
 #include <rtdevice.h>
 #include <board.h>
 #include <string.h>
-#define APP_VER       ((0<<8)+17)//0x0105 表示1.5版本
+#define APP_VER       ((0<<8)+18)//0x0105 表示1.5版本
 //0V1   20220919
 //初始化  没有加入版本管理 
 //0V3   20220920

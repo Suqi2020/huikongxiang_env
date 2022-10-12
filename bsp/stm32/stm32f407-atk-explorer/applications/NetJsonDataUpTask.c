@@ -1,6 +1,7 @@
 #include   "NetJsonDataTask.h"
 #include   "board.h"
 
+
 rt_bool_t gbRegFlag = RT_FALSE;
 extern struct rt_mailbox mbNetSendData;
 extern uint8_t   packBuf[TX_RX_MAX_BUF_SIZE];
@@ -63,6 +64,8 @@ void   upKeepStateTask(void *para)
 	  uint32_t count=20;
 	  extern void cirCurrConf();
 	  cirCurrConf();//公众电流初始化
+	  extern void  partDischagMutexQueueCreat();
+	  partDischagMutexQueueCreat();
 		while(1){
 			  if(gbNetState ==RT_TRUE){
 						easyUpTimer();

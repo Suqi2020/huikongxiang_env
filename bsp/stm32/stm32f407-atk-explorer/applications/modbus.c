@@ -11,7 +11,7 @@
 */
 //读一个或多个寄存器
 //MQTTLenString test;
-// out --输出数据
+//// out --输出数据
 uint8_t modbusReadReg(uint16_t slavAddr,uint16_t regAddr,uint16_t len,uint8_t * out)
 {
 		int i=0;

@@ -7,7 +7,10 @@ uint8 ch_status[MAX_SOCK_NUM] = {0};/** 0:close, 1:ready, 2:connected */
 uint8_t  NetTxBuffer[TX_RX_MAX_BUF_SIZE]={0};
 uint8_t  NetRxBuffer[TX_RX_MAX_BUF_SIZE]={0};
 
-
+void rstCh_status()
+{
+		rt_memset(ch_status,0,MAX_SOCK_NUM);
+}
 //					len = recvfrom(s, data_buf, len,(uint8*)&destip,&destport);/* read the received data */
 //					sendto(s, data_buf, len,(uint8*)&destip,destport) ;
 
@@ -332,6 +335,7 @@ void loopback_udp(SOCKET s, uint16 port)
 void w5500Init()
 {
 		ip_from=IP_FROM_DHCP;
+	  SOCK_DISCON(SOCK_TCPC);
 		reset_w5500();											/*硬复位W5500*/
 		set_w5500_mac();										/*配置MAC地址*/
 		setRTR(2000);/*设置溢出时间值*/
@@ -343,4 +347,6 @@ void w5500Init()
 		IINCHIP_WRITE(SIMR, 0xFE);
 	  extern void rstDhcp();
 	  rstDhcp();
+
+		rstCh_status();
 }

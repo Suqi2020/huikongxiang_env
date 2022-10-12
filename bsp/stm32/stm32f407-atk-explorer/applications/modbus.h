@@ -8,6 +8,8 @@
 #define WRITE_MUL  0x10
 
 
+
+
 uint8_t modbusReadReg(uint16_t slavAddr,uint16_t regAddr,uint16_t len,uint8_t * out);
 //Ð´Ò»¸ö¼Ä´æÆ÷
 uint8_t modbusWriteOneReg(uint16_t slavAddr,uint16_t regAddr,uint16_t value,uint8_t *out);
