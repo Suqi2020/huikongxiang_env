@@ -7,15 +7,6 @@
 #define WRITE      0x06
 #define WRITE_MUL  0x10
 
-//typedef struct{
-//	int len;
-//	char* data;
-//} MQTTLenString;
-
-//extern MQTTLenString test;
-
-
-
 
 uint8_t modbusReadReg(uint16_t slavAddr,uint16_t regAddr,uint16_t len,uint8_t * out);
 //Ð´Ò»¸ö¼Ä´æÆ÷

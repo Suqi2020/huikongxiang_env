@@ -659,7 +659,7 @@ void USART2_IRQHandler(void)
 	  //rt_kprintf("irq\n");
     rt_interrupt_enter();
 	#ifdef TEST_UART
-	uart2SendRecTest();
+		uart2SendRecTest();
 //		static uint8_t Res;
 
 ////  //  uart_isr(&(uart_obj[UART2_INDEX].serial));
@@ -682,9 +682,8 @@ void USART2_IRQHandler(void)
 		uint8_t Res=0;
 		if((__HAL_UART_GET_FLAG(&huart2,UART_FLAG_RXNE)!=RESET))  //接收中断(接收到的数据必须是0x0d 0x0a结尾)
 		{
-			  //rt_kprintf("read\n");
 				HAL_UART_Receive(&huart2,&Res,1,1000); 
-			  rt_mq_send(&rs485_2mque, &Res, 1);  //收到数据后就往队列里丢
+			  rt_mq_send(&cirCurrmque, &Res, 1);  //收到数据后就往队列里丢
 
 		}
 		HAL_UART_IRQHandler(&huart2);	
@@ -725,15 +724,16 @@ void USART3_IRQHandler(void)
     rt_interrupt_enter();
 	#ifdef TEST_UART
 		uart3SendRecTest();
-		#else
+	#else
 		uint8_t Res=0;
 		if((__HAL_UART_GET_FLAG(&huart3,UART_FLAG_RXNE)!=RESET))  //接收中断(接收到的数据必须是0x0d 0x0a结尾)
 		{
-			  //rt_kprintf("read\n");
+	
 				HAL_UART_Receive(&huart3,&Res,1,1000); 
+			
 		}
 		HAL_UART_IRQHandler(&huart3);	
-		#endif
+	#endif
 
     /* leave interrupt */
     rt_interrupt_leave();
@@ -787,7 +787,7 @@ void UART4_IRQHandler(void)
 //			 
 //		}
 //		HAL_UART_IRQHandler(&huart4);	
-		#else
+	#else
 		uint8_t Res=0;
 		if((__HAL_UART_GET_FLAG(&huart4,UART_FLAG_RXNE)!=RESET))  //接收中断(接收到的数据必须是0x0d 0x0a结尾)
 		{
@@ -795,7 +795,7 @@ void UART4_IRQHandler(void)
 				HAL_UART_Receive(&huart4,&Res,1,1000); 
 		}
 		HAL_UART_IRQHandler(&huart4);	
-		#endif
+	#endif
 
     /* leave interrupt */
     rt_interrupt_leave();

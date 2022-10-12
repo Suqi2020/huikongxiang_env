@@ -13,7 +13,7 @@
 #include <rtdevice.h>
 #include <board.h>
 #include <string.h>
-#define APP_VER       ((0<<8)+16)//0x0105 表示1.5版本
+#define APP_VER       ((0<<8)+17)//0x0105 表示1.5版本
 //0V1   20220919
 //初始化  没有加入版本管理 
 //0V3   20220920
@@ -46,15 +46,18 @@
 //V0.15		rs485_公众环流 modbus 初步调式读取数据成功，并能实现上传 20221011
 //        rt_sprintf float类型有问题  使用sprintf代替 
 //V0.16   READ WRITE modbus OK   20221012
+//V0.17   //迅速切换其它485接口来使用 方法：只需要修改串口发送接口 和中断接收接口即可
+//         rs485Circula.c-cirCurrUartSend(uint8_t *buf,int len) 
+//         和drv_uart.c-USART2_IRQHandler中 -rt_mq_send(&cirCurrmque, &Res, 1);    20221012
+
 static    rt_thread_t tid 	= RT_NULL;
 
 //信号量的定义
 extern  rt_sem_t  w5500Iqr_semp ;//w5500有数据时候中断来临
-rt_mutex_t rs485_2Mutex = RT_NULL;
-#define  MSGPOOL_LEN   1024 //485数据最大量  大于1k需要修改此处
-//队列的定义
-struct  rt_messagequeue rs485_2mque;
-uint8_t rs485_1quePool[MSGPOOL_LEN];  //
+
+
+
+
 //邮箱的定义
 extern struct  rt_mailbox mbNetRecData;
 extern struct  rt_mailbox mbNetSendData;
@@ -81,22 +84,9 @@ int main(void)
     {
         rt_kprintf("create w5500Iqr_semp failed\n");
     }
-    rs485_2Mutex = rt_mutex_create("rs485_1Mutex", RT_IPC_FLAG_FIFO);
-    if (rs485_2Mutex == RT_NULL)
-    {
-        rt_kprintf("create rs485_1Mutex failed.\n");
-        return -1;
-    }
-		
-//////////////////////////////////消息队列//////////////////////////////////
-		
-		result = rt_mq_init(&rs485_2mque,"rs485_1mque",&rs485_1quePool[0],1,sizeof(rs485_1quePool),RT_IPC_FLAG_FIFO);       
-		if (result != RT_EOK)
-    {
-        rt_kprintf("init rs485_1mque failed.\n");
-        return -1;
-    }
-		 __HAL_UART_ENABLE_IT(&huart2, UART_IT_RXNE);//队列初始化之后再开启串口中断接收
+		extern void cirCurrMutexQueueCreat();
+		cirCurrMutexQueueCreat();
+		 //__HAL_UART_ENABLE_IT(&huart2, UART_IT_RXNE);//队列初始化之后再开启串口中断接收
 ////////////////////////////////////邮箱//////////////////////////////////
 		
 
@@ -135,6 +125,7 @@ int main(void)
 		}
 		extern void uartIrqEnaAfterQueue();
 		uartIrqEnaAfterQueue();//串口中断中用到了队列  开启中断需要放到后边
+		//队列初始化之后再开启串口中断接收
 //////////////////////////////结束//////////////////////////////////////
     while (1)//task用于测试 以及闪灯操作
     {

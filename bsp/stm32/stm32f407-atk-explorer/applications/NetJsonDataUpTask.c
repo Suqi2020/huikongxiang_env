@@ -8,10 +8,10 @@ extern rt_bool_t gbNetState;
 
 const uint16_t  heart_timTick=120; //120秒发一次心跳
 const uint16_t  reg_timTick=50;  //5秒注册一次
-uint16_t  rs485_1_timTick=60;//默认值给个60
-uint16_t  rs485_2_timTick=60;//默认值给个60
-uint16_t  rs485_3_timTick=60;//默认值给个60
-uint16_t  rs485_4_timTick=60;//默认值给个60
+uint16_t  uart6_timTick=60;//默认值给个60
+uint16_t  uart2_timTick=60;//默认值给个60
+uint16_t  uart3_timTick=60;//默认值给个60
+uint16_t  uart4_timTick=60;//默认值给个60
 //利用upKeepStateTask中1秒的间隔做一个简易定时器
 //来执行对应的上行包的发送
 //掉线情况下先不执行count
@@ -31,29 +31,28 @@ static void easyUpTimer()
 //					  devRegPack();
 				}
 		}
-		if(((count+3)%rs485_1_timTick)==0){
+		if(((count+3)%uart6_timTick)==0){
 				rt_kprintf("485_1 timer out\r\n");
 
 		}
-		if(((count+5)%rs485_2_timTick)==0){
+		if(((count+5)%uart2_timTick)==0){
 			  readCirCurrAndWaring();
 			  if(waringcheck()==RT_TRUE){//先发报警状态 再发数据
 						waringEventPack();
-//				rt_mb_send_wait(&mbNetSendData, (rt_ubase_t)&packBuf,RT_WAITING_FOREVER); 
-					  rt_thread_mdelay(1000);
+					  rt_thread_mdelay(1000);//延时1秒再发下一包
 				}
 				cirCulaDataPack();
 				rt_mb_send_wait(&mbNetSendData, (rt_ubase_t)&packBuf,RT_WAITING_FOREVER);
 				rt_kprintf("485_2 timer out\r\n");
 		}
-		if(((count+7)%rs485_3_timTick)==0){
+		if(((count+7)%uart3_timTick)==0){
 				rt_kprintf("485_3 timer out\r\n");
 		}
-		if(((count+9)%rs485_4_timTick)==0){
+		if(((count+9)%uart4_timTick)==0){
 				rt_kprintf("485_4 timer out\r\n");
 				rs485DataPack();
 		}
-		//upDataTimEnum  
+
 }
 //上行数据的维护以及重发
 void   upKeepStateTask(void *para)

@@ -44,9 +44,9 @@ extern UART_HandleTypeDef huart6;
 
 
 
-extern rt_mutex_t rs485_2Mutex ;
+extern rt_mutex_t cirCurrMutex ;
 //队列的定义
-extern struct  rt_messagequeue rs485_2mque;
+extern struct  rt_messagequeue cirCurrmque;
 
 //#define  kt_printfP(const char *str,const char *fmt, ...)  rt_kprintf(str);rt_kprintf(fmt, ...)
 

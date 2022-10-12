@@ -4,7 +4,8 @@
 1.1 定时读取  队列发送 485 延时500ms 等待队列接收 接受完打包发送  加入1个 互斥保护
 1.2 服务器读取 设置 队列发送 485 延时500ms 等待队列接收 接受完打包发送  加入互斥保护
     每个485 1个接收队列 发送直接调用串口发送接口
-要求：能实现迅速切换其它485接口来使用 
+要求：能实现迅速切换其它485接口来使用 方法：只需要修改串口发送接口 和中断接收接口即可
+      rs485Circula.c-cirCurrUartSend(uint8_t *buf,int len) 和drv_uart.c-USART2_IRQHandler中
 串口2346 modbus 串口1 debug 串口5 串口屏
 
 */
@@ -138,3 +139,5 @@ rt_bool_t  modbusWrRespCheck(uint16_t slavAddr,uint8_t *buf,uint16_t len)
 		return RT_TRUE;
 }
 */
+
+
