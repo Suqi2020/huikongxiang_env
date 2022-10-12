@@ -62,6 +62,8 @@ void   upKeepStateTask(void *para)
 	  extern  void devIDRead();
     devIDRead();
 	  uint32_t count=20;
+	  extern void cirCurrConf();
+	  cirCurrConf();//公众电流初始化
 		while(1){
 			  if(gbNetState ==RT_TRUE){
 						easyUpTimer();

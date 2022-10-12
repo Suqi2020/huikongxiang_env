@@ -10,14 +10,12 @@
 */
 //读一个或多个寄存器
 //MQTTLenString test;
-#define READ       3
-#define WRITE      6
-#define WRITE_MUL  10
-uint8_t modbusReadReg(uint8_t slavAddr,uint16_t regAddr,uint16_t len,uint8_t * out)
+// out --输出数据
+uint8_t modbusReadReg(uint16_t slavAddr,uint16_t regAddr,uint16_t len,uint8_t * out)
 {
 		int i=0;
 	  out[i]=slavAddr;					 			i++;
-	  out[i]=READ;      					 			i++;
+	  out[i]=READ;      					 		i++;
 	  out[i]=(uint8_t)(regAddr>>8);   i++;
 	  out[i]=(uint8_t) regAddr;       i++;
 		out[i]=(uint8_t)(len>>8);       i++;
@@ -28,39 +26,71 @@ uint8_t modbusReadReg(uint8_t slavAddr,uint16_t regAddr,uint16_t len,uint8_t * o
 		return i;
 }
 //写一个寄存器
-uint8_t modbusWriteOneReg(uint8_t slavAddr,uint8_t regAddr,uint8_t *out)
+uint8_t modbusWriteOneReg(uint16_t slavAddr,uint16_t regAddr,uint16_t value,uint8_t *out)
 {
 		int i=0;
 	  out[i]=slavAddr;					 			i++;
-	  out[i]=WRITE;      					 			i++;
+	  out[i]=WRITE;      					 		i++;
 	  out[i]=(uint8_t)(regAddr>>8);   i++;
 	  out[i]=(uint8_t) regAddr;       i++;
-		out[i]=0;     								  i++;
-	  out[i]=1;       								i++;
+		out[i]=(uint8_t)(value>>8);   	i++;
+	  out[i]=(uint8_t) value;     		i++;
 	  uint16_t crcRet=RTU_CRC(out ,i);
 	  out[i]=(uint8_t)(crcRet>>8);    i++;
 	  out[i]=crcRet;       						i++;	
     return i;	
 }
-//写多个寄存器
-uint8_t modbusWriteMultReg(uint8_t slavAddr,uint8_t regAddr,uint16_t len,uint8_t *out)
+//写多个寄存器  len  数据长度 len/2寄存器个数  OUT-输出数据
+uint8_t modbusWriteMultReg(uint16_t slavAddr,uint16_t regAddr,uint16_t len,uint8_t *in,uint8_t *out)
 {
 		int i=0;
 	  out[i]=slavAddr;					 			i++;
 	  out[i]=WRITE_MUL;      					i++;
 	  out[i]=(uint8_t)(regAddr>>8);   i++;
 	  out[i]=(uint8_t) regAddr;       i++;
-		out[i]=(uint8_t)(len>>8);       i++;
-	  out[i]=(uint8_t) len;       		i++;
+		out[i]=(uint8_t)((len/2)>>8);   i++;
+	  out[i]=(uint8_t) len/2;       	i++; //寄存器个数
+	  out[i]=(uint8_t) len;       		i++;//数据长度
+	  for(int j=0;j<len;j++,i++){
+				out[i]=in[j];
+		}
 	  uint16_t crcRet=RTU_CRC(out ,i);
 	  out[i]=(uint8_t)(crcRet>>8);    i++;
 	  out[i]=crcRet;       						i++;	
     return i;			
 }
-
-
-//modbus回复数据校验 
-rt_bool_t  modbusReadRespCheck(uint8_t slavAddr,uint8_t *buf,uint16_t len)
+//modbus回复数据校验   readFLAG TRUE  读  FALSE  写
+rt_bool_t  modbusRespCheck(uint16_t slavAddr,uint8_t *buf,uint16_t len,rt_bool_t readFlag)
+{
+	  if(len<2){
+				rt_kprintf("ERR:modbus resp\r\n");
+				return RT_FALSE;
+		}
+		if(buf[0]!=slavAddr){
+				rt_kprintf("ERR:modbus slaveADDR\r\n");
+				return RT_FALSE;
+		}
+		if(readFlag==RT_TRUE){
+		if((buf[2]+2+1+2)!=len){
+						rt_kprintf("ERR:modbus 可能连包\r\n");
+				}
+				len =buf[2]+2+1+2;//重新刷新长度
+		}
+		else{
+			#define  WR_RESP_LEN  8
+				len =WR_RESP_LEN;//重新刷新长度
+		}
+		uint16_t respCrc=(buf[len-2]<<8)+buf[len-1];
+	  uint16_t checkCrc= RTU_CRC(buf,len-2);
+		if(respCrc!=checkCrc){
+				rt_kprintf("CRC check err 0x%04x  0x%04x\r\n",respCrc,checkCrc);
+				return RT_FALSE;
+		}
+		return RT_TRUE;
+}
+/*
+//modbus读取回复数据校验 
+rt_bool_t  modbusReadRespCheck(uint16_t slavAddr,uint8_t *buf,uint16_t len)
 {
 	  if(len<2){
 				rt_kprintf("ERR:modbus resp\r\n");
@@ -82,3 +112,29 @@ rt_bool_t  modbusReadRespCheck(uint8_t slavAddr,uint8_t *buf,uint16_t len)
 		}
 		return RT_TRUE;
 }
+
+//modbus写入回复数据校验 
+rt_bool_t  modbusWrRespCheck(uint16_t slavAddr,uint8_t *buf,uint16_t len)
+{
+	  #define WR_RESP_LEN  8
+	  if(len<2){
+				rt_kprintf("ERR:modbus resp\r\n");
+				return RT_FALSE;
+		}
+		if(buf[0]!=slavAddr){
+				rt_kprintf("ERR:modbus slaveADDR\r\n");
+				return RT_FALSE;
+		}
+		if(WR_RESP_LEN!=len){
+			  rt_kprintf("ERR:modbus 可能连包\r\n");
+		}
+		len =WR_RESP_LEN;//重新刷新长度
+		uint16_t respCrc=(buf[len-2]<<8)+buf[len-1];
+	  uint16_t checkCrc= RTU_CRC(buf,len-2);
+		if(respCrc!=checkCrc){
+				rt_kprintf("CRC check err 0x%04x  0x%04x\r\n",respCrc,checkCrc);
+				return RT_FALSE;
+		}
+		return RT_TRUE;
+}
+*/

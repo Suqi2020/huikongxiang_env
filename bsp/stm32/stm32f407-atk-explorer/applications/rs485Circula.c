@@ -1,6 +1,5 @@
-
 #include "rs485Circula.h"
-//调整RS485串口需要调整 UART5_IRQHandler以及HAL_UART_Transmit发送串口  还需要更换对应串口的队列
+
 //<<公众环流>>  目前测试只采集环流值
 //  1、读取环流值   
 //  2、读取报警标志 
@@ -8,14 +7,22 @@
 //  4、读取报警阈值
 //  5、设置采集间隔
 //  6、读取采集间隔
+//调整RS485串口需要调整 UART5_IRQHandler以及HAL_UART_Transmit发送串口  还需要更换对应串口的队列
 // 9600波特率 注意修改此处 rt_mq_recv(&rs485_2mque, &buf, sizeof(buf), 2)
 #define   SLAVE_ADDR     0X01
 #define   LENTH          50  //工作环流用到的最大接收buf长度
-#define   LARGE_TIMES    100 //放大倍数  后期如果需要 读取寄存器0x000b 有可能放大10倍
+//#define   LARGE_TIMES    100 //放大倍数  后期如果需要 读取寄存器0x000b 有可能放大10倍
 extern uint8_t packBuf[TX_RX_MAX_BUF_SIZE];
 
 CIRCURStru  cirCurStru_p;
-//读取环流值和报警信息
+uint16_t readAcqInterv(void);
+rt_bool_t writeAcqInterv(uint16_t value);
+uint32_t readThresholdVal(void);
+rt_bool_t writeThresholdVal(uint32_t value);
+uint16_t readPoint(void);
+rt_bool_t writePoint(uint16_t value);
+///////////////////////////////////////读写寄存器相关操作////////////////////////////////////////
+//读取环流值和报警信息 寄存器地址 0x0023 长度12
 void readCirCurrAndWaring()
 {
 	  uint8_t offset=3;//add+regadd+len
@@ -26,7 +33,7 @@ void readCirCurrAndWaring()
 		UART2_485_SEND;
 	  HAL_UART_Transmit(&huart2,(uint8_t *)buf,len,1000);
 		UART2_485_REC;
-	  rt_kprintf("modbus2 send:");
+	  rt_kprintf("readCirCurrAndWaring send:");
 		for(int j=0;j<len;j++){
 				rt_kprintf("%x ",buf[j]);
 		}
@@ -36,22 +43,22 @@ void readCirCurrAndWaring()
 		while(rt_mq_recv(&rs485_2mque, buf+len, 1, 500) == RT_EOK){//115200 波特率1ms 10个数据
 				len++;
 		}
-		rt_kprintf("modbus2 rec:");
+		rt_kprintf("rec:");
 		for(int j=0;j<len;j++){
 				rt_kprintf("%x ",buf[j]);
 		}
 		rt_kprintf("\n");
 		//提取环流值 第一步判断crc 第二部提取
 		
-		if(RT_TRUE ==  modbusReadRespCheck(SLAVE_ADDR,buf,len)){//刷新读取到的值
+		if(RT_TRUE ==  modbusRespCheck(SLAVE_ADDR,buf,len,RT_TRUE)){//刷新读取到的值
 				cirCurStru_p.circlCurA=(buf[offset]<<24)+(buf[offset+1]<<16)+(buf[offset+2]<<8)+buf[offset+3];offset+=4;
 				cirCurStru_p.circlCurB=(buf[offset]<<24)+(buf[offset+1]<<16)+(buf[offset+2]<<8)+buf[offset+3];offset+=4;
 				cirCurStru_p.circlCurC=(buf[offset]<<24)+(buf[offset+1]<<16)+(buf[offset+2]<<8)+buf[offset+3];offset+=4;
 				cirCurStru_p.circlCurD=(buf[offset]<<24)+(buf[offset+1]<<16)+(buf[offset+2]<<8)+buf[offset+3];offset+=4;
-			  cirCurStru_p.warningA	=	buf[offset];	offset+=1;
-			  cirCurStru_p.warningB	=	buf[offset];	offset+=1;
-			  cirCurStru_p.warningC	=	buf[offset];	offset+=1;
-			  cirCurStru_p.warningD	=	buf[offset];	offset+=1;
+			  cirCurStru_p.warningA	=(buf[offset]<<8)	+buf[offset+1];	offset+=2;
+			  cirCurStru_p.warningB	=(buf[offset]<<8)	+buf[offset+1];	offset+=2;
+			  cirCurStru_p.warningC	=(buf[offset]<<8)	+buf[offset+1];	offset+=2;
+			  cirCurStru_p.warningD	=(buf[offset]<<8)	+buf[offset+1];	offset+=2;
 			  rt_kprintf("提取电流、报警值成功\r\n");
 		} 
 
@@ -59,8 +66,298 @@ void readCirCurrAndWaring()
 		rt_free(buf);
 	  buf=RT_NULL;
 }
+//每次上电后需要从flash中读出存储的值与modbus回复的值进行比较
+void cirCurrConf()
+{
+		//给个初值 后期需要从flash中读取
+	  rt_thread_mdelay(1000); //初始化时候需要延时 等待设备初始化完成
+		cirCurStru_p.AcqInterv=5;
+		cirCurStru_p.point =100;       //非modbus真实值  此处读取modbus后经过了转换便于直接计算  0 -扩大了100倍 1-2 扩大了10倍
+	  cirCurStru_p.thresholdVal=350;//3.5A扩大了100倍
+//		rt_kprintf("readAcqInterv:%d\n",readAcqInterv());
+//		rt_kprintf("readThresholdVal:%d\n",readThresholdVal());
+//		rt_kprintf("readPoint:%d\n",readPoint());
+ 
+	  if(readAcqInterv()!=cirCurStru_p.AcqInterv){
+				if(RT_FALSE==writeAcqInterv(cirCurStru_p.AcqInterv)){
+						rt_kprintf("writeAcqInterv err\n");
+				}
+		}
+		if(readThresholdVal()!=cirCurStru_p.thresholdVal){
+				if(RT_FALSE==writeThresholdVal(cirCurStru_p.thresholdVal)){
+						rt_kprintf("writeThresholdVal err\n");
+				}
+		}
+		if(readPoint()!=cirCurStru_p.point){
+				if(RT_FALSE==writePoint(cirCurStru_p.point)){
+						rt_kprintf("writePoint err\n");
+				}
+		}
 
+}
 
+//读取采集间隔
+uint16_t readAcqInterv()
+{
+	  uint8_t offset=3;//add+regadd+len
+		uint8_t  *buf = rt_malloc(LENTH);
+	  uint16_t len = modbusReadReg(SLAVE_ADDR,0x0004,1,buf);
+	  uint16_t ret =0;
+		rt_mutex_take(rs485_2Mutex,RT_WAITING_FOREVER);
+	  //485发送buf  len  等待modbus回应
+		UART2_485_SEND;
+	  HAL_UART_Transmit(&huart2,(uint8_t *)buf,len,1000);
+		UART2_485_REC;
+	  rt_kprintf("readAcqInterv send:");
+		for(int j=0;j<len;j++){
+				rt_kprintf("%x ",buf[j]);
+		}
+		rt_kprintf("\n");
+
+    len=0;
+		while(rt_mq_recv(&rs485_2mque, buf+len, 1, 500) == RT_EOK){//115200 波特率1ms 10个数据
+				len++;
+		}
+		rt_kprintf("rec:");
+		for(int j=0;j<len;j++){
+				rt_kprintf("%x ",buf[j]);
+		}
+		rt_kprintf("\n");
+		//提取环流值 第一步判断crc 第二部提取
+		
+		if(RT_TRUE == modbusRespCheck(SLAVE_ADDR,buf,len,RT_TRUE)){//刷新读取到的值
+
+			  ret	=(buf[offset]<<8)	+buf[offset+1];	//offset+=2;
+			  rt_kprintf("提取采集间隔成功 %d\r\n",ret);
+		} 
+    //
+	  rt_mutex_release(rs485_2Mutex);
+		rt_free(buf);
+	  buf=RT_NULL;
+		return ret;
+}
+
+//设置采集间隔
+//01 06 00 04 00 05 08 08	# RECV HEX>
+//01 06 00 04 00 05 08 08
+rt_bool_t writeAcqInterv(uint16_t value)
+{
+		
+		uint8_t  *buf = rt_malloc(LENTH);
+	  uint16_t len = modbusWriteOneReg(SLAVE_ADDR,0x0004,value,buf);//modbusWriteReg(SLAVE_ADDR,0x0004,1,buf);
+		rt_mutex_take(rs485_2Mutex,RT_WAITING_FOREVER);
+	  //485发送buf  len  等待modbus回应
+		UART2_485_SEND;
+	  HAL_UART_Transmit(&huart2,(uint8_t *)buf,len,1000);
+		UART2_485_REC;
+	  rt_kprintf("wrAcqInterv send:");
+		for(int j=0;j<len;j++){
+				rt_kprintf("%x ",buf[j]);
+		}
+		rt_kprintf("\n");
+
+    len=0;
+		while(rt_mq_recv(&rs485_2mque, buf+len, 1, 500) == RT_EOK){//115200 波特率1ms 10个数据
+				len++;
+		}
+		rt_kprintf("rec:");
+		for(int j=0;j<len;j++){
+				rt_kprintf("%x ",buf[j]);
+		}
+		rt_kprintf("\n");
+		//提取环流值 第一步判断crc 第二判断对错
+		
+		if(RT_TRUE ==  modbusRespCheck(SLAVE_ADDR,buf,len,RT_FALSE)){//刷新读取到的值
+        if(buf[1]==WRITE){
+						return RT_TRUE;
+				}
+		} 
+    //
+	  rt_mutex_release(rs485_2Mutex);
+		rt_free(buf);
+	  buf=RT_NULL;
+	
+	
+		return RT_FALSE;
+}
+//读取报警阈值
+uint32_t readThresholdVal()
+{
+	  uint8_t offset=3;//add+regadd+len
+		uint8_t  *buf = rt_malloc(LENTH);
+	  uint16_t len = modbusReadReg(SLAVE_ADDR,0x0009,4,buf);
+	  uint32_t ret =0;
+		rt_mutex_take(rs485_2Mutex,RT_WAITING_FOREVER);
+	  //485发送buf  len  等待modbus回应
+		UART2_485_SEND;
+	  HAL_UART_Transmit(&huart2,(uint8_t *)buf,len,1000);
+		UART2_485_REC;
+	  rt_kprintf("readthresholdVal send:");
+		for(int j=0;j<len;j++){
+				rt_kprintf("%x ",buf[j]);
+		}
+		rt_kprintf("\n");
+
+    len=0;
+		while(rt_mq_recv(&rs485_2mque, buf+len, 1, 500) == RT_EOK){//115200 波特率1ms 10个数据
+				len++;
+		}
+		rt_kprintf(" rec:");
+		for(int j=0;j<len;j++){
+				rt_kprintf("%x ",buf[j]);
+		}
+		rt_kprintf("\n");
+		//提取环流值 第一步判断crc 第二部提取
+		
+		if(RT_TRUE ==  modbusRespCheck(SLAVE_ADDR,buf,len,RT_TRUE)){//刷新读取到的值
+
+			  ret	=(buf[offset]<<24)+(buf[offset+1]<<16)+(buf[offset+2]<<8)+buf[offset+3];//offset+=2;
+			  rt_kprintf("提取报警阈值 %d\r\n",ret);
+		} 
+    //
+	  rt_mutex_release(rs485_2Mutex);
+		rt_free(buf);
+	  buf=RT_NULL;
+		return ret;
+}
+//设置报警阈值  rt_true 成功 rt-false 失败
+rt_bool_t writeThresholdVal(uint32_t value)
+{
+
+		uint8_t  *buf = rt_malloc(LENTH);
+	  uint8_t send[4]={0};
+		send[0]=(uint8_t)(value>>24);
+		send[1]=(uint8_t)(value>>16);
+		send[2]=(uint8_t)(value>>8);
+		send[3]=value;
+	  uint16_t len = modbusWriteMultReg(SLAVE_ADDR,0x0009,sizeof(uint32_t),send,buf);
+//	  uint16_t ret =0;
+		rt_mutex_take(rs485_2Mutex,RT_WAITING_FOREVER);
+	  //485发送buf  len  等待modbus回应
+		UART2_485_SEND;
+	  HAL_UART_Transmit(&huart2,(uint8_t *)buf,len,1000);
+		UART2_485_REC;
+	  rt_kprintf("wrAcqInterv send:");
+		for(int j=0;j<len;j++){
+				rt_kprintf("%x ",buf[j]);
+		}
+		rt_kprintf("\n");
+ 
+    len=0;
+		while(rt_mq_recv(&rs485_2mque, buf+len, 1, 500) == RT_EOK){//115200 波特率1ms 10个数据
+				len++;
+		}
+		rt_kprintf("rec:");
+		for(int j=0;j<len;j++){
+				rt_kprintf("%x ",buf[j]);
+		}
+		rt_kprintf("\n");
+		//提取环流值 第一步判断crc 第二判断对错
+		
+		if(RT_TRUE ==  modbusRespCheck(SLAVE_ADDR,buf,len,RT_FALSE)){//刷新读取到的值
+        if(buf[1]==WRITE_MUL){
+						return RT_TRUE;
+				}
+		} 
+    //
+	  rt_mutex_release(rs485_2Mutex);
+		rt_free(buf);
+	  buf=RT_NULL;
+	
+	
+		return RT_FALSE;
+	
+}
+//读取小数处理方式
+uint16_t readPoint()
+{
+	  uint8_t offset=3;//add+regadd+len
+		uint8_t  *buf = rt_malloc(LENTH);
+	  uint16_t len = modbusReadReg(SLAVE_ADDR,0x000B,1,buf);
+	  uint16_t ret =0;
+		rt_mutex_take(rs485_2Mutex,RT_WAITING_FOREVER);
+	  //485发送buf  len  等待modbus回应
+		UART2_485_SEND;
+	  HAL_UART_Transmit(&huart2,(uint8_t *)buf,len,1000);
+		UART2_485_REC;
+	  rt_kprintf("readPoint send:");
+		for(int j=0;j<len;j++){
+				rt_kprintf("%x ",buf[j]);
+		}
+		rt_kprintf("\n");
+
+    len=0;
+		while(rt_mq_recv(&rs485_2mque, buf+len, 1, 500) == RT_EOK){//115200 波特率1ms 10个数据
+				len++;
+		}
+		rt_kprintf(" rec:");
+		for(int j=0;j<len;j++){
+				rt_kprintf("%x ",buf[j]);
+		}
+		rt_kprintf("\n");
+		//提取环流值 第一步判断crc 第二部提取
+		
+		if(RT_TRUE ==  modbusRespCheck(SLAVE_ADDR,buf,len,RT_TRUE)){//刷新读取到的值
+
+			  ret	=(buf[offset]<<8)	+buf[offset+1];	//offset+=2;
+			  if(ret==0)
+						cirCurStru_p.point =100;
+				else
+						cirCurStru_p.point =10;
+			  rt_kprintf("提取小数点 %d\r\n",ret);
+		} 
+    //
+	  rt_mutex_release(rs485_2Mutex);
+		rt_free(buf);
+	  buf=RT_NULL;
+		return ret;
+}
+//设置小数处理方式
+//设置采集间隔
+rt_bool_t writePoint(uint16_t value)
+{
+//	uint8_t offset=3;//add+regadd+len
+		uint8_t  *buf = rt_malloc(LENTH);
+	  uint16_t len = modbusWriteOneReg(SLAVE_ADDR,0x000b,value,buf);//modbusWriteReg(SLAVE_ADDR,0x0004,1,buf);
+//	  uint16_t ret =0;
+		rt_mutex_take(rs485_2Mutex,RT_WAITING_FOREVER);
+	  //485发送buf  len  等待modbus回应
+		UART2_485_SEND;
+	  HAL_UART_Transmit(&huart2,(uint8_t *)buf,len,1000);
+		UART2_485_REC;
+	  rt_kprintf("wrAcqInterv send:");
+		for(int j=0;j<len;j++){
+				rt_kprintf("%x ",buf[j]);
+		}
+		rt_kprintf("\n");
+
+    len=0;
+		while(rt_mq_recv(&rs485_2mque, buf+len, 1, 500) == RT_EOK){//115200 波特率1ms 10个数据
+				len++;
+		}
+		rt_kprintf("rec:");
+		for(int j=0;j<len;j++){
+				rt_kprintf("%x ",buf[j]);
+		}
+		rt_kprintf("\n");
+		//提取环流值 第一步判断crc 第二判断对错
+		
+		if(RT_TRUE ==  modbusRespCheck(SLAVE_ADDR,buf,len,RT_FALSE)){//刷新读取到的值
+        if(buf[1]==WRITE){
+						return RT_TRUE;
+				}
+		} 
+    //
+	  rt_mutex_release(rs485_2Mutex);
+		rt_free(buf);
+	  buf=RT_NULL;
+	
+	
+		return RT_FALSE;
+	
+
+}
+//判断是否有报警 需要在readCirCurrAndWaring()后边使用
 rt_bool_t waringcheck()
 {
 		if((cirCurStru_p.warningA)||(cirCurStru_p.warningA)||(cirCurStru_p.warningA)|(cirCurStru_p.warningA)){
@@ -96,6 +393,10 @@ rt_bool_t waringcheck()
      "timestamp":"1655172531937"
 }
 */
+
+
+
+/////////////////////////////////////////JSON格式打包//////////////////////////////////////////
 //电流值打包
 uint16_t 	cirCulaDataPack()
 {
@@ -136,7 +437,7 @@ uint16_t 	cirCulaDataPack()
 		rt_strcpy((char *)packBuf+len,str);
 		len+=rt_strlen(str);
 	 	//sprintf(str,"test:%0.2f",(float)121/100);				 
-		sprintf(str,"\"earthCurA\":\"%0.2f\"}},",(float)(cirCurStru_p.circlCurA/LARGE_TIMES));	 
+		sprintf(str,"\"earthCurA\":\"%0.2f\"}},",(float)(cirCurStru_p.circlCurA/cirCurStru_p.point));	 
 		rt_strcpy((char *)packBuf+len,str);
 		len+=rt_strlen(str);
 		
@@ -147,7 +448,7 @@ uint16_t 	cirCulaDataPack()
 		rt_strcpy((char *)packBuf+len,str);
 		len+=rt_strlen(str);
 		
-		sprintf(str,"\"earthCurB\":\"%0.2f\"}},",(float)(cirCurStru_p.circlCurB/LARGE_TIMES));	 
+		sprintf(str,"\"earthCurB\":\"%0.2f\"}},",(float)(cirCurStru_p.circlCurB/cirCurStru_p.point));	 
 		rt_strcpy((char *)packBuf+len,str);
 		len+=rt_strlen(str);
 		
@@ -158,7 +459,7 @@ uint16_t 	cirCulaDataPack()
 		rt_strcpy((char *)packBuf+len,str);
 		len+=rt_strlen(str);
 		
-		sprintf(str,"\"earthCurC\":\"%0.2f\"}},",(float)(cirCurStru_p.circlCurC/LARGE_TIMES));	 
+		sprintf(str,"\"earthCurC\":\"%0.2f\"}},",(float)(cirCurStru_p.circlCurC/cirCurStru_p.point));	 
 		rt_strcpy((char *)packBuf+len,str);
 		len+=rt_strlen(str);
 		

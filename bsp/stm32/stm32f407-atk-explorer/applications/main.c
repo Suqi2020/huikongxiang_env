@@ -13,7 +13,7 @@
 #include <rtdevice.h>
 #include <board.h>
 #include <string.h>
-#define APP_VER       ((0<<8)+15)//0x0105 表示1.5版本
+#define APP_VER       ((0<<8)+16)//0x0105 表示1.5版本
 //0V1   20220919
 //初始化  没有加入版本管理 
 //0V3   20220920
@@ -45,6 +45,7 @@
 //        串口2346 modbus 串口1 debug 串口5 串口屏
 //V0.15		rs485_公众环流 modbus 初步调式读取数据成功，并能实现上传 20221011
 //        rt_sprintf float类型有问题  使用sprintf代替 
+//V0.16   READ WRITE modbus OK   20221012
 static    rt_thread_t tid 	= RT_NULL;
 
 //信号量的定义
@@ -72,7 +73,7 @@ extern  void   hardWareDriverTest(void);
 int main(void)
 {
 
-    rt_kprintf("\n20221011  ver=%02d.%02d\n",(uint8_t)(APP_VER>>8),(uint8_t)APP_VER);
+    rt_kprintf("\n20221012  ver=%02d.%02d\n",(uint8_t)(APP_VER>>8),(uint8_t)APP_VER);
 	  rt_err_t result;
 //////////////////////////////////////信号量//////////////////////////////
 	  w5500Iqr_semp = rt_sem_create("w5500Iqr_semp",0, RT_IPC_FLAG_FIFO);
