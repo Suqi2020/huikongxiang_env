@@ -254,6 +254,89 @@ uint16_t devRegPack()
 
 
 //test only
+
+//uint16_t rs485DataPack()
+//{
+//	  char num=0;//第1路485
+//	  memset(packBuf,0,sizeof(packBuf));
+//		int len=0;
+//    //head+lenth
+////	  packBuf[len]= (uint8_t)(HEAD>>8); len++;
+////	  packBuf[len]= (uint8_t)(HEAD);    len++;
+////	  len+=LENTH_LEN;//json长度最后再填写
+//	  //json
+//	  char *str=RT_NULL;//临时使用的数组
+//	  str= rt_malloc(1024);
+//		rt_sprintf(str,"{\"mid\":%lu,",mcu.upMessID);
+//		rt_strcpy((char *)packBuf+len,str);
+//    len+=rt_strlen(str);
+//		
+//		rt_strcpy(str,"\"packetType\":\"CMD_REPORTDATA12345678901http://www.cmsoft.cn QQ:10865600http://www.cmsoft.cn QQ:10865600http://www.cmsoft.cn QQ:10865600http://www.cmsoft.cn QQ:10865600http://www.cmsoft.cn QQ:10865600http://www.cmsoft.cn QQ:10865600http://www.cmsoft.cn QQ:10865600http://www.cmsoft.cn QQ:10865600http://www.cmsoft.cn QQ:10865600http://www.cmsoft.cn QQ:10865600http://www.cmsoft.cn QQ:10865600http://www.cmso1111111111111111122222222222222222222222233333333333\",");
+//		rt_strcpy((char *)packBuf+len,str);
+//    len+=rt_strlen(str);
+//		
+//		rt_strcpy(str,"\"param\":{");
+//		rt_strcpy((char *)packBuf+len,str);
+//    len+=rt_strlen(str);
+
+//		rt_strcpy(str,"\"identifier\":\"http:http://www.cmsoft.cn QQ:10865600http://www.cmsoft.cn QQ:10865600http://www.cmsoft.cn QQ:10865600//http://www.cmsoft.cn QQ:10865600www.cmsoft.cn QQ:10865600http://www.cmsoft.cn QQ:10865600http://www.cmsoft.cn QQ:10865600environment_monitor11111111111111111111111111111111333333333333333333333http://www.cmsoft.cn QQ:10865600http://www.cmsoft.cn QQ:10865600http://www.cmsoft.cn QQ:1086560033http://www.cmsoft.cn QQ:1086560033\",");
+//		rt_strcpy((char *)packBuf+len,str);
+//		len+=rt_strlen(str);
+
+//		rt_sprintf(str,"\"acuId\":\"%s\",",mcu.devID);
+//		rt_strcpy((char *)packBuf+len,str);
+//		len+=rt_strlen(str);
+//		
+//		rt_sprintf(str,"\"deviceId\":\"%s\",",dev[num].ID);
+//		rt_strcpy((char *)packBuf+len,str);
+//		len+=rt_strlen(str);
+
+//		rt_strcpy(str,"\"data\":{");
+//		rt_strcpy((char *)packBuf+len,str);
+//		len+=rt_strlen(str);
+//		
+//		
+//		rt_strcpy(str,"\"temperature\":\"http://www.cmsoft.cnhttp://www.cmsoft.cn QQ:10865600http://www.cmsoft.cn QQ:10865600http:http://www.cmsoft.cn QQ:10865600//www.cmsoft.cn QQ:10http://www.cmsoft.cn QQ:10865600865600 QQ:10865600http://www.cmsoft.cn QQ:10865600http://www.cmsoft.cn QQ:10865600http://www.cmsoft.cn QQ:10865600http://www.cmsoft.cn QQ:10865600http://www.cmsoft.cn QQ:10865600http://www.cmsoft.cn QQ:10865600http://www.cmsoft.cn QQ:108656001111111111111111111111111111111111111111111122.24444444444444444444444444444444444\",");
+//		rt_strcpy((char *)packBuf+len,str);
+//		len+=rt_strlen(str);
+//		
+//		rt_strcpy(str,"\"humidity\":\"http://www.cmsoft.cn QQ:10865600http://www.cmsoft.cn QQ:10865600http://www.cmsoft.cn QQ:10http://www.cmsoft.cn QQ:10865600865600http://www.cmsoft.cn QQ:108656001112222http://www.cmsoft.cn QQ:10865600http://www.cmsoft.cn QQ:10865600http://www.cmsoft.cn QQ:108656002222222222222222222222222222222222222222280.1444444444444444444444444444444444444http://www.cmsoft.cn QQ:10865600http://www.cmsoft.cn QQ:10865600http://www.cmsoft.cn QQ:10865600http://www.cmsoft.cn QQ:1086560044\",");
+//		rt_strcpy((char *)packBuf+len,str);
+//		len+=rt_strlen(str);
+
+//		rt_sprintf(str,"\"monitoringTime\":\"%lu\"}},",utcTime());
+//		rt_strcpy((char *)packBuf+len,str);
+//    len+=rt_strlen(str);
+//		
+//		rt_sprintf(str,"\"timestamp\":\"%lu\"}",utcTime());
+//		rt_strcpy((char *)packBuf+len,str);
+//    len+=rt_strlen(str);
+//		
+//		//lenth
+////	  packBuf[2]=(uint8_t)((len-LENTH_LEN-HEAD_LEN)>>8);//更新json长度
+////	  packBuf[3]=(uint8_t)(len-LENTH_LEN-HEAD_LEN);
+////	  uint16_t jsonBodyCrc=RTU_CRC(packBuf+HEAD_LEN+LENTH_LEN,len-HEAD_LEN-LENTH_LEN);
+////	  //crc
+////	  packBuf[len]=(uint8_t)(jsonBodyCrc>>8); len++;//更新crc
+////	  packBuf[len]=(uint8_t)(jsonBodyCrc);    len++;
+
+////		//tail
+////		packBuf[len]= (uint8_t)(TAIL>>8); len++;
+////		packBuf[len]= (uint8_t)(TAIL);    len++;
+//		packBuf[len] =0;//len++;//结尾 补0
+//		
+//		mcu.devRegMessID =mcu.upMessID;
+//		upMessIdAdd();
+//		rt_kprintf("reg len:%d\r\n",len);
+//		
+//		for(int i=0;i<len;i++)
+//				rt_kprintf("%02x",packBuf[i]);
+//		//rt_kprintf("\r\nlen：%d str0:%x str1:%x str[2]:%d  str[3]:%d\r\n",len,packBuf[0],packBuf[1],packBuf[2],packBuf[3]);
+//		//rt_kprintf("heart:%s \n",packBuf);
+//		rt_free(str);
+//		str=RT_NULL;
+//		return len;
+//}
 uint16_t rs485DataPack()
 {
 	  char num=0;//第1路485
@@ -329,8 +412,9 @@ uint16_t rs485DataPack()
 		
 		for(int i=0;i<len;i++)
 				rt_kprintf("%02x",packBuf[i]);
-		rt_kprintf("\r\nlen：%d str0:%x str1:%x str[2]:%d  str[3]:%d\r\n",len,packBuf[0],packBuf[1],packBuf[2],packBuf[3]);
+		//rt_kprintf("\r\nlen：%d str0:%x str1:%x str[2]:%d  str[3]:%d\r\n",len,packBuf[0],packBuf[1],packBuf[2],packBuf[3]);
 		//rt_kprintf("heart:%s \n",packBuf);
 		return len;
 }
+
 

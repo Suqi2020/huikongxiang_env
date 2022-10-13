@@ -683,7 +683,9 @@ void USART2_IRQHandler(void)
 		if((__HAL_UART_GET_FLAG(&huart2,UART_FLAG_RXNE)!=RESET))  //接收中断(接收到的数据必须是0x0d 0x0a结尾)
 		{
 				HAL_UART_Receive(&huart2,&Res,1,1000); 
-			  rt_mq_send(&cirCurrmque, &Res, 1);  //收到数据后就往队列里丢
+			  extern rt_err_t cirCurrUartRec(uint8_t dat);
+				cirCurrUartRec(Res);
+			  //rt_mq_send(&cirCurrmque, &Res, 1);  //收到数据后就往队列里丢
 
 		}
 		HAL_UART_IRQHandler(&huart2);	
@@ -730,7 +732,8 @@ void USART3_IRQHandler(void)
 		{
 	
 				HAL_UART_Receive(&huart3,&Res,1,1000); 
-			
+			  extern rt_err_t partDischagUartRec(uint8_t dat);
+			  partDischagUartRec(Res);
 		}
 		HAL_UART_IRQHandler(&huart3);	
 	#endif

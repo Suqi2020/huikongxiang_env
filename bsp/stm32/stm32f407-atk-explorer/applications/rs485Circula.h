@@ -91,9 +91,9 @@ typedef struct
 extern CIRCURStru  cirCurStru_p;
 
 void readCirCurrAndWaring(void);
-rt_bool_t waringcheck(void);
+rt_bool_t cirCurrWaringcheck(void);
 uint16_t 	cirCulaDataPack(void);
-void  waringEventPack(void);
+void  cirCurrWaringEventPack(void);
 
 
 #endif

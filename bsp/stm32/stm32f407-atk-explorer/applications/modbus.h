@@ -4,6 +4,7 @@
 
 
 #define READ       0x03
+#define READM_BIT   0X01
 #define WRITE      0x06
 #define WRITE_MUL  0x10
 
@@ -11,6 +12,7 @@
 
 
 uint8_t modbusReadReg(uint16_t slavAddr,uint16_t regAddr,uint16_t len,uint8_t * out);
+uint8_t modbusReadBitReg(uint16_t slavAddr,uint16_t regAddr,uint16_t len,uint8_t * out);
 //写一个寄存器
 uint8_t modbusWriteOneReg(uint16_t slavAddr,uint16_t regAddr,uint16_t value,uint8_t *out);
 //写多个寄存器  len  数据长度 len/2寄存器个数

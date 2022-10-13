@@ -7,7 +7,7 @@
 要求：能实现迅速切换其它485接口来使用 方法：只需要修改串口发送接口 和中断接收接口即可
       rs485Circula.c-cirCurrUartSend(uint8_t *buf,int len) 和drv_uart.c-USART2_IRQHandler中
 串口2346 modbus 串口1 debug 串口5 串口屏
-
+//modbus接口通用read  03 06 10 
 */
 //读一个或多个寄存器
 //MQTTLenString test;
@@ -17,6 +17,23 @@ uint8_t modbusReadReg(uint16_t slavAddr,uint16_t regAddr,uint16_t len,uint8_t * 
 		int i=0;
 	  out[i]=slavAddr;					 			i++;
 	  out[i]=READ;      					 		i++;
+	  out[i]=(uint8_t)(regAddr>>8);   i++;
+	  out[i]=(uint8_t) regAddr;       i++;
+		out[i]=(uint8_t)(len>>8);       i++;
+	  out[i]=(uint8_t) len;       		i++;
+	  uint16_t crcRet=RTU_CRC(out ,i);
+	  out[i]=(uint8_t)(crcRet>>8);    i++;
+	  out[i]=crcRet;       						i++;
+		return i;
+}
+
+
+//modbus 读bit位寄存器
+uint8_t modbusReadBitReg(uint16_t slavAddr,uint16_t regAddr,uint16_t len,uint8_t * out)
+{
+		int i=0;
+	  out[i]=slavAddr;					 			i++;
+	  out[i]=READM_BIT;      					i++;
 	  out[i]=(uint8_t)(regAddr>>8);   i++;
 	  out[i]=(uint8_t) regAddr;       i++;
 		out[i]=(uint8_t)(len>>8);       i++;
@@ -89,6 +106,9 @@ rt_bool_t  modbusRespCheck(uint16_t slavAddr,uint8_t *buf,uint16_t len,rt_bool_t
 		}
 		return RT_TRUE;
 }
+
+
+
 /*
 //modbus读取回复数据校验 
 rt_bool_t  modbusReadRespCheck(uint16_t slavAddr,uint8_t *buf,uint16_t len)

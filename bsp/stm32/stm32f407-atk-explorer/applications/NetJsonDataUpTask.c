@@ -7,73 +7,130 @@ extern struct rt_mailbox mbNetSendData;
 extern uint8_t   packBuf[TX_RX_MAX_BUF_SIZE];
 extern rt_bool_t gbNetState;
 
-const uint16_t  heart_timTick=120; //120秒发一次心跳
-const uint16_t  reg_timTick=50;  //5秒注册一次
-uint16_t  uart6_timTick=60;//默认值给个60
-uint16_t  uart2_timTick=60;//默认值给个60
-uint16_t  uart3_timTick=60;//默认值给个60
-uint16_t  uart4_timTick=60;//默认值给个60
-//利用upKeepStateTask中1秒的间隔做一个简易定时器
-//来执行对应的上行包的发送
-//掉线情况下先不执行count
-static void easyUpTimer()
+
+#define TIM_NUM  6 //目前支持6路定时器  最大 65536秒
+typedef struct
 {
-	  
-	  static uint32_t count = 0;
-	  count++;
-		if((count%heart_timTick)==0){
-//				heartUpPack();
-//				rt_mb_send_wait(&mbNetSendData, (rt_ubase_t)&packBuf,RT_WAITING_FOREVER); 
-			  rt_kprintf("heart timer out\r\n");
+		uint16_t count;     //计数
+	  uint16_t threshoVal;//阈值
+}timerStru;
+static timerStru tim[TIM_NUM];
+//给个定时值
+static void timeInit(int num,int value)//给个定时值
+{
+	  if((num>=TIM_NUM)||(value==0)){
+				rt_kprintf("tim inint err\n");
+			return;
 		}
-		if(gbRegFlag==RT_FALSE){
-				if(((count+1)%reg_timTick)==0){//不能用else 有可能多个定时任务同时到
-//						rt_kprintf("reg timer out\r\n");
-//					  devRegPack();
+		tim[num].threshoVal=value;
+		 
+}
+//每1秒递增一次
+static void timeInc()
+{
+	  for(int i=0;i<TIM_NUM;i++){
+			  if(tim[i].count!=0xFFFF)
+						tim[i].count++;
+		}
+}
+
+//启动
+static void timeStart(int num)
+{
+		tim[num].count=0;
+}
+//停止
+static void timeStop(int num)
+{
+		tim[num].count=0xFFFF;
+}
+
+//定时时间到
+static int timeOut()
+{
+	  for(int i=0;i<TIM_NUM;i++){
+				if(tim[i].count!=0xFFFF){
+						if(tim[i].count>=tim[i].threshoVal){
+							timeStart(i);
+							return i;
+						}
 				}
 		}
-		if(((count+3)%uart6_timTick)==0){
-				rt_kprintf("485_1 timer out\r\n");
+		return 0xff;
+}
 
-		}
-		if(((count+5)%uart2_timTick)==0){
+//定时时间到  执行相应事件
+static void  timeOutRunFun()
+{
+	  void readPdFreqDischarge(void);
+		switch(timeOut()){
+			case 0://心跳
+				heartUpPack();
+				rt_mb_send_wait(&mbNetSendData, (rt_ubase_t)&packBuf,RT_WAITING_FOREVER); 
+			  rt_kprintf("heart timer out\r\n");
+				break;
+			case 1://注册 注册成功后定时器就关闭
+			  if(gbRegFlag==RT_FALSE){
+					  devRegPack();
+						rt_mb_send_wait(&mbNetSendData, (rt_ubase_t)&packBuf,RT_WAITING_FOREVER); 
+						rt_kprintf("reg timer out\r\n");
+					  timeStop(1);
+				}
+				else
+						timeStop(1);
+				break;
+			case 2://读取环流
 			  readCirCurrAndWaring();
-			  if(waringcheck()==RT_TRUE){//先发报警状态 再发数据
-						waringEventPack();
+			  if(cirCurrWaringcheck()==RT_TRUE){//先发报警状态 再发数据
+						cirCurrWaringEventPack();
 					  rt_thread_mdelay(1000);//延时1秒再发下一包
 				}
 				cirCulaDataPack();
 				rt_mb_send_wait(&mbNetSendData, (rt_ubase_t)&packBuf,RT_WAITING_FOREVER);
-				rt_kprintf("485_2 timer out\r\n");
+				rt_kprintf("timer 2 out\r\n");
+				break;
+			case 3://读取局放
+        readPdFreqDischarge();
+			  if(readPartDischgWarning()==RT_TRUE){
+						partDisWaringEventPack();
+					  rt_mb_send_wait(&mbNetSendData, (rt_ubase_t)&packBuf,RT_WAITING_FOREVER);
+					  rt_thread_mdelay(1000);//延时1秒再发下一包
+						rt_kprintf("\r\n");
+				}
+				partDisDataPack();
+				rt_mb_send_wait(&mbNetSendData, (rt_ubase_t)&packBuf,RT_WAITING_FOREVER);
+				rt_kprintf("timer 3 out\r\n");
+				break;
+			case 4:
+				rt_kprintf("timer 4 out\r\n");
+				break;
+			case 5:
+				rt_kprintf("timer 5 out\r\n");
+				break;
+			default:
+				break;
 		}
-		if(((count+7)%uart3_timTick)==0){
-				rt_kprintf("485_3 timer out\r\n");
-		}
-		if(((count+9)%uart4_timTick)==0){
-				rt_kprintf("485_4 timer out\r\n");
-				rs485DataPack();
-		}
-
 }
+
 //上行数据的维护以及重发
 void   upKeepStateTask(void *para)
 {
 	 
 	  extern  void devIDRead();
     devIDRead();
-	  uint32_t count=20;
 	  extern void cirCurrConf();
-	  cirCurrConf();//公众电流初始化
-	  extern void  partDischagMutexQueueCreat();
-	  partDischagMutexQueueCreat();
+	  cirCurrConf();//公众电流初始化 modbus配置
+		timeInit(0, 120);//心跳定时
+		timeInit(1, 2);//注册 注册成功后定时器就关闭
+		timeInit(2, 60);//读取环流
+		timeInit(3, 60);//读取局放
+		timeInit(4, 70);
+		timeInit(5, 70);
 		while(1){
 			  if(gbNetState ==RT_TRUE){
-						easyUpTimer();
+					  timeOutRunFun();
+					  timeInc();
 				}
-//				if((count--)==0){
-//					count=30;
-//				readCirCurrAndWaring();
-//				}
 				rt_thread_mdelay(1000);
 		}
 }

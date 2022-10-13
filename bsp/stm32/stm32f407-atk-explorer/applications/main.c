@@ -28,28 +28,32 @@
 //0V7  w5500 中断接收数据OK  20220927
 //0V9  shell命令行OK        20220927
 //V0.11  增加4个主要task    20220930
-	//task1  w5500网络状态的维护，以及接收数据               w5500Task
-	//task2  上行数据发送的维护（包括上行心跳 注册 数据打包 ）
-	//       以及重发 丢给task3                              upKeepStateTask
-	//task3  net网络端的发送                                 netDataSednTask                      
-	//task4  接收完数据的解析与处理                          netDataRecTask
-//task1  w5500网络状态的维护，以及接收数据               w5500Task
-//task2  上行数据发送的维护（包括上行心跳 注册 数据打包 ）
-//       以及重发 丢给task3                              upKeepStateTask
-//task3  net网络端的发送                                 netDataSednTask                      
-//task4  接收完数据的解析与处理                          netDataRecTask
-//#define RT_CONSOLEBUF_SIZE 2048  //后期需要该小 512
-//V0.12  上行心跳json和回复OK    20221008
-//V0.13   加入dataup 和devreg easy timer 20221009
-//V0.14   手动测试3条上行数据OK  20221010
+//			task1  w5500网络状态的维护，以及接收数据               w5500Task
+//			task2  上行数据发送的维护（包括上行心跳 注册 数据打包 ）
+//       		以及重发 丢给task3                              upKeepStateTask
+//			task3  net网络端的发送                                 netDataSednTask                      
+//			task4  接收完数据的解析与处理                          netDataRecTask
+//			task1  w5500网络状态的维护，以及接收数据               w5500Task
+//			task2  上行数据发送的维护（包括上行心跳 注册 数据打包 ）
+//       				以及重发 丢给task3                              upKeepStateTask
+//			task3  net网络端的发送                                 netDataSednTask                      
+//			task4  接收完数据的解析与处理                          netDataRecTask
+//			#define RT_CONSOLEBUF_SIZE 2048  //后期需要该小 512
+//V0.12  上行心跳json和回复OK    																	20221008
+//V0.13   加入dataup 和devreg easy timer													 20221009
+//V0.14   手动测试3条上行数据OK  																		20221010
 //        串口2346 modbus 串口1 debug 串口5 串口屏
 //V0.15		rs485_公众环流 modbus 初步调式读取数据成功，并能实现上传 20221011
 //        rt_sprintf float类型有问题  使用sprintf代替 
-//V0.16   READ WRITE modbus OK   20221012
+//V0.16   READ WRITE modbus OK   																			20221012
 //V0.17   //迅速切换其它485接口来使用 方法：只需要修改串口发送接口 和中断接收接口即可
 //         rs485Circula.c-cirCurrUartSend(uint8_t *buf,int len) 
 //         和drv_uart.c-USART2_IRQHandler中 -rt_mq_send(&cirCurrmque, &Res, 1);    20221012
-
+//V0.18    modbus读不到数据填充0       2022012
+//V0.19    局放读取可以  加入modbus读取保护  每次发送后再读取             
+//         增加软件定时器 粗略具备初始化 开始 停止功能 需要1秒的基准 
+//         增加modbus设备重启后出现的干扰过滤（非modbus读取的数据 丢弃）
+//         具备定时器同时到的情况下错开发送功能                          20221013
 static    rt_thread_t tid 	= RT_NULL;
 
 //信号量的定义
@@ -84,9 +88,12 @@ int main(void)
     {
         rt_kprintf("create w5500Iqr_semp failed\n");
     }
+		//创建285设备用到的互斥 队列
 		extern void cirCurrMutexQueueCreat();
 		cirCurrMutexQueueCreat();
-		 //__HAL_UART_ENABLE_IT(&huart2, UART_IT_RXNE);//队列初始化之后再开启串口中断接收
+		extern void partDischagMutexQueueCreat();
+		partDischagMutexQueueCreat();
+	
 ////////////////////////////////////邮箱//////////////////////////////////
 		
 

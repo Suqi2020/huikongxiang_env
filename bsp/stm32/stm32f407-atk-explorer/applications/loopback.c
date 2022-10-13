@@ -260,7 +260,7 @@ void loopback_tcpc(SOCKET s, uint16 port)
 					rt_mb_send_wait(&mbNetRecData, (rt_ubase_t)&NetRxBuffer,RT_WAITING_FOREVER);  
 					//send(s,data_buf,len);//
 //					rt_thread_mdelay(500); //延时后边再打印
-//					rt_kprintf("data_buf:%d \r\n",len);
+					rt_kprintf("net rec len:%d \r\n",len);
 //					rt_kprintf("[");
 //					for(int i=0;i<len;i++)
 //					   rt_kprintf("%02x",NetRxBuffer[i]);

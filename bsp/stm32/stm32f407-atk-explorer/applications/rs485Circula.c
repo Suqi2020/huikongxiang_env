@@ -1,22 +1,27 @@
 #include "rs485Circula.h"
 
 //<<公众环流 GY-JDHL03>>  目前测试只采集环流值
+//相应时间 200m
 //  1、读取环流值   
 //  2、读取报警标志 
 //  3、配置报警阈值 
 //  4、读取报警阈值
 //  5、设置采集间隔
 //  6、读取采集间隔
-//调整RS485串口需要调整 UART5_IRQHandler以及HAL_UART_Transmit发送串口  还需要更换对应串口的队列
+//调整RS485串口需要调整 UART5_IRQHandler以及HAL_UART_Transmit发送串口  
+//还需要更换对应串口的队列 调整 char num=0;
 // 9600波特率 注意修改此处 rt_mq_recv(&cirCurrmque, &buf, sizeof(buf), 2)
 //迅速切换其它485接口来使用 方法：只需要修改串口发送接口 和中断接收接口即可
 // rs485Circula.c-cirCurrUartSend(uint8_t *buf,int len) 和drv_uart.c-USART2_IRQHandler中
-rt_mutex_t cirCurrMutex = RT_NULL;
+// cirCurrUartSend(uint8_t *buf,int len)   cirCurrUartRec(uint8_t dat)
+
+
+static rt_mutex_t cirCurrMutex = RT_NULL;
 #define  MSGPOOL_LEN   200 //485数据最大量  大于1k需要修改此处
 //队列的定义
-struct  rt_messagequeue cirCurrmque;
-uint8_t cirCurrQuePool[MSGPOOL_LEN];  //
-
+static struct  rt_messagequeue cirCurrmque;
+static uint8_t cirCurrQuePool[MSGPOOL_LEN];  //
+static rt_bool_t  recFlag = RT_FALSE; //每个循环发送一次 发完 RT_TRUE 接收完成或者接收超时置为 RT_FALSE
 
 
 #define   SLAVE_ADDR     0X01
@@ -25,22 +30,35 @@ uint8_t cirCurrQuePool[MSGPOOL_LEN];  //
 extern uint8_t packBuf[TX_RX_MAX_BUF_SIZE];
 
 CIRCURStru  cirCurStru_p;
-uint16_t readAcqInterv(void);
-uint16_t readPoint(void);
-uint32_t readThresholdVal(void);
-rt_bool_t writeAcqInterv(uint16_t value);
-rt_bool_t writeThresholdVal(uint32_t value);
-rt_bool_t writePoint(uint16_t value);
+static uint16_t readAcqInterv(void);
+static uint16_t readPoint(void);
+static uint32_t readThresholdVal(void);
+static rt_bool_t writeAcqInterv(uint16_t value);
+static rt_bool_t writeThresholdVal(uint32_t value);
+static rt_bool_t writePoint(uint16_t value);
+
+static char num=0;//第1路485
 //打包串口发送 
-void cirCurrUartSend(uint8_t *buf,int len)
+static void cirCurrUartSend(uint8_t *buf,int len)
 {
+
 		UART2_485_SEND;
 	  HAL_UART_Transmit(&huart2,(uint8_t *)buf,len,1000);
 		UART2_485_REC;
+
+}
+//串口接收后丢到队列里
+rt_err_t cirCurrUartRec(uint8_t dat)
+{
+	
+		if(recFlag==RT_TRUE){
+				return rt_mq_send(&cirCurrmque, &dat, 1);  //收到数据后就往队列里丢
+		}
+		else
+			  return RT_FALSE;
 }
 
-
-
+//
 //创建环流用到的互斥量和消息队列
 void  cirCurrMutexQueueCreat()
 {
@@ -61,85 +79,6 @@ void  cirCurrMutexQueueCreat()
     }
 }
 
-////////////////////////////////////读写寄存器以及crc校验/////////////////////////////////////////////////
-// out --输出数据
-//uint8_t modbusReadReg(uint16_t slavAddr,uint16_t regAddr,uint16_t len,uint8_t * out)
-//{
-//		int i=0;
-//	  out[i]=slavAddr;					 			i++;
-//	  out[i]=READ;      					 		i++;
-//	  out[i]=(uint8_t)(regAddr>>8);   i++;
-//	  out[i]=(uint8_t) regAddr;       i++;
-//		out[i]=(uint8_t)(len>>8);       i++;
-//	  out[i]=(uint8_t) len;       		i++;
-//	  uint16_t crcRet=RTU_CRC(out ,i);
-//	  out[i]=(uint8_t)(crcRet>>8);    i++;
-//	  out[i]=crcRet;       						i++;
-//		return i;
-//}
-////写一个寄存器
-//uint8_t modbusWriteOneReg(uint16_t slavAddr,uint16_t regAddr,uint16_t value,uint8_t *out)
-//{
-//		int i=0;
-//	  out[i]=slavAddr;					 			i++;
-//	  out[i]=WRITE;      					 		i++;
-//	  out[i]=(uint8_t)(regAddr>>8);   i++;
-//	  out[i]=(uint8_t) regAddr;       i++;
-//		out[i]=(uint8_t)(value>>8);   	i++;
-//	  out[i]=(uint8_t) value;     		i++;
-//	  uint16_t crcRet=RTU_CRC(out ,i);
-//	  out[i]=(uint8_t)(crcRet>>8);    i++;
-//	  out[i]=crcRet;       						i++;	
-//    return i;	
-//}
-////写多个寄存器  len  数据长度 len/2寄存器个数  OUT-输出数据
-//uint8_t modbusWriteMultReg(uint16_t slavAddr,uint16_t regAddr,uint16_t len,uint8_t *in,uint8_t *out)
-//{
-//		int i=0;
-//	  out[i]=slavAddr;					 			i++;
-//	  out[i]=WRITE_MUL;      					i++;
-//	  out[i]=(uint8_t)(regAddr>>8);   i++;
-//	  out[i]=(uint8_t) regAddr;       i++;
-//		out[i]=(uint8_t)((len/2)>>8);   i++;
-//	  out[i]=(uint8_t) len/2;       	i++; //寄存器个数
-//	  out[i]=(uint8_t) len;       		i++;//数据长度
-//	  for(int j=0;j<len;j++,i++){
-//				out[i]=in[j];
-//		}
-//	  uint16_t crcRet=RTU_CRC(out ,i);
-//	  out[i]=(uint8_t)(crcRet>>8);    i++;
-//	  out[i]=crcRet;       						i++;	
-//    return i;			
-//}
-////modbus回复数据校验   readFLAG TRUE  读  FALSE  写
-//rt_bool_t  modbusRespCheck(uint16_t slavAddr,uint8_t *buf,uint16_t len,rt_bool_t readFlag)
-//{
-//	  if(len<2){
-//				rt_kprintf("ERR:modbus resp\r\n");
-//				return RT_FALSE;
-//		}
-//		if(buf[0]!=slavAddr){
-//				rt_kprintf("ERR:modbus slaveADDR\r\n");
-//				return RT_FALSE;
-//		}
-//		if(readFlag==RT_TRUE){
-//		if((buf[2]+2+1+2)!=len){
-//						rt_kprintf("ERR:modbus 可能连包\r\n");
-//				}
-//				len =buf[2]+2+1+2;//重新刷新长度
-//		}
-//		else{
-//			#define  WR_RESP_LEN  8
-//				len =WR_RESP_LEN;//重新刷新长度
-//		}
-//		uint16_t respCrc=(buf[len-2]<<8)+buf[len-1];
-//	  uint16_t checkCrc= RTU_CRC(buf,len-2);
-//		if(respCrc!=checkCrc){
-//				rt_kprintf("CRC check err 0x%04x  0x%04x\r\n",respCrc,checkCrc);
-//				return RT_FALSE;
-//		}
-//		return RT_TRUE;
-//}
 ///////////////////////////////////////读写寄存器相关操作////////////////////////////////////////
 //读取环流值和报警信息 寄存器地址 0x0023 长度12
 void readCirCurrAndWaring()
@@ -150,7 +89,7 @@ void readCirCurrAndWaring()
 	  //uint8_t   buf[100]
 	  uint16_t len = modbusReadReg(SLAVE_ADDR,0x0023,12,buf);
 	  //485发送buf  len  等待modbus回应
-	  
+	  recFlag = RT_TRUE;
 	  cirCurrUartSend(buf,len);
 
 	  rt_kprintf("readCirCurrAndWaring send:");
@@ -181,11 +120,22 @@ void readCirCurrAndWaring()
 			  cirCurStru_p.warningD	=(buf[offset]<<8)	+buf[offset+1];	offset+=2;
 			  rt_kprintf("提取电流、报警值成功\r\n");
 		} 
-
+		else{//读不到给0
+				cirCurStru_p.circlCurA=0;
+				cirCurStru_p.circlCurB=0;
+				cirCurStru_p.circlCurC=0;
+				cirCurStru_p.circlCurD=0;
+			  cirCurStru_p.warningA	=0;
+			  cirCurStru_p.warningB	=0;
+			  cirCurStru_p.warningC	=0;
+			  cirCurStru_p.warningD	=0;
+			  rt_kprintf("提取电流、报警值fail\r\n");
+		}
+		recFlag = RT_FALSE;
 	  rt_mutex_release(cirCurrMutex);
-		 rt_kprintf("release\r\n");
+	//	 rt_kprintf("release\r\n");
 		rt_free(buf);
-		 rt_kprintf("free\r\n");
+	//	 rt_kprintf("free\r\n");
 	  buf=RT_NULL;
 }
 //每次上电后需要从flash中读出存储的值与modbus回复的值进行比较
@@ -225,6 +175,7 @@ uint16_t readAcqInterv()
 		uint8_t  *buf = rt_malloc(LENTH);
 	  uint16_t len = modbusReadReg(SLAVE_ADDR,0x0004,1,buf);
 	  uint16_t ret =0;
+		recFlag = RT_TRUE;
 		rt_mutex_take(cirCurrMutex,RT_WAITING_FOREVER);
 	  //485发送buf  len  等待modbus回应
 		cirCurrUartSend(buf,len);
@@ -250,7 +201,9 @@ uint16_t readAcqInterv()
 			  ret	=(buf[offset]<<8)	+buf[offset+1];	//offset+=2;
 			  rt_kprintf("提取采集间隔成功 %d\r\n",ret);
 		} 
+		
     //
+		recFlag = RT_FALSE;
 	  rt_mutex_release(cirCurrMutex);
 		rt_free(buf);
 	  buf=RT_NULL;
@@ -266,6 +219,7 @@ rt_bool_t writeAcqInterv(uint16_t value)
 		uint8_t  *buf = rt_malloc(LENTH);
 	  uint16_t len = modbusWriteOneReg(SLAVE_ADDR,0x0004,value,buf);//modbusWriteReg(SLAVE_ADDR,0x0004,1,buf);
 		rt_mutex_take(cirCurrMutex,RT_WAITING_FOREVER);
+	  recFlag = RT_TRUE;
 	  //485发送buf  len  等待modbus回应
 		cirCurrUartSend(buf,len);
 	  rt_kprintf("wrAcqInterv send:");
@@ -291,6 +245,7 @@ rt_bool_t writeAcqInterv(uint16_t value)
 				}
 		} 
     //
+		recFlag = RT_FALSE;
 	  rt_mutex_release(cirCurrMutex);
 		rt_free(buf);
 	  buf=RT_NULL;
@@ -304,7 +259,9 @@ uint32_t readThresholdVal()
 	  uint8_t offset=3;//add+regadd+len
 		uint8_t  *buf = rt_malloc(LENTH);
 	  uint16_t len = modbusReadReg(SLAVE_ADDR,0x0009,4,buf);
-	  uint32_t ret =0;
+	  uint32_t ret =0;		
+	  recFlag = RT_TRUE;
+
 		rt_mutex_take(cirCurrMutex,RT_WAITING_FOREVER);
 	  //485发送buf  len  等待modbus回应
 		cirCurrUartSend(buf,len);
@@ -330,7 +287,7 @@ uint32_t readThresholdVal()
 			  ret	=(buf[offset]<<24)+(buf[offset+1]<<16)+(buf[offset+2]<<8)+buf[offset+3];//offset+=2;
 			  rt_kprintf("提取报警阈值 %d\r\n",ret);
 		} 
-    //
+		recFlag = RT_FALSE;
 	  rt_mutex_release(cirCurrMutex);
 		rt_free(buf);
 	  buf=RT_NULL;
@@ -347,7 +304,7 @@ rt_bool_t writeThresholdVal(uint32_t value)
 		send[2]=(uint8_t)(value>>8);
 		send[3]=value;
 	  uint16_t len = modbusWriteMultReg(SLAVE_ADDR,0x0009,sizeof(uint32_t),send,buf);
-//	  uint16_t ret =0;
+    recFlag = RT_TRUE;
 		rt_mutex_take(cirCurrMutex,RT_WAITING_FOREVER);
 	  //485发送buf  len  等待modbus回应
 		cirCurrUartSend(buf,len);
@@ -373,7 +330,7 @@ rt_bool_t writeThresholdVal(uint32_t value)
 						return RT_TRUE;
 				}
 		} 
-    //
+		recFlag = RT_FALSE;
 	  rt_mutex_release(cirCurrMutex);
 		rt_free(buf);
 	  buf=RT_NULL;
@@ -389,6 +346,7 @@ uint16_t readPoint()
 		uint8_t  *buf = rt_malloc(LENTH);
 	  uint16_t len = modbusReadReg(SLAVE_ADDR,0x000B,1,buf);
 	  uint16_t ret =0;
+		recFlag = RT_TRUE;
 		rt_mutex_take(cirCurrMutex,RT_WAITING_FOREVER);
 	  //485发送buf  len  等待modbus回应
 		cirCurrUartSend(buf,len);
@@ -418,7 +376,7 @@ uint16_t readPoint()
 						cirCurStru_p.point =10;
 			  rt_kprintf("提取小数点 %d\r\n",ret);
 		} 
-    //
+		recFlag = RT_FALSE;
 	  rt_mutex_release(cirCurrMutex);
 		rt_free(buf);
 	  buf=RT_NULL;
@@ -432,6 +390,7 @@ rt_bool_t writePoint(uint16_t value)
 		uint8_t  *buf = rt_malloc(LENTH);
 	  uint16_t len = modbusWriteOneReg(SLAVE_ADDR,0x000b,value,buf);//modbusWriteReg(SLAVE_ADDR,0x0004,1,buf);
 		rt_mutex_take(cirCurrMutex,RT_WAITING_FOREVER);
+		recFlag = RT_TRUE;
 	  //485发送buf  len  等待modbus回应
 		cirCurrUartSend(buf,len);
 	  rt_kprintf("wrAcqInterv send:");
@@ -456,7 +415,7 @@ rt_bool_t writePoint(uint16_t value)
 						return RT_TRUE;
 				}
 		} 
-    
+		recFlag = RT_FALSE;
 	  rt_mutex_release(cirCurrMutex);
 		rt_free(buf);
 	  buf=RT_NULL;
@@ -467,7 +426,7 @@ rt_bool_t writePoint(uint16_t value)
 
 }
 //判断是否有报警 需要在readCirCurrAndWaring()后边使用
-rt_bool_t waringcheck()
+rt_bool_t cirCurrWaringcheck()
 {
 		if((cirCurStru_p.warningA)||(cirCurStru_p.warningA)||(cirCurStru_p.warningA)|(cirCurStru_p.warningA)){
 			 rt_kprintf("ERR:环流值过高 触发报警 \n\r");
@@ -509,7 +468,7 @@ rt_bool_t waringcheck()
 //电流值打包
 uint16_t 	cirCulaDataPack()
 {
-	  char num=0;//第1路485
+	 
 	  memset(packBuf,0,sizeof(packBuf));
 		int len=0;
     //head+lenth
@@ -600,7 +559,7 @@ uint16_t 	cirCulaDataPack()
 		packBuf[len]= (uint8_t)(TAIL);    len++;
 		packBuf[len] =0;//len++;//结尾 补0
 		
-		mcu.devRegMessID =mcu.upMessID;
+		mcu.repDataMessID =mcu.upMessID;
 		upMessIdAdd();
 		rt_kprintf("reg len:%d\r\n",len);
 		
@@ -611,7 +570,7 @@ uint16_t 	cirCulaDataPack()
 		return len;
 }
 //告警信息的打包  readCirCurrAndWaring()
-void  waringEventPack()
+void  cirCurrWaringEventPack()
 {
 		rt_kprintf("后期加入 \n\r");
 		
