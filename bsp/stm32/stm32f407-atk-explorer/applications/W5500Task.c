@@ -83,6 +83,10 @@ void  w5500Task(void *parameter)
 	W5500_enum W5500State=W5500InitEnum;
   static uint8_t dhcpTick=0;
 	static uint8_t rstW5500Ct=0;
+//	while(1){
+//			rt_thread_mdelay(500);
+//			  
+//	}
   while(1) 														/*循环执行的函数*/ 
   {
 		switch(W5500State)

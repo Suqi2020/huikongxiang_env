@@ -13,7 +13,7 @@
 #include <rtdevice.h>
 #include <board.h>
 #include <string.h>
-#define APP_VER       ((0<<8)+18)//0x0105 表示1.5版本
+#define APP_VER       ((0<<8)+20)//0x0105 表示1.5版本
 //0V1   20220919
 //初始化  没有加入版本管理 
 //0V3   20220920
@@ -54,6 +54,24 @@
 //         增加软件定时器 粗略具备初始化 开始 停止功能 需要1秒的基准 
 //         增加modbus设备重启后出现的干扰过滤（非modbus读取的数据 丢弃）
 //         具备定时器同时到的情况下错开发送功能                          20221013
+//V0.20    加入16K代码测试  MAX_SOCK_NUM 为1时候 最大发送16k网络数据  
+//         TX_RX_MAX_BUF_SIZE为实际发送缓存buf大小(与MAX_SOCK_NUM反比)                       20221017
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 static    rt_thread_t tid 	= RT_NULL;
 
 //信号量的定义
@@ -80,7 +98,7 @@ extern  void   hardWareDriverTest(void);
 int main(void)
 {
 
-    rt_kprintf("\n20221012  ver=%02d.%02d\n",(uint8_t)(APP_VER>>8),(uint8_t)APP_VER);
+    rt_kprintf("\n20221017  ver=%02d.%02d\n",(uint8_t)(APP_VER>>8),(uint8_t)APP_VER);
 	  rt_err_t result;
 //////////////////////////////////////信号量//////////////////////////////
 	  w5500Iqr_semp = rt_sem_create("w5500Iqr_semp",0, RT_IPC_FLAG_FIFO);

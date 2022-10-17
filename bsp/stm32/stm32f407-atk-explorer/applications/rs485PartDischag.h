@@ -24,6 +24,7 @@ typedef struct{
 		uint32_t dischargeC;
 	
 	  bs alarm;  //bit0 A bit1 B bit2 C
+	  uint8_t rev[3];
 }partDischargeStru;
 
 extern partDischargeStru partDisc;

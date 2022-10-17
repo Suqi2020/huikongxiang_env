@@ -345,6 +345,7 @@ void w5500Init()
 		IINCHIP_WRITE(Sn_IMR(7), 0x0F);
 		IINCHIP_WRITE(IMR, 0xF0);
 		IINCHIP_WRITE(SIMR, 0xFE);
+	 
 	  extern void rstDhcp();
 	  rstDhcp();
 

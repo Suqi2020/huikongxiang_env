@@ -78,15 +78,16 @@ uint8_t modbusWriteMultReg(uint16_t slavAddr,uint16_t regAddr,uint16_t len,uint8
     return i;			
 }
 //modbus回复数据校验   readFLAG TRUE  读  FALSE  写
-rt_bool_t  modbusRespCheck(uint16_t slavAddr,uint8_t *buf,uint16_t len,rt_bool_t readFlag)
+//0 succ  1 slave addr or bsp err    2 modbus uart err
+int  modbusRespCheck(uint16_t slavAddr,uint8_t *buf,uint16_t len,rt_bool_t readFlag)
 {
 	  if(len<2){
 				rt_kprintf("ERR:modbus resp\r\n");
-				return RT_FALSE;
+				return 2;
 		}
 		if(buf[0]!=slavAddr){
 				rt_kprintf("ERR:modbus slaveADDR\r\n");
-				return RT_FALSE;
+				return 1;
 		}
 		if(readFlag==RT_TRUE){
 		if((buf[2]+2+1+2)!=len){
@@ -102,9 +103,9 @@ rt_bool_t  modbusRespCheck(uint16_t slavAddr,uint8_t *buf,uint16_t len,rt_bool_t
 	  uint16_t checkCrc= RTU_CRC(buf,len-2);
 		if(respCrc!=checkCrc){
 				rt_kprintf("CRC check err 0x%04x  0x%04x\r\n",respCrc,checkCrc);
-				return RT_FALSE;
+				return 0;
 		}
-		return RT_TRUE;
+		return 0;
 }
 
 

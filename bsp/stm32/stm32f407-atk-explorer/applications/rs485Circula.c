@@ -1,7 +1,7 @@
 #include "rs485Circula.h"
 
 //<<公众环流 GY-JDHL03>>  目前测试只采集环流值
-//相应时间 200m
+//响应时间 200ms  默认波特率115200
 //  1、读取环流值   
 //  2、读取报警标志 
 //  3、配置报警阈值 
@@ -109,7 +109,7 @@ void readCirCurrAndWaring()
 		rt_kprintf("\n");
 		//提取环流值 第一步判断crc 第二部提取
 		
-		if(RT_TRUE ==  modbusRespCheck(SLAVE_ADDR,buf,len,RT_TRUE)){//刷新读取到的值
+		if(0 ==  modbusRespCheck(SLAVE_ADDR,buf,len,RT_TRUE)){//刷新读取到的值
 				cirCurStru_p.circlCurA=(buf[offset]<<24)+(buf[offset+1]<<16)+(buf[offset+2]<<8)+buf[offset+3];offset+=4;
 				cirCurStru_p.circlCurB=(buf[offset]<<24)+(buf[offset+1]<<16)+(buf[offset+2]<<8)+buf[offset+3];offset+=4;
 				cirCurStru_p.circlCurC=(buf[offset]<<24)+(buf[offset+1]<<16)+(buf[offset+2]<<8)+buf[offset+3];offset+=4;
@@ -196,7 +196,7 @@ uint16_t readAcqInterv()
 		rt_kprintf("\n");
 		//提取环流值 第一步判断crc 第二部提取
 		
-		if(RT_TRUE == modbusRespCheck(SLAVE_ADDR,buf,len,RT_TRUE)){//刷新读取到的值
+		if(0 == modbusRespCheck(SLAVE_ADDR,buf,len,RT_TRUE)){//刷新读取到的值
 
 			  ret	=(buf[offset]<<8)	+buf[offset+1];	//offset+=2;
 			  rt_kprintf("提取采集间隔成功 %d\r\n",ret);
@@ -239,7 +239,7 @@ rt_bool_t writeAcqInterv(uint16_t value)
 		rt_kprintf("\n");
 		//提取环流值 第一步判断crc 第二判断对错
 		
-		if(RT_TRUE ==  modbusRespCheck(SLAVE_ADDR,buf,len,RT_FALSE)){//刷新读取到的值
+		if(0 ==  modbusRespCheck(SLAVE_ADDR,buf,len,RT_FALSE)){//刷新读取到的值
         if(buf[1]==WRITE){
 						return RT_TRUE;
 				}
@@ -282,7 +282,7 @@ uint32_t readThresholdVal()
 		rt_kprintf("\n");
 		//提取环流值 第一步判断crc 第二部提取
 		
-		if(RT_TRUE ==  modbusRespCheck(SLAVE_ADDR,buf,len,RT_TRUE)){//刷新读取到的值
+		if(0 ==  modbusRespCheck(SLAVE_ADDR,buf,len,RT_TRUE)){//刷新读取到的值
 
 			  ret	=(buf[offset]<<24)+(buf[offset+1]<<16)+(buf[offset+2]<<8)+buf[offset+3];//offset+=2;
 			  rt_kprintf("提取报警阈值 %d\r\n",ret);
@@ -298,12 +298,12 @@ rt_bool_t writeThresholdVal(uint32_t value)
 {
 
 		uint8_t  *buf = rt_malloc(LENTH);
-	  uint8_t send[4]={0};
-		send[0]=(uint8_t)(value>>24);
-		send[1]=(uint8_t)(value>>16);
-		send[2]=(uint8_t)(value>>8);
-		send[3]=value;
-	  uint16_t len = modbusWriteMultReg(SLAVE_ADDR,0x0009,sizeof(uint32_t),send,buf);
+	  uint8_t sendD[4]={0};
+		sendD[0]=(uint8_t)(value>>24);
+		sendD[1]=(uint8_t)(value>>16);
+		sendD[2]=(uint8_t)(value>>8);
+		sendD[3]=value;
+	  uint16_t len = modbusWriteMultReg(SLAVE_ADDR,0x0009,sizeof(uint32_t),sendD,buf);
     recFlag = RT_TRUE;
 		rt_mutex_take(cirCurrMutex,RT_WAITING_FOREVER);
 	  //485发送buf  len  等待modbus回应
@@ -325,7 +325,7 @@ rt_bool_t writeThresholdVal(uint32_t value)
 		rt_kprintf("\n");
 		//提取环流值 第一步判断crc 第二判断对错
 		
-		if(RT_TRUE ==  modbusRespCheck(SLAVE_ADDR,buf,len,RT_FALSE)){//刷新读取到的值
+		if(0 ==  modbusRespCheck(SLAVE_ADDR,buf,len,RT_FALSE)){//刷新读取到的值
         if(buf[1]==WRITE_MUL){
 						return RT_TRUE;
 				}
@@ -367,7 +367,7 @@ uint16_t readPoint()
 		rt_kprintf("\n");
 		//提取环流值 第一步判断crc 第二部提取
 		
-		if(RT_TRUE ==  modbusRespCheck(SLAVE_ADDR,buf,len,RT_TRUE)){//刷新读取到的值
+		if(0 ==  modbusRespCheck(SLAVE_ADDR,buf,len,RT_TRUE)){//刷新读取到的值
 
 			  ret	=(buf[offset]<<8)	+buf[offset+1];	//offset+=2;
 			  if(ret==0)
@@ -410,7 +410,7 @@ rt_bool_t writePoint(uint16_t value)
 		rt_kprintf("\n");
 		//提取环流值 第一步判断crc 第二判断对错
 		
-		if(RT_TRUE ==  modbusRespCheck(SLAVE_ADDR,buf,len,RT_FALSE)){//刷新读取到的值
+		if(0 ==  modbusRespCheck(SLAVE_ADDR,buf,len,RT_FALSE)){//刷新读取到的值
         if(buf[1]==WRITE){
 						return RT_TRUE;
 				}

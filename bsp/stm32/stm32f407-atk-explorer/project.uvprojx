@@ -494,21 +494,6 @@
               <FilePath>.\applications\modbus.c</FilePath>
             </File>
             <File>
-              <FileName>rs485_3.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>.\applications\rs485_3.c</FilePath>
-            </File>
-            <File>
-              <FileName>rs485_4.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>.\applications\rs485_4.c</FilePath>
-            </File>
-            <File>
-              <FileName>rs485_5.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>.\applications\rs485_5.c</FilePath>
-            </File>
-            <File>
               <FileName>rs485Circula.c</FileName>
               <FileType>1</FileType>
               <FilePath>.\applications\rs485Circula.c</FilePath>

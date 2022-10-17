@@ -2,6 +2,7 @@
 #include "rs485PartDischag.h"
 //<<局放在线检测 --GY-JF100-C01>>  GZPD-1000电缆局放
 //响应时间不确定 最长1.7秒 有时候长 有时候短
+//           默认波特率115200
 partDischargeStru partDiscStru_p;
 #define  MSGPOOL_LEN   1024 //485数据最大量  大于1k需要修改此处
 static rt_mutex_t partDischagMutex = RT_NULL;  //局放互斥量 
@@ -91,7 +92,7 @@ void readPdFreqDischarge()
 		rt_kprintf("\n");
 		//提取环流值 第一步判断crc 第二部提取
 		
-		if(RT_TRUE ==  modbusRespCheck(SLAVE_ADDR,buf,len,RT_TRUE)){//刷新读取到的值
+		if(0 ==  modbusRespCheck(SLAVE_ADDR,buf,len,RT_TRUE)){//刷新读取到的值
 
 
 				partDiscStru_p.amplitudeA=(buf[offset]<<24)+(buf[offset+1]<<16)+(buf[offset+2]<<8)+buf[offset+3];offset+=4;
@@ -163,7 +164,7 @@ rt_bool_t readPartDischgWarning()
 		rt_kprintf("\n");
 		//提取环流值 第一步判断crc 第二部提取
 		
-		if(RT_TRUE ==  modbusRespCheck(SLAVE_ADDR,buf,len,RT_TRUE)){//刷新读取到的值
+		if(0 ==  modbusRespCheck(SLAVE_ADDR,buf,len,RT_TRUE)){//刷新读取到的值
      
 			  partDiscStru_p.alarm.a=buf[offset]>>0;
 				partDiscStru_p.alarm.b=buf[offset]>>1;

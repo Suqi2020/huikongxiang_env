@@ -162,7 +162,7 @@ void reset_w5500(void)
 	HAL_GPIO_WritePin(W5500_RST_GPIO_Port, W5500_RST_Pin, GPIO_PIN_SET);
 	rt_thread_mdelay(200);
   HAL_GPIO_WritePin(W5500_RST_GPIO_Port, W5500_RST_Pin, GPIO_PIN_RESET);	
-	rt_thread_mdelay(2000);
+	rt_thread_mdelay(200);
 	HAL_GPIO_WritePin(W5500_RST_GPIO_Port, W5500_RST_Pin, GPIO_PIN_SET);
 	rt_thread_mdelay(1600);
 }
@@ -174,9 +174,10 @@ uint8_t SPI_SendByte(uint8_t byte)
  uint8_t SPITimeout =200;
  while(__HAL_SPI_GET_FLAG(&hspi1,SPI_FLAG_TXE)==RESET)
  {
-  if((SPITimeout--)==0)
-  HAL_SPI_ErrorCallback(&hspi1);
-   return 0;
+  if((SPITimeout--)==0){
+		HAL_SPI_ErrorCallback(&hspi1);
+		return 0;
+	}
  }
  HAL_SPI_TransmitReceive(&hspi1,&byte,&rxbyte,1,100);
  return rxbyte;

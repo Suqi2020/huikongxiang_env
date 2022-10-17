@@ -45,8 +45,9 @@ uint8 socket(SOCKET s, uint8 protocol, uint16 port, uint8 flag)
       IINCHIP_WRITE( Sn_CR(s) ,Sn_CR_OPEN); // run sockinit Sn_CR
 
       /* wait to process the command... */
-      while( IINCHIP_READ(Sn_CR(s)) )
-         ;
+			
+				  int count =10000;
+   while( IINCHIP_READ(Sn_CR(s) ) &&(count--))
       /* ------- */
       ret = 1;
    }
@@ -69,9 +70,10 @@ void close(SOCKET s)
    IINCHIP_WRITE( Sn_CR(s) ,Sn_CR_CLOSE);
 
    /* wait to process the command... */
-   while( IINCHIP_READ(Sn_CR(s) ) )
+
        ;/* ------- */
-   
+	  int count =10000;
+   while( IINCHIP_READ(Sn_CR(s) ) &&(count--))
 	IINCHIP_WRITE( Sn_IR(s) , 0xFF);	 /* all clear */
 }
 
@@ -89,8 +91,8 @@ uint8 listen(SOCKET s)
    {
       IINCHIP_WRITE( Sn_CR(s) ,Sn_CR_LISTEN);
       /* wait to process the command... */
-      while( IINCHIP_READ(Sn_CR(s) ) )
-         ;
+	  int count =10000;
+   while( IINCHIP_READ(Sn_CR(s) ) &&(count--))
       /* ------- */
       ret = 1;
    }
@@ -134,7 +136,9 @@ uint8 connect(SOCKET s, uint8 * addr, uint16 port)
         IINCHIP_WRITE( Sn_DPORT1(s), (uint8)(port & 0x00ff));
         IINCHIP_WRITE( Sn_CR(s) ,Sn_CR_CONNECT);
         /* wait for completion */
-        while ( IINCHIP_READ(Sn_CR(s) ) ) ;
+						int count =10000;
+					 while( IINCHIP_READ(Sn_CR(s) ) &&(count--))
+						 ;
 
         while ( IINCHIP_READ(Sn_SR(s)) != SOCK_SYNSENT )
         {
@@ -164,7 +168,8 @@ void disconnect(SOCKET s)
    IINCHIP_WRITE( Sn_CR(s) ,Sn_CR_DISCON);
 
    /* wait to process the command... */
-   while( IINCHIP_READ(Sn_CR(s) ) )
+	  int count =10000;
+   while( IINCHIP_READ(Sn_CR(s) ) &&(count--))
       ;
    /* ------- */
 }
@@ -196,15 +201,19 @@ uint16 send(SOCKET s, const uint8 * buf, uint16 len)
 			printf("SEND_ERR\r\n");
       break;
     }
+		#if(MAX_SOCK_NUM==1)
+		 break;//不管有多大就跳出  add by suqi 20221017
+		#endif
   } while (freesize < ret);
-  
+printf("SEND 001 %d %d\r\n",ret,len);
   // copy data
   send_data_processing(s, (uint8 *)buf, ret);
   IINCHIP_WRITE( Sn_CR(s) ,Sn_CR_SEND);
-
   /* wait to process the command... */
-  while( IINCHIP_READ(Sn_CR(s) ) );
-
+//  while( IINCHIP_READ(Sn_CR(s) ) );
+	  int count =10000;
+   while( IINCHIP_READ(Sn_CR(s) ) &&(count--))
+		 ;
   while ( (IINCHIP_READ(Sn_IR(s) ) & Sn_IR_SEND_OK) != Sn_IR_SEND_OK )
   {
     status = IINCHIP_READ(Sn_SR(s));
@@ -215,6 +224,7 @@ uint16 send(SOCKET s, const uint8 * buf, uint16 len)
       return 0;
     }
   }
+
   IINCHIP_WRITE( Sn_IR(s) , Sn_IR_SEND_OK);
 
 #ifdef __DEF_IINCHIP_INT__
@@ -242,7 +252,10 @@ uint16 recv(SOCKET s, uint8 * buf, uint16 len)
       recv_data_processing(s, buf, len);
       IINCHIP_WRITE( Sn_CR(s) ,Sn_CR_RECV);
       /* wait to process the command... */
-      while( IINCHIP_READ(Sn_CR(s) ));
+		 	  int count =10000;
+   while( IINCHIP_READ(Sn_CR(s) ) &&(count--))
+		 ;
+//      while( IINCHIP_READ(Sn_CR(s) ));
       /* ------- */
       ret = len;
    }
@@ -281,10 +294,13 @@ uint16 sendto(SOCKET s, const uint8 * buf, uint16 len, uint8 * addr, uint16 port
       IINCHIP_WRITE( Sn_DPORT0(s),(uint8)((port & 0xff00) >> 8));
       IINCHIP_WRITE( Sn_DPORT1(s),(uint8)(port & 0x00ff));
       // copy data
+		// printf("SEND 002\r\n");
       send_data_processing(s, (uint8 *)buf, ret);
       IINCHIP_WRITE( Sn_CR(s) ,Sn_CR_SEND);
       /* wait to process the command... */
-      while( IINCHIP_READ( Sn_CR(s) ) )
+		 	  int count =10000;
+   while( IINCHIP_READ(Sn_CR(s) ) &&(count--))
+//      while( IINCHIP_READ( Sn_CR(s) ) )
 	  ;
       /* ------- */
      while( (IINCHIP_READ( Sn_IR(s) ) & Sn_IR_SEND_OK) != Sn_IR_SEND_OK )
@@ -396,7 +412,9 @@ uint16 recvfrom(SOCKET s, uint8 * buf, uint16 len, uint8 * addr, uint16 *port)
       IINCHIP_WRITE( Sn_CR(s) ,Sn_CR_RECV);
 
       /* wait to process the command... */
-      while( IINCHIP_READ( Sn_CR(s)) ) ;
+				  int count =10000;
+   while( IINCHIP_READ(Sn_CR(s) ) &&(count--));
+//      while( IINCHIP_READ( Sn_CR(s)) ) ;
       /* ------- */
    }
    return data_len;
@@ -433,12 +451,17 @@ uint16 macraw_send( const uint8 * buf, uint16 len )
 
    if (len > getIINCHIP_TxMAX(sock_num)) ret = getIINCHIP_TxMAX(sock_num); // check size not to exceed MAX size.
    else ret = len;
-
+//printf("SEND 003\r\n");
    send_data_processing(sock_num, (uint8 *)buf, len);
 
    //W5500 SEND COMMAND
    IINCHIP_WRITE(Sn_CR(sock_num),Sn_CR_SEND);
-   while( IINCHIP_READ(Sn_CR(sock_num)) );
+//   while( IINCHIP_READ(Sn_CR(sock_num)) );
+	
+	
+		  int count =10000;
+   while( IINCHIP_READ(Sn_CR(sock_num) ) &&(count--))
+		 ;
    while ( (IINCHIP_READ(Sn_IR(sock_num)) & Sn_IR_SEND_OK) != Sn_IR_SEND_OK );
    IINCHIP_WRITE(Sn_IR(sock_num), Sn_IR_SEND_OK);
 
@@ -490,7 +513,11 @@ uint16 macraw_recv( uint8 * buf, uint16 len )
       IINCHIP_WRITE(Sn_RX_RD0(sock_num),(uint8)((ptr & 0xff00) >> 8));
       IINCHIP_WRITE(Sn_RX_RD1(sock_num),(uint8)(ptr & 0x00ff));
       IINCHIP_WRITE(Sn_CR(sock_num), Sn_CR_RECV);
-      while( IINCHIP_READ(Sn_CR(sock_num)) ) ;
+//      while( IINCHIP_READ(Sn_CR(sock_num)) ) ;
+			
+					  int count =10000;
+   while( IINCHIP_READ(Sn_CR(sock_num) ) &&(count--))
+		 ;
    }
 
    return data_len;

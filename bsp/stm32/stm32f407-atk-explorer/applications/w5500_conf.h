@@ -73,7 +73,9 @@ extern uint8    use_eeprom;                             	  /* 是否使用EEPROM中的
 
 #define MAX_BUF_SIZE		 				1460       			            /*定义每个数据包的大小*/
 #define KEEP_ALIVE_TIME	     		30	// 30sec
-#define TX_RX_MAX_BUF_SIZE      2048							 
+// (MAX_SOCK_NUM==1)
+#define TX_RX_MAX_BUF_SIZE      (1024*(16/MAX_SOCK_NUM))		
+
 #define EEPROM_MSG_LEN        	sizeof(EEPROM_MSG)
 
 #define IP_FROM_DEFINE	        0       			              /*使用初始定义的IP信息*/

@@ -59,14 +59,23 @@ static int timeOut()
 		return 0xff;
 }
 
+
+void  w5500_16KDataTest()
+{
+	extern uint8_t   packBuf[TX_RX_MAX_BUF_SIZE];
+	for(int i=0;i<TX_RX_MAX_BUF_SIZE;i++){
+		packBuf[i]=0x30+i%0x4d;
+		
+	}
+}
 //定时时间到  执行相应事件
 static void  timeOutRunFun()
 {
 	  void readPdFreqDischarge(void);
 		switch(timeOut()){
 			case 0://心跳
-				heartUpPack();
-				rt_mb_send_wait(&mbNetSendData, (rt_ubase_t)&packBuf,RT_WAITING_FOREVER); 
+//				heartUpPack();
+//				rt_mb_send_wait(&mbNetSendData, (rt_ubase_t)&packBuf,RT_WAITING_FOREVER); 
 			  rt_kprintf("heart timer out\r\n");
 				break;
 			case 1://注册 注册成功后定时器就关闭
@@ -74,34 +83,39 @@ static void  timeOutRunFun()
 					  devRegPack();
 						rt_mb_send_wait(&mbNetSendData, (rt_ubase_t)&packBuf,RT_WAITING_FOREVER); 
 						rt_kprintf("reg timer out\r\n");
-					  timeStop(1);
+					  timeStop(1);//正式使用时候需要去掉
 				}
 				else
 						timeStop(1);
 				break;
 			case 2://读取环流
-			  readCirCurrAndWaring();
-			  if(cirCurrWaringcheck()==RT_TRUE){//先发报警状态 再发数据
-						cirCurrWaringEventPack();
-					  rt_thread_mdelay(1000);//延时1秒再发下一包
-				}
-				cirCulaDataPack();
-				rt_mb_send_wait(&mbNetSendData, (rt_ubase_t)&packBuf,RT_WAITING_FOREVER);
+//			  readCirCurrAndWaring();
+//			  if(cirCurrWaringcheck()==RT_TRUE){//先发报警状态 再发数据
+//						cirCurrWaringEventPack();
+//					  rt_thread_mdelay(1000);//延时1秒再发下一包
+//				}
+//				cirCulaDataPack();
+//				rt_mb_send_wait(&mbNetSendData, (rt_ubase_t)&packBuf,RT_WAITING_FOREVER);
 				rt_kprintf("timer 2 out\r\n");
 				break;
 			case 3://读取局放
-        readPdFreqDischarge();
-			  if(readPartDischgWarning()==RT_TRUE){
-						partDisWaringEventPack();
-					  rt_mb_send_wait(&mbNetSendData, (rt_ubase_t)&packBuf,RT_WAITING_FOREVER);
-					  rt_thread_mdelay(1000);//延时1秒再发下一包
-						rt_kprintf("\r\n");
-				}
-				partDisDataPack();
-				rt_mb_send_wait(&mbNetSendData, (rt_ubase_t)&packBuf,RT_WAITING_FOREVER);
+//        readPdFreqDischarge();
+//			  if(readPartDischgWarning()==RT_TRUE){
+//						partDisWaringEventPack();
+//					  rt_mb_send_wait(&mbNetSendData, (rt_ubase_t)&packBuf,RT_WAITING_FOREVER);
+//					  rt_thread_mdelay(1000);//延时1秒再发下一包
+//						rt_kprintf("\r\n");
+//				}
+//				partDisDataPack();
+//				rt_mb_send_wait(&mbNetSendData, (rt_ubase_t)&packBuf,RT_WAITING_FOREVER);
 				rt_kprintf("timer 3 out\r\n");
 				break;
 			case 4:
+				rt_kprintf("timer 4 in\r\n");
+				w5500_16KDataTest();
+			  rt_kprintf("timer 4 in2\r\n");
+			  extern uint16_t netSend(uint8_t *data,int len);
+			  netSend(packBuf,TX_RX_MAX_BUF_SIZE);
 				rt_kprintf("timer 4 out\r\n");
 				break;
 			case 5:
@@ -124,7 +138,7 @@ void   upKeepStateTask(void *para)
 		timeInit(1, 2);//注册 注册成功后定时器就关闭
 		timeInit(2, 60);//读取环流
 		timeInit(3, 60);//读取局放
-		timeInit(4, 70);
+		timeInit(4, 30);
 		timeInit(5, 70);
 		while(1){
 			  if(gbNetState ==RT_TRUE){

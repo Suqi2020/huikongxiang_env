@@ -328,7 +328,7 @@ void  hardWareDriverTest(void)
 		w5500Test();
 #endif
 }
-
+//TX_RX_MAX_BUF_SIZE=16*1024  以及MAX_SOCK_NUM=1
 
 //获取tick值
 //不能打印 uint64_t 数据  拆分成32位打印
