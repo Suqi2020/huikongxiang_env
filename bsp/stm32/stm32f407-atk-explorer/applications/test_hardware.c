@@ -348,3 +348,36 @@ int tick()
 }
 FINSH_FUNCTION_EXPORT(tick, tick finsh);//FINSH_FUNCTION_EXPORT_CMD
 MSH_CMD_EXPORT(tick,tick stamp);//FINSH_FUNCTION_EXPORT_CMD
+
+uint32_t 	offLTimes;
+uint32_t 	onLTimes;
+offLineStru offLine={0};
+//实现网络掉线的监测  掉线次数 每次掉线时长，
+//如果拔掉网线情况下时长不准确 需要加上心跳周期 或者发送数据的间隔时长 
+//拔掉网线时候需要发送数据才能验证网络断开
+int offline()
+{
+	  int i=1;
+	  for( i=1;i<offLine.times;i++){ //下标从1开始
+				rt_kprintf("[offLine] the %d time,relayTimer %d 秒\r\n",i,offLine.relayTimer[i]);
+		}
+
+		if(offLine.times==0){
+				rt_kprintf("On line OK\r\n");
+		}
+		else{
+				if(i==(offLine.times)){
+						extern rt_bool_t gbNetState;
+						if(gbNetState==RT_FALSE){
+								rt_kprintf("[offLine] %d Time,relayTimer %d 秒\r\n",i,(rt_tick_get()-offLine.relayTimer[i])/1000);
+						}
+						else{
+								rt_kprintf("[offLine] %d Times,relayTimer %d 秒\r\n",i,offLine.relayTimer[i]);
+						}
+				}
+		}
+		return 0;
+}
+FINSH_FUNCTION_EXPORT(offline, offline finsh);//FINSH_FUNCTION_EXPORT_CMD
+MSH_CMD_EXPORT(offline,offline stamp);//FINSH_FUNCTION_EXPORT_CMD
+

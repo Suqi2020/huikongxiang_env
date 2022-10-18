@@ -114,8 +114,10 @@ static void  timeOutRunFun()
 				rt_kprintf("timer 4 in\r\n");
 				w5500_16KDataTest();
 			  rt_kprintf("timer 4 in2\r\n");
-			  extern uint16_t netSend(uint8_t *data,int len);
+			  extern void netSend(uint8_t *data,int len);
 			  netSend(packBuf,TX_RX_MAX_BUF_SIZE);
+									
+												
 				rt_kprintf("timer 4 out\r\n");
 				break;
 			case 5:

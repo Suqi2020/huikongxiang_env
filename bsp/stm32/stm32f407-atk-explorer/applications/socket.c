@@ -205,7 +205,7 @@ uint16 send(SOCKET s, const uint8 * buf, uint16 len)
 		 break;//不管有多大就跳出  add by suqi 20221017
 		#endif
   } while (freesize < ret);
-printf("SEND 001 %d %d\r\n",ret,len);
+printf("SEND 001 %d %d\r\n",ret,len);//0 2048
   // copy data
   send_data_processing(s, (uint8 *)buf, ret);
   IINCHIP_WRITE( Sn_CR(s) ,Sn_CR_SEND);
@@ -276,8 +276,8 @@ uint16 sendto(SOCKET s, const uint8 * buf, uint16 len, uint8 * addr, uint16 port
 {
    uint16 ret=0;
 
-   if (len > getIINCHIP_TxMAX(s)) 
-   ret = getIINCHIP_TxMAX(s); // check size not to exceed MAX size.
+   if (len > getIINCHIP_TxMAX(0)) //改为0  change by suqi  getIINCHIP_TxMAX(s
+   ret = getIINCHIP_TxMAX(0); // change by suqi check size not to exceed MAX size.
    else ret = len;
 
    if( ((addr[0] == 0x00) && (addr[1] == 0x00) && (addr[2] == 0x00) && (addr[3] == 0x00)) || ((port == 0x00)) )//||(ret == 0) )
@@ -294,7 +294,7 @@ uint16 sendto(SOCKET s, const uint8 * buf, uint16 len, uint8 * addr, uint16 port
       IINCHIP_WRITE( Sn_DPORT0(s),(uint8)((port & 0xff00) >> 8));
       IINCHIP_WRITE( Sn_DPORT1(s),(uint8)(port & 0x00ff));
       // copy data
-		// printf("SEND 002\r\n");
+		 printf("SEND 002  %d %d\r\n",len, ret);
       send_data_processing(s, (uint8 *)buf, ret);
       IINCHIP_WRITE( Sn_CR(s) ,Sn_CR_SEND);
       /* wait to process the command... */
@@ -451,7 +451,7 @@ uint16 macraw_send( const uint8 * buf, uint16 len )
 
    if (len > getIINCHIP_TxMAX(sock_num)) ret = getIINCHIP_TxMAX(sock_num); // check size not to exceed MAX size.
    else ret = len;
-//printf("SEND 003\r\n");
+printf("SEND 003\r\n");
    send_data_processing(sock_num, (uint8 *)buf, len);
 
    //W5500 SEND COMMAND

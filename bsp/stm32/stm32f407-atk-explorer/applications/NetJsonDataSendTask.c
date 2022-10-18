@@ -32,13 +32,7 @@ void   netDataSendTask(void *para)
         { 
 						int lenth = netDataSendCheck(str);
 						if(lenth!=0){
-								if(netSend(str,lenth)==0){//启动个定时器来实现重发  2s内收不到回复
-										gbNetState=RT_FALSE;//发送身边 重新联网
-										rt_kprintf("net send fail\n");
-								}
-								else{
-										rt_kprintf("net send succ\n");
-								}	
+								netSend(str,lenth);
 						}
 				}
 		}

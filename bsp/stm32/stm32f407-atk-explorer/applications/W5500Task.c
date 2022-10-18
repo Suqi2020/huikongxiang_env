@@ -27,10 +27,7 @@ rt_bool_t  gbNetState =RT_FALSE;   //联网状态  false 断网  true联网
 
 
 
-//rt_bool_t  netStateFun(rt_bool_t state)
-//{
-//		return gbNetState;
-//}
+
 /*******************************************************************************
 * 函数名  : Load_Net_Parameters
 * 描述    : 装载网络参数
@@ -133,9 +130,23 @@ void  w5500Task(void *parameter)
 
 }	
 //封装外部调用发送 函数接口
-uint16_t netSend(uint8_t *data,int len)
+void netSend(uint8_t *data,int len)
 {
-		return send(SOCK_TCPC,	data,len);
+		//return send(SOCK_TCPC,	data,len);
+	
+	
+		if(send(SOCK_TCPC,	data,len)==0){//启动个定时器来实现重发  2s内收不到回复
+				gbNetState=RT_FALSE;//发送身边 重新联网
+				offLine.times++;
+				
+				offLine.relayTimer[offLine.times]=rt_tick_get();
+			
+
+				rt_kprintf("net send fail\n");
+		}
+		else{
+				rt_kprintf("net send succ\n");
+		}	
 }
 
 

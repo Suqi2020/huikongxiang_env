@@ -186,6 +186,7 @@ void loopback_tcps(SOCKET s, uint16 port)
 #endif
 void loopback_tcpc(SOCKET s, uint16 port)
 {
+	static rt_bool_t  offLineTimesGet=RT_FALSE;
 	uint16 len; 						
 	//uint8 * data_buf = (uint8*) NetRxBuffer;
 	uint8	tmp = 0;
@@ -209,6 +210,8 @@ void loopback_tcpc(SOCKET s, uint16 port)
 		  rt_kprintf("w5500 connected\r\n");
 		  extern rt_bool_t  gbNetState;
 			gbNetState =RT_TRUE;	
+		  offLineTimesGet =RT_FALSE;
+			offLine.relayTimer[offLine.times]=(rt_tick_get()-offLine.relayTimer[offLine.times])/1000;
 		
 			heartUpPack();
 		  extern struct rt_mailbox mbNetSendData;
@@ -233,7 +236,13 @@ void loopback_tcpc(SOCKET s, uint16 port)
 			}
 			SOCK_DISCON(s);
 			extern rt_bool_t gbNetState;
-			gbNetState = RT_FALSE;
+			
+			if(offLineTimesGet==RT_FALSE){//只获取一次
+				  offLineTimesGet =RT_TRUE;
+					gbNetState = RT_FALSE;
+					offLine.times++;
+					offLine.relayTimer[offLine.times]=rt_tick_get();
+			}
 			rt_kprintf("w5500 discon\r\n");
 			break;
 		case Sn_IR_RECV: 
