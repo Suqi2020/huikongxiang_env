@@ -503,6 +503,11 @@
               <FileType>1</FileType>
               <FilePath>.\applications\rs485PartDischag.c</FilePath>
             </File>
+            <File>
+              <FileName>rs485PressSettl.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>.\applications\rs485PressSettl.c</FilePath>
+            </File>
           </Files>
         </Group>
         <Group>

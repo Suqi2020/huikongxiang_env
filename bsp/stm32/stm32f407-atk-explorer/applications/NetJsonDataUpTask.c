@@ -71,7 +71,9 @@ void  w5500_16KDataTest()
 //定时时间到  执行相应事件
 static void  timeOutRunFun()
 {
-	  void readPdFreqDischarge(void);
+		void readPdFreqDischarge(void);
+		void readPSTempHeight();
+		void  PSTempHeightPack();
 		switch(timeOut()){
 			case 0://心跳
 //				heartUpPack();
@@ -111,13 +113,14 @@ static void  timeOutRunFun()
 				rt_kprintf("timer 3 out\r\n");
 				break;
 			case 4:
-				rt_kprintf("timer 4 in\r\n");
-				w5500_16KDataTest();
-			  rt_kprintf("timer 4 in2\r\n");
-			  extern void netSend(uint8_t *data,int len);
-			  netSend(packBuf,TX_RX_MAX_BUF_SIZE);
-									
-												
+//				rt_kprintf("timer 4 in\r\n");
+//				w5500_16KDataTest();
+//			  rt_kprintf("timer 4 in2\r\n");
+//			  extern void netSend(uint8_t *data,int len);
+//			  netSend(packBuf,TX_RX_MAX_BUF_SIZE);
+				readPSTempHeight();
+				PSTempHeightPack();
+				rt_mb_send_wait(&mbNetSendData, (rt_ubase_t)&packBuf,RT_WAITING_FOREVER);
 				rt_kprintf("timer 4 out\r\n");
 				break;
 			case 5:
@@ -140,7 +143,7 @@ void   upKeepStateTask(void *para)
 		timeInit(1, 2);//注册 注册成功后定时器就关闭
 		timeInit(2, 60);//读取环流
 		timeInit(3, 60);//读取局放
-		timeInit(4, 30);
+		timeInit(4, 30);//读取压差式沉降仪
 		timeInit(5, 70);
 		while(1){
 			  if(gbNetState ==RT_TRUE){

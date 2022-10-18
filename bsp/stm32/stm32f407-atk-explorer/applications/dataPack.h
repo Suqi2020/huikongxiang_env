@@ -2,7 +2,7 @@
 #define   __DATAPACK_H__
 
 #include   "board.h"
-#define   NUM        2
+#define   NUM        4
 #define   HEAD_LEN   2
 #define   LENTH_LEN  2
 #define   CRC_LEN    2

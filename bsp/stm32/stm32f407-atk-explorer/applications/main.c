@@ -57,10 +57,10 @@
 //V0.20    加入16K代码测试  MAX_SOCK_NUM 为1时候 最大发送16k网络数据  
 //         TX_RX_MAX_BUF_SIZE为实际发送缓存buf大小(与MAX_SOCK_NUM反比)                       20221017
 //V0.21    加入统计代码，粗略计算掉线次数和掉线时长 命令 offline                    20221018
+//V0.22    增加沉降仪代码 默认波特率9600 文档有误      20221018
 
 
-
-#define APP_VER       ((0<<8)+21)//0x0105 表示1.5版本
+#define APP_VER       ((0<<8)+22)//0x0105 表示1.5版本
 
 static    rt_thread_t tid 	= RT_NULL;
 
@@ -99,6 +99,8 @@ int main(void)
 		cirCurrMutexQueueCreat();
 		extern void partDischagMutexQueueCreat();
 		partDischagMutexQueueCreat();
+		extern void pressSettlMutexQueueCreat();
+		pressSettlMutexQueueCreat();
 	
 ////////////////////////////////////邮箱//////////////////////////////////
 		

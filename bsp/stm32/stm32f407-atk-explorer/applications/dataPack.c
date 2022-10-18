@@ -21,11 +21,21 @@ void  devIDRead()
 		rt_strcpy(dev[0].ID,"A000000000001");
 		rt_strcpy(dev[0].model,"GY280");
 	  rt_strcpy(dev[0].type,"1");
-	  rt_strcpy(dev[0].name,"环境监测");
+	  rt_strcpy(dev[0].name,"接地环流");
 		rt_strcpy(dev[1].ID,"A000000000002");
 		rt_strcpy(dev[1].model,"GY281");
 	  rt_strcpy(dev[1].type,"2");
-	  rt_strcpy(dev[1].name,"接地环流");
+	  rt_strcpy(dev[1].name,"局放监控");
+	
+		rt_strcpy(dev[2].ID,"A000000000003");
+		rt_strcpy(dev[2].model,"GY282");
+	  rt_strcpy(dev[2].type,"3");
+	  rt_strcpy(dev[2].name,"沉降仪");
+	
+		rt_strcpy(dev[3].ID,"A000000000004");
+		rt_strcpy(dev[3].model,"GY283");
+	  rt_strcpy(dev[3].type,"4");
+	  rt_strcpy(dev[3].name,"三轴测振仪");
 //		rt_strcpy(dev[2].ID,"A000000000003");
 //		rt_strcpy(dev[3].ID,"A000000000004");
 }

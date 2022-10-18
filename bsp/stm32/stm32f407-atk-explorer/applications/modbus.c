@@ -77,7 +77,7 @@ uint8_t modbusWriteMultReg(uint16_t slavAddr,uint16_t regAddr,uint16_t len,uint8
 	  out[i]=crcRet;       						i++;	
     return i;			
 }
-//modbus回复数据校验   readFLAG TRUE  读  FALSE  写
+//modbus回复数据校验   readFLAG TRUE-读     FALSE-写
 //0 succ  1 slave addr or bsp err    2 modbus uart err
 int  modbusRespCheck(uint16_t slavAddr,uint8_t *buf,uint16_t len,rt_bool_t readFlag)
 {
@@ -90,10 +90,10 @@ int  modbusRespCheck(uint16_t slavAddr,uint8_t *buf,uint16_t len,rt_bool_t readF
 				return 1;
 		}
 		if(readFlag==RT_TRUE){
-		if((buf[2]+2+1+2)!=len){
-						rt_kprintf("ERR:modbus 可能连包\r\n");
-				}
-				len =buf[2]+2+1+2;//重新刷新长度
+				if((buf[2]+2+1+2)!=len){
+								rt_kprintf("ERR:modbus 可能连包\r\n");
+						}
+						len =buf[2]+2+1+2;//重新刷新长度
 		}
 		else{
 			#define  WR_RESP_LEN  8

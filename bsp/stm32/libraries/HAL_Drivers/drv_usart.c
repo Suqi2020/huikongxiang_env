@@ -924,6 +924,10 @@ void USART6_IRQHandler(void)
 		{
 			  //rt_kprintf("read\n");
 				HAL_UART_Receive(&huart6,&Res,1,1000); 
+			  extern void pressSettlUartRec(uint8_t dat);
+				pressSettlUartRec(Res);
+			
+			
 		}
 		HAL_UART_IRQHandler(&huart6);	
 		#endif
