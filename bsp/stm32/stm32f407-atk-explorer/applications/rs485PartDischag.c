@@ -3,6 +3,9 @@
 //<<局放在线检测 --GY-JF100-C01>>  GZPD-1000电缆局放
 //响应时间不确定 最长1.7秒 有时候长 有时候短
 //           默认波特率115200
+
+
+const static char sign[]="[局放]";
 partDischargeStru partDiscStru_p;
 #define  MSGPOOL_LEN   1024 //485数据最大量  大于1k需要修改此处
 static rt_mutex_t partDischagMutex = RT_NULL;  //局放互斥量 
@@ -38,23 +41,23 @@ rt_err_t partDischagUartRec(uint8_t dat)
 //创建局放用到的互斥量和消息队列
 void  partDischagMutexQueueCreat()
 {
-	  rt_kprintf("init partDischagmque start.\n");
+	  rt_kprintf("%sinit partDischagmque start.\n",sign);
 	  partDischagMutex = rt_mutex_create("partDischagMutex", RT_IPC_FLAG_FIFO);
     if (partDischagMutex == RT_NULL)
     {
-        rt_kprintf("create partDischagMutex failed.\n");
+        rt_kprintf("%screate partDischagMutex failed.\n",sign);
         return ;
     }
-		rt_kprintf("create partDischagMutex succ.\n");
+		rt_kprintf("%screate partDischagMutex succ.\n",sign);
 //////////////////////////////////消息队列//////////////////////////////////
 		
 		int result = rt_mq_init(&partDischagmque,"partDischagmque",&partDischagQuePool[0],1,sizeof(partDischagQuePool),RT_IPC_FLAG_FIFO);       
 		if (result != RT_EOK)
     {
-        rt_kprintf("init partDischagmque failed.\n");
+        rt_kprintf("%sinit partDischagmque failed.\n",sign);
         return ;
     }
-		rt_kprintf("init partDischagmque succ.\n");
+		rt_kprintf("%sinit partDischagmque succ.\n",sign);
 }
 
 
@@ -73,7 +76,7 @@ void readPdFreqDischarge()
 		rt_mutex_take(partDischagMutex,RT_WAITING_FOREVER);
 	  //485发送buf  len  等待modbus回应
 		partDischagUartSend(buf,len);
-	  rt_kprintf("PdFreqDiach send:");
+	  rt_kprintf("%sPdFreqDiach send:",sign);
 		for(int j=0;j<len;j++){
 				rt_kprintf("%x ",buf[j]);
 		}
@@ -85,14 +88,16 @@ void readPdFreqDischarge()
 		while(rt_mq_recv(&partDischagmque, buf+len, 1, 10) == RT_EOK){//115200 波特率1ms 10个数据
 				len++;
 		}
-		rt_kprintf(" rec:");
-		for(int j=0;j<len;j++){
-				rt_kprintf("%x ",buf[j]);
+		if(len!=0){
+				rt_kprintf("%srec:",sign);
+				for(int j=0;j<len;j++){
+						rt_kprintf("%x ",buf[j]);
+				}
+				rt_kprintf("\n");
 		}
-		rt_kprintf("\n");
 		//提取环流值 第一步判断crc 第二部提取
-		
-		if(0 ==  modbusRespCheck(SLAVE_ADDR,buf,len,RT_TRUE)){//刷新读取到的值
+		int ret2= modbusRespCheck(SLAVE_ADDR,buf,len,RT_TRUE);
+		if(0 ==  ret2){//刷新读取到的值
 
 
 				partDiscStru_p.amplitudeA=(buf[offset]<<24)+(buf[offset+1]<<16)+(buf[offset+2]<<8)+buf[offset+3];offset+=4;
@@ -106,9 +111,13 @@ void readPdFreqDischarge()
 				partDiscStru_p.amplitudeC=(buf[offset]<<24)+(buf[offset+1]<<16)+(buf[offset+2]<<8)+buf[offset+3];offset+=4;
 				partDiscStru_p.freqC     =(buf[offset]<<24)+(buf[offset+1]<<16)+(buf[offset+2]<<8)+buf[offset+3];offset+=4;
 			  partDiscStru_p.dischargeC=(buf[offset]<<24)+(buf[offset+1]<<16)+(buf[offset+2]<<8)+buf[offset+3];offset+=4;
-			  rt_kprintf("PdFreqDiach read ok\n");
+			  rt_kprintf("%sPdFreqDiach read ok\n",sign);
 		} 
 		else{//读不到给0
+			
+				if(ret2==2){
+						rt_kprintf("%sERR:请检查485接线或者供电\r\n",sign);
+				}
 				partDiscStru_p.amplitudeA=0;
 				partDiscStru_p.freqA     =0;
 			  partDiscStru_p.dischargeA=0;
@@ -120,7 +129,7 @@ void readPdFreqDischarge()
 				partDiscStru_p.amplitudeC=0;
 				partDiscStru_p.freqC     =0;
 			  partDiscStru_p.dischargeC=0;
-			  rt_kprintf("PdFreqDiach read fail\n");
+			  rt_kprintf("%sPdFreqDiach read fail\n",sign);
 		}
     //
 		recFlag = RT_FALSE;
@@ -144,7 +153,7 @@ rt_bool_t readPartDischgWarning()
 		rt_mutex_take(partDischagMutex,RT_WAITING_FOREVER);
 	  //485发送buf  len  等待modbus回应
 		partDischagUartSend(buf,len);
-	  rt_kprintf("readPd send:");
+	  rt_kprintf("%sreadPd send:",sign);
 		for(int j=0;j<len;j++){
 				rt_kprintf("%x ",buf[j]);
 		}
@@ -157,25 +166,28 @@ rt_bool_t readPartDischgWarning()
 		while(rt_mq_recv(&partDischagmque, buf+len, 1, 10) == RT_EOK){//115200 波特率1ms 10个数据
 				len++;
 		}
-		rt_kprintf(" rec:");
+		rt_kprintf("%srec:",sign);
 		for(int j=0;j<len;j++){
 				rt_kprintf("%x ",buf[j]);
 		}
 		rt_kprintf("\n");
 		//提取环流值 第一步判断crc 第二部提取
-		
-		if(0 ==  modbusRespCheck(SLAVE_ADDR,buf,len,RT_TRUE)){//刷新读取到的值
+		int ret2=modbusRespCheck(SLAVE_ADDR,buf,len,RT_TRUE);
+		if(0 == ret2){//刷新读取到的值
      
 			  partDiscStru_p.alarm.a=buf[offset]>>0;
 				partDiscStru_p.alarm.b=buf[offset]>>1;
 			  partDiscStru_p.alarm.c=buf[offset]>>2;
-			  rt_kprintf("提取alarm OK\r\n");
+			  rt_kprintf("%s提取alarm OK\r\n",sign);
 		} 
 		else{
+				if(ret2==2){
+						rt_kprintf("%sERR:请检查485接线或者供电\r\n",sign);
+				}
 				partDiscStru_p.alarm.a=0;
 				partDiscStru_p.alarm.b=0;
 				partDiscStru_p.alarm.c=0;
-			  rt_kprintf("提取alarm fail\r\n");
+			  rt_kprintf("%s提取alarm fail\r\n",sign);
 		}
     //
 	  rt_mutex_release(partDischagMutex);
@@ -190,7 +202,7 @@ rt_bool_t readPartDischgWarning()
 
 void  partDisWaringEventPack()
 {
-		rt_kprintf("later add \n\r");
+		rt_kprintf("%slater add \n\r",sign);
 		
 }
 /*
@@ -338,11 +350,11 @@ void  partDisDataPack()
 		
 		mcu.repDataMessID =mcu.upMessID;
 		upMessIdAdd();
-		rt_kprintf("reg len:%d\r\n",len);
+		rt_kprintf("%sreg len:%d\r\n",sign,len);
 		
 		for(int i=0;i<len;i++)
 				rt_kprintf("%02x",packBuf[i]);
-		rt_kprintf("\r\nlen：%d str0:%x str1:%x str[2]:%d  str[3]:%d\r\n",len,packBuf[0],packBuf[1],packBuf[2],packBuf[3]);
+		rt_kprintf("\r\n%slen：%d str0:%x str1:%x str[2]:%d  str[3]:%d\r\n",sign,len,packBuf[0],packBuf[1],packBuf[2],packBuf[3]);
 		//rt_kprintf("heart:%s \n",packBuf);
 	
 }

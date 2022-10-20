@@ -796,6 +796,8 @@ void UART4_IRQHandler(void)
 		{
 			  //rt_kprintf("read\n");
 				HAL_UART_Receive(&huart4,&Res,1,1000); 
+				extern rt_err_t threeAxisUartRec(uint8_t dat);
+				threeAxisUartRec(Res);
 		}
 		HAL_UART_IRQHandler(&huart4);	
 	#endif

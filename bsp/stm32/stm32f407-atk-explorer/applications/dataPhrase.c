@@ -2,7 +2,7 @@
 #include   "cJSON.h"
 //https://blog.csdn.net/woody218/article/details/119634171  json解析参考
 extern uint16_t RTU_CRC(uint8_t *puchMsg , uint16_t usDataLen);
-
+const static char sign[]="[dataPhrs]";
 //数据校验 头尾 校验和 是否正确
 //rt_TRUE 正确 rt_FALSE 错误
 rt_bool_t dataCheck(char *data,int lenth)
@@ -14,19 +14,19 @@ rt_bool_t dataCheck(char *data,int lenth)
 		uint16_t jsonBodyCrc=RTU_CRC((uint8_t *)data+HEAD_LEN+LENTH_LEN,lenth-HEAD_LEN-LENTH_LEN-TAIL_LEN-CRC_LEN);
 	  uint16_t dataCrc=(uint16_t)(data[lenth-4]<<8)+data[lenth-3];
 	  if(((data[0]<<8)+data[1])!=HEAD){
-				rt_kprintf("head err  %02x %02x\r\n",data[0],data[1]);
+				rt_kprintf("%shead err  %02x %02x\r\n",sign,data[0],data[1]);
 				return RT_FALSE;		
 		}
 		if(((data[lenth-2]<<8)+data[lenth-1])!=TAIL){
-				rt_kprintf("tail err\r\n");
+				rt_kprintf("%stail err\r\n",sign);
 				return RT_FALSE;		
 		}
 	  if(lenth!=((data[2]<<8)+data[3]+HEAD_LEN+LENTH_LEN+TAIL_LEN+CRC_LEN)){
-				rt_kprintf("lenth err %d %d\r\n",lenth,((data[2]<<8)+data[3]+HEAD_LEN+LENTH_LEN+TAIL_LEN+CRC_LEN));
+				rt_kprintf("%slenth err %d %d\r\n",sign,lenth,((data[2]<<8)+data[3]+HEAD_LEN+LENTH_LEN+TAIL_LEN+CRC_LEN));
 				return RT_FALSE;		
 		}
 	  if(jsonBodyCrc!=dataCrc){
-			  rt_kprintf("crc err r:0x%04x c:0x%04x\r\n",dataCrc,jsonBodyCrc);
+			  rt_kprintf("%scrc err r:0x%04x c:0x%04x\r\n",sign,dataCrc,jsonBodyCrc);
 				return RT_FALSE;
 		}
 		return RT_TRUE;
@@ -48,7 +48,7 @@ packTypeEnum  downLinkPackTpyeGet(cJSON  *TYPE)
 				return CMDRepData;
 		}
 		else{
-				rt_kprintf("err:packetType  %s %d\r\n",TYPE->valuestring,strlen(TYPE->valuestring));
+				rt_kprintf("%serr:packetType  %s %d\r\n",sign,TYPE->valuestring,strlen(TYPE->valuestring));
 		}
 		
 		return errResp;
@@ -60,19 +60,19 @@ rt_bool_t heartRespFun(cJSON  *Json)
 {
 
 		cJSON  *time =cJSON_GetObjectItem(Json,"timestamp");
-	  rt_kprintf("time:%s\n\r",time->valuestring);
+	  rt_kprintf("%stime:%s\n\r",sign,time->valuestring);
 
 	
 		cJSON  *msg =cJSON_GetObjectItem(Json,"msg");
-		rt_kprintf("heart msg %s\r\n",msg->valuestring);
+		rt_kprintf("%sheart msg %s\r\n",sign,msg->valuestring);
 			
 			
 		static uint64_t u64getTick_p;
 
 		u64getTick_p =atoll(time->valuestring);
-		rt_kprintf("time:[%lu]s \r\n", (uint32_t)((u64getTick_p)/1000));
+		rt_kprintf("%stime:[%lu]s \r\n",sign, (uint32_t)((u64getTick_p)/1000));
 
-		rt_kprintf("time:[%lu]ms\r\n", (uint32_t)(u64getTick_p)%1000);
+		rt_kprintf("%stime:[%lu]ms\r\n",sign, (uint32_t)(u64getTick_p)%1000);
 	 // uint32_t test_ms=(uint32_t)(u64getTick_p&0xFfff);
 			//rt_kprintf("time:[%lu]ms\r\n", (uint32_t)(test_ms)%1000);
 	
@@ -81,19 +81,19 @@ rt_bool_t heartRespFun(cJSON  *Json)
 	
 		cJSON  *mid =cJSON_GetObjectItem(Json,"mid");
     if(mcu.upHeartMessID != mid->valueint){
-				rt_kprintf("heart resp messID err %d\r\n",mid->valueint);
+				rt_kprintf("%sheart resp messID err %d\r\n",sign,mid->valueint);
 			  return RT_FALSE;
 			
 		}
 		cJSON  *code =cJSON_GetObjectItem(Json,"code");
 		if(code->valueint!=0){
-			  rt_kprintf("heart code err %d\r\n",code->valueint);
+			  rt_kprintf("%sheart code err %d\r\n",sign,code->valueint);
 				return RT_FALSE;
 		}
 
 		cJSON  *devid =cJSON_GetObjectItem(Json,"id");
 		if(strcmp(mcu.devID,devid->valuestring)!=0){
-				rt_kprintf("heart resp devID err %s\r\n",devid->valuestring);
+				rt_kprintf("%sheart resp devID err %s\r\n",sign,devid->valuestring);
 			  return RT_FALSE;
 		}
 
@@ -107,19 +107,19 @@ rt_bool_t comRespFun(cJSON  *Json)
 {
 
 		cJSON  *msg =cJSON_GetObjectItem(Json,"msg");
-		rt_kprintf("heart msg %s\r\n",msg->valuestring);
+		rt_kprintf("%sheart msg %s\r\n",sign,msg->valuestring);
 	
 
 		cJSON  *mid =cJSON_GetObjectItem(Json,"mid");
     if(mcu.devRegMessID != mid->valueint){
-				rt_kprintf("reg resp messID err %d %d\r\n",mid->valueint,mcu.devRegMessID );
+				rt_kprintf("%sreg resp messID err %d %d\r\n",sign,mid->valueint,mcu.devRegMessID );
 			  return RT_FALSE;
 			
 		}
 		cJSON  *code =cJSON_GetObjectItem(Json,"code");
-		rt_kprintf("reg code  %d\r\n",code->valueint);
+		rt_kprintf("%sreg code  %d\r\n",sign,code->valueint);
 		if(code->valueint==1){
-			  rt_kprintf("reg code err\r\n");
+			  rt_kprintf("%sreg code err\r\n",sign);
 				return RT_FALSE;
 		}
 
@@ -128,7 +128,7 @@ rt_bool_t comRespFun(cJSON  *Json)
 //下行数据解析
 void AllDownPhrase(char *data,int lenth)
 {
-		rt_kprintf("phrase len:%d\r\n",lenth);
+		rt_kprintf("%sphrase len:%d\r\n",sign,lenth);
 		
 //		for(int i=0;i<lenth;i++)
 //				rt_kprintf("%02x",data[i]);
@@ -152,7 +152,7 @@ void AllDownPhrase(char *data,int lenth)
 //		rt_kprintf("\r\n");
 
 		//开始解析json
-		rt_kprintf("getJson:%s  \r\n",Buffer);	
+		rt_kprintf("%sgetJson:%s  \r\n",sign,Buffer);	
 		//rt_kprintf("getJson:%.*s  %d\r\n",len,Buffer,len);			
 		cJSON  *Json=NULL;
 		Json = cJSON_Parse(Buffer);
@@ -163,19 +163,19 @@ void AllDownPhrase(char *data,int lenth)
 			  switch(downLinkPackTpyeGet(pkType)){
 					case 	heartResp:
 						if(RT_TRUE==heartRespFun(Json)){//收到心跳回应 怎么通知发送层
-								rt_kprintf("rec heart resp\r\n");
+								rt_kprintf("%srec heart resp\r\n",sign);
 						}
 						break;
 					case devRegResp:
 						if(RT_TRUE==comRespFun(Json)){//收到心跳回应 怎么通知发送层
-								rt_kprintf("reg dev succ\r\n");
+								rt_kprintf("%sreg dev succ\r\n",sign);
 							  extern rt_bool_t gbRegFlag;
 							  gbRegFlag = RT_TRUE;
 						}
 						break;
 					case repDataResp:
 						if(RT_TRUE==comRespFun(Json)){//收到心跳回应 怎么通知发送层
-								rt_kprintf("rep data succ\r\n");
+								rt_kprintf("%srep data succ\r\n",sign);
 						}
 						break;
 					case CMDRepData:
@@ -193,7 +193,7 @@ void AllDownPhrase(char *data,int lenth)
 				}
 		}
 		else{
-			rt_kprintf("err:json empty\r\n");	
+			rt_kprintf("%serr:json empty\r\n",sign);	
 		}
 		
 		rt_free(Buffer);

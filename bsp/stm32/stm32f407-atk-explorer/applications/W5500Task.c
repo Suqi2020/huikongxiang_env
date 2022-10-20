@@ -2,7 +2,7 @@
 #include "board.h"
 
 //w5500联网状态的维护 
-
+const static char task[]="[w55task]";
 
 rt_sem_t  w5500Iqr_semp = RT_NULL;//w5500有数据时候中断来临
 
@@ -91,7 +91,7 @@ void  w5500Task(void *parameter)
 			case W5500InitEnum:
 						w5500Init();
 			      W5500State=W5500DHCPEnum;
-			      rt_kprintf("W5500 init……\r\n");
+			      rt_kprintf("%s init……\r\n",task);
 				break;
 			case W5500DHCPEnum:
 					  if(RT_TRUE == do_dhcp()){                        /*DHCP测试程序*/
@@ -138,14 +138,11 @@ void netSend(uint8_t *data,int len)
 		if(send(SOCK_TCPC,	data,len)==0){//启动个定时器来实现重发  2s内收不到回复
 				gbNetState=RT_FALSE;//发送身边 重新联网
 				offLine.times++;
-				
 				offLine.relayTimer[offLine.times]=rt_tick_get();
-			
-
-				rt_kprintf("net send fail\n");
+				rt_kprintf("%snet send fail\n",task);
 		}
 		else{
-				rt_kprintf("net send succ\n");
+				rt_kprintf("%snet send succ\n",task);
 		}	
 }
 

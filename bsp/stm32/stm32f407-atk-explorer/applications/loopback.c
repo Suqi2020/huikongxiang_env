@@ -6,7 +6,7 @@ uint8 ch_status[MAX_SOCK_NUM] = {0};/** 0:close, 1:ready, 2:connected */
 
 uint8_t  NetTxBuffer[TX_RX_MAX_BUF_SIZE]={0};
 uint8_t  NetRxBuffer[TX_RX_MAX_BUF_SIZE]={0};
-
+const static char sign[]="[lookback]";
 void rstCh_status()
 {
 		rt_memset(ch_status,0,MAX_SOCK_NUM);
@@ -199,7 +199,7 @@ void loopback_tcpc(SOCKET s, uint16 port)
 				ch_status[s] = 1;
 				socket(s, Sn_MR_TCP, port, 0x00);  			//connect(SOCK_TCPC,remote_ip,remote_port);                /*socket连接服务器*/ 
 				connect(s, remote_ip, remote_port);
-				rt_kprintf("w5500 coning\r\n");
+				rt_kprintf("%sw5500 coning\r\n",sign);
 			}			
 //			rt_kprintf("w5500 cloes %d\r\n",I_STATUS[s]);
 			break;
@@ -207,7 +207,7 @@ void loopback_tcpc(SOCKET s, uint16 port)
 			// connected
 			ch_status[s] = 2;
 			I_STATUS[s] &= ~(0x01);
-		  rt_kprintf("w5500 connected\r\n");
+		  rt_kprintf("%sw5500 connected\r\n",sign);
 		  extern rt_bool_t  gbNetState;
 			gbNetState =RT_TRUE;	
 		  offLineTimesGet =RT_FALSE;
@@ -243,7 +243,7 @@ void loopback_tcpc(SOCKET s, uint16 port)
 					offLine.times++;
 					offLine.relayTimer[offLine.times]=rt_tick_get();
 			}
-			rt_kprintf("w5500 discon\r\n");
+			rt_kprintf("%sw5500 discon\r\n",sign);
 			break;
 		case Sn_IR_RECV: 
 			IINCHIP_WRITE(IMR, 0x00);//开中断屏蔽IP,UNREACH,PPPoE,Magic Packet
@@ -269,7 +269,7 @@ void loopback_tcpc(SOCKET s, uint16 port)
 					rt_mb_send_wait(&mbNetRecData, (rt_ubase_t)&NetRxBuffer,RT_WAITING_FOREVER);  
 					//send(s,data_buf,len);//
 //					rt_thread_mdelay(500); //延时后边再打印
-					rt_kprintf("net rec len:%d \r\n",len);
+					rt_kprintf("%snet rec len:%d \r\n",sign,len);
 //					rt_kprintf("[");
 //					for(int i=0;i<len;i++)
 //					   rt_kprintf("%02x",NetRxBuffer[i]);

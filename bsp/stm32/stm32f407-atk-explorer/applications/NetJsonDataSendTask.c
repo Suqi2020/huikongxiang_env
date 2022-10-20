@@ -1,6 +1,7 @@
 #include   "NetJsonDataTask.h"
 #include   "board.h"
 
+const static char task[]="[dataSend]";
 
 struct rt_mailbox mbNetSendData;
 
@@ -14,12 +15,12 @@ uint16_t netDataSendCheck(uint8_t *str)
 				if(lenth<=2048){
 				}
 				else{
-					rt_kprintf("lenth  err£º%d str0:%x str1:%x str[2]:%d  str[3]:%d\r\n",lenth,str[0],str[1],str[2],str[3]);
+					rt_kprintf("%slenth  err£º%d str0:%x str1:%x str[2]:%d  str[3]:%d\r\n",lenth,str[0],str[1],str[2],str[3],task);
 						//rt_kprintf("lenth  err %d str[2]:%d  str[3]:%d\r\n",lenth,str[2],str[3]);
 				}
 		}
 		else{
-				 rt_kprintf("head  err\r\n");
+				 rt_kprintf("%shead  err\r\n",task);
 		}
 		return lenth;
 }

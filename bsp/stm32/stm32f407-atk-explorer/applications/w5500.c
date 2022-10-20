@@ -15,6 +15,10 @@
 #ifdef __DEF_IINCHIP_PPP__
 #include "md5.h"
 #endif
+
+
+
+const static char sign[]="[w5500]";
 #if(MAX_SOCK_NUM==1)
 
 uint16 SSIZE[MAX_SOCK_NUM]={0}; // Max Tx buffer
@@ -318,7 +322,7 @@ void send_data_processing(SOCKET s, uint8 *data, uint16 len)
   uint32 addrbsb =0;
   if(len == 0)
   {
-    printf("CH: %d Unexpected1 length 0\r\n", s);
+    printf("%sCH: %d Unexpected1 length 0\r\n",sign, s);
     return;
   }
    
@@ -350,7 +354,7 @@ void recv_data_processing(SOCKET s, uint8 *data, uint16 len)
   
   if(len == 0)
   {
-    printf("CH: %d Unexpected2 length 0\r\n", s);
+    printf("%sCH: %d Unexpected2 length 0\r\n",sign, s);
     return;
   }
 

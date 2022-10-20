@@ -16,7 +16,7 @@
 #include "dhcp.h"
 #include "board.h"
 
-
+const static char sign[]="[w55Conf]";
 extern SPI_HandleTypeDef hspi1;
 CONFIG_MSG  ConfigMsg;																	/*配置结构体*/
 EEPROM_MSG_STR EEPROM_MSG;															/*EEPROM存储信息结构体*/
@@ -61,7 +61,7 @@ void set_w5500_ip(void)
 	memcpy(ConfigMsg.gw,gateway,4);
 	memcpy(ConfigMsg.dns,dns_server,4);
 	if(ip_from==IP_FROM_DEFINE)	
-		printf(" 使用定义的IP信息配置W5500\r\n");
+		printf("%s 使用定义的IP信息配置W5500\r\n",sign);
 	
 	
 
@@ -71,7 +71,7 @@ void set_w5500_ip(void)
 		/*复制DHCP获取的配置信息到配置结构体*/
 		if(dhcp_ok==1)
 		{
-			printf(" IP from DHCP\r\n");		 
+			printf("%s IP from DHCP\r\n",sign);	 
 			memcpy(ConfigMsg.lip,DHCP_GET.lip, 4);
 			memcpy(ConfigMsg.sub,DHCP_GET.sub, 4);
 			memcpy(ConfigMsg.gw,DHCP_GET.gw, 4);
@@ -79,8 +79,8 @@ void set_w5500_ip(void)
 		}
 		else
 		{
-			printf(" DHCP子程序未运行,或者不成功\r\n");
-			printf(" 使用定义的IP信息配置W5500\r\n");
+			printf("%s DHCP子程序未运行,或者不成功\r\n",sign);
+			printf("%s 使用定义的IP信息配置W5500\r\n",sign);
 		}
 	}
 		
@@ -94,11 +94,11 @@ void set_w5500_ip(void)
 	setSIPR(ConfigMsg.lip);
 	
 	getSIPR (local_ip);			
-	printf(" W5500 IP地址   : %d.%d.%d.%d\r\n", local_ip[0],local_ip[1],local_ip[2],local_ip[3]);
+	printf("%s W5500 IP地址   : %d.%d.%d.%d\r\n", sign,local_ip[0],local_ip[1],local_ip[2],local_ip[3]);
 	getSUBR(subnet);
-	printf(" W5500 子网掩码 : %d.%d.%d.%d\r\n", subnet[0],subnet[1],subnet[2],subnet[3]);
+	printf("%s W5500 子网掩码 : %d.%d.%d.%d\r\n",sign, subnet[0],subnet[1],subnet[2],subnet[3]);
 	getGAR(gateway);
-	printf(" W5500 网关     : %d.%d.%d.%d\r\n", gateway[0],gateway[1],gateway[2],gateway[3]);
+	printf("%s W5500 网关     : %d.%d.%d.%d\r\n",sign, gateway[0],gateway[1],gateway[2],gateway[3]);
 }
 
 /**
@@ -239,7 +239,7 @@ uint8 IINCHIP_READ(uint32 addrbsb)
 uint16 wiz_write_buf(uint32 addrbsb,uint8* buf,uint16 len)
 {
    uint16 idx = 0;
-   if(len == 0) printf("Unexpected2 length 0\r\n");
+   if(len == 0) printf("%sUnexpected2 length 0\r\n",sign);
    iinchip_csoff();                               
    IINCHIP_SpiSendData( (addrbsb & 0x00FF0000)>>16);
    IINCHIP_SpiSendData( (addrbsb & 0x0000FF00)>> 8);
@@ -264,7 +264,7 @@ uint16 wiz_read_buf(uint32 addrbsb, uint8* buf,uint16 len)
   uint16 idx = 0;
   if(len == 0)
   {
-    printf("Unexpected2 length 0\r\n");
+    printf("%sUnexpected2 length 0\r\n",sign);
   }
   iinchip_csoff();                                
   IINCHIP_SpiSendData( (addrbsb & 0x00FF0000)>>16);

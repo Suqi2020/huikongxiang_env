@@ -1,7 +1,7 @@
 #ifndef _TYPE_H_
 #define _TYPE_H_
 
-#define	MAX_SOCK_NUM		1 //1-16kbuffer 2-8kbuffer 4-4kbuffer 8-8kbuffer  /**< Maxmium number of socket  */
+#define	MAX_SOCK_NUM		4 //1--16kbuffer  2--8kbuffer 4--4kbuffer 8--2kbuffer  /**< Maxmium number of socket  */
 
 typedef char int8;
 

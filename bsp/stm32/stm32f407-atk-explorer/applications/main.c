@@ -58,9 +58,9 @@
 //         TX_RX_MAX_BUF_SIZE为实际发送缓存buf大小(与MAX_SOCK_NUM反比)                       20221017
 //V0.21    加入统计代码，粗略计算掉线次数和掉线时长 命令 offline                    20221018
 //V0.22    增加沉降仪代码 默认波特率9600 文档有误      20221018
+//V0.23    增加三轴代码 默认波特率9600 需要修改三轴的地址为01  同沉降仪  20221019
 
-
-#define APP_VER       ((0<<8)+22)//0x0105 表示1.5版本
+#define APP_VER       ((0<<8)+23)//0x0105 表示1.5版本
 
 static    rt_thread_t tid 	= RT_NULL;
 
@@ -82,74 +82,128 @@ extern  void   w5500Task(void *parameter);//w5500网络状态的维护
 extern  void   hardWareDriverTest(void);
 
 
+const static char sign[]="[main]";
+
+
+
+/* 定时器的控制块 */
+static rt_timer_t timer1;
+
+static int cnt = 0;
+/* 定时器1超时函数 */
+static void timeout1(void *parameter)
+{
+//    rt_kprintf("periodic timer is timeout %d\n", cnt);
+//    /* 运行第10次，停止周期定时器 */
+//    if (cnt++ >= 9)
+//    {
+//        rt_timer_stop(timer1);
+//        rt_kprintf("periodic timer was stopped! \n");
+//    }
+		static int count=0;
+		extern rt_bool_t gbNetState;
+		if(gbNetState==RT_TRUE){
+				if(count++%5==0){
+						HAL_GPIO_TogglePin(LED_GPIO_Port, LED_Pin);
+				}
+		}
+		else
+				HAL_GPIO_TogglePin(LED_GPIO_Port, LED_Pin);
+}
+
 
 int main(void)
 {
 
-    rt_kprintf("\n20221018  ver=%02d.%02d\n",(uint8_t)(APP_VER>>8),(uint8_t)APP_VER);
+		RELAY1_ON;
+		RELAY2_ON;
+		RELAY3_ON;
+		RELAY4_ON;//上电后外部485全部供电
+    rt_kprintf("\n%s20221019  ver=%02d.%02d\n",sign,(uint8_t)(APP_VER>>8),(uint8_t)APP_VER);
 	  rt_err_t result;
 //////////////////////////////////////信号量//////////////////////////////
 	  w5500Iqr_semp = rt_sem_create("w5500Iqr_semp",0, RT_IPC_FLAG_FIFO);
 		if (w5500Iqr_semp == RT_NULL)
     {
-        rt_kprintf("create w5500Iqr_semp failed\n");
+        rt_kprintf("%screate w5500Iqr_semp failed\n",sign);
     }
+		
+		
+		  /* 创建定时器 周期定时器 */
+    timer1 = rt_timer_create("timer1", timeout1,
+                             RT_NULL, 100,
+                             RT_TIMER_FLAG_PERIODIC);
+		if (timer1 != RT_NULL)
+        rt_timer_start(timer1);
 		//创建285设备用到的互斥 队列
-		extern void cirCurrMutexQueueCreat();
+		extern void 	cirCurrMutexQueueCreat();
 		cirCurrMutexQueueCreat();
-		extern void partDischagMutexQueueCreat();
+		extern void 	partDischagMutexQueueCreat();
 		partDischagMutexQueueCreat();
-		extern void pressSettlMutexQueueCreat();
+		extern void 	pressSettlMutexQueueCreat();
 		pressSettlMutexQueueCreat();
-	
+		extern void 	threeAxisMutexQueueCreat();
+		threeAxisMutexQueueCreat();
 ////////////////////////////////////邮箱//////////////////////////////////
 		
 
     result = rt_mb_init(&mbNetRecData,"mbRec",&mbRecPool[0],sizeof(mbRecPool)/4,RT_IPC_FLAG_FIFO);         
     if (result != RT_EOK)
     {
-        rt_kprintf("init mailbox NetRecData failed.\n");
+        rt_kprintf("%sinit mailbox NetRecData failed.\n",sign);
         return -1;
     }
     result = rt_mb_init(&mbNetSendData,"mbSend",&mbSendPool[0],sizeof(mbSendPool)/4,RT_IPC_FLAG_FIFO);         
     if (result != RT_EOK)
     {
-        rt_kprintf("init mailbox NetSend failed.\n");
+        rt_kprintf("%sinit mailbox NetSend failed.\n",sign);
         return -1;
     }
 ////////////////////////////////任务////////////////////////////////////
     tid =  rt_thread_create("w5500",w5500Task,RT_NULL,1024,2, 10 );
 		if(tid!=NULL){
 				rt_thread_startup(tid);													 
-				rt_kprintf("RTcreat w5500Task task\r\n");
+				rt_kprintf("%sRTcreat w5500Task task\r\n",sign);
 		}
 		tid =  rt_thread_create("netRec",netDataRecTask,RT_NULL,1024,2, 10 );
 		if(tid!=NULL){
 				rt_thread_startup(tid);													 
-				rt_kprintf("RTcreat netDataRecTask \r\n");
+				rt_kprintf("%sRTcreat netDataRecTask \r\n",sign);
 		}
 		tid =  rt_thread_create("netSend",netDataSendTask,RT_NULL,1024,2, 10 );
 		if(tid!=NULL){
 				rt_thread_startup(tid);													 
-				rt_kprintf("RTcreat netDataSendTask \r\n");
+				rt_kprintf("%sRTcreat netDataSendTask \r\n",sign);
 		}
+
+		
+
+
+		extern void uartIrqEnaAfterQueue();
+		uartIrqEnaAfterQueue();//串口中断中用到了队列  开启中断需要放到后边
+		
 		tid =  rt_thread_create("upKeep",upKeepStateTask,RT_NULL,1024,2, 10 );
 		if(tid!=NULL){
 				rt_thread_startup(tid);													 
-				rt_kprintf("RTcreat upKeepStateTask \r\n");
+				rt_kprintf("%sRTcreat upKeepStateTask \r\n",sign);
 		}
-		extern void uartIrqEnaAfterQueue();
-		uartIrqEnaAfterQueue();//串口中断中用到了队列  开启中断需要放到后边
 		//队列初始化之后再开启串口中断接收
 //////////////////////////////结束//////////////////////////////////////
-    while (1)//task用于测试 以及闪灯操作
+    while (0)//task用于测试 以及闪灯操作
     {
 				hardWareDriverTest();
-				HAL_GPIO_WritePin(LED_GPIO_Port, LED_Pin, GPIO_PIN_SET);
-				rt_thread_mdelay(500);
 				HAL_GPIO_WritePin(LED_GPIO_Port, LED_Pin, GPIO_PIN_RESET);
-				rt_thread_mdelay(500);
-			  
+				rt_thread_mdelay(250);
+			  extern rt_bool_t gbNetState;
+			  if(gbNetState==RT_TRUE){
+					  rt_thread_mdelay(250);
+						
+				}
+				HAL_GPIO_WritePin(LED_GPIO_Port, LED_Pin, GPIO_PIN_SET);
+				rt_thread_mdelay(250);
+				if(gbNetState==RT_TRUE){
+					  rt_thread_mdelay(250);	
+				}
     }
 }
 

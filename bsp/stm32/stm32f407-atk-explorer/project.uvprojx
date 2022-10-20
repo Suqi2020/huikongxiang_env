@@ -508,6 +508,11 @@
               <FileType>1</FileType>
               <FilePath>.\applications\rs485PressSettl.c</FilePath>
             </File>
+            <File>
+              <FileName>rs485ThreeAxis.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>.\applications\rs485ThreeAxis.c</FilePath>
+            </File>
           </Files>
         </Group>
         <Group>

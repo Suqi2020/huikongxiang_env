@@ -1,7 +1,7 @@
 #include   "NetJsonDataTask.h"
 #include   "board.h"
 
-
+const static char task[]="[dataRec]";
 struct rt_mailbox mbNetRecData;
 extern void AllDownPhrase(char *data,int lenth);
 //备用 解决拼包  错包的问题
@@ -15,11 +15,11 @@ void netDataCheckp(uint8_t *data)
 						if(lenth<=2048){
 								for(int i=0;i<lenth;i++)
 										rt_kprintf("%02x",data[i]);
-								rt_kprintf("\r\n TASK rec  %d\r\n",lenth);
+								rt_kprintf("\r\n %sTASK rec  %d\r\n",task,lenth);
 							  AllDownPhrase((char *)data+count,lenth);
 						}
 						else{
-								rt_kprintf("lenth  err：%d str0:%x str1:%x str[2]:%d  str[3]:%d\r\n",lenth,data[0],data[1],data[2],data[3]);
+								rt_kprintf("%slenth  err：%d str0:%x str1:%x str[2]:%d  str[3]:%d\r\n",task,lenth,data[0],data[1],data[2],data[3]);
 						}
 				}
 				if(count++>=2040){
@@ -39,11 +39,11 @@ uint16_t netDataCheck(uint8_t *data)
 //						rt_kprintf("\r\n net rec  %d\r\n",lenth);
 				}
 				else{
-						rt_kprintf("lenth  err：%d str0:%x str1:%x str[2]:%d  str[3]:%d\r\n",lenth,data[0],data[1],data[2],data[3]);
+						rt_kprintf("%slenth  err：%d str0:%x str1:%x str[2]:%d  str[3]:%d\r\n",task,lenth,data[0],data[1],data[2],data[3]);
 				}
 		}
 		else{
-				 rt_kprintf("head  err\r\n");
+				 rt_kprintf("%shead  err\r\n",task);
 		}	 
 		return lenth;
 }

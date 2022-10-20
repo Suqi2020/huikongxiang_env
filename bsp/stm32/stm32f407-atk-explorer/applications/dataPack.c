@@ -1,6 +1,6 @@
 #include  "dataPack.h"
 
-
+const static char sign[]="[dataPack]";
 //heartUpStru  heartUp;
 extern uint16_t RTU_CRC(uint8_t *puchMsg ,uint16_t usDataLen);
 uint8_t   packBuf[TX_RX_MAX_BUF_SIZE];  //与net发送buff大小一致  通过邮箱传递给NetTxBuffer 进行发送出去
@@ -10,7 +10,7 @@ rs485ParaStru dev[NUM];//目前4路485设备
 //上行messageID自增  每次打包后自增1
 uint32_t upMessIdAdd()
 {
-	  rt_kprintf("messID:%d\r\n",mcu.upMessID);
+	  rt_kprintf("%smessID:%d\r\n",sign,mcu.upMessID);
 		return mcu.upMessID++;
 }
 
@@ -104,11 +104,11 @@ uint16_t heartUpPack()
 		
 		mcu.upHeartMessID =mcu.upMessID;
 		upMessIdAdd();
-		rt_kprintf("heart len:%d\r\n",len);
+		rt_kprintf("%sheart len:%d\r\n",sign,len);
 		
 		for(int i=0;i<len;i++)
 				rt_kprintf("%02x",packBuf[i]);
-		rt_kprintf("\r\nlen：%d str0:%x str1:%x str[2]:%d  str[3]:%d\r\n",len,packBuf[0],packBuf[1],packBuf[2],packBuf[3]);
+		rt_kprintf("\r\n%slen：%d str0:%x str1:%x str[2]:%d  str[3]:%d\r\n",sign,len,packBuf[0],packBuf[1],packBuf[2],packBuf[3]);
 		//rt_kprintf("heart:%s \n",packBuf);
 		return len;
 }
@@ -224,11 +224,11 @@ uint16_t devRegPack()
 		
 		mcu.devRegMessID =mcu.upMessID;
 		upMessIdAdd();
-		rt_kprintf("reg len:%d\r\n",len);
+		rt_kprintf("%sreg len:%d\r\n",sign,len);
 		
 		for(int i=0;i<len;i++)
 				rt_kprintf("%02x",packBuf[i]);
-		rt_kprintf("\r\nlen：%d str0:%x str1:%x str[2]:%d  str[3]:%d\r\n",len,packBuf[0],packBuf[1],packBuf[2],packBuf[3]);
+		rt_kprintf("\r\n%slen：%d str0:%x str1:%x str[2]:%d  str[3]:%d\r\n",sign,len,packBuf[0],packBuf[1],packBuf[2],packBuf[3]);
 		//rt_kprintf("heart:%s \n",packBuf);
 		return len;
 }
@@ -418,7 +418,7 @@ uint16_t rs485DataPack()
 		
 		mcu.devRegMessID =mcu.upMessID;
 		upMessIdAdd();
-		rt_kprintf("reg len:%d\r\n",len);
+		rt_kprintf("%sreg len:%d\r\n",sign,len);
 		
 		for(int i=0;i<len;i++)
 				rt_kprintf("%02x",packBuf[i]);

@@ -1,4 +1,6 @@
 #include    "modbus.h"
+
+const static char sign[]="[modbus]";
 /*
 1、什么时候读取数据 
 1.1 定时读取  队列发送 485 延时500ms 等待队列接收 接受完打包发送  加入1个 互斥保护
@@ -82,16 +84,16 @@ uint8_t modbusWriteMultReg(uint16_t slavAddr,uint16_t regAddr,uint16_t len,uint8
 int  modbusRespCheck(uint16_t slavAddr,uint8_t *buf,uint16_t len,rt_bool_t readFlag)
 {
 	  if(len<2){
-				rt_kprintf("ERR:modbus resp\r\n");
+				rt_kprintf("%sERR:no resp\r\n",sign);
 				return 2;
 		}
 		if(buf[0]!=slavAddr){
-				rt_kprintf("ERR:modbus slaveADDR\r\n");
+				rt_kprintf("%sERR:slaveADDR\r\n",sign);
 				return 1;
 		}
 		if(readFlag==RT_TRUE){
 				if((buf[2]+2+1+2)!=len){
-								rt_kprintf("ERR:modbus 可能连包\r\n");
+								rt_kprintf("%sERR:可能连包\r\n",sign);
 						}
 						len =buf[2]+2+1+2;//重新刷新长度
 		}
@@ -102,7 +104,7 @@ int  modbusRespCheck(uint16_t slavAddr,uint8_t *buf,uint16_t len,rt_bool_t readF
 		uint16_t respCrc=(buf[len-2]<<8)+buf[len-1];
 	  uint16_t checkCrc= RTU_CRC(buf,len-2);
 		if(respCrc!=checkCrc){
-				rt_kprintf("CRC check err 0x%04x  0x%04x\r\n",respCrc,checkCrc);
+				rt_kprintf("%sCRC check err 0x%04x  0x%04x\r\n",sign,respCrc,checkCrc);
 				return 0;
 		}
 		return 0;

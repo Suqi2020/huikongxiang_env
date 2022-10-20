@@ -42,7 +42,10 @@ extern UART_HandleTypeDef huart2;
 extern UART_HandleTypeDef huart3;
 extern UART_HandleTypeDef huart6;
 
-
+extern  void MX_UART4_Init(int bps);
+extern  void MX_USART2_UART_Init(int bps);
+extern  void MX_USART3_UART_Init(int bps);
+extern  void MX_USART6_UART_Init(int bps);
 
 //extern rt_mutex_t cirCurrMutex ;
 //队列的定义

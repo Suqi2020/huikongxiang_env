@@ -10,6 +10,8 @@
 
 ////////////////////////////////////
 #ifdef TEST_UART
+
+
 uint8_t testRecBuf[200];
 int testCount=0;
 extern UART_HandleTypeDef huart4;
@@ -338,12 +340,12 @@ int tick()
 	  extern uint64_t subTimeStampGet();
 	  uint64_t time =subTimeStampGet()+tick;
 
-	  rt_kprintf("[rttick][%lu]\r\n", tick);
+	  rt_kprintf("[tick][%lu]\r\n", tick);
 //		rt_kprintf("[utc][%lu]\r\n",time);//打印失败
 	  uint32_t rtc_s=time/1000;
 	  uint32_t rtc_ms=time%1000;
-		rt_kprintf("[tick-s][%lu]\r\n",rtc_s);//不能同时打印需要分开打印才正确
-		rt_kprintf("[tick-ms][%lu]\r\n",rtc_ms);
+		rt_kprintf("[tick][%lu]-s\r\n",rtc_s);//不能同时打印需要分开打印才正确
+		rt_kprintf("[tick][%lu]-ms\r\n",rtc_ms);
 	  return 0;
 }
 FINSH_FUNCTION_EXPORT(tick, tick finsh);//FINSH_FUNCTION_EXPORT_CMD
@@ -359,20 +361,20 @@ int offline()
 {
 	  int i=1;
 	  for( i=1;i<offLine.times;i++){ //下标从1开始
-				rt_kprintf("[offLine] the %d time,relayTimer %d 秒\r\n",i,offLine.relayTimer[i]);
+				rt_kprintf("[offLine]the %d time,relayTimer %d 秒\r\n",i,offLine.relayTimer[i]);
 		}
 
 		if(offLine.times==0){
-				rt_kprintf("On line OK\r\n");
+				rt_kprintf("[offLine]On line OK\r\n");
 		}
 		else{
 				if(i==(offLine.times)){
 						extern rt_bool_t gbNetState;
 						if(gbNetState==RT_FALSE){
-								rt_kprintf("[offLine] %d Time,relayTimer %d 秒\r\n",i,(rt_tick_get()-offLine.relayTimer[i])/1000);
+								rt_kprintf("[offLine]the %d Time,relayTimer %d 秒\r\n",i,(rt_tick_get()-offLine.relayTimer[i])/1000);
 						}
 						else{
-								rt_kprintf("[offLine] %d Times,relayTimer %d 秒\r\n",i,offLine.relayTimer[i]);
+								rt_kprintf("[offLine]the %d Times,relayTimer %d 秒\r\n",i,offLine.relayTimer[i]);
 						}
 				}
 		}

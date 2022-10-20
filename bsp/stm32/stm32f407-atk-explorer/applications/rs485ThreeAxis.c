@@ -1,15 +1,25 @@
-#include "rs485PressSettl.h"
+#include "rs485ThreeAxis.h"
 
 //<<—π≤Ó Ω≥¡Ωµ“« GY-STC-2000>> ƒ¨»œ≤®Ãÿ¬ 9600  modbusµÿ÷∑ 0xb1(”–ŒÛ) º˚ª˙…Ì±Í«©∫Û2Œª
+/*
+»˝÷·—È÷§∂Ãµÿ÷∑£´04 00 01 00 04
+
+—π≤Ó—È÷§∂Ãµÿ÷∑£´04 00 01 00 02
+≤®Ãÿ¬ ∏ƒŒ™9600£¨—π≤Ó∫Õ»˝÷·∏√∂Ãµÿ÷∑√¸¡Ó¬Î∂º «“ª—˘µƒ£¨FF FF 03 0A£´…Ë±∏ÕÍ’˚µƒ≥§µÿ÷∑£´01£´∂Ãµÿ÷∑
+*/
 //–ﬁ∏ƒ…Ë±∏µÿ÷∑ FF FF 03 0A£´…Ë±∏ÕÍ’˚µƒ≥§µÿ÷∑£´01£´∂Ãµÿ÷∑ 
-//   FF FF 03 0A 6E 01 20 21 09 08 00 B1 01 01
+//   FF FF 03 0A 6E 01 20 21 09 08 00 B1 01 01 
 //  24+∫Ï…´£¨24-∫⁄…´£¨A+¿∂…´£¨B-¬Ã…´
-const static char sign[]="[≥¡Ωµ“«]";
-static rt_mutex_t pressSettlMutex = RT_NULL;
+// ∑¢ 01 04 00 01 00 04 A0 09 
+//  ’ 01 04 08 0B CA FE 8D 00 03 03 80 C7 23 
+const static char sign[]="[»˝÷·]";
+
+threeAxisStru threeAxis;
+static rt_mutex_t threeAxisMutex = RT_NULL;
 #define  MSGPOOL_LEN   200 //485 ˝æ›◊Ó¥Û¡ø  ¥Û”⁄1k–Ë“™–ﬁ∏ƒ¥À¥¶
 //∂”¡–µƒ∂®“Â
-static struct  rt_messagequeue pressSettlmque;
-static uint8_t pressSettlQuePool[MSGPOOL_LEN];  //
+static struct  rt_messagequeue threeAxismque;
+static uint8_t threeAxisQuePool[MSGPOOL_LEN];  //
 static rt_bool_t  recFlag = RT_FALSE; //√ø∏ˆ—≠ª∑∑¢ÀÕ“ª¥Œ ∑¢ÕÍ RT_TRUE Ω” ’ÕÍ≥…ªÚ’ﬂΩ” ’≥¨ ±÷√Œ™ RT_FALSE
 
 
@@ -18,24 +28,23 @@ static rt_bool_t  recFlag = RT_FALSE; //√ø∏ˆ—≠ª∑∑¢ÀÕ“ª¥Œ ∑¢ÕÍ RT_TRUE Ω” ’ÕÍ≥…ªÚ
 //#define   LARGE_TIMES    100 //∑≈¥Û±∂ ˝  ∫Û∆⁄»Áπ˚–Ë“™ ∂¡»°ºƒ¥Ê∆˜0x000b ”–ø…ƒ‹∑≈¥Û10±∂
 extern uint8_t packBuf[TX_RX_MAX_BUF_SIZE];
 
-pressSettlStru pressSettle;
 
-static char num=2;//µ⁄3¬∑485
+static char num=3;//µ⁄4¬∑485
 //¥Ú∞¸¥Æø⁄∑¢ÀÕ 
-static void pressSettlUartSend(uint8_t *buf,int len)
+static void threeAxisUartSend(uint8_t *buf,int len)
 {
 
-		UART6_485_SEND;
-	  HAL_UART_Transmit(&huart6,(uint8_t *)buf,len,1000);
-		UART6_485_REC;
+		UART4_485_SEND;
+	  HAL_UART_Transmit(&huart4,(uint8_t *)buf,len,1000);
+		UART4_485_REC;
 
 }
 //¥Æø⁄Ω” ’∫Û∂™µΩ∂”¡–¿Ô
-rt_err_t pressSettlUartRec(uint8_t dat)
+rt_err_t threeAxisUartRec(uint8_t dat)
 {
 	
 		if(recFlag==RT_TRUE){
-				return rt_mq_send(&pressSettlmque, &dat, 1);  // ’µΩ ˝æ›∫ÛæÕÕ˘∂”¡–¿Ô∂™
+				return rt_mq_send(&threeAxismque, &dat, 1);  // ’µΩ ˝æ›∫ÛæÕÕ˘∂”¡–¿Ô∂™
 		}
 		else
 			  return RT_FALSE;
@@ -43,21 +52,21 @@ rt_err_t pressSettlUartRec(uint8_t dat)
 
 //
 //¥¥Ω®ª∑¡˜”√µΩµƒª•≥‚¡ø∫Õœ˚œ¢∂”¡–  main÷–µ˜”√
-void  pressSettlMutexQueueCreat()
+void  threeAxisMutexQueueCreat()
 {
-	  pressSettlMutex = rt_mutex_create("pressSettlMutex", RT_IPC_FLAG_FIFO);
-    if (pressSettlMutex == RT_NULL)
+	  threeAxisMutex = rt_mutex_create("threeAxisMutex", RT_IPC_FLAG_FIFO);
+    if (threeAxisMutex == RT_NULL)
     {
-        rt_kprintf("%screate pressSettlMutex failed.\n",sign);
+        rt_kprintf("%screate threeAxisMutex failed.\n",sign);
         return ;
     }
 		
 //////////////////////////////////œ˚œ¢∂”¡–//////////////////////////////////
 		
-		int result = rt_mq_init(&pressSettlmque,"pressSettlmque",&pressSettlQuePool[0],1,sizeof(pressSettlQuePool),RT_IPC_FLAG_FIFO);       
+		int result = rt_mq_init(&threeAxismque,"threeAxismque",&threeAxisQuePool[0],1,sizeof(threeAxisQuePool),RT_IPC_FLAG_FIFO);       
 		if (result != RT_EOK)
     {
-        rt_kprintf("%sinit pressSettlmque failed.\n",sign);
+        rt_kprintf("%sinit threeAxismque failed.\n",sign);
         return ;
     }
 }
@@ -65,46 +74,33 @@ void  pressSettlMutexQueueCreat()
 ///////////////////////////////////////∂¡–¥ºƒ¥Ê∆˜œ‡πÿ≤Ÿ◊˜////////////////////////////////////////
 
 
-
-uint8_t psReadReg(uint16_t slavAddr,uint16_t regAddr,uint16_t len,uint8_t * out)
-{
-		int i=0;
-	  out[i]=slavAddr;					 			i++;
-	  out[i]=0x04;      					 		i++;
-	  out[i]=(uint8_t)(regAddr>>8);   i++;
-	  out[i]=(uint8_t) regAddr;       i++;
-		out[i]=(uint8_t)(len>>8);       i++;
-	  out[i]=(uint8_t) len;       		i++;
-	  uint16_t crcRet=RTU_CRC(out ,i);
-	  out[i]=(uint8_t)(crcRet>>8);    i++;
-	  out[i]=crcRet;       						i++;
-		return i;
-}
+//”Î—π≤Ó Ω¥´∏–∆˜π≤”√“ª∏ˆ∂¡√¸¡Ó
+extern uint8_t psReadReg(uint16_t slavAddr,uint16_t regAddr,uint16_t len,uint8_t * out);
 
 
 
 //∑¢ 1A 04 00 01 00 02 23 E0
 // ’ 1A 04 04 0B 1B 00 1C 23 6F
-void readPSTempHeight()
+void readThreeTempAcc()
 {
 	  uint8_t offset=3;//add+regadd+len
 		uint8_t  *buf = rt_malloc(LENTH);
-	  uint16_t len = psReadReg(SLAVE_ADDR,0X0001,2,buf);
+	  uint16_t len = psReadReg(SLAVE_ADDR,0X0001,4,buf);
 //	  uint16_t ret =0;
 	  recFlag = RT_TRUE;
-		rt_mutex_take(pressSettlMutex,RT_WAITING_FOREVER);
+		rt_mutex_take(threeAxisMutex,RT_WAITING_FOREVER);
 	  //485∑¢ÀÕbuf  len  µ»¥˝modbusªÿ”¶
-		pressSettlUartSend(buf,len);
-	  rt_kprintf("%spressSettl send:",sign);
+		threeAxisUartSend(buf,len);
+	  rt_kprintf("%sthreeAxis send:",sign);
 		for(int j=0;j<len;j++){
 				rt_kprintf("%x ",buf[j]);
 		}
 		rt_kprintf("\n");
     len=0;
-		if(rt_mq_recv(&pressSettlmque, buf+len, 1, 3000) == RT_EOK){//µ⁄“ª¥ŒΩ” ’ ±º‰∑≈≥§µ„  œ‡”¶ ±º‰”–ø…ƒ‹±»Ωœæ√
+		if(rt_mq_recv(&threeAxismque, buf+len, 1, 3000) == RT_EOK){//µ⁄“ª¥ŒΩ” ’ ±º‰∑≈≥§µ„  œ‡”¶ ±º‰”–ø…ƒ‹±»Ωœæ√
 				len++;
 		}
-		while(rt_mq_recv(&pressSettlmque, buf+len, 1, 10) == RT_EOK){//115200 ≤®Ãÿ¬ 1ms 10∏ˆ ˝æ›
+		while(rt_mq_recv(&threeAxismque, buf+len, 1, 10) == RT_EOK){//115200 ≤®Ãÿ¬ 1ms 10∏ˆ ˝æ›
 				len++;
 		}
 		if(len!=0){
@@ -116,25 +112,28 @@ void readPSTempHeight()
 		}
 		//Ã·»°ª∑¡˜÷µ µ⁄“ª≤Ω≈–∂œcrc µ⁄∂˛≤øÃ·»°
 		int ret2=modbusRespCheck(SLAVE_ADDR,buf,len,RT_TRUE);
-		if(0 == ret2){//À¢–¬∂¡»°µΩµƒ÷µ
+		if(0 ==  ret2){//À¢–¬∂¡»°µΩµƒ÷µ
 
-        pressSettle.temp	=(buf[offset]<<8)+buf[offset+1];offset+=2;
-			  pressSettle.height=(buf[offset]<<8)+buf[offset+1];
-        float temp=(float)((float)pressSettle.temp/100);
-			  float heigh=(float)((float)pressSettle.height/10);
-			  rt_kprintf("%stemp:%0.2f*C height:%0.1fmm read ok\n",sign,temp,heigh);  
+        threeAxis.temp	=(buf[offset]<<8)+buf[offset+1];offset+=2;
+			  threeAxis.acclrationX = (buf[offset]<<8)+buf[offset+1];offset+=2;
+				threeAxis.acclrationY = (buf[offset]<<8)+buf[offset+1];offset+=2;
+				threeAxis.acclrationZ = (buf[offset]<<8)+buf[offset+1];offset+=2;
+        float temp=(float)((float)threeAxis.temp/100); 
+
+			  rt_kprintf("%stemp:%0.2f*C ACC:X%dmg Y%dmg Z%dmg ok\n",sign,temp,threeAxis.acclrationX,threeAxis.acclrationY,threeAxis.acclrationZ);  
 		} 
 		else{//∂¡≤ªµΩ∏¯0
 				if(ret2==2){
 						rt_kprintf("%sERR:«ÎºÏ≤È485Ω”œﬂªÚ’ﬂπ©µÁ\r\n",sign);
 				}
-			  pressSettle.temp	=0;
-			  pressSettle.height=0;
+			  threeAxis.acclrationX	= 0;
+			  threeAxis.acclrationY = 0;
+			  threeAxis.acclrationY = 0;
 			  rt_kprintf("%stemp height read fail\n",sign);
 		}
     //
 		recFlag = RT_FALSE;
-	  rt_mutex_release(pressSettlMutex);
+	  rt_mutex_release(threeAxisMutex);
 		rt_free(buf);
 	  buf=RT_NULL;
 
@@ -145,28 +144,29 @@ void readPSTempHeight()
 /////////////////////////////////////////JSON∏Ò Ω¥Ú∞¸//////////////////////////////////////////
 //Œ¬∂»∏ﬂ∂»÷µ¥Ú∞¸
 
+/*
+{
+    "mid":1234,
+    "packetType†":"CMD_REPORTDATA",  
+    "param":
+    {
+        "identifier":" vibration_meter_monitor",
+        "acuId":"100000000000001",
+        "deviceId":"1000000000004",†
+        "data":
+        {
+            "temp":"22.75", //?
+            "accelerationX":"1234",//mg
+"accelerationY":"1234",//mg
+"accelerationZ":"1234",//mg
+            "monitoringTime":"1655172531937"
+        }
+    },
+    "timestamp":"1655172531937"
+}
+*/
 
-
-//{
-//        "mid":1234,
-//        "packetType?:"CMD_REPORTDATA",    
-//        "param":
-//        {
-//                "identifier":"pressure_settler_monitor",
-//                "acuId":"100000000000001",
-//                "deviceId":"1000000000004",?
-//                "data":
-//                {
-//                        "temp":"22.75", //?
-//                        "height":"0.8",//mm
-//                        "monitoringTime":"1655172531937"
-//                }
-//        },
-//        "timestamp":"1655172531937"
-//}
-
-
-void PSTempHeightPack()
+void t3AxisTempAccPack()
 {
 		memset(packBuf,0,sizeof(packBuf));
 		int len=0;
@@ -206,14 +206,19 @@ void PSTempHeightPack()
 		
 		
 	 	//sprintf(str,"test:%0.2f",(float)121/100);				 
-		sprintf(str,"\"temp\":\"%0.2f\",",(float)((float)pressSettle.temp/100));	 
+		sprintf(str,"\"temp\":\"%0.2f\",",(float)((float)threeAxis.temp/100));	 
 		rt_strcpy((char *)packBuf+len,str);
 		len+=rt_strlen(str);
-		sprintf(str,"\"height\":\"%0.1f\",",(float)((float)pressSettle.height/10));	 
+		sprintf(str,"\"accelerationX\":\"%d\",",threeAxis.acclrationX);	 
 		rt_strcpy((char *)packBuf+len,str);
 		len+=rt_strlen(str);
 
-	
+		sprintf(str,"\"accelerationY\":\"%d\",",threeAxis.acclrationY);	 
+		rt_strcpy((char *)packBuf+len,str);
+		len+=rt_strlen(str);
+		sprintf(str,"\"accelerationZ\":\"%d\",",threeAxis.acclrationZ);	 
+		rt_strcpy((char *)packBuf+len,str);
+		len+=rt_strlen(str);		
 		
 		rt_sprintf(str,"\"monitoringTime\":\"%lu\"}},",utcTime());
 		rt_strcpy((char *)packBuf+len,str);
