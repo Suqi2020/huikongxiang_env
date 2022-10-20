@@ -59,8 +59,11 @@
 //V0.21    加入统计代码，粗略计算掉线次数和掉线时长 命令 offline                    20221018
 //V0.22    增加沉降仪代码 默认波特率9600 文档有误      20221018
 //V0.23    增加三轴代码 默认波特率9600 需要修改三轴的地址为01  同沉降仪  20221019
+//V0.24 	 增加支持modbus设备选择串口 UART2(1) UART3(2) UART6(3) UART1(debug) UART4(4)  未测试  20221020
 
-#define APP_VER       ((0<<8)+23)//0x0105 表示1.5版本
+
+
+#define APP_VER       ((0<<8)+24)//0x0105 表示1.5版本
 
 static    rt_thread_t tid 	= RT_NULL;
 
@@ -93,13 +96,6 @@ static int cnt = 0;
 /* 定时器1超时函数 */
 static void timeout1(void *parameter)
 {
-//    rt_kprintf("periodic timer is timeout %d\n", cnt);
-//    /* 运行第10次，停止周期定时器 */
-//    if (cnt++ >= 9)
-//    {
-//        rt_timer_stop(timer1);
-//        rt_kprintf("periodic timer was stopped! \n");
-//    }
 		static int count=0;
 		extern rt_bool_t gbNetState;
 		if(gbNetState==RT_TRUE){
@@ -119,7 +115,7 @@ int main(void)
 		RELAY2_ON;
 		RELAY3_ON;
 		RELAY4_ON;//上电后外部485全部供电
-    rt_kprintf("\n%s20221019  ver=%02d.%02d\n",sign,(uint8_t)(APP_VER>>8),(uint8_t)APP_VER);
+    rt_kprintf("\n%s20221020  ver=%02d.%02d\n",sign,(uint8_t)(APP_VER>>8),(uint8_t)APP_VER);
 	  rt_err_t result;
 //////////////////////////////////////信号量//////////////////////////////
 	  w5500Iqr_semp = rt_sem_create("w5500Iqr_semp",0, RT_IPC_FLAG_FIFO);
@@ -179,14 +175,15 @@ int main(void)
 		
 
 
-		extern void uartIrqEnaAfterQueue();
-		uartIrqEnaAfterQueue();//串口中断中用到了队列  开启中断需要放到后边
+
 		
 		tid =  rt_thread_create("upKeep",upKeepStateTask,RT_NULL,1024,2, 10 );
 		if(tid!=NULL){
 				rt_thread_startup(tid);													 
 				rt_kprintf("%sRTcreat upKeepStateTask \r\n",sign);
 		}
+		
+
 		//队列初始化之后再开启串口中断接收
 //////////////////////////////结束//////////////////////////////////////
     while (0)//task用于测试 以及闪灯操作

@@ -37,14 +37,12 @@ static rt_bool_t writeAcqInterv(uint16_t value);
 static rt_bool_t writeThresholdVal(uint32_t value);
 static rt_bool_t writePoint(uint16_t value);
 
-static char num=0;//第1路485
+
 //打包串口发送 
-static void cirCurrUartSend(uint8_t *buf,int len)
+void cirCurrUartSend(uint8_t *buf,int len)
 {
 
-		UART2_485_SEND;
-	  HAL_UART_Transmit(&huart2,(uint8_t *)buf,len,1000);
-		UART2_485_REC;
+		rs485UartSend(chanl.cirCula,buf, len);
 
 }
 //串口接收后丢到队列里
@@ -536,7 +534,7 @@ uint16_t 	cirCulaDataPack()
 		rt_strcpy((char *)packBuf+len,str);
 		len+=rt_strlen(str);
 		
-		rt_sprintf(str,"\"deviceId\":\"%s\",",dev[num].ID);
+		rt_sprintf(str,"\"deviceId\":\"%s\",",dev[chanl.cirCula].ID);
 		rt_strcpy((char *)packBuf+len,str);
 		len+=rt_strlen(str);
 

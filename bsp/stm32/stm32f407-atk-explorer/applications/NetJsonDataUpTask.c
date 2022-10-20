@@ -149,6 +149,9 @@ void   upKeepStateTask(void *para)
 {
 
     devIDRead();
+	  uartConfRead();//根据flash存储重新配置串口
+		extern void uartIrqEnaAfterQueue();
+		uartIrqEnaAfterQueue();//串口中断中用到了队列  开启中断需要放到后边
 	  cirCurrConf();//公众电流初始化 modbus配置
 
 	  readPSTempHeight();//读取压差式沉降仪

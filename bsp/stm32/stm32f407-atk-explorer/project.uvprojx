@@ -147,7 +147,7 @@
             <RestoreSysVw>1</RestoreSysVw>
           </Target>
           <RunDebugAfterBuild>0</RunDebugAfterBuild>
-          <TargetSelection>11</TargetSelection>
+          <TargetSelection>1</TargetSelection>
           <SimDlls>
             <CpuDll></CpuDll>
             <CpuDllArguments></CpuDllArguments>
@@ -161,7 +161,7 @@
             <PeripheralDll></PeripheralDll>
             <PeripheralDllArguments></PeripheralDllArguments>
             <InitializationFile></InitializationFile>
-            <Driver>STLink\ST-LINKIII-KEIL_SWO.dll</Driver>
+            <Driver>BIN\UL2CM3.DLL</Driver>
           </TargetDlls>
         </DebugOption>
         <Utilities>
@@ -512,6 +512,11 @@
               <FileName>rs485ThreeAxis.c</FileName>
               <FileType>1</FileType>
               <FilePath>.\applications\rs485ThreeAxis.c</FilePath>
+            </File>
+            <File>
+              <FileName>uartReconf.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>.\applications\uartReconf.c</FilePath>
             </File>
           </Files>
         </Group>

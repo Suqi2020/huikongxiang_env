@@ -683,8 +683,9 @@ void USART2_IRQHandler(void)
 		if((__HAL_UART_GET_FLAG(&huart2,UART_FLAG_RXNE)!=RESET))  //接收中断(接收到的数据必须是0x0d 0x0a结尾)
 		{
 				HAL_UART_Receive(&huart2,&Res,1,1000); 
-			  extern rt_err_t cirCurrUartRec(uint8_t dat);
-				cirCurrUartRec(Res);
+//			  extern rt_err_t cirCurrUartRec(uint8_t dat);
+//				cirCurrUartRec(Res);
+			   modDev[USE_UART2].UartRec(Res);
 			  //rt_mq_send(&cirCurrmque, &Res, 1);  //收到数据后就往队列里丢
 
 		}
@@ -732,8 +733,9 @@ void USART3_IRQHandler(void)
 		{
 	
 				HAL_UART_Receive(&huart3,&Res,1,1000); 
-			  extern rt_err_t partDischagUartRec(uint8_t dat);
-			  partDischagUartRec(Res);
+//			  extern rt_err_t partDischagUartRec(uint8_t dat);
+//			  partDischagUartRec(Res);
+			  modDev[USE_UART3].UartRec(Res);
 		}
 		HAL_UART_IRQHandler(&huart3);	
 	#endif
@@ -796,8 +798,9 @@ void UART4_IRQHandler(void)
 		{
 			  //rt_kprintf("read\n");
 				HAL_UART_Receive(&huart4,&Res,1,1000); 
-				extern rt_err_t threeAxisUartRec(uint8_t dat);
-				threeAxisUartRec(Res);
+//				extern rt_err_t threeAxisUartRec(uint8_t dat);
+//				threeAxisUartRec(Res);
+			  modDev[USE_UART4].UartRec(Res);
 		}
 		HAL_UART_IRQHandler(&huart4);	
 	#endif
@@ -926,9 +929,9 @@ void USART6_IRQHandler(void)
 		{
 			  //rt_kprintf("read\n");
 				HAL_UART_Receive(&huart6,&Res,1,1000); 
-			  extern void pressSettlUartRec(uint8_t dat);
-				pressSettlUartRec(Res);
-			
+//			  extern void pressSettlUartRec(uint8_t dat);
+//				pressSettlUartRec(Res);
+				modDev[USE_UART6].UartRec(Res);
 			
 		}
 		HAL_UART_IRQHandler(&huart6);	

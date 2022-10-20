@@ -29,14 +29,12 @@ static rt_bool_t  recFlag = RT_FALSE; //每个循环发送一次 发完 RT_TRUE 接收完成或
 extern uint8_t packBuf[TX_RX_MAX_BUF_SIZE];
 
 
-static char num=3;//第4路485
+
 //打包串口发送 
-static void threeAxisUartSend(uint8_t *buf,int len)
+ void threeAxisUartSend(uint8_t *buf,int len)
 {
 
-		UART4_485_SEND;
-	  HAL_UART_Transmit(&huart4,(uint8_t *)buf,len,1000);
-		UART4_485_REC;
+		rs485UartSend(chanl.threeAxis,buf, len);
 
 }
 //串口接收后丢到队列里
@@ -196,7 +194,7 @@ void t3AxisTempAccPack()
 		rt_strcpy((char *)packBuf+len,str);
 		len+=rt_strlen(str);
 		
-		rt_sprintf(str,"\"deviceId\":\"%s\",",dev[num].ID);
+		rt_sprintf(str,"\"deviceId\":\"%s\",",dev[chanl.threeAxis].ID);
 		rt_strcpy((char *)packBuf+len,str);
 		len+=rt_strlen(str);
 

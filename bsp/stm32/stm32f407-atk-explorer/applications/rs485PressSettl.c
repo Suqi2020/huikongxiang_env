@@ -20,14 +20,12 @@ extern uint8_t packBuf[TX_RX_MAX_BUF_SIZE];
 
 pressSettlStru pressSettle;
 
-static char num=2;//第3路485
+
 //打包串口发送 
-static void pressSettlUartSend(uint8_t *buf,int len)
+ void pressSettlUartSend(uint8_t *buf,int len)
 {
 
-		UART6_485_SEND;
-	  HAL_UART_Transmit(&huart6,(uint8_t *)buf,len,1000);
-		UART6_485_REC;
+		rs485UartSend(chanl.pressSettl,buf, len);
 
 }
 //串口接收后丢到队列里
@@ -196,7 +194,7 @@ void PSTempHeightPack()
 		rt_strcpy((char *)packBuf+len,str);
 		len+=rt_strlen(str);
 		
-		rt_sprintf(str,"\"deviceId\":\"%s\",",dev[num].ID);
+		rt_sprintf(str,"\"deviceId\":\"%s\",",dev[chanl.pressSettl].ID);
 		rt_strcpy((char *)packBuf+len,str);
 		len+=rt_strlen(str);
 

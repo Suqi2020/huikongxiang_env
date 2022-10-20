@@ -21,12 +21,10 @@ struct  rt_messagequeue partDischagmque;//局放队列
 extern uint8_t packBuf[TX_RX_MAX_BUF_SIZE];
 static rt_bool_t  recFlag = RT_FALSE; //每个循环发送一次 发完 RT_TRUE 接收完成或者接收超时置为 RT_FALSE
 
-static char num=1;//第2路485
-static void partDischagUartSend(uint8_t *buf,int len)
+
+ void partDischagUartSend(uint8_t *buf,int len)
 {
-		UART3_485_SEND;
-	  HAL_UART_Transmit(&huart3,(uint8_t *)buf,len,1000);
-		UART3_485_REC;
+		rs485UartSend(chanl.partDischag,buf, len);
 	
 }
 //串口接收后丢到队列里
@@ -269,7 +267,7 @@ void  partDisDataPack()
 		rt_strcpy((char *)packBuf+len,str);
 		len+=rt_strlen(str);
 		
-		rt_sprintf(str,"\"deviceId\":\"%s\",",dev[num].ID);
+		rt_sprintf(str,"\"deviceId\":\"%s\",",dev[chanl.partDischag].ID);
 		rt_strcpy((char *)packBuf+len,str);
 		len+=rt_strlen(str);
 

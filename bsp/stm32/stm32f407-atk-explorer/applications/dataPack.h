@@ -2,7 +2,7 @@
 #define   __DATAPACK_H__
 
 #include   "board.h"
-#define   NUM        4
+
 #define   HEAD_LEN   2
 #define   LENTH_LEN  2
 #define   CRC_LEN    2
@@ -35,7 +35,7 @@ typedef  struct
 	  char  type[4];
     	
 }rs485ParaStru;
-extern  rs485ParaStru dev[NUM];
+extern  rs485ParaStru dev[];
 extern  uint32_t  utcTime(void);
 extern  uint32_t upMessIdAdd(void);
 /**************************/
