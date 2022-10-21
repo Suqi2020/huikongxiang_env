@@ -12,11 +12,11 @@ const static char task[]="[dataUp]";
 
 extern void 	readPdFreqDischarge(void);
 extern void 	readPSTempHeight(void);
-extern void  PSTempHeightPack(void);
-extern void  readThreeTempAcc(void);
-extern void	t3AxisTempAccPack(void);
-extern void devIDRead(void);
-extern void cirCurrConf(void);
+extern void  	PSTempHeightPack(void);
+extern void  	readThreeTempAcc(void);
+extern void		t3AxisTempAccPack(void);
+extern void 	devIDFlashRead(void);
+extern void 	cirCurrConf(void);
 #define TIM_NUM  6 //目前支持6路定时器  最大 65536秒
 typedef struct 
 {
@@ -148,12 +148,14 @@ static void  timeOutRunFun()
 void   upKeepStateTask(void *para)
 {
 
-    devIDRead();
-	  uartConfRead();//根据flash存储重新配置串口
+    
+	  uartConfFlashRead();//根据flash存储重新配置串口
+	  devIDFlashRead();//必须放到uartConfFlashRead后边 配置chanl各项参数后才能使用
 		extern void uartIrqEnaAfterQueue();
 		uartIrqEnaAfterQueue();//串口中断中用到了队列  开启中断需要放到后边
-	  cirCurrConf();//公众电流初始化 modbus配置
 
+	
+	  cirCurrConf();//公众电流初始化 modbus配置
 	  readPSTempHeight();//读取压差式沉降仪
 	  readThreeTempAcc();//读取三轴
 		rt_thread_mdelay(2000);//延时2秒为了局放读取
@@ -165,10 +167,9 @@ void   upKeepStateTask(void *para)
 		timeInit(4, 120);//读取压差式沉降仪
 		timeInit(5, 120);//读取三轴
 		while(1){
-			  if(gbNetState ==RT_TRUE){
-					  timeOutRunFun();
-					  timeInc();
-				}
+
+				timeOutRunFun();
+				timeInc();
 				rt_thread_mdelay(1000);
 		}
 }

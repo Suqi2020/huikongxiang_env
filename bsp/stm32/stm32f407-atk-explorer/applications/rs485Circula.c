@@ -107,6 +107,7 @@ void readCirCurrAndWaring()
 				}
 				rt_kprintf("\n");
 		}
+		modDev[chanl.cirCula].offline=RT_FALSE;
 		//提取环流值 第一步判断crc 第二部提取
 		int ret=modbusRespCheck(SLAVE_ADDR,buf,len,RT_TRUE);
 		if(0 ==  ret){//刷新读取到的值
@@ -122,7 +123,8 @@ void readCirCurrAndWaring()
 		} 
 		else{//读不到给0
 			  if(ret==2){
-						rt_kprintf("%sERR:请检查485接线或者供电\r\n",sign);
+						//rt_kprintf("%sERR:请检查485接线或者供电\r\n",sign);
+						modDev[chanl.cirCula].offline=RT_TRUE;
 				}
 				cirCurStru_p.circlCurA=0;
 				cirCurStru_p.circlCurB=0;
@@ -197,6 +199,7 @@ uint16_t readAcqInterv()
 				rt_kprintf("%x ",buf[j]);
 		}
 		rt_kprintf("\n");
+		modDev[chanl.cirCula].offline=RT_FALSE;
 		//提取环流值 第一步判断crc 第二部提取
 		int ret2=modbusRespCheck(SLAVE_ADDR,buf,len,RT_TRUE);
 		if(0 == ret2){//刷新读取到的值
@@ -206,7 +209,8 @@ uint16_t readAcqInterv()
 		} 
 		else{
 				if(ret2==2){
-						rt_kprintf("%sERR:请检查485接线或者供电\r\n",sign);
+					   modDev[chanl.cirCula].offline=RT_TRUE;
+						//rt_kprintf("%sERR:请检查485接线或者供电\r\n",sign);
 				}
 		}
 		
@@ -246,6 +250,7 @@ rt_bool_t writeAcqInterv(uint16_t value)
 				rt_kprintf("%x ",buf[j]);
 		}
 		rt_kprintf("\n");
+		modDev[chanl.cirCula].offline=RT_FALSE;
 		//提取环流值 第一步判断crc 第二判断对错
 		int ret2= modbusRespCheck(SLAVE_ADDR,buf,len,RT_FALSE);
 		if(0 ==  ret2){//刷新读取到的值
@@ -255,7 +260,8 @@ rt_bool_t writeAcqInterv(uint16_t value)
 		} 
 		else{
 				if(ret2==2){
-						rt_kprintf("%sERR:请检查485接线或者供电\r\n",sign);
+					  modDev[chanl.cirCula].offline=RT_TRUE;
+						//rt_kprintf("%sERR:请检查485接线或者供电\r\n",sign);
 				}
 		}
     //
@@ -294,6 +300,7 @@ uint32_t readThresholdVal()
 				rt_kprintf("%x ",buf[j]);
 		}
 		rt_kprintf("\n");
+		modDev[chanl.cirCula].offline=RT_FALSE;
 		//提取环流值 第一步判断crc 第二部提取
 		int ret2=modbusRespCheck(SLAVE_ADDR,buf,len,RT_TRUE);
 		if(0 ==ret2){//刷新读取到的值
@@ -303,7 +310,8 @@ uint32_t readThresholdVal()
 		} 
 		else{
 				if(ret2==2){
-						rt_kprintf("%sERR:请检查485接线或者供电\r\n",sign);
+						modDev[chanl.cirCula].offline=RT_TRUE;
+						//rt_kprintf("%sERR:请检查485接线或者供电\r\n",sign);
 				}
 		}
 		recFlag = RT_FALSE;
@@ -342,6 +350,7 @@ rt_bool_t writeThresholdVal(uint32_t value)
 				rt_kprintf("%x ",buf[j]);
 		}
 		rt_kprintf("\n");
+		modDev[chanl.cirCula].offline=RT_FALSE;
 		//提取环流值 第一步判断crc 第二判断对错
 		int ret2 = modbusRespCheck(SLAVE_ADDR,buf,len,RT_FALSE);
 		if(0 ==  ret2){//刷新读取到的值
@@ -351,7 +360,8 @@ rt_bool_t writeThresholdVal(uint32_t value)
 		} 
 		else{
 				if(ret2==2){
-						rt_kprintf("%sERR:请检查485接线或者供电\r\n",sign);
+					  modDev[chanl.cirCula].offline=RT_TRUE;
+						//rt_kprintf("%sERR:请检查485接线或者供电\r\n",sign);
 				}
 		}
 		recFlag = RT_FALSE;
@@ -390,6 +400,7 @@ uint16_t readPoint()
 		}
 		rt_kprintf("\n");
 		//提取环流值 第一步判断crc 第二部提取
+		modDev[chanl.cirCula].offline=RT_FALSE;
 		int ret2=modbusRespCheck(SLAVE_ADDR,buf,len,RT_TRUE);
 		if(0 == ret2){//刷新读取到的值
 
@@ -402,7 +413,8 @@ uint16_t readPoint()
 		} 
 		else{
 				if(ret2==2){
-						rt_kprintf("%sERR:请检查485接线或者供电\r\n",sign);
+					  modDev[chanl.cirCula].offline=RT_TRUE;
+						//rt_kprintf("%sERR:请检查485接线或者供电\r\n",sign);
 				}
 		}
 		recFlag = RT_FALSE;
@@ -440,6 +452,7 @@ rt_bool_t writePoint(uint16_t value)
 				}
 				rt_kprintf("\n");
 		}
+		modDev[chanl.cirCula].offline=RT_FALSE;
 		//提取环流值 第一步判断crc 第二判断对错
 		int ret2=modbusRespCheck(SLAVE_ADDR,buf,len,RT_FALSE);
 		if(0 == ret2 ){//刷新读取到的值
@@ -449,7 +462,8 @@ rt_bool_t writePoint(uint16_t value)
 		} 
 		else{
 				if(ret2==2){
-						rt_kprintf("%sERR:请检查485接线或者供电\r\n",sign);
+					  modDev[chanl.cirCula].offline=RT_TRUE;
+						//rt_kprintf("%sERR:请检查485接线或者供电\r\n",sign);
 				}
 		}
 		recFlag = RT_FALSE;

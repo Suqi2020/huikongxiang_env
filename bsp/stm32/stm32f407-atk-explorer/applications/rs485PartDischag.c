@@ -94,6 +94,7 @@ void readPdFreqDischarge()
 				rt_kprintf("\n");
 		}
 		//提取环流值 第一步判断crc 第二部提取
+		modDev[chanl.partDischag].offline=RT_FALSE;
 		int ret2= modbusRespCheck(SLAVE_ADDR,buf,len,RT_TRUE);
 		if(0 ==  ret2){//刷新读取到的值
 
@@ -112,9 +113,9 @@ void readPdFreqDischarge()
 			  rt_kprintf("%sPdFreqDiach read ok\n",sign);
 		} 
 		else{//读不到给0
-			
 				if(ret2==2){
-						rt_kprintf("%sERR:请检查485接线或者供电\r\n",sign);
+						//rt_kprintf("%sERR:请检查485接线或者供电\r\n",sign);
+						modDev[chanl.partDischag].offline=RT_TRUE;
 				}
 				partDiscStru_p.amplitudeA=0;
 				partDiscStru_p.freqA     =0;
@@ -169,18 +170,20 @@ rt_bool_t readPartDischgWarning()
 				rt_kprintf("%x ",buf[j]);
 		}
 		rt_kprintf("\n");
+		modDev[chanl.partDischag].offline=RT_FALSE;
 		//提取环流值 第一步判断crc 第二部提取
 		int ret2=modbusRespCheck(SLAVE_ADDR,buf,len,RT_TRUE);
 		if(0 == ret2){//刷新读取到的值
      
-			  partDiscStru_p.alarm.a=buf[offset]>>0;
-				partDiscStru_p.alarm.b=buf[offset]>>1;
-			  partDiscStru_p.alarm.c=buf[offset]>>2;
+			  partDiscStru_p.alarm.a=(buf[offset]>>0)&0x01;
+				partDiscStru_p.alarm.b=(buf[offset]>>1)&0x01;
+			  partDiscStru_p.alarm.c=(buf[offset]>>2)&0x01;
 			  rt_kprintf("%s提取alarm OK\r\n",sign);
 		} 
 		else{
 				if(ret2==2){
-						rt_kprintf("%sERR:请检查485接线或者供电\r\n",sign);
+						//rt_kprintf("%sERR:请检查485接线或者供电\r\n",sign);
+					  modDev[chanl.partDischag].offline=RT_TRUE;
 				}
 				partDiscStru_p.alarm.a=0;
 				partDiscStru_p.alarm.b=0;

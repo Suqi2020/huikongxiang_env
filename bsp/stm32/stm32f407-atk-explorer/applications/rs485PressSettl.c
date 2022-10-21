@@ -113,6 +113,7 @@ void readPSTempHeight()
 				rt_kprintf("\n");
 		}
 		//提取环流值 第一步判断crc 第二部提取
+		modDev[chanl.pressSettl].offline=RT_FALSE;
 		int ret2=modbusRespCheck(SLAVE_ADDR,buf,len,RT_TRUE);
 		if(0 == ret2){//刷新读取到的值
 
@@ -124,7 +125,8 @@ void readPSTempHeight()
 		} 
 		else{//读不到给0
 				if(ret2==2){
-						rt_kprintf("%sERR:请检查485接线或者供电\r\n",sign);
+						//rt_kprintf("%sERR:请检查485接线或者供电\r\n",sign);
+					  modDev[chanl.pressSettl].offline=RT_TRUE;
 				}
 			  pressSettle.temp	=0;
 			  pressSettle.height=0;

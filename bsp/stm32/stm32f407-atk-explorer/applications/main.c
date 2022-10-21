@@ -43,6 +43,8 @@
 //V0.13   加入dataup 和devreg easy timer													 20221009
 //V0.14   手动测试3条上行数据OK  																		20221010
 //        串口2346 modbus 串口1 debug 串口5 串口屏
+
+
 //V0.15		rs485_公众环流 modbus 初步调式读取数据成功，并能实现上传 20221011
 //        rt_sprintf float类型有问题  使用sprintf代替 
 //V0.16   READ WRITE modbus OK   																			20221012
@@ -60,10 +62,11 @@
 //V0.22    增加沉降仪代码 默认波特率9600 文档有误      20221018
 //V0.23    增加三轴代码 默认波特率9600 需要修改三轴的地址为01  同沉降仪  20221019
 //V0.24 	 增加支持modbus设备选择串口 UART2(1) UART3(2) UART6(3) UART1(debug) UART4(4)  未测试  20221020
+//V0.24    增加4路485和网络故障log打印输出                                     20221021
 
 
 
-#define APP_VER       ((0<<8)+24)//0x0105 表示1.5版本
+#define APP_VER       ((0<<8)+25)//0x0105 表示1.5版本
 
 static    rt_thread_t tid 	= RT_NULL;
 
@@ -86,7 +89,7 @@ extern  void   hardWareDriverTest(void);
 
 
 const static char sign[]="[main]";
-
+//const char errStr[]="[ERR]";
 
 
 /* 定时器的控制块 */
@@ -94,17 +97,42 @@ static rt_timer_t timer1;
 
 static int cnt = 0;
 /* 定时器1超时函数 */
+//10秒提醒一次 uart offline状态
 static void timeout1(void *parameter)
 {
 		static int count=0;
+	  static int alarmTick=10;
 		extern rt_bool_t gbNetState;
+	  count++;
+	  
 		if(gbNetState==RT_TRUE){
-				if(count++%5==0){
+				if(count%5==0){
 						HAL_GPIO_TogglePin(LED_GPIO_Port, LED_Pin);
 				}
 		}
 		else
 				HAL_GPIO_TogglePin(LED_GPIO_Port, LED_Pin);
+		if(count%alarmTick==0){
+			  alarmTick+=20;
+			  if(alarmTick>=100){
+						alarmTick=100;// 1 2 3 最终10秒提醒一次
+				}
+				if(modDev[chanl.cirCula].offline==RT_TRUE){
+						rt_kprintf("%sERR:请检查<<环流>>485接线或电源\n",sign);
+				}
+				if(modDev[chanl.partDischag].offline==RT_TRUE){
+						rt_kprintf("%sERR:请检查<<局放>>485接线或电源\n",sign);
+				}
+				if(modDev[chanl.pressSettl].offline==RT_TRUE){
+						rt_kprintf("%sERR:请检查<<沉降仪>>485接线或电源\n",sign);
+				}
+				if(modDev[chanl.threeAxis].offline==RT_TRUE){
+						rt_kprintf("%sERR:请检查<<三轴测振仪>>485接线或电源\n",sign);
+				}
+				if(gbNetState ==RT_FALSE){
+						rt_kprintf("%sERR:网络故障\n",sign);
+				}
+		}
 }
 
 
@@ -115,7 +143,7 @@ int main(void)
 		RELAY2_ON;
 		RELAY3_ON;
 		RELAY4_ON;//上电后外部485全部供电
-    rt_kprintf("\n%s20221020  ver=%02d.%02d\n",sign,(uint8_t)(APP_VER>>8),(uint8_t)APP_VER);
+    rt_kprintf("\n%s20221021  ver=%02d.%02d\n",sign,(uint8_t)(APP_VER>>8),(uint8_t)APP_VER);
 	  rt_err_t result;
 //////////////////////////////////////信号量//////////////////////////////
 	  w5500Iqr_semp = rt_sem_create("w5500Iqr_semp",0, RT_IPC_FLAG_FIFO);

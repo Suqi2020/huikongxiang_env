@@ -27,7 +27,10 @@ void uart2SendRecTest()
 		{
 				HAL_UART_Receive(&huart2,&Res,1,1000); 
 				testRecBuf[testCount++]=Res;
-			  if(Res=='\n'){
+			  UART2_485_SEND;
+			  HAL_UART_Transmit(&huart2,&Res,1,1000);
+			  UART2_485_REC;
+			  if((Res=='\n')||(testCount>=10)){
 			    testRecBuf[testCount++]=0;
 					UART2_485_SEND;
 					HAL_UART_Transmit(&huart2,(uint8_t *)testRecBuf,(uint16_t)strlen((char *)testRecBuf),1000);

@@ -7,7 +7,7 @@
 
 //devIDRead()
 const static char sign[]="[uartRecfg]";
-modbusConfStru  modDev[NUM];
+modbusConfStru  modDev[UART_NUM];
 uartChanlStru  chanl;
 
 
@@ -27,29 +27,33 @@ extern void threeAxisUartSend(uint8_t *buf,int len);
 //串口接收后丢到队列里
 extern rt_err_t threeAxisUartRec(uint8_t dat);
 void uartReconfig(void);
-void uartConfRead()
+void uartConfFlashRead()
 {
 	
 //	  rt_strcpy(modDev[0].name,"circula");
+//	  chanl.cirCula		  =USE_UART3;//使用串口2
+//	  chanl.partDischag =USE_UART6;//使用串口3
+//	  chanl.pressSettl	=USE_UART4;//使用串口6
+//	  chanl.threeAxis   =USE_UART2;//使用串口4
 	  chanl.cirCula		  =USE_UART2;//使用串口2
 	  chanl.partDischag =USE_UART3;//使用串口3
 	  chanl.pressSettl	=USE_UART6;//使用串口6
 	  chanl.threeAxis   =USE_UART4;//使用串口4
-	
-		modDev[chanl.cirCula].bps	=115200;
-	  modDev[chanl.cirCula].UartRec=&cirCurrUartRec;
-
+		modDev[chanl.cirCula].bps		 =115200;
 		modDev[chanl.partDischag].bps=115200;
-	  modDev[chanl.partDischag].UartRec=&partDischagUartRec;
-
-		modDev[chanl.pressSettl].bps=9600;
-	  modDev[chanl.pressSettl].UartRec=&pressSettlUartRec;
+		modDev[chanl.pressSettl].bps =9600;
+		modDev[chanl.threeAxis].bps	 =9600;
 	
-		modDev[chanl.threeAxis].bps=9600;
-	  modDev[chanl.threeAxis].UartRec=&threeAxisUartRec;
+		modDev[chanl.cirCula].UartRec    =&cirCurrUartRec;
+		modDev[chanl.partDischag].UartRec=&partDischagUartRec;
+		modDev[chanl.pressSettl].UartRec =&pressSettlUartRec;
+		modDev[chanl.threeAxis].UartRec  =&threeAxisUartRec;
 
 	  uartReconfig();
 }
+
+
+uint8_t  tetStr[]="qwertyuiopASDFGHJKLZXCVBNM";
 //485根据串口发送
 void rs485UartSend(uint8_t chanl,uint8_t *buf,int len)
 {
@@ -89,6 +93,13 @@ void uartReconfig()
 		MX_USART2_UART_Init(modDev[USE_UART2].bps	);
 		MX_USART3_UART_Init(modDev[USE_UART3].bps	);
 		MX_USART6_UART_Init(modDev[USE_UART6].bps	);
-	  rt_kprintf("%sERR:UART re config\n",sign);
+	  rt_kprintf("%sUART re config\n",sign);
+//	for(int i=0;i<1000;i++){
+//		rs485UartSend(0,tetStr,sizeof(tetStr));
+//		rs485UartSend(1,tetStr,sizeof(tetStr));
+//		rs485UartSend(2,tetStr,sizeof(tetStr));
+//		rs485UartSend(3,tetStr,sizeof(tetStr));
+//		rt_thread_mdelay(2000);
+//	}
 }
 

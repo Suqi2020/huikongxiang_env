@@ -32,9 +32,11 @@ void   netDataSendTask(void *para)
 			  if (rt_mb_recv(&mbNetSendData, (rt_ubase_t *)&str, RT_WAITING_FOREVER) == RT_EOK)
         { 
 						int lenth = netDataSendCheck(str);
-						if(lenth!=0){
+						if((lenth!=0)&&(gbNetState ==RT_TRUE)){
 								netSend(str,lenth);
 						}
+						else
+							rt_kprintf("%sERR:net offline drop data\r\n",task);
 				}
 		}
 }
