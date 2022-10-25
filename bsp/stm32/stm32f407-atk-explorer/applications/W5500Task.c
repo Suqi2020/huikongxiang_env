@@ -94,9 +94,19 @@ void  w5500Task(void *parameter)
 			      rt_kprintf("%s init……\r\n",task);
 				break;
 			case W5500DHCPEnum:
-					  if(RT_TRUE == do_dhcp()){                        /*DHCP测试程序*/
+				    if(ip_from==IP_FROM_DHCP){//IP_FROM_DHCP)
+							if(RT_TRUE == do_dhcp()){                        /*DHCP测试程序*/
+									W5500State=W5500NetOKEnum;
+									break;
+							}
+						}
+						else{
+							  set_w5500_ip();
+								rt_kprintf("%sW5500 服务器IP:%d.%d.%d.%d\r\n",task,remote_ip[0],remote_ip[1],remote_ip[2],remote_ip[3]);
+								rt_kprintf("%sW5500 监听端口:%d \r\n",task,remote_port);
 								W5500State=W5500NetOKEnum;
-							  break;
+							  rt_sem_release(w5500Iqr_semp);
+								break;
 						}
 						if(dhcpTick++>=5){//1秒基准  200*5
 								dhcpTick=0;
@@ -114,6 +124,7 @@ void  w5500Task(void *parameter)
 			      static int count=0;      
 						if(ret==RT_EOK){
 								W5500ISR();//w5500
+							 // rt_kprintf("w5500 test\r\n");
 								loopback_tcpc(SOCK_TCPC, local_port);//W5500内部自动维护网络连接 此处只读寄存器
 						}
 

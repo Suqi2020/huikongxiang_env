@@ -162,8 +162,8 @@ void   upKeepStateTask(void *para)
 		readPartDischgWarning();//局放初始化比较久 放后边读取
 		timeInit(0, 120);//心跳定时
 		timeInit(1, 2);//注册 注册成功后定时器就关闭
-		timeInit(2, 120);//读取环流
-		timeInit(3, 30);//读取局放
+		timeInit(2, 30);//读取环流
+		timeInit(3, 60);//读取局放
 		timeInit(4, 120);//读取压差式沉降仪
 		timeInit(5, 120);//读取三轴
 		while(1){

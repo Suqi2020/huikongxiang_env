@@ -785,15 +785,12 @@ void rstDhcp()
 int  do_dhcp(void)
 {
 	uint8 dhcpret=0;
-	ip_from=IP_FROM_DHCP;	/*IP配置方法选择为DHCP*/
-	//dhcp_timer_init();																 /*初始化DHCP定时器*/
 	if(Conflict_flag == 1)
 	{
 		init_dhcp_client();				                       /*初始化DHCP客户端*/ 
 		Conflict_flag =0;
 	}
-	
-	dhcpret = check_DHCP_state(SOCK_DHCP);             /*获取DHCP服务状态*/
+		dhcpret = check_DHCP_state(SOCK_DHCP);             /*获取DHCP服务状态*/
 	
 	switch(dhcpret)
 	{
@@ -808,7 +805,7 @@ int  do_dhcp(void)
 		case DHCP_RET_UPDATE:														 /*成功获取到IP地址*/ 
 		  dhcp_ok=1;                  
 			set_w5500_ip();                                /*将获取到的IP地址写入W5500寄存器*/ 
-			rt_kprintf(" 已从DHCP服务器成功获得IP地址\r\n");
+					rt_kprintf(" 已从DHCP服务器成功获得IP地址\r\n");
 			rt_kprintf("W5500 服务器IP:%d.%d.%d.%d\r\n",remote_ip[0],remote_ip[1],remote_ip[2],remote_ip[3]);
 			rt_kprintf("W5500 监听端口:%d \r\n",remote_port);
       return RT_TRUE;

@@ -81,7 +81,7 @@ extern uint8    use_eeprom;                             	  /* 是否使用EEPROM中的
 #define IP_FROM_DEFINE	        0       			              /*使用初始定义的IP信息*/
 #define IP_FROM_DHCP	          1       			              /*使用DHCP获取IP信息*/
 #define IP_FROM_EEPROM	        2       			              /*使用EEPROM定义的IP信息*/
-extern uint8	ip_from;											                /*选择IP信息配置源*/
+extern const uint8	ip_from;											                /*选择IP信息配置源*/
 #pragma pack(1)
 /*此结构体定义了W5500可供配置的主要参数*/
 typedef struct _CONFIG_MSG											

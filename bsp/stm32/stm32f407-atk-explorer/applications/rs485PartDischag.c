@@ -280,13 +280,13 @@ void  partDisDataPack()
 		
 		
 	 	//sprintf(str,"test:%0.2f",(float)121/100);				 
-		sprintf(str,"\"pdA\":\"%u\"}},",partDiscStru_p.amplitudeA);	 
+		sprintf(str,"\"pdA\":\"%u\",",partDiscStru_p.amplitudeA);	 
 		rt_strcpy((char *)packBuf+len,str);
 		len+=rt_strlen(str);
-		sprintf(str,"\"freqA\":\"%u\"}},",partDiscStru_p.freqA);	 
+		sprintf(str,"\"freqA\":\"%u\",",partDiscStru_p.freqA);	 
 		rt_strcpy((char *)packBuf+len,str);
 		len+=rt_strlen(str);
-		sprintf(str,"\"dischargeDataA\":\"%u\"}},",partDiscStru_p.dischargeA);	 
+		sprintf(str,"\"dischargeDataA\":\"%u\",",partDiscStru_p.dischargeA);	 
 		rt_strcpy((char *)packBuf+len,str);
 		len+=rt_strlen(str);
 		rt_strcpy(str,"\"prpdDataA\":\"\",");
@@ -296,13 +296,13 @@ void  partDisDataPack()
 		rt_strcpy((char *)packBuf+len,str);
 		len+=rt_strlen(str);
 		
-		sprintf(str,"\"pdB\":\"%u\"}},",partDiscStru_p.amplitudeA);	 
+		sprintf(str,"\"pdB\":\"%u\",",partDiscStru_p.amplitudeA);	 
 		rt_strcpy((char *)packBuf+len,str);
 		len+=rt_strlen(str);
-		sprintf(str,"\"freqB\":\"%u\"}},",partDiscStru_p.freqA);	 
+		sprintf(str,"\"freqB\":\"%u\",",partDiscStru_p.freqA);	 
 		rt_strcpy((char *)packBuf+len,str);
 		len+=rt_strlen(str);
-		sprintf(str,"\"dischargeDataB\":\"%u\"}},",partDiscStru_p.dischargeA);	 
+		sprintf(str,"\"dischargeDataB\":\"%u\",",partDiscStru_p.dischargeA);	 
 		rt_strcpy((char *)packBuf+len,str);
 		len+=rt_strlen(str);
 		rt_strcpy(str,"\"prpdDataB\":\"\",");
@@ -312,13 +312,13 @@ void  partDisDataPack()
 		rt_strcpy((char *)packBuf+len,str);
 		len+=rt_strlen(str);		
 
-		sprintf(str,"\"pdC\":\"%u\"}},",partDiscStru_p.amplitudeA);	 
+		sprintf(str,"\"pdC\":\"%u\",",partDiscStru_p.amplitudeA);	 
 		rt_strcpy((char *)packBuf+len,str);
 		len+=rt_strlen(str);
-		sprintf(str,"\"freqC\":\"%u\"}},",partDiscStru_p.freqA);	 
+		sprintf(str,"\"freqC\":\"%u\",",partDiscStru_p.freqA);	 
 		rt_strcpy((char *)packBuf+len,str);
 		len+=rt_strlen(str);
-		sprintf(str,"\"dischargeDataC\":\"%u\"}},",partDiscStru_p.dischargeA);	 
+		sprintf(str,"\"dischargeDataC\":\"%u\",",partDiscStru_p.dischargeA);	 
 		rt_strcpy((char *)packBuf+len,str);
 		len+=rt_strlen(str);
 		rt_strcpy(str,"\"prpdDataC\":\"\",");

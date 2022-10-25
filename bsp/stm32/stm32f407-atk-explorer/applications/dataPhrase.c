@@ -36,10 +36,10 @@ packTypeEnum  downLinkPackTpyeGet(cJSON  *TYPE)
 {
 	
 	
-	  if(rt_strcmp(TYPE->valuestring,"CMD_HEARTBEAT_RESPONSE")==0){
+	  if(rt_strcmp(TYPE->valuestring,"CMD_HEARTBEA_RESPONSE")==0){
 				return heartResp;
 		}
-		else if(rt_strcmp(TYPE->valuestring,"CMD_DEVICE_REGISTE_RESPONSE")==0){
+		else if(rt_strcmp(TYPE->valuestring,"CMD_DEVICE_REGISTER_RESPONSE")==0){
 				return devRegResp;
 		}
 		else if(rt_strcmp(TYPE->valuestring,"CMD_REPORTDATA_RESPONSE")==0){
@@ -103,7 +103,7 @@ rt_bool_t heartRespFun(cJSON  *Json)
 
 
 //需要判断devid 和消息ID一致才认为注册成功
-rt_bool_t comRespFun(cJSON  *Json)
+rt_bool_t comRespFun(cJSON  *Json,uint32_t mesgID)
 {
 
 		cJSON  *msg =cJSON_GetObjectItem(Json,"msg");
@@ -111,8 +111,8 @@ rt_bool_t comRespFun(cJSON  *Json)
 	
 
 		cJSON  *mid =cJSON_GetObjectItem(Json,"mid");
-    if(mcu.devRegMessID != mid->valueint){
-				rt_kprintf("%sreg resp messID err %d %d\r\n",sign,mid->valueint,mcu.devRegMessID );
+    if(mesgID!= mid->valueint){
+				rt_kprintf("%sreg resp messID err %d %d\r\n",sign,mid->valueint,mesgID);
 			  return RT_FALSE;
 			
 		}
@@ -167,14 +167,14 @@ void AllDownPhrase(char *data,int lenth)
 						}
 						break;
 					case devRegResp:
-						if(RT_TRUE==comRespFun(Json)){//收到心跳回应 怎么通知发送层
+						if(RT_TRUE==comRespFun(Json,mcu.devRegMessID)){//收到心跳回应 怎么通知发送层
 								rt_kprintf("%sreg dev succ\r\n",sign);
 							  extern rt_bool_t gbRegFlag;
 							  gbRegFlag = RT_TRUE;
 						}
 						break;
 					case repDataResp:
-						if(RT_TRUE==comRespFun(Json)){//收到心跳回应 怎么通知发送层
+						if(RT_TRUE==comRespFun(Json,mcu.repDataMessID)){//收到心跳回应 怎么通知发送层
 								rt_kprintf("%srep data succ\r\n",sign);
 						}
 						break;

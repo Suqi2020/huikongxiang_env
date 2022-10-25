@@ -556,7 +556,7 @@ uint16_t 	cirCulaDataPack()
 		rt_strcpy((char *)packBuf+len,str);
 		len+=rt_strlen(str);
 	 	//sprintf(str,"test:%0.2f",(float)121/100);				 
-		sprintf(str,"\"earthCurA\":\"%0.2f\"}},",(float)((float)cirCurStru_p.circlCurA/cirCurStru_p.point));	 
+		sprintf(str,"\"earthCurA\":\"%0.2f\",",(float)((float)cirCurStru_p.circlCurA/cirCurStru_p.point));	 
 		rt_strcpy((char *)packBuf+len,str);
 		len+=rt_strlen(str);
 		
@@ -567,7 +567,7 @@ uint16_t 	cirCulaDataPack()
 		rt_strcpy((char *)packBuf+len,str);
 		len+=rt_strlen(str);
 		
-		sprintf(str,"\"earthCurB\":\"%0.2f\"}},",(float)((float)cirCurStru_p.circlCurB/cirCurStru_p.point));	 
+		sprintf(str,"\"earthCurB\":\"%0.2f\",",(float)((float)cirCurStru_p.circlCurB/cirCurStru_p.point));	 
 		rt_strcpy((char *)packBuf+len,str);
 		len+=rt_strlen(str);
 		
@@ -578,7 +578,7 @@ uint16_t 	cirCulaDataPack()
 		rt_strcpy((char *)packBuf+len,str);
 		len+=rt_strlen(str);
 		
-		sprintf(str,"\"earthCurC\":\"%0.2f\"}},",(float)((float)cirCurStru_p.circlCurC/cirCurStru_p.point));	 
+		sprintf(str,"\"earthCurC\":\"%0.2f\",",(float)((float)cirCurStru_p.circlCurC/cirCurStru_p.point));	 
 		rt_strcpy((char *)packBuf+len,str);
 		len+=rt_strlen(str);
 		

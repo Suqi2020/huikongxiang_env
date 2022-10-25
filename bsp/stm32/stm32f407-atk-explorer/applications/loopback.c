@@ -227,7 +227,7 @@ void loopback_tcpc(SOCKET s, uint16 port)
 				len = recv(s, NetRxBuffer, len);		/* read the received data */
 				
 				NetRxBuffer[len]=0;  //防止多打印
-				//rt_kprintf("w5500 discon\r\n");
+				
 				
 				extern struct rt_mailbox mbNetRecData;
 				rt_mb_send_wait(&mbNetRecData, (rt_ubase_t)&NetRxBuffer,RT_WAITING_FOREVER);  
@@ -235,6 +235,7 @@ void loopback_tcpc(SOCKET s, uint16 port)
 //				rt_free(data_buf);
 			}
 			SOCK_DISCON(s);
+			rt_kprintf("w5500 discon\r\n");
 			extern rt_bool_t gbNetState;
 			
 			if(offLineTimesGet==RT_FALSE){//只获取一次
@@ -343,7 +344,7 @@ void loopback_udp(SOCKET s, uint16 port)
 
 void w5500Init()
 {
-		ip_from=IP_FROM_DHCP;
+
 	  SOCK_DISCON(SOCK_TCPC);
 		reset_w5500();											/*硬复位W5500*/
 		set_w5500_mac();										/*配置MAC地址*/

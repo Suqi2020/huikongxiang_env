@@ -18,7 +18,8 @@ typedef enum{
 		USE_UART2=0,
 	  USE_UART3,
 	  USE_UART6,
-	  USE_UART4
+	  USE_UART4,
+	  USE_DIS_UART=0XFF
 }uartEnum;
 
 

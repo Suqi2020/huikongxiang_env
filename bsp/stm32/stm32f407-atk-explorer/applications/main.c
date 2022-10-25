@@ -62,11 +62,11 @@
 //V0.22    增加沉降仪代码 默认波特率9600 文档有误      20221018
 //V0.23    增加三轴代码 默认波特率9600 需要修改三轴的地址为01  同沉降仪  20221019
 //V0.24 	 增加支持modbus设备选择串口 UART2(1) UART3(2) UART6(3) UART1(debug) UART4(4)  未测试  20221020
-//V0.24    增加4路485和网络故障log打印输出                                     20221021
+//V0.25    增加4路485和网络故障log打印输出                                     20221021
+//V0.26    增加ip_from==IP_FROM_DHCP 或者自定义来实现网络ip配置 （交换机自动获取ip失败） 20221025
 
 
-
-#define APP_VER       ((0<<8)+25)//0x0105 表示1.5版本
+#define APP_VER       ((0<<8)+26)//0x0105 表示1.5版本
 
 static    rt_thread_t tid 	= RT_NULL;
 
@@ -106,33 +106,33 @@ static void timeout1(void *parameter)
 	  count++;
 	  
 		if(gbNetState==RT_TRUE){
-				if(count%5==0){
+				if(count%10==0){
 						HAL_GPIO_TogglePin(LED_GPIO_Port, LED_Pin);
 				}
 		}
 		else
 				HAL_GPIO_TogglePin(LED_GPIO_Port, LED_Pin);
-		if(count%alarmTick==0){
-			  alarmTick+=20;
-			  if(alarmTick>=100){
-						alarmTick=100;// 1 2 3 最终10秒提醒一次
-				}
-				if(modDev[chanl.cirCula].offline==RT_TRUE){
-						rt_kprintf("%sERR:请检查<<环流>>485接线或电源\n",sign);
-				}
-				if(modDev[chanl.partDischag].offline==RT_TRUE){
-						rt_kprintf("%sERR:请检查<<局放>>485接线或电源\n",sign);
-				}
-				if(modDev[chanl.pressSettl].offline==RT_TRUE){
-						rt_kprintf("%sERR:请检查<<沉降仪>>485接线或电源\n",sign);
-				}
-				if(modDev[chanl.threeAxis].offline==RT_TRUE){
-						rt_kprintf("%sERR:请检查<<三轴测振仪>>485接线或电源\n",sign);
-				}
-				if(gbNetState ==RT_FALSE){
-						rt_kprintf("%sERR:网络故障\n",sign);
-				}
-		}
+//		if(count%alarmTick==0){
+//			  alarmTick+=20;
+//			  if(alarmTick>=100){
+//						alarmTick=100;// 1 2 3 最终10秒提醒一次
+//				}
+//				if(modDev[chanl.cirCula].offline==RT_TRUE){
+//						rt_kprintf("%sERR:请检查<<环流>>485接线或电源\n",sign);
+//				}
+//				if(modDev[chanl.partDischag].offline==RT_TRUE){
+//						rt_kprintf("%sERR:请检查<<局放>>485接线或电源\n",sign);
+//				}
+//				if(modDev[chanl.pressSettl].offline==RT_TRUE){
+//						rt_kprintf("%sERR:请检查<<沉降仪>>485接线或电源\n",sign);
+//				}
+//				if(modDev[chanl.threeAxis].offline==RT_TRUE){
+//						rt_kprintf("%sERR:请检查<<三轴测振仪>>485接线或电源\n",sign);
+//				}
+//				if(gbNetState ==RT_FALSE){
+//						rt_kprintf("%sERR:网络故障\n",sign);
+//				}
+//		}
 }
 
 
