@@ -67,7 +67,8 @@ void  partDischagMutexQueueCreat()
 void readPdFreqDischarge()
 {
 	  uint8_t offset=3;//add+regadd+len
-		uint8_t  *buf = rt_malloc(LENTH);
+	  uint8_t  *buf = RT_NULL;
+		buf = rt_malloc(LENTH);
 	  uint16_t len = modbusReadReg(SLAVE_ADDR,0x0300,18,buf);
 //	  uint16_t ret =0;
 	  recFlag = RT_TRUE;
@@ -79,6 +80,7 @@ void readPdFreqDischarge()
 				rt_kprintf("%x ",buf[j]);
 		}
 		rt_kprintf("\n");
+		memset(buf,0,LENTH);
     len=0;
 		if(rt_mq_recv(&partDischagmque, buf+len, 1, 3000) == RT_EOK){//第一次接收时间放长点  相应时间有可能比较久
 				len++;
@@ -145,7 +147,8 @@ void readPdFreqDischarge()
 rt_bool_t readPartDischgWarning()
 {
 	  uint8_t offset=3;//add+regadd+len
-		uint8_t  *buf = rt_malloc(LENTH);
+	  uint8_t  *buf = RT_NULL;
+		buf = rt_malloc(LENTH);
 	  uint16_t len = modbusReadBitReg(SLAVE_ADDR,0x0001,8,buf);//读取8个bit
 //	  uint16_t ret =0;
 	  recFlag = RT_TRUE;
@@ -157,7 +160,7 @@ rt_bool_t readPartDischgWarning()
 				rt_kprintf("%x ",buf[j]);
 		}
 		rt_kprintf("\n");
-
+		memset(buf,0,LENTH);
     len=0;
 		if(rt_mq_recv(&partDischagmque, buf+len, 1, 3000) == RT_EOK){//第一次接收时间放长点  相应时间有可能比较久
 				len++;
@@ -270,7 +273,7 @@ void  partDisDataPack()
 		rt_strcpy((char *)packBuf+len,str);
 		len+=rt_strlen(str);
 		
-		rt_sprintf(str,"\"deviceId\":\"%s\",",dev[chanl.partDischag].ID);
+		rt_sprintf(str,"\"deviceId\":\"%s\",",devi[chanl.partDischag].ID);
 		rt_strcpy((char *)packBuf+len,str);
 		len+=rt_strlen(str);
 

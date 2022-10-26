@@ -25,6 +25,14 @@ typedef struct
 }timerStru;
 static timerStru tim[TIM_NUM];
 //给个定时值
+
+
+//启动
+static void timeStart(int num)
+{
+		tim[num].count=0;
+}
+//初始化后会自动运行
 static void timeInit(int num,int value)//给个定时值
 {
 	  if((num>=TIM_NUM)||(value==0)){  
@@ -32,7 +40,6 @@ static void timeInit(int num,int value)//给个定时值
 			return;
 		}
 		tim[num].threshoVal=value;
-		 
 }
 //每1秒递增一次
 static void timeInc()
@@ -43,11 +50,7 @@ static void timeInc()
 		}
 }
 
-//启动
-static void timeStart(int num)
-{
-		tim[num].count=0;
-}
+
 //停止
 static void timeStop(int num)
 {
@@ -80,7 +83,7 @@ void  w5500_16KDataTest()
 //定时时间到  执行相应事件
 static void  timeOutRunFun()
 {
-
+    extern uint16_t devRegJsonPack(void);
 		switch(timeOut()){
 			case 0://心跳
 //				heartUpPack();
@@ -89,13 +92,15 @@ static void  timeOutRunFun()
 				break;
 			case 1://注册 注册成功后定时器就关闭
 			  if(gbRegFlag==RT_FALSE){
-					  devRegPack();
+					 
+					  devRegJsonPack();
 						rt_mb_send_wait(&mbNetSendData, (rt_ubase_t)&packBuf,RT_WAITING_FOREVER); 
-						rt_kprintf("%sreg timer out\r\n",task);
+						
 					  timeStop(1);//正式使用时候需要去掉
 				}
 				else
 						timeStop(1);
+				rt_kprintf("%sreg timer out\r\n",task);
 				break;
 			case 2://读取环流
 			  readCirCurrAndWaring();
@@ -160,12 +165,17 @@ void   upKeepStateTask(void *para)
 	  readThreeTempAcc();//读取三轴
 		rt_thread_mdelay(2000);//延时2秒为了局放读取
 		readPartDischgWarning();//局放初始化比较久 放后边读取
-		timeInit(0, 120);//心跳定时
+
+		timeInit(0, 30);//心跳定时
 		timeInit(1, 2);//注册 注册成功后定时器就关闭
 		timeInit(2, 30);//读取环流
 		timeInit(3, 60);//读取局放
 		timeInit(4, 120);//读取压差式沉降仪
 		timeInit(5, 120);//读取三轴
+//		timeStop(2);
+//		timeStop(3);
+//		timeStop(4);
+//		timeStop(5);
 		while(1){
 
 				timeOutRunFun();

@@ -19,7 +19,7 @@
 #include "w5500_conf.h"
 #include "rtthread.h"
 //#define DHCP_DEBUG
-
+const static char sign[]="[dhcp]";
 DHCP_Get DHCP_GET;
 
 uint8*   SRC_MAC_ADDR   = EXTERN_DHCP_MAC;				/*本地MAC地址*/
@@ -791,11 +791,14 @@ int  do_dhcp(void)
 		Conflict_flag =0;
 	}
 		dhcpret = check_DHCP_state(SOCK_DHCP);             /*获取DHCP服务状态*/
-	
+	static int count=0;
 	switch(dhcpret)
 	{
 		case DHCP_RET_NONE:                              /*IP地址获取不成功*/ 
-      			//rt_kprintf("DHCP_RET_NONE\r\n");
+      if(count++>=50){	//200ms基准调用的
+				count=0;
+				rt_kprintf("%sDHCP自动获取IP失败\r\n",sign);
+			}
 			break;
 		
 		case DHCP_RET_TIMEOUT:                           /*IP地址获取超时*/ 
@@ -805,9 +808,9 @@ int  do_dhcp(void)
 		case DHCP_RET_UPDATE:														 /*成功获取到IP地址*/ 
 		  dhcp_ok=1;                  
 			set_w5500_ip();                                /*将获取到的IP地址写入W5500寄存器*/ 
-					rt_kprintf(" 已从DHCP服务器成功获得IP地址\r\n");
-			rt_kprintf("W5500 服务器IP:%d.%d.%d.%d\r\n",remote_ip[0],remote_ip[1],remote_ip[2],remote_ip[3]);
-			rt_kprintf("W5500 监听端口:%d \r\n",remote_port);
+					rt_kprintf("%s 已从DHCP服务器成功获得IP地址\r\n",sign);
+			rt_kprintf("%sW5500 服务器IP:%d.%d.%d.%d\r\n",sign,remote_ip[0],remote_ip[1],remote_ip[2],remote_ip[3]);
+			rt_kprintf("%sW5500 监听端口:%d \r\n",sign,remote_port);
       return RT_TRUE;
 //	    break;
 		

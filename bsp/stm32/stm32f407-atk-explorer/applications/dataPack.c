@@ -1,64 +1,65 @@
 #include  "dataPack.h"
-
+#include  "cJSON.h"
 const static char sign[]="[dataPack]";
 //heartUpStru  heartUp;
 extern uint16_t RTU_CRC(uint8_t *puchMsg ,uint16_t usDataLen);
-uint8_t   packBuf[TX_RX_MAX_BUF_SIZE];  //Óënet·¢ËÍbuff´óĞ¡Ò»ÖÂ  Í¨¹ıÓÊÏä´«µİ¸øNetTxBuffer ½øĞĞ·¢ËÍ³öÈ¥
+uint8_t   packBuf[TX_RX_MAX_BUF_SIZE];  //ä¸netå‘é€buffå¤§å°ä¸€è‡´  é€šè¿‡é‚®ç®±ä¼ é€’ç»™NetTxBuffer è¿›è¡Œå‘é€å‡ºå»
 mcuParazStru mcu ={0};
 
-rs485ParaStru dev[UART_NUM];//Ä¿Ç°4Â·485Éè±¸
-//ÉÏĞĞmessageID×ÔÔö  Ã¿´Î´ò°üºó×ÔÔö1
+rs485ParaStru devi[UART_NUM];//ç›®å‰4è·¯485è®¾å¤‡
+//ä¸Šè¡ŒmessageIDè‡ªå¢  æ¯æ¬¡æ‰“åŒ…åè‡ªå¢1
 uint32_t upMessIdAdd()
 {
 	  rt_kprintf("%smessID:%d\r\n",sign,mcu.upMessID);
 		return mcu.upMessID++;
 }
 
-//ºóÆÚĞèÒª´ÓflashÖĞ¶ÁÈ¡ID
+//åæœŸéœ€è¦ä»flashä¸­è¯»å–ID
 void  devIDFlashRead()
 {
 		rt_strcpy(mcu.devID  ,"1000000000001");
-		rt_strcpy(dev[chanl.cirCula].ID,"A000000000001");
-		rt_strcpy(dev[chanl.cirCula].model,"GY280");
-	  rt_strcpy(dev[chanl.cirCula].type,"1");
-	  rt_strcpy(dev[chanl.cirCula].name,"½ÓµØ»·Á÷");
-		rt_strcpy(dev[chanl.partDischag].ID,"A000000000002");
-		rt_strcpy(dev[chanl.partDischag].model,"GY281");
-	  rt_strcpy(dev[chanl.partDischag].type,"2");
-	  rt_strcpy(dev[chanl.partDischag].name,"¾Ö·Å¼à¿Ø");
+		rt_strcpy(devi[chanl.cirCula].ID,"A000000000001");
+		rt_strcpy(devi[chanl.cirCula].model,"GY280");
+	  rt_strcpy(devi[chanl.cirCula].type,"1");
+	  rt_strcpy(devi[chanl.cirCula].name,"æ¥åœ°ç¯æµ");
 	
-		rt_strcpy(dev[chanl.pressSettl].ID,"A000000000003");
-		rt_strcpy(dev[chanl.pressSettl].model,"GY282");
-	  rt_strcpy(dev[chanl.pressSettl].type,"3");
-	  rt_strcpy(dev[chanl.pressSettl].name,"³Á½µÒÇ");
+		rt_strcpy(devi[chanl.partDischag].ID,"A000000000002");
+		rt_strcpy(devi[chanl.partDischag].model,"GY281");
+	  rt_strcpy(devi[chanl.partDischag].type,"2");
+	  rt_strcpy(devi[chanl.partDischag].name,"å±€æ”¾");
 	
-		rt_strcpy(dev[chanl.threeAxis].ID,"A000000000004");
-		rt_strcpy(dev[chanl.threeAxis].model,"GY283");
-	  rt_strcpy(dev[chanl.threeAxis].type,"4");
-	  rt_strcpy(dev[chanl.threeAxis].name,"ÈıÖá²âÕñÒÇ");
-//		rt_strcpy(dev[2].ID,"A000000000003");
-//		rt_strcpy(dev[3].ID,"A000000000004");
+		rt_strcpy(devi[chanl.pressSettl].ID,"A000000000003");
+		rt_strcpy(devi[chanl.pressSettl].model,"GY282");
+	  rt_strcpy(devi[chanl.pressSettl].type,"3");
+	  rt_strcpy(devi[chanl.pressSettl].name,"æ²‰é™ä»ª");
+	
+		rt_strcpy(devi[chanl.threeAxis].ID,"A000000000004");
+		rt_strcpy(devi[chanl.threeAxis].model,"GY283");
+	  rt_strcpy(devi[chanl.threeAxis].type,"4");
+	  rt_strcpy(devi[chanl.threeAxis].name,"ä¸‰è½´æµ‹æŒ¯ä»ª");
+//		rt_strcpy(devi[2].ID,"A000000000003");
+//		rt_strcpy(devi[3].ID,"A000000000004");
 }
 
 
 uint64_t subTimeStamp=0;
 
-//»ñÈ¡µ½·şÎñÆ÷Ê±¼ä´Á²îÖµ
+//è·å–åˆ°æœåŠ¡å™¨æ—¶é—´æˆ³å·®å€¼
 uint64_t subTimeStampGet()
 {
 		return subTimeStamp;
 }
-//´æ´¢·şÎñÆ÷µÄÊ±¼ä´Á²îÖµ  
+//å­˜å‚¨æœåŠ¡å™¨çš„æ—¶é—´æˆ³å·®å€¼  
  void  subTimeStampSet(uint64_t time)
 {
-	  subTimeStamp=time-rt_tick_get();//·şÎñÆ÷rtcÖµ-µ±Ç°tickÖµ
+	  subTimeStamp=time-rt_tick_get();//æœåŠ¡å™¨rtcå€¼-å½“å‰tickå€¼
 
 }
 uint32_t  utcTime()
 {
 	return rt_tick_get()+subTimeStampGet();
 }
-//ÉÏĞĞÊı¾İ´ò°ü
+//ä¸Šè¡Œæ•°æ®æ‰“åŒ…
 uint16_t heartUpPack()
 {
 	  
@@ -67,9 +68,9 @@ uint16_t heartUpPack()
     //head+lenth
 	  packBuf[len]= (uint8_t)(HEAD>>8); len++;
 	  packBuf[len]= (uint8_t)(HEAD);    len++;
-	  len+=LENTH_LEN;//json³¤¶È×îºóÔÙÌîĞ´
+	  len+=LENTH_LEN;//jsoné•¿åº¦æœ€åå†å¡«å†™
 	  //json
-	  char str[50]={0};//ÁÙÊ±Ê¹ÓÃµÄÊı×é
+	  char str[50]={0};//ä¸´æ—¶ä½¿ç”¨çš„æ•°ç»„
 		rt_sprintf(str,"{\"mid\":%lu,",mcu.upMessID);
 		rt_strcpy((char *)packBuf+len,str);
     len+=rt_strlen(str);
@@ -90,17 +91,17 @@ uint16_t heartUpPack()
 		rt_strcpy((char *)packBuf+len,str);
     len+=rt_strlen(str);
 		//lenth
-	  packBuf[2]=(uint8_t)((len-LENTH_LEN-HEAD_LEN)>>8);//¸üĞÂjson³¤¶È
+	  packBuf[2]=(uint8_t)((len-LENTH_LEN-HEAD_LEN)>>8);//æ›´æ–°jsoné•¿åº¦
 	  packBuf[3]=(uint8_t)(len-LENTH_LEN-HEAD_LEN);
 	  uint16_t jsonBodyCrc=RTU_CRC(packBuf+HEAD_LEN+LENTH_LEN,len-HEAD_LEN-LENTH_LEN);
 	  //crc
-	  packBuf[len]=(uint8_t)(jsonBodyCrc>>8); len++;//¸üĞÂcrc
+	  packBuf[len]=(uint8_t)(jsonBodyCrc>>8); len++;//æ›´æ–°crc
 	  packBuf[len]=(uint8_t)(jsonBodyCrc);    len++;
 
 		//tail
 		packBuf[len]= (uint8_t)(TAIL>>8); len++;
 		packBuf[len]= (uint8_t)(TAIL);    len++;
-		packBuf[len] =0;//len++;//½áÎ² ²¹0
+		packBuf[len] =0;//len++;//ç»“å°¾ è¡¥0
 		
 		mcu.upHeartMessID =mcu.upMessID;
 		upMessIdAdd();
@@ -108,15 +109,15 @@ uint16_t heartUpPack()
 		
 		for(int i=0;i<len;i++)
 				rt_kprintf("%02x",packBuf[i]);
-		rt_kprintf("\r\n%slen£º%d str0:%x str1:%x str[2]:%d  str[3]:%d\r\n",sign,len,packBuf[0],packBuf[1],packBuf[2],packBuf[3]);
+		rt_kprintf("\r\n%slenï¼š%d str0:%x str1:%x str[2]:%d  str[3]:%d\r\n",sign,len,packBuf[0],packBuf[1],packBuf[2],packBuf[3]);
 		//rt_kprintf("heart:%s \n",packBuf);
 		return len;
 }
-//ÉÏĞĞĞÄÌø°ü ×¢²áĞÅÏ¢½¨Á¢Ò»¸ötask  ÓÃÀ´Î¬»¤
-//1¡¢Ö÷¶¯·¢ËÍÉÏĞĞÊı¾İÃ¿´Î·¢ËÍºóÆô¶¯¶¨Ê±Æ÷ Èç¹ûÊÕ²»µ½»ØÓ¦¾ÍÒ»Ö±ÖØ·¢  ¼ä¸ô5Ãë
-//2¡¢·¢ËÍÓÃ·¢ËÍÓÊÏä 
-//3¡¢·¢ËÍ·Ö2ÖÖ Ö÷¶¯·¢ËÍµÄ  ºÍ»Ø¸´µÄ£¨·¢Ò»´Î£©
-//  1¸ötask
+//ä¸Šè¡Œå¿ƒè·³åŒ… æ³¨å†Œä¿¡æ¯å»ºç«‹ä¸€ä¸ªtask  ç”¨æ¥ç»´æŠ¤
+//1ã€ä¸»åŠ¨å‘é€ä¸Šè¡Œæ•°æ®æ¯æ¬¡å‘é€åå¯åŠ¨å®šæ—¶å™¨ å¦‚æœæ”¶ä¸åˆ°å›åº”å°±ä¸€ç›´é‡å‘  é—´éš”5ç§’
+//2ã€å‘é€ç”¨å‘é€é‚®ç®± 
+//3ã€å‘é€åˆ†2ç§ ä¸»åŠ¨å‘é€çš„  å’Œå›å¤çš„ï¼ˆå‘ä¸€æ¬¡ï¼‰
+//  1ä¸ªtask
 
 
 //extern struct rt_mailbox mbNetSendData;
@@ -125,14 +126,14 @@ uint16_t heartUpPack()
 //	rt_mb_send_wait(&mbNetSendData, (rt_ubase_t)&packBuf,RT_WAITING_FOREVER); 
 //}
 
-//ÉÏĞĞ×¢²áÊı¾İ´ò°ü
+//ä¸Šè¡Œæ³¨å†Œæ•°æ®æ‰“åŒ…
 /*
 {    
-	"mid": 1234,
+		"mid": 1234,
 	    "packetType": "CMD_DEVICE_REGISTER",
 	    "params":     [{        
 			"model": "GY280",
-			"name": "»·¾³¼à²â",
+			"name": "ç¯å¢ƒç›‘æµ‹",
 			"deviceId": "GYNJLXSD000000457",
 			"ip": "192.168.1.108",
 			"port": "",
@@ -140,16 +141,126 @@ uint16_t heartUpPack()
 		},
 		{        
 			"model": "GY281",
-			"name": "½ÓµØ»·Á÷",
+			"name": "æ¥åœ°ç¯æµ",
 			"deviceId": "GYNJLXSD000000458",
 			"ip": "192.168.1.108",
 			"port": "",
 			"type": "2"
 		}
-	],
-	"timestamp": "1655172531937"
+		],
+		"timestamp": "1655172531937"
 }
 */
+/*
+{
+	"mid": 0,
+	"packetType": "CMD_DEVICE_REGISTER",
+	"params": [{
+		"model": "GY280",
+		"name": "????",
+		"deviceId": "A000000000001",
+		"ip": "",
+		"port": "",
+		"type": "1"
+	}, {
+		"model": "GY281",
+		"name": "????",
+		"deviceId": "A000000000002",
+		"ip": "",
+		"port": "",
+		"type": "2"
+	}, {
+		"model": "GY282",
+		"name": "???",
+		"deviceId": "A000000000003",
+		"ip": "",
+		"port": "",
+		"type": "3"
+	}, {
+		"model": "GY283",
+		"name": "?????",
+		"deviceId": "A000000000004",
+		"ip": "",
+		"port": "",
+		"type": "4"
+	}],
+	"timestamp": "17152"
+}*/
+uint16_t devRegJsonPack()
+{
+	char* out = NULL;
+	//åˆ›å»ºæ•°ç»„
+	cJSON* Array = NULL;
+	// åˆ›å»ºJSON Object  
+	cJSON* root = NULL;
+	cJSON* nodeobj = NULL;
+	root = cJSON_CreateObject();
+	if (root == NULL) return 0;
+	// åŠ å…¥èŠ‚ç‚¹ï¼ˆé”®å€¼å¯¹ï¼‰
+	cJSON_AddNumberToObject(root, "mid",mcu.upMessID);
+	cJSON_AddStringToObject(root, "packetType","CMD_DEVICE_REGISTER");
+	{
+		Array = cJSON_CreateArray();
+		if (Array == NULL) return 0;
+		cJSON_AddItemToObject(root, "params", Array);
+		for (int i = 0; i < UART_NUM; i++)
+		{
+			nodeobj = cJSON_CreateObject();
+			cJSON_AddItemToArray(Array, nodeobj);
+			cJSON_AddItemToObject(nodeobj,"model",cJSON_CreateString(devi[i].model));
+			cJSON_AddItemToObject(nodeobj,"name", cJSON_CreateString(devi[i].name));
+			cJSON_AddItemToObject(nodeobj,"deviceId",cJSON_CreateString(devi[i].ID));
+			cJSON_AddItemToObject(nodeobj,"ip", cJSON_CreateString(devi[i].ip));
+			cJSON_AddItemToObject(nodeobj,"port", cJSON_CreateString(devi[i].port));
+			cJSON_AddItemToObject(nodeobj,"type", cJSON_CreateString(devi[i].type));	
+
+		}
+	}
+	// æ‰“å°JSONæ•°æ®åŒ…  
+	out = cJSON_Print(root);
+	rt_kprintf("\n %s \n", out);
+			for(int i=0;i<rt_strlen(out);i++)
+				rt_kprintf("%02x",out[i]);
+		rt_kprintf("\n");
+	//æ‰“åŒ…
+	int len=0;
+	packBuf[len]= (uint8_t)(HEAD>>8); len++;
+	packBuf[len]= (uint8_t)(HEAD);    len++;
+	len+=LENTH_LEN;//jsoné•¿åº¦æœ€åå†å¡«å†™
+	
+	// é‡Šæ”¾å†…å­˜  
+	
+	
+	rt_strcpy((char *)packBuf+len,out);
+    len+=rt_strlen(out);
+	cJSON_Delete(root);
+
+		//lenth
+	  packBuf[2]=(uint8_t)((len-LENTH_LEN-HEAD_LEN)>>8);//æ›´æ–°jsoné•¿åº¦
+	  packBuf[3]=(uint8_t)(len-LENTH_LEN-HEAD_LEN);
+	  uint16_t jsonBodyCrc=RTU_CRC(packBuf+HEAD_LEN+LENTH_LEN,len-HEAD_LEN-LENTH_LEN);
+	  //crc
+	  packBuf[len]=(uint8_t)(jsonBodyCrc>>8); len++;//æ›´æ–°crc
+	  packBuf[len]=(uint8_t)(jsonBodyCrc);    len++;
+
+		//tail
+		packBuf[len]=(uint8_t)(TAIL>>8); len++;
+		packBuf[len]=(uint8_t)(TAIL);    len++;
+		packBuf[len]=0;//len++;//ç»“å°¾ è¡¥0
+		
+		mcu.devRegMessID =mcu.upMessID;
+		upMessIdAdd();
+		rt_kprintf("%sreg len:%d\r\n",sign,len);
+		
+		for(int i=0;i<len;i++)
+				rt_kprintf("%02x",packBuf[i]);
+		rt_kprintf("\r\n%slenï¼š%d str0:%x str1:%x str[2]:%d  str[3]:%d\r\n",sign,len,packBuf[0],packBuf[1],packBuf[2],packBuf[3]);
+		//rt_kprintf("heart:%s \n",packBuf);
+		return len;
+}
+
+
+
 uint16_t devRegPack()
 {
 	  memset(packBuf,0,sizeof(packBuf));
@@ -157,9 +268,9 @@ uint16_t devRegPack()
     //head+lenth
 	  packBuf[len]= (uint8_t)(HEAD>>8); len++;
 	  packBuf[len]= (uint8_t)(HEAD);    len++;
-	  len+=LENTH_LEN;//json³¤¶È×îºóÔÙÌîĞ´
+	  len+=LENTH_LEN;//jsoné•¿åº¦æœ€åå†å¡«å†™
 	  //json
-	  char str[50]={0};//ÁÙÊ±Ê¹ÓÃµÄÊı×é
+	  char str[50]={0};//ä¸´æ—¶ä½¿ç”¨çš„æ•°ç»„
 		rt_sprintf(str,"{\"mid\":%lu,",mcu.upMessID);
 		rt_strcpy((char *)packBuf+len,str);
     len+=rt_strlen(str);
@@ -173,34 +284,42 @@ uint16_t devRegPack()
     len+=rt_strlen(str);
 	
 		for(int i=0;i<UART_NUM;i++){
-				rt_sprintf(str,"{\"model\":\"%s\",",dev[i].model);
+				rt_sprintf(str,"{\"model\":\"%s\",",devi[i].model);
 				rt_strcpy((char *)packBuf+len,str);
 				len+=rt_strlen(str);
 			
-				rt_sprintf(str,"\"name\":\"%s\",",dev[i].name);
+			  	
+				sprintf(str,"\"name\":\"%s\",",devi[i].name);
+			  
+				rt_strcpy((char *)packBuf+len,str);
+			
+			
+			
+
+			
+			
+				len+=rt_strlen(str);
+			
+				rt_sprintf(str,"\"deviceId\":\"%s\",",devi[i].ID);
 				rt_strcpy((char *)packBuf+len,str);
 				len+=rt_strlen(str);
 			
-				rt_sprintf(str,"\"deviceId\":\"%s\",",dev[i].ID);
+				rt_sprintf(str,"\"ip\":\"%s\",",devi[i].ip);
 				rt_strcpy((char *)packBuf+len,str);
 				len+=rt_strlen(str);
 			
-				rt_sprintf(str,"\"ip\":\"%s\",",dev[i].ip);
+				rt_sprintf(str,"\"port\":\"%s\",",devi[i].port);
 				rt_strcpy((char *)packBuf+len,str);
 				len+=rt_strlen(str);
 			
-				rt_sprintf(str,"\"port\":\"%s\",",dev[i].port);
+				rt_sprintf(str,"\"type\":\"%s\"}",devi[i].type);
 				rt_strcpy((char *)packBuf+len,str);
 				len+=rt_strlen(str);
-			
-				rt_sprintf(str,"\"type\":\"%s\"}",dev[i].type);
-				rt_strcpy((char *)packBuf+len,str);
-				len+=rt_strlen(str);
-				if(i+1==UART_NUM){//¿½±´ ] ºÅ
+				if(i+1==UART_NUM){//æ‹·è´ ] å·
 						rt_strcpy((char *)packBuf+len,"],");
 						len+=2;
 				}
-				else{//¿½±´ , ºÅ
+				else{//æ‹·è´ , å·
 						rt_strcpy((char *)packBuf+len,",");
 						len++;
 				}
@@ -208,19 +327,19 @@ uint16_t devRegPack()
 		rt_sprintf(str,"\"timestamp\":\"%lu\"}",utcTime());
 		rt_strcpy((char *)packBuf+len,str);
     len+=rt_strlen(str);
-		
+		rt_kprintf("[%s]\n",packBuf+4);
 		//lenth
-	  packBuf[2]=(uint8_t)((len-LENTH_LEN-HEAD_LEN)>>8);//¸üĞÂjson³¤¶È
+	  packBuf[2]=(uint8_t)((len-LENTH_LEN-HEAD_LEN)>>8);//æ›´æ–°jsoné•¿åº¦
 	  packBuf[3]=(uint8_t)(len-LENTH_LEN-HEAD_LEN);
 	  uint16_t jsonBodyCrc=RTU_CRC(packBuf+HEAD_LEN+LENTH_LEN,len-HEAD_LEN-LENTH_LEN);
 	  //crc
-	  packBuf[len]=(uint8_t)(jsonBodyCrc>>8); len++;//¸üĞÂcrc
+	  packBuf[len]=(uint8_t)(jsonBodyCrc>>8); len++;//æ›´æ–°crc
 	  packBuf[len]=(uint8_t)(jsonBodyCrc);    len++;
 
 		//tail
 		packBuf[len]=(uint8_t)(TAIL>>8); len++;
 		packBuf[len]=(uint8_t)(TAIL);    len++;
-		packBuf[len]=0;//len++;//½áÎ² ²¹0
+		packBuf[len]=0;//len++;//ç»“å°¾ è¡¥0
 		
 		mcu.devRegMessID =mcu.upMessID;
 		upMessIdAdd();
@@ -228,14 +347,14 @@ uint16_t devRegPack()
 		
 		for(int i=0;i<len;i++)
 				rt_kprintf("%02x",packBuf[i]);
-		rt_kprintf("\r\n%slen£º%d str0:%x str1:%x str[2]:%d  str[3]:%d\r\n",sign,len,packBuf[0],packBuf[1],packBuf[2],packBuf[3]);
+		rt_kprintf("\r\n%slenï¼š%d str0:%x str1:%x str[2]:%d  str[3]:%d\r\n",sign,len,packBuf[0],packBuf[1],packBuf[2],packBuf[3]);
 		//rt_kprintf("heart:%s \n",packBuf);
 		return len;
 }
 
-//ÉÏĞĞ×¢²áÊı¾İ´ò°ü
+//ä¸Šè¡Œæ³¨å†Œæ•°æ®æ‰“åŒ…
 /*
-»·¾³¼à²â
+ç¯å¢ƒç›‘æµ‹
 {
     "mid":1234,
     "packetType":"CMD_REPORTDATA",
@@ -267,15 +386,15 @@ uint16_t devRegPack()
 
 //uint16_t rs485DataPack()
 //{
-//	  char num=0;//µÚ1Â·485
+//	  char num=0;//ç¬¬1è·¯485
 //	  memset(packBuf,0,sizeof(packBuf));
 //		int len=0;
 //    //head+lenth
 ////	  packBuf[len]= (uint8_t)(HEAD>>8); len++;
 ////	  packBuf[len]= (uint8_t)(HEAD);    len++;
-////	  len+=LENTH_LEN;//json³¤¶È×îºóÔÙÌîĞ´
+////	  len+=LENTH_LEN;//jsoné•¿åº¦æœ€åå†å¡«å†™
 //	  //json
-//	  char *str=RT_NULL;//ÁÙÊ±Ê¹ÓÃµÄÊı×é
+//	  char *str=RT_NULL;//ä¸´æ—¶ä½¿ç”¨çš„æ•°ç»„
 //	  str= rt_malloc(1024);
 //		rt_sprintf(str,"{\"mid\":%lu,",mcu.upMessID);
 //		rt_strcpy((char *)packBuf+len,str);
@@ -297,7 +416,7 @@ uint16_t devRegPack()
 //		rt_strcpy((char *)packBuf+len,str);
 //		len+=rt_strlen(str);
 //		
-//		rt_sprintf(str,"\"deviceId\":\"%s\",",dev[num].ID);
+//		rt_sprintf(str,"\"deviceId\":\"%s\",",devi[num].ID);
 //		rt_strcpy((char *)packBuf+len,str);
 //		len+=rt_strlen(str);
 
@@ -323,17 +442,17 @@ uint16_t devRegPack()
 //    len+=rt_strlen(str);
 //		
 //		//lenth
-////	  packBuf[2]=(uint8_t)((len-LENTH_LEN-HEAD_LEN)>>8);//¸üĞÂjson³¤¶È
+////	  packBuf[2]=(uint8_t)((len-LENTH_LEN-HEAD_LEN)>>8);//æ›´æ–°jsoné•¿åº¦
 ////	  packBuf[3]=(uint8_t)(len-LENTH_LEN-HEAD_LEN);
 ////	  uint16_t jsonBodyCrc=RTU_CRC(packBuf+HEAD_LEN+LENTH_LEN,len-HEAD_LEN-LENTH_LEN);
 ////	  //crc
-////	  packBuf[len]=(uint8_t)(jsonBodyCrc>>8); len++;//¸üĞÂcrc
+////	  packBuf[len]=(uint8_t)(jsonBodyCrc>>8); len++;//æ›´æ–°crc
 ////	  packBuf[len]=(uint8_t)(jsonBodyCrc);    len++;
 
 ////		//tail
 ////		packBuf[len]= (uint8_t)(TAIL>>8); len++;
 ////		packBuf[len]= (uint8_t)(TAIL);    len++;
-//		packBuf[len] =0;//len++;//½áÎ² ²¹0
+//		packBuf[len] =0;//len++;//ç»“å°¾ è¡¥0
 //		
 //		mcu.devRegMessID =mcu.upMessID;
 //		upMessIdAdd();
@@ -341,7 +460,7 @@ uint16_t devRegPack()
 //		
 //		for(int i=0;i<len;i++)
 //				rt_kprintf("%02x",packBuf[i]);
-//		//rt_kprintf("\r\nlen£º%d str0:%x str1:%x str[2]:%d  str[3]:%d\r\n",len,packBuf[0],packBuf[1],packBuf[2],packBuf[3]);
+//		//rt_kprintf("\r\nlenï¼š%d str0:%x str1:%x str[2]:%d  str[3]:%d\r\n",len,packBuf[0],packBuf[1],packBuf[2],packBuf[3]);
 //		//rt_kprintf("heart:%s \n",packBuf);
 //		rt_free(str);
 //		str=RT_NULL;
@@ -349,15 +468,15 @@ uint16_t devRegPack()
 //}
 uint16_t rs485DataPack()
 {
-	  char num=0;//µÚ1Â·485
+	  char num=0;//ç¬¬1è·¯485
 	  memset(packBuf,0,sizeof(packBuf));
 		int len=0;
     //head+lenth
 	  packBuf[len]= (uint8_t)(HEAD>>8); len++;
 	  packBuf[len]= (uint8_t)(HEAD);    len++;
-	  len+=LENTH_LEN;//json³¤¶È×îºóÔÙÌîĞ´
+	  len+=LENTH_LEN;//jsoné•¿åº¦æœ€åå†å¡«å†™
 	  //json
-	  char str[50]={0};//ÁÙÊ±Ê¹ÓÃµÄÊı×é
+	  char str[50]={0};//ä¸´æ—¶ä½¿ç”¨çš„æ•°ç»„
 		rt_sprintf(str,"{\"mid\":%lu,",mcu.upMessID);
 		rt_strcpy((char *)packBuf+len,str);
     len+=rt_strlen(str);
@@ -378,7 +497,7 @@ uint16_t rs485DataPack()
 		rt_strcpy((char *)packBuf+len,str);
 		len+=rt_strlen(str);
 		
-		rt_sprintf(str,"\"deviceId\":\"%s\",",dev[num].ID);
+		rt_sprintf(str,"\"deviceId\":\"%s\",",devi[num].ID);
 		rt_strcpy((char *)packBuf+len,str);
 		len+=rt_strlen(str);
 
@@ -404,17 +523,17 @@ uint16_t rs485DataPack()
     len+=rt_strlen(str);
 		
 		//lenth
-	  packBuf[2]=(uint8_t)((len-LENTH_LEN-HEAD_LEN)>>8);//¸üĞÂjson³¤¶È
+	  packBuf[2]=(uint8_t)((len-LENTH_LEN-HEAD_LEN)>>8);//æ›´æ–°jsoné•¿åº¦
 	  packBuf[3]=(uint8_t)(len-LENTH_LEN-HEAD_LEN);
 	  uint16_t jsonBodyCrc=RTU_CRC(packBuf+HEAD_LEN+LENTH_LEN,len-HEAD_LEN-LENTH_LEN);
 	  //crc
-	  packBuf[len]=(uint8_t)(jsonBodyCrc>>8); len++;//¸üĞÂcrc
+	  packBuf[len]=(uint8_t)(jsonBodyCrc>>8); len++;//æ›´æ–°crc
 	  packBuf[len]=(uint8_t)(jsonBodyCrc);    len++;
 
 		//tail
 		packBuf[len]= (uint8_t)(TAIL>>8); len++;
 		packBuf[len]= (uint8_t)(TAIL);    len++;
-		packBuf[len] =0;//len++;//½áÎ² ²¹0
+		packBuf[len] =0;//len++;//ç»“å°¾ è¡¥0
 		
 		mcu.devRegMessID =mcu.upMessID;
 		upMessIdAdd();
@@ -422,7 +541,7 @@ uint16_t rs485DataPack()
 		
 		for(int i=0;i<len;i++)
 				rt_kprintf("%02x",packBuf[i]);
-		//rt_kprintf("\r\nlen£º%d str0:%x str1:%x str[2]:%d  str[3]:%d\r\n",len,packBuf[0],packBuf[1],packBuf[2],packBuf[3]);
+		//rt_kprintf("\r\nlenï¼š%d str0:%x str1:%x str[2]:%d  str[3]:%d\r\n",len,packBuf[0],packBuf[1],packBuf[2],packBuf[3]);
 		//rt_kprintf("heart:%s \n",packBuf);
 		return len;
 }

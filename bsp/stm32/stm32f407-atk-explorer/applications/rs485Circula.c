@@ -96,6 +96,7 @@ void readCirCurrAndWaring()
 		}
 		rt_kprintf("\n");
 	  rt_mutex_take(cirCurrMutex,RT_WAITING_FOREVER);
+		memset(buf,0,LENTH);
     len=0;
 		while(rt_mq_recv(&cirCurrmque, buf+len, 1, 500) == RT_EOK){//115200 波特率1ms 10个数据
 				len++;
@@ -177,7 +178,8 @@ void cirCurrConf()
 uint16_t readAcqInterv()
 {
 	  uint8_t offset=3;//add+regadd+len
-		uint8_t  *buf = rt_malloc(LENTH);
+	  uint8_t  *buf = RT_NULL;
+		buf = rt_malloc(LENTH);
 	  uint16_t len = modbusReadReg(SLAVE_ADDR,0x0004,1,buf);
 	  uint16_t ret =0;
 		recFlag = RT_TRUE;
@@ -189,7 +191,7 @@ uint16_t readAcqInterv()
 				rt_kprintf("%x ",buf[j]);
 		}
 		rt_kprintf("\n");
-
+		memset(buf,0,LENTH);
     len=0;
 		while(rt_mq_recv(&cirCurrmque, buf+len, 1, 500) == RT_EOK){//115200 波特率1ms 10个数据
 				len++;
@@ -228,7 +230,8 @@ uint16_t readAcqInterv()
 rt_bool_t writeAcqInterv(uint16_t value)
 {
 		
-		uint8_t  *buf = rt_malloc(LENTH);
+	  uint8_t  *buf = RT_NULL;
+		buf = rt_malloc(LENTH);
 	  uint16_t len = modbusWriteOneReg(SLAVE_ADDR,0x0004,value,buf);//modbusWriteReg(SLAVE_ADDR,0x0004,1,buf);
 		rt_mutex_take(cirCurrMutex,RT_WAITING_FOREVER);
 	  recFlag = RT_TRUE;
@@ -240,7 +243,7 @@ rt_bool_t writeAcqInterv(uint16_t value)
 				rt_kprintf("%x ",buf[j]);
 		}
 		rt_kprintf("\n");
-
+		memset(buf,0,LENTH);
     len=0;
 		while(rt_mq_recv(&cirCurrmque, buf+len, 1, 500) == RT_EOK){//115200 波特率1ms 10个数据
 				len++;
@@ -277,7 +280,8 @@ rt_bool_t writeAcqInterv(uint16_t value)
 uint32_t readThresholdVal()
 {
 	  uint8_t offset=3;//add+regadd+len
-		uint8_t  *buf = rt_malloc(LENTH);
+	  uint8_t  *buf = RT_NULL;
+		buf = rt_malloc(LENTH);
 	  uint16_t len = modbusReadReg(SLAVE_ADDR,0x0009,4,buf);
 	  uint32_t ret =0;		
 	  recFlag = RT_TRUE;
@@ -290,7 +294,7 @@ uint32_t readThresholdVal()
 				rt_kprintf("%x ",buf[j]);
 		}
 		rt_kprintf("\n");
-
+		memset(buf,0,LENTH);
     len=0;
 		while(rt_mq_recv(&cirCurrmque, buf+len, 1, 500) == RT_EOK){//115200 波特率1ms 10个数据
 				len++;
@@ -324,7 +328,8 @@ uint32_t readThresholdVal()
 rt_bool_t writeThresholdVal(uint32_t value)
 {
     rt_bool_t ret=RT_FALSE;
-		uint8_t  *buf = rt_malloc(LENTH);
+	  uint8_t  *buf = RT_NULL;
+		buf = rt_malloc(LENTH);
 	  uint8_t sendD[4]={0};
 		sendD[0]=(uint8_t)(value>>24);
 		sendD[1]=(uint8_t)(value>>16);
@@ -340,7 +345,7 @@ rt_bool_t writeThresholdVal(uint32_t value)
 				rt_kprintf("%x ",buf[j]);
 		}
 		rt_kprintf("\n");
- 
+		memset(buf,0,LENTH);
     len=0;
 		while(rt_mq_recv(&cirCurrmque, buf+len, 1, 500) == RT_EOK){//115200 波特率1ms 10个数据
 				len++;
@@ -377,7 +382,8 @@ rt_bool_t writeThresholdVal(uint32_t value)
 uint16_t readPoint()
 {
 	  uint8_t offset=3;//add+regadd+len
-		uint8_t  *buf = rt_malloc(LENTH);
+	  uint8_t  *buf = RT_NULL;
+		buf = rt_malloc(LENTH);
 	  uint16_t len = modbusReadReg(SLAVE_ADDR,0x000B,1,buf);
 	  uint16_t ret =0;
 		recFlag = RT_TRUE;
@@ -389,7 +395,7 @@ uint16_t readPoint()
 				rt_kprintf("%x ",buf[j]);
 		}
 		rt_kprintf("\n");
-
+		memset(buf,0,LENTH);
     len=0;
 		while(rt_mq_recv(&cirCurrmque, buf+len, 1, 500) == RT_EOK){//115200 波特率1ms 10个数据
 				len++;
@@ -428,7 +434,8 @@ uint16_t readPoint()
 rt_bool_t writePoint(uint16_t value)
 {
 
-		uint8_t  *buf = rt_malloc(LENTH);
+	  uint8_t  *buf = RT_NULL;
+		buf = rt_malloc(LENTH);
 	  uint16_t len = modbusWriteOneReg(SLAVE_ADDR,0x000b,value,buf);//modbusWriteReg(SLAVE_ADDR,0x0004,1,buf);
 		rt_mutex_take(cirCurrMutex,RT_WAITING_FOREVER);
 		recFlag = RT_TRUE;
@@ -440,7 +447,7 @@ rt_bool_t writePoint(uint16_t value)
 				rt_kprintf("%x ",buf[j]);
 		}
 		rt_kprintf("\n");
-
+		memset(buf,0,LENTH);
     len=0;
 		while(rt_mq_recv(&cirCurrmque, buf+len, 1, 500) == RT_EOK){//115200 波特率1ms 10个数据
 				len++;
@@ -548,7 +555,7 @@ uint16_t 	cirCulaDataPack()
 		rt_strcpy((char *)packBuf+len,str);
 		len+=rt_strlen(str);
 		
-		rt_sprintf(str,"\"deviceId\":\"%s\",",dev[chanl.cirCula].ID);
+		sprintf(str,"\"deviceId\":\"%s\",",devi[chanl.cirCula].ID);
 		rt_strcpy((char *)packBuf+len,str);
 		len+=rt_strlen(str);
 

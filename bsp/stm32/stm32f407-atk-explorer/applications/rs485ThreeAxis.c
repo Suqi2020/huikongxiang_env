@@ -82,7 +82,8 @@ extern uint8_t psReadReg(uint16_t slavAddr,uint16_t regAddr,uint16_t len,uint8_t
 void readThreeTempAcc()
 {
 	  uint8_t offset=3;//add+regadd+len
-		uint8_t  *buf = rt_malloc(LENTH);
+	  uint8_t  *buf = RT_NULL;
+		buf = rt_malloc(LENTH);
 	  uint16_t len = psReadReg(SLAVE_ADDR,0X0001,4,buf);
 //	  uint16_t ret =0;
 	  recFlag = RT_TRUE;
@@ -95,6 +96,7 @@ void readThreeTempAcc()
 		}
 		rt_kprintf("\n");
     len=0;
+		memset(buf,0,LENTH);
 		if(rt_mq_recv(&threeAxismque, buf+len, 1, 3000) == RT_EOK){//第一次接收时间放长点  相应时间有可能比较久
 				len++;
 		}
@@ -176,7 +178,7 @@ void t3AxisTempAccPack()
 	  len+=LENTH_LEN;//json长度最后再填写
 	  //json
 	  char str[50]={0};//临时使用的数组
-		rt_sprintf(str,"{\"mid\":%lu,",mcu.upMessID);
+		sprintf(str,"{\"mid\":%lu,",mcu.upMessID);
 		rt_strcpy((char *)packBuf+len,str);
     len+=rt_strlen(str);
 		
@@ -196,7 +198,7 @@ void t3AxisTempAccPack()
 		rt_strcpy((char *)packBuf+len,str);
 		len+=rt_strlen(str);
 		
-		rt_sprintf(str,"\"deviceId\":\"%s\",",dev[chanl.threeAxis].ID);
+		rt_sprintf(str,"\"deviceId\":\"%s\",",devi[chanl.threeAxis].ID);
 		rt_strcpy((char *)packBuf+len,str);
 		len+=rt_strlen(str);
 

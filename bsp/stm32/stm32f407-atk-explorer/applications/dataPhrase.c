@@ -195,7 +195,7 @@ void AllDownPhrase(char *data,int lenth)
 		else{
 			rt_kprintf("%serr:json empty\r\n",sign);	
 		}
-		
+		cJSON_Delete(Json);
 		rt_free(Buffer);
 	  Buffer =RT_NULL;
 		

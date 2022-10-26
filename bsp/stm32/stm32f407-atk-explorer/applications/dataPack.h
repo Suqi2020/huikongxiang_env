@@ -35,7 +35,7 @@ typedef  struct
 	  char  type[4];
     	
 }rs485ParaStru;
-extern  rs485ParaStru dev[];
+extern  rs485ParaStru devi[];
 extern  uint32_t  utcTime(void);
 extern  uint32_t upMessIdAdd(void);
 /**************************/

@@ -64,9 +64,11 @@
 //V0.24 	 增加支持modbus设备选择串口 UART2(1) UART3(2) UART6(3) UART1(debug) UART4(4)  未测试  20221020
 //V0.25    增加4路485和网络故障log打印输出                                     20221021
 //V0.26    增加ip_from==IP_FROM_DHCP 或者自定义来实现网络ip配置 （交换机自动获取ip失败） 20221025
+//V0.27    加入utf8格式打包json格式  nodepad++设置为utf8 以及 c++中设置 --no-multibyte-chars
+//         修复接收数后死机问题 接收完json数据没有释放掉                      20221026
 
-
-#define APP_VER       ((0<<8)+26)//0x0105 表示1.5版本
+#define APP_VER       ((0<<8)+27)//0x0105 表示1.5版本
+const char date[]="20221026";
 
 static    rt_thread_t tid 	= RT_NULL;
 
@@ -142,8 +144,17 @@ int main(void)
 		RELAY1_ON;
 		RELAY2_ON;
 		RELAY3_ON;
-		RELAY4_ON;//上电后外部485全部供电
-    rt_kprintf("\n%s20221021  ver=%02d.%02d\n",sign,(uint8_t)(APP_VER>>8),(uint8_t)APP_VER);
+		RELAY4_ON;//上电后外部485全部供
+	
+//		uint8_t tet[20];
+//	rt_strcpy((char *)tet,"局放监控");
+//	
+//	rt_kprintf("%s  %d\n",tet,strlen(tet));
+//	memset((char *)tet,0,20);
+//			strcpy((char *)tet,"局放监控");
+
+//		rt_kprintf("%s\n",tet);
+    rt_kprintf("\n%s%s  ver=%02d.%02d\n",sign,date,(uint8_t)(APP_VER>>8),(uint8_t)APP_VER);
 	  rt_err_t result;
 //////////////////////////////////////信号量//////////////////////////////
 	  w5500Iqr_semp = rt_sem_create("w5500Iqr_semp",0, RT_IPC_FLAG_FIFO);
