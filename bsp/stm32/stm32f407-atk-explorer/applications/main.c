@@ -64,8 +64,10 @@
 //V0.24 	 增加支持modbus设备选择串口 UART2(1) UART3(2) UART6(3) UART1(debug) UART4(4)  未测试  20221020
 //V0.25    增加4路485和网络故障log打印输出                                     20221021
 //V0.26    增加ip_from==IP_FROM_DHCP 或者自定义来实现网络ip配置 （交换机自动获取ip失败） 20221025
-//V0.27    加入utf8格式打包json格式  nodepad++设置为utf8 以及 c++中设置 --no-multibyte-chars
-//         修复接收数后死机问题 接收完json数据没有释放掉                      20221026
+//V0.27    1、加入utf8格式打包json格式  nodepad++设置为utf8 以及 c++中设置 --no-multibyte-chars
+//            增加json格式中文字符要在dataPack.c中增加 已经把文件用nodepad++更改为utf8格式
+//         2、修复接收数后死机问题 接收完json数据没有释放掉                      20221026
+//         3、增加json格式打包devRegJsonPack  用json自带代替sprintf 增加数据包 465Byte增加到586Byte 谨慎使用
 
 #define APP_VER       ((0<<8)+27)//0x0105 表示1.5版本
 const char date[]="20221026";

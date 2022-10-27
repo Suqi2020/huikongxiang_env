@@ -218,10 +218,11 @@ uint16_t devRegJsonPack()
 	}
 	// 打印JSON数据包  
 	out = cJSON_Print(root);
+	cJSON_Delete(root);
 	rt_kprintf("\n %s \n", out);
-			for(int i=0;i<rt_strlen(out);i++)
-				rt_kprintf("%02x",out[i]);
-		rt_kprintf("\n");
+//			for(int i=0;i<rt_strlen(out);i++)
+//				rt_kprintf("%02x",out[i]);
+//		rt_kprintf("\n");
 	//打包
 	int len=0;
 	packBuf[len]= (uint8_t)(HEAD>>8); len++;
@@ -233,7 +234,7 @@ uint16_t devRegJsonPack()
 	
 	rt_strcpy((char *)packBuf+len,out);
     len+=rt_strlen(out);
-	cJSON_Delete(root);
+	
 
 		//lenth
 	  packBuf[2]=(uint8_t)((len-LENTH_LEN-HEAD_LEN)>>8);//更新json长度

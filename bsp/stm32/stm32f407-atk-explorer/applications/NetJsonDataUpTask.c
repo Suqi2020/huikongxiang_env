@@ -27,19 +27,23 @@ static timerStru tim[TIM_NUM];
 //给个定时值
 
 
-//启动
+//启动从0开始计时
 static void timeStart(int num)
 {
 		tim[num].count=0;
 }
 //初始化后会自动运行
-static void timeInit(int num,int value)//给个定时值
+//num 第几个定时器
+//value 定时器值
+//firstCnt 第一次计数值  为了防止定时器值同时到达 
+static void timeInit(int num,int value,int firstCnt)
 {
 	  if((num>=TIM_NUM)||(value==0)){  
 				rt_kprintf("%stim inint err\n",task);
 			return;
 		}
 		tim[num].threshoVal=value;
+		tim[num].count=firstCnt;
 }
 //每1秒递增一次
 static void timeInc()
@@ -86,14 +90,14 @@ static void  timeOutRunFun()
     extern uint16_t devRegJsonPack(void);
 		switch(timeOut()){
 			case 0://心跳
-//				heartUpPack();
-//				rt_mb_send_wait(&mbNetSendData, (rt_ubase_t)&packBuf,RT_WAITING_FOREVER); 
+				heartUpPack();
+				rt_mb_send_wait(&mbNetSendData, (rt_ubase_t)&packBuf,RT_WAITING_FOREVER); 
 			  rt_kprintf("%sheart timer out\r\n",task);
 				break;
 			case 1://注册 注册成功后定时器就关闭
 			  if(gbRegFlag==RT_FALSE){
 					 
-					  devRegJsonPack();
+					  devRegPack();//devRegJsonPack();
 						rt_mb_send_wait(&mbNetSendData, (rt_ubase_t)&packBuf,RT_WAITING_FOREVER); 
 						
 					  timeStop(1);//正式使用时候需要去掉
@@ -166,12 +170,12 @@ void   upKeepStateTask(void *para)
 		rt_thread_mdelay(2000);//延时2秒为了局放读取
 		readPartDischgWarning();//局放初始化比较久 放后边读取
 
-		timeInit(0, 30);//心跳定时
-		timeInit(1, 2);//注册 注册成功后定时器就关闭
-		timeInit(2, 30);//读取环流
-		timeInit(3, 60);//读取局放
-		timeInit(4, 120);//读取压差式沉降仪
-		timeInit(5, 120);//读取三轴
+		timeInit(0, 30,2);//心跳定时  定时30秒 第一次28秒就来
+		timeInit(1, 5,0);//注册 注册成功后定时器就关闭
+		timeInit(2, 60,10);//读取环流
+		timeInit(3, 60,20);//读取局放
+		timeInit(4, 60,30);//读取压差式沉降仪
+		timeInit(5, 60,40);//读取三轴
 //		timeStop(2);
 //		timeStop(3);
 //		timeStop(4);
