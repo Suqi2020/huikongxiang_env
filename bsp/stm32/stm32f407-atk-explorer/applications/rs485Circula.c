@@ -10,23 +10,15 @@
 //  6、读取采集间隔
 //调整RS485串口需要调整 UART5_IRQHandler以及HAL_UART_Transmit发送串口  
 //还需要更换对应串口的队列 调整 char num=0;
-// 9600波特率 注意修改此处 rt_mq_recv(&cirCurrmque, &buf, sizeof(buf), 2)
+// 9600波特率 注意修改此处 rt_mq_recv(modDev[chanl.cirCula].uartMessque, &buf, sizeof(buf), 2)
 //迅速切换其它485接口来使用 方法：只需要修改串口发送接口 和中断接收接口即可
 // rs485Circula.c-cirCurrUartSend(uint8_t *buf,int len) 和drv_uart.c-USART2_IRQHandler中
 // cirCurrUartSend(uint8_t *buf,int len)   cirCurrUartRec(uint8_t dat)
 
 const static char sign[]="[环流]";
-static rt_mutex_t cirCurrMutex = RT_NULL;
-#define  MSGPOOL_LEN   200 //485数据最大量  大于1k需要修改此处
-//队列的定义
-static struct  rt_messagequeue cirCurrmque;
-static uint8_t cirCurrQuePool[MSGPOOL_LEN];  //
-static rt_bool_t  recFlag = RT_FALSE; //每个循环发送一次 发完 RT_TRUE 接收完成或者接收超时置为 RT_FALSE
 
-
-#define   SLAVE_ADDR     0X01
+#define   SLAVE_ADDR     0X02
 #define   LENTH          50  //工作环流用到的最大接收buf长度
-//#define   LARGE_TIMES    100 //放大倍数  后期如果需要 读取寄存器0x000b 有可能放大10倍
 extern uint8_t packBuf[TX_RX_MAX_BUF_SIZE];
 
 CIRCURStru  cirCurStru_p;
@@ -45,37 +37,7 @@ void cirCurrUartSend(uint8_t *buf,int len)
 		rs485UartSend(chanl.cirCula,buf, len);
 
 }
-//串口接收后丢到队列里
-rt_err_t cirCurrUartRec(uint8_t dat)
-{
-	
-		if(recFlag==RT_TRUE){
-				return rt_mq_send(&cirCurrmque, &dat, 1);  //收到数据后就往队列里丢
-		}
-		else
-			  return RT_FALSE;
-}
 
-//
-//创建环流用到的互斥量和消息队列
-void  cirCurrMutexQueueCreat()
-{
-	  cirCurrMutex = rt_mutex_create("cirCurrMutex", RT_IPC_FLAG_FIFO);
-    if (cirCurrMutex == RT_NULL)
-    {
-        rt_kprintf("%screate rs485_1Mutex failed.\n",sign);
-        return ;
-    }
-		
-//////////////////////////////////消息队列//////////////////////////////////
-		
-		int result = rt_mq_init(&cirCurrmque,"cirCurrmque",&cirCurrQuePool[0],1,sizeof(cirCurrQuePool),RT_IPC_FLAG_FIFO);       
-		if (result != RT_EOK)
-    {
-        rt_kprintf("%sinit rs485_1mque failed.\n",sign);
-        return ;
-    }
-}
 
 ///////////////////////////////////////读写寄存器相关操作////////////////////////////////////////
 //读取环流值和报警信息 寄存器地址 0x0023 长度12
@@ -87,7 +49,7 @@ void readCirCurrAndWaring()
 	  //uint8_t   buf[100]
 	  uint16_t len = modbusReadReg(SLAVE_ADDR,0x0023,12,buf);
 	  //485发送buf  len  等待modbus回应
-	  recFlag = RT_TRUE;
+	  //recFlag = RT_TRUE;
 	  cirCurrUartSend(buf,len);
 
 	  rt_kprintf("%sreadCirCurrAndWaring send:",sign);
@@ -95,10 +57,10 @@ void readCirCurrAndWaring()
 				rt_kprintf("%x ",buf[j]);
 		}
 		rt_kprintf("\n");
-	  rt_mutex_take(cirCurrMutex,RT_WAITING_FOREVER);
+	  rt_mutex_take(modDev[chanl.cirCula].uartMutex,RT_WAITING_FOREVER);
 		memset(buf,0,LENTH);
     len=0;
-		while(rt_mq_recv(&cirCurrmque, buf+len, 1, 500) == RT_EOK){//115200 波特率1ms 10个数据
+		while(rt_mq_recv(modDev[chanl.cirCula].uartMessque, buf+len, 1, 500) == RT_EOK){//115200 波特率1ms 10个数据
 				len++;
 		}
 		if(len!=0){
@@ -137,8 +99,8 @@ void readCirCurrAndWaring()
 			  cirCurStru_p.warningD	=0;
 			  rt_kprintf("%s提取电流、报警值fail\r\n",sign);
 		}
-		recFlag = RT_FALSE;
-	  rt_mutex_release(cirCurrMutex);
+		//recFlag = RT_FALSE;
+	  rt_mutex_release(modDev[chanl.cirCula].uartMutex);
 	//	 rt_kprintf("release\r\n");
 		rt_free(buf);
 	//	 rt_kprintf("free\r\n");
@@ -182,8 +144,8 @@ uint16_t readAcqInterv()
 		buf = rt_malloc(LENTH);
 	  uint16_t len = modbusReadReg(SLAVE_ADDR,0x0004,1,buf);
 	  uint16_t ret =0;
-		recFlag = RT_TRUE;
-		rt_mutex_take(cirCurrMutex,RT_WAITING_FOREVER);
+		//recFlag = RT_TRUE;
+		rt_mutex_take(modDev[chanl.cirCula].uartMutex,RT_WAITING_FOREVER);
 	  //485发送buf  len  等待modbus回应
 		cirCurrUartSend(buf,len);
 	  rt_kprintf("%sreadAcqInterv send:",sign);
@@ -193,7 +155,7 @@ uint16_t readAcqInterv()
 		rt_kprintf("\n");
 		memset(buf,0,LENTH);
     len=0;
-		while(rt_mq_recv(&cirCurrmque, buf+len, 1, 500) == RT_EOK){//115200 波特率1ms 10个数据
+		while(rt_mq_recv(modDev[chanl.cirCula].uartMessque, buf+len, 1, 500) == RT_EOK){//115200 波特率1ms 10个数据
 				len++;
 		}
 		rt_kprintf("%srec:",sign);
@@ -217,8 +179,8 @@ uint16_t readAcqInterv()
 		}
 		
     //
-		recFlag = RT_FALSE;
-	  rt_mutex_release(cirCurrMutex);
+		//recFlag = RT_FALSE;
+	  rt_mutex_release(modDev[chanl.cirCula].uartMutex);
 		rt_free(buf);
 	  buf=RT_NULL;
 		return ret;
@@ -233,8 +195,8 @@ rt_bool_t writeAcqInterv(uint16_t value)
 	  uint8_t  *buf = RT_NULL;
 		buf = rt_malloc(LENTH);
 	  uint16_t len = modbusWriteOneReg(SLAVE_ADDR,0x0004,value,buf);//modbusWriteReg(SLAVE_ADDR,0x0004,1,buf);
-		rt_mutex_take(cirCurrMutex,RT_WAITING_FOREVER);
-	  recFlag = RT_TRUE;
+		rt_mutex_take(modDev[chanl.cirCula].uartMutex,RT_WAITING_FOREVER);
+	  //recFlag = RT_TRUE;
 	  rt_bool_t ret=RT_FALSE;
 	  //485发送buf  len  等待modbus回应
 		cirCurrUartSend(buf,len);
@@ -245,7 +207,7 @@ rt_bool_t writeAcqInterv(uint16_t value)
 		rt_kprintf("\n");
 		memset(buf,0,LENTH);
     len=0;
-		while(rt_mq_recv(&cirCurrmque, buf+len, 1, 500) == RT_EOK){//115200 波特率1ms 10个数据
+		while(rt_mq_recv(modDev[chanl.cirCula].uartMessque, buf+len, 1, 500) == RT_EOK){//115200 波特率1ms 10个数据
 				len++;
 		}
 		rt_kprintf("%srec:",sign);
@@ -268,8 +230,8 @@ rt_bool_t writeAcqInterv(uint16_t value)
 				}
 		}
     //
-		recFlag = RT_FALSE;
-	  rt_mutex_release(cirCurrMutex);
+		//recFlag = RT_FALSE;
+	  rt_mutex_release(modDev[chanl.cirCula].uartMutex);
 		rt_free(buf);
 	  buf=RT_NULL;
 	  
@@ -284,9 +246,9 @@ uint32_t readThresholdVal()
 		buf = rt_malloc(LENTH);
 	  uint16_t len = modbusReadReg(SLAVE_ADDR,0x0009,4,buf);
 	  uint32_t ret =0;		
-	  recFlag = RT_TRUE;
+	  //recFlag = RT_TRUE;
 
-		rt_mutex_take(cirCurrMutex,RT_WAITING_FOREVER);
+		rt_mutex_take(modDev[chanl.cirCula].uartMutex,RT_WAITING_FOREVER);
 	  //485发送buf  len  等待modbus回应
 		cirCurrUartSend(buf,len);
 	  rt_kprintf("%sreadthresholdVal send:",sign);
@@ -296,7 +258,7 @@ uint32_t readThresholdVal()
 		rt_kprintf("\n");
 		memset(buf,0,LENTH);
     len=0;
-		while(rt_mq_recv(&cirCurrmque, buf+len, 1, 500) == RT_EOK){//115200 波特率1ms 10个数据
+		while(rt_mq_recv(modDev[chanl.cirCula].uartMessque, buf+len, 1, 500) == RT_EOK){//115200 波特率1ms 10个数据
 				len++;
 		}
 		rt_kprintf("%srec:",sign);
@@ -318,8 +280,8 @@ uint32_t readThresholdVal()
 						//rt_kprintf("%sERR:请检查485接线或者供电\r\n",sign);
 				}
 		}
-		recFlag = RT_FALSE;
-	  rt_mutex_release(cirCurrMutex);
+		//recFlag = RT_FALSE;
+	  rt_mutex_release(modDev[chanl.cirCula].uartMutex);
 		rt_free(buf);
 	  buf=RT_NULL;
 		return ret;
@@ -336,8 +298,8 @@ rt_bool_t writeThresholdVal(uint32_t value)
 		sendD[2]=(uint8_t)(value>>8);
 		sendD[3]=value;
 	  uint16_t len = modbusWriteMultReg(SLAVE_ADDR,0x0009,sizeof(uint32_t),sendD,buf);
-    recFlag = RT_TRUE;
-		rt_mutex_take(cirCurrMutex,RT_WAITING_FOREVER);
+    //recFlag = RT_TRUE;
+		rt_mutex_take(modDev[chanl.cirCula].uartMutex,RT_WAITING_FOREVER);
 	  //485发送buf  len  等待modbus回应
 		cirCurrUartSend(buf,len);
 	  rt_kprintf("%swrAcqInterv send:",sign);
@@ -347,7 +309,7 @@ rt_bool_t writeThresholdVal(uint32_t value)
 		rt_kprintf("\n");
 		memset(buf,0,LENTH);
     len=0;
-		while(rt_mq_recv(&cirCurrmque, buf+len, 1, 500) == RT_EOK){//115200 波特率1ms 10个数据
+		while(rt_mq_recv(modDev[chanl.cirCula].uartMessque, buf+len, 1, 500) == RT_EOK){//115200 波特率1ms 10个数据
 				len++;
 		}
 		rt_kprintf("%srec:",sign);
@@ -369,8 +331,8 @@ rt_bool_t writeThresholdVal(uint32_t value)
 						//rt_kprintf("%sERR:请检查485接线或者供电\r\n",sign);
 				}
 		}
-		recFlag = RT_FALSE;
-	  rt_mutex_release(cirCurrMutex);
+		//recFlag = RT_FALSE;
+	  rt_mutex_release(modDev[chanl.cirCula].uartMutex);
 		rt_free(buf);
 	  buf=RT_NULL;
 	
@@ -386,8 +348,8 @@ uint16_t readPoint()
 		buf = rt_malloc(LENTH);
 	  uint16_t len = modbusReadReg(SLAVE_ADDR,0x000B,1,buf);
 	  uint16_t ret =0;
-		recFlag = RT_TRUE;
-		rt_mutex_take(cirCurrMutex,RT_WAITING_FOREVER);
+	//	recFlag = RT_TRUE;
+		rt_mutex_take(modDev[chanl.cirCula].uartMutex,RT_WAITING_FOREVER);
 	  //485发送buf  len  等待modbus回应
 		cirCurrUartSend(buf,len);
 	  rt_kprintf("%sreadPoint send:",sign);
@@ -397,7 +359,7 @@ uint16_t readPoint()
 		rt_kprintf("\n");
 		memset(buf,0,LENTH);
     len=0;
-		while(rt_mq_recv(&cirCurrmque, buf+len, 1, 500) == RT_EOK){//115200 波特率1ms 10个数据
+		while(rt_mq_recv(modDev[chanl.cirCula].uartMessque, buf+len, 1, 500) == RT_EOK){//115200 波特率1ms 10个数据
 				len++;
 		}
 		rt_kprintf("%srec:",sign);
@@ -423,8 +385,8 @@ uint16_t readPoint()
 						//rt_kprintf("%sERR:请检查485接线或者供电\r\n",sign);
 				}
 		}
-		recFlag = RT_FALSE;
-	  rt_mutex_release(cirCurrMutex);
+		//recFlag = RT_FALSE;
+	  rt_mutex_release(modDev[chanl.cirCula].uartMutex);
 		rt_free(buf);
 	  buf=RT_NULL;
 		return ret;
@@ -437,8 +399,8 @@ rt_bool_t writePoint(uint16_t value)
 	  uint8_t  *buf = RT_NULL;
 		buf = rt_malloc(LENTH);
 	  uint16_t len = modbusWriteOneReg(SLAVE_ADDR,0x000b,value,buf);//modbusWriteReg(SLAVE_ADDR,0x0004,1,buf);
-		rt_mutex_take(cirCurrMutex,RT_WAITING_FOREVER);
-		recFlag = RT_TRUE;
+		rt_mutex_take(modDev[chanl.cirCula].uartMutex,RT_WAITING_FOREVER);
+		//recFlag = RT_TRUE;
 		rt_bool_t ret=RT_FALSE;
 	  //485发送buf  len  等待modbus回应
 		cirCurrUartSend(buf,len);
@@ -449,7 +411,7 @@ rt_bool_t writePoint(uint16_t value)
 		rt_kprintf("\n");
 		memset(buf,0,LENTH);
     len=0;
-		while(rt_mq_recv(&cirCurrmque, buf+len, 1, 500) == RT_EOK){//115200 波特率1ms 10个数据
+		while(rt_mq_recv(modDev[chanl.cirCula].uartMessque, buf+len, 1, 500) == RT_EOK){//115200 波特率1ms 10个数据
 				len++;
 		}
 		if(len!=0){
@@ -473,8 +435,8 @@ rt_bool_t writePoint(uint16_t value)
 						//rt_kprintf("%sERR:请检查485接线或者供电\r\n",sign);
 				}
 		}
-		recFlag = RT_FALSE;
-	  rt_mutex_release(cirCurrMutex);
+		//recFlag = RT_FALSE;
+	  rt_mutex_release(modDev[chanl.cirCula].uartMutex);
 		rt_free(buf);
 	  buf=RT_NULL;
 	

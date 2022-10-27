@@ -1,6 +1,6 @@
 #include "rs485ThreeAxis.h"
 
-//<<压差式沉降仪 GY-STC-2000>> 默认波特率9600  modbus地址 0xb1(有误) 见机身标签后2位
+//<<压差式沉降仪 GY-STC-2000>> 默认波特率9600  modbus地址 0xb1(有误) 见机身标签后2位   协议文档有误
 /*
 三轴验证短地址＋04 00 01 00 04
 
@@ -13,64 +13,19 @@
 // 发 01 04 00 01 00 04 A0 09 
 // 收 01 04 08 0B CA FE 8D 00 03 03 80 C7 23 
 const static char sign[]="[三轴]";
-
 threeAxisStru threeAxis;
-static rt_mutex_t threeAxisMutex = RT_NULL;
-#define  MSGPOOL_LEN   200 //485数据最大量  大于1k需要修改此处
-//队列的定义
-static struct  rt_messagequeue threeAxismque;
-static uint8_t threeAxisQuePool[MSGPOOL_LEN];  //
-static rt_bool_t  recFlag = RT_FALSE; //每个循环发送一次 发完 RT_TRUE 接收完成或者接收超时置为 RT_FALSE
 
-
-#define   SLAVE_ADDR     0X01 
+#define   SLAVE_ADDR     0X02 
 #define   LENTH          50  //工作环流用到的最大接收buf长度
-//#define   LARGE_TIMES    100 //放大倍数  后期如果需要 读取寄存器0x000b 有可能放大10倍
-extern uint8_t packBuf[TX_RX_MAX_BUF_SIZE];
-
 
 
 //打包串口发送 
- void threeAxisUartSend(uint8_t *buf,int len)
+static void threeAxisUartSend(uint8_t *buf,int len)
 {
-
 		rs485UartSend(chanl.threeAxis,buf, len);
-
-}
-//串口接收后丢到队列里
-rt_err_t threeAxisUartRec(uint8_t dat)
-{
-	
-		if(recFlag==RT_TRUE){
-				return rt_mq_send(&threeAxismque, &dat, 1);  //收到数据后就往队列里丢
-		}
-		else
-			  return RT_FALSE;
-}
-
-//
-//创建环流用到的互斥量和消息队列  main中调用
-void  threeAxisMutexQueueCreat()
-{
-	  threeAxisMutex = rt_mutex_create("threeAxisMutex", RT_IPC_FLAG_FIFO);
-    if (threeAxisMutex == RT_NULL)
-    {
-        rt_kprintf("%screate threeAxisMutex failed.\n",sign);
-        return ;
-    }
-		
-//////////////////////////////////消息队列//////////////////////////////////
-		
-		int result = rt_mq_init(&threeAxismque,"threeAxismque",&threeAxisQuePool[0],1,sizeof(threeAxisQuePool),RT_IPC_FLAG_FIFO);       
-		if (result != RT_EOK)
-    {
-        rt_kprintf("%sinit threeAxismque failed.\n",sign);
-        return ;
-    }
 }
 
 ///////////////////////////////////////读写寄存器相关操作////////////////////////////////////////
-
 
 //与压差式传感器共用一个读命令
 extern uint8_t psReadReg(uint16_t slavAddr,uint16_t regAddr,uint16_t len,uint8_t * out);
@@ -85,9 +40,7 @@ void readThreeTempAcc()
 	  uint8_t  *buf = RT_NULL;
 		buf = rt_malloc(LENTH);
 	  uint16_t len = psReadReg(SLAVE_ADDR,0X0001,4,buf);
-//	  uint16_t ret =0;
-	  recFlag = RT_TRUE;
-		rt_mutex_take(threeAxisMutex,RT_WAITING_FOREVER);
+		rt_mutex_take(modDev[chanl.threeAxis].uartMutex,RT_WAITING_FOREVER);
 	  //485发送buf  len  等待modbus回应
 		threeAxisUartSend(buf,len);
 	  rt_kprintf("%sthreeAxis send:",sign);
@@ -97,10 +50,10 @@ void readThreeTempAcc()
 		rt_kprintf("\n");
     len=0;
 		memset(buf,0,LENTH);
-		if(rt_mq_recv(&threeAxismque, buf+len, 1, 3000) == RT_EOK){//第一次接收时间放长点  相应时间有可能比较久
+		if(rt_mq_recv(modDev[chanl.threeAxis].uartMessque, buf+len, 1, 3000) == RT_EOK){//第一次接收时间放长点  相应时间有可能比较久
 				len++;
 		}
-		while(rt_mq_recv(&threeAxismque, buf+len, 1, 10) == RT_EOK){//115200 波特率1ms 10个数据
+		while(rt_mq_recv(modDev[chanl.threeAxis].uartMessque, buf+len, 1, 10) == RT_EOK){//115200 波特率1ms 10个数据
 				len++;
 		}
 		if(len!=0){
@@ -125,7 +78,6 @@ void readThreeTempAcc()
 		} 
 		else{//读不到给0
 				if(ret2==2){
-						//rt_kprintf("%sERR:请检查485接线或者供电\r\n",sign);
 					  modDev[chanl.threeAxis].offline=RT_TRUE;
 				}
 			  threeAxis.acclrationX	= 0;
@@ -133,9 +85,7 @@ void readThreeTempAcc()
 			  threeAxis.acclrationY = 0;
 			  rt_kprintf("%stemp height read fail\n",sign);
 		}
-    //
-		recFlag = RT_FALSE;
-	  rt_mutex_release(threeAxisMutex);
+	  rt_mutex_release(modDev[chanl.threeAxis].uartMutex);
 		rt_free(buf);
 	  buf=RT_NULL;
 
@@ -178,7 +128,7 @@ void t3AxisTempAccPack()
 	  len+=LENTH_LEN;//json长度最后再填写
 	  //json
 	  char str[50]={0};//临时使用的数组
-		sprintf(str,"{\"mid\":%lu,",mcu.upMessID);
+		sprintf(str,"{\"mid\":%u,",mcu.upMessID);
 		rt_strcpy((char *)packBuf+len,str);
     len+=rt_strlen(str);
 		

@@ -68,9 +68,10 @@
 //            增加json格式中文字符要在dataPack.c中增加 已经把文件用nodepad++更改为utf8格式
 //         2、修复接收数后死机问题 接收完json数据没有释放掉                      20221026
 //         3、增加json格式打包devRegJsonPack  用json自带代替sprintf 增加数据包 465Byte增加到586Byte 谨慎使用
+//V0.28    增加配置多个modbus到同一个串口上  需要同类型的放到一起  比如 局放和环流  三轴和沉降仪   20221027
 
-#define APP_VER       ((0<<8)+27)//0x0105 表示1.5版本
-const char date[]="20221026";
+#define APP_VER       ((0<<8)+28)//0x0105 表示1.5版本
+const char date[]="20221027";
 
 static    rt_thread_t tid 	= RT_NULL;
 
@@ -99,7 +100,7 @@ const static char sign[]="[main]";
 /* 定时器的控制块 */
 static rt_timer_t timer1;
 
-static int cnt = 0;
+//static int cnt = 0;
 /* 定时器1超时函数 */
 //10秒提醒一次 uart offline状态
 static void timeout1(void *parameter)
@@ -116,27 +117,27 @@ static void timeout1(void *parameter)
 		}
 		else
 				HAL_GPIO_TogglePin(LED_GPIO_Port, LED_Pin);
-//		if(count%alarmTick==0){
-//			  alarmTick+=20;
-//			  if(alarmTick>=100){
-//						alarmTick=100;// 1 2 3 最终10秒提醒一次
-//				}
-//				if(modDev[chanl.cirCula].offline==RT_TRUE){
-//						rt_kprintf("%sERR:请检查<<环流>>485接线或电源\n",sign);
-//				}
-//				if(modDev[chanl.partDischag].offline==RT_TRUE){
-//						rt_kprintf("%sERR:请检查<<局放>>485接线或电源\n",sign);
-//				}
-//				if(modDev[chanl.pressSettl].offline==RT_TRUE){
-//						rt_kprintf("%sERR:请检查<<沉降仪>>485接线或电源\n",sign);
-//				}
-//				if(modDev[chanl.threeAxis].offline==RT_TRUE){
-//						rt_kprintf("%sERR:请检查<<三轴测振仪>>485接线或电源\n",sign);
-//				}
-//				if(gbNetState ==RT_FALSE){
-//						rt_kprintf("%sERR:网络故障\n",sign);
-//				}
-//		}
+		if(count%alarmTick==0){
+			  alarmTick+=20;
+			  if(alarmTick>=100){
+						alarmTick=100;// 1 2 3 最终10秒提醒一次
+				}
+				if(modDev[chanl.cirCula].offline==RT_TRUE){
+						rt_kprintf("%sERR:请检查<<环流>>485接线或电源\n",sign);
+				}
+				if(modDev[chanl.partDischag].offline==RT_TRUE){
+						rt_kprintf("%sERR:请检查<<局放>>485接线或电源\n",sign);
+				}
+				if(modDev[chanl.pressSettl].offline==RT_TRUE){
+						rt_kprintf("%sERR:请检查<<沉降仪>>485接线或电源\n",sign);
+				}
+				if(modDev[chanl.threeAxis].offline==RT_TRUE){
+						rt_kprintf("%sERR:请检查<<三轴测振仪>>485接线或电源\n",sign);
+				}
+				if(gbNetState ==RT_FALSE){
+						rt_kprintf("%sERR:网络故障\n",sign);
+				}
+		}
 }
 
 
@@ -173,14 +174,9 @@ int main(void)
 		if (timer1 != RT_NULL)
         rt_timer_start(timer1);
 		//创建285设备用到的互斥 队列
-		extern void 	cirCurrMutexQueueCreat();
-		cirCurrMutexQueueCreat();
-		extern void 	partDischagMutexQueueCreat();
-		partDischagMutexQueueCreat();
-		extern void 	pressSettlMutexQueueCreat();
-		pressSettlMutexQueueCreat();
-		extern void 	threeAxisMutexQueueCreat();
-		threeAxisMutexQueueCreat();
+
+		extern void 	uartMutexQueueCreate();
+		uartMutexQueueCreate();
 ////////////////////////////////////邮箱//////////////////////////////////
 		
 
@@ -196,6 +192,8 @@ int main(void)
         rt_kprintf("%sinit mailbox NetSend failed.\n",sign);
         return -1;
     }
+		
+
 ////////////////////////////////任务////////////////////////////////////
     tid =  rt_thread_create("w5500",w5500Task,RT_NULL,1024,2, 10 );
 		if(tid!=NULL){
@@ -212,10 +210,6 @@ int main(void)
 				rt_thread_startup(tid);													 
 				rt_kprintf("%sRTcreat netDataSendTask \r\n",sign);
 		}
-
-		
-
-
 
 		
 		tid =  rt_thread_create("upKeep",upKeepStateTask,RT_NULL,1024,2, 10 );
@@ -244,12 +238,4 @@ int main(void)
 				}
     }
 }
-
-
-
-//void  rt_kprintf(char *str,const char *fmt, ...)
-//{
-//	rt_kprintf(const char *fmt, ...)
-//}
-
 

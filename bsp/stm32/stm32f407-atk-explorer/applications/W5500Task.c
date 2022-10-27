@@ -80,10 +80,7 @@ void  w5500Task(void *parameter)
 	W5500_enum W5500State=W5500InitEnum;
   static uint8_t dhcpTick=0;
 	static uint8_t rstW5500Ct=0;
-//	while(1){
-//			rt_thread_mdelay(500);
-//			  
-//	}
+
   while(1) 														/*循环执行的函数*/ 
   {
 		switch(W5500State)
@@ -124,7 +121,6 @@ void  w5500Task(void *parameter)
 			      static int count=0;      
 						if(ret==RT_EOK){
 								W5500ISR();//w5500
-							 // rt_kprintf("w5500 test\r\n");
 								loopback_tcpc(SOCK_TCPC, local_port);//W5500内部自动维护网络连接 此处只读寄存器
 						}
 
@@ -143,9 +139,6 @@ void  w5500Task(void *parameter)
 //封装外部调用发送 函数接口
 void netSend(uint8_t *data,int len)
 {
-		//return send(SOCK_TCPC,	data,len);
-	
-	
 		if(send(SOCK_TCPC,	data,len)==0){//启动个定时器来实现重发  2s内收不到回复
 				gbNetState=RT_FALSE;//发送身边 重新联网
 				offLine.times++;

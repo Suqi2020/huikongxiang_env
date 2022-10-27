@@ -558,34 +558,12 @@ void USART2_IRQHandler(void)
     rt_interrupt_enter();
 	#ifdef TEST_UART
 		uart2SendRecTest();
-//		static uint8_t Res;
-
-////  //  uart_isr(&(uart_obj[UART2_INDEX].serial));
-//		if((__HAL_UART_GET_FLAG(&huart2,UART_FLAG_RXNE)!=RESET))  //接收中断(接收到的数据必须是0x0d 0x0a结尾)
-//		{
-//			//  rt_kprintf("read\n");
-//				HAL_UART_Receive(&huart2,&Res,1,1000); 
-//				testRecBuf1[testCount1++]=Res;
-//			  if(Res=='\n'){
-//			    testRecBuf1[testCount1++]=0;
-//					UART2_485_SEND;
-//					HAL_UART_Transmit(&huart2,(uint8_t *)testRecBuf1,(uint16_t)strlen((char *)testRecBuf1),1000);
-//					UART2_485_REC;
-//					testCount1 = 0;
-//				}
-//			 
-//		}
-//		HAL_UART_IRQHandler(&huart2);	
 		#else
 		uint8_t Res=0;
 		if((__HAL_UART_GET_FLAG(&huart2,UART_FLAG_RXNE)!=RESET))  //接收中断(接收到的数据必须是0x0d 0x0a结尾)
 		{
 				HAL_UART_Receive(&huart2,&Res,1,1000); 
-//			  extern rt_err_t cirCurrUartRec(uint8_t dat);
-//				cirCurrUartRec(Res);
-			   modDev[USE_UART2].UartRec(Res);
-			  //rt_mq_send(&cirCurrmque, &Res, 1);  //收到数据后就往队列里丢
-
+			  uartDataRec(USE_UART2,Res);
 		}
 		HAL_UART_IRQHandler(&huart2);	
 		#endif
@@ -631,9 +609,7 @@ void USART3_IRQHandler(void)
 		{
 	
 				HAL_UART_Receive(&huart3,&Res,1,1000); 
-//			  extern rt_err_t partDischagUartRec(uint8_t dat);
-//			  partDischagUartRec(Res);
-			  modDev[USE_UART3].UartRec(Res);
+			  uartDataRec(USE_UART3,Res);
 		}
 		HAL_UART_IRQHandler(&huart3);	
 	#endif
@@ -675,30 +651,13 @@ void UART4_IRQHandler(void)
 
 	#ifdef TEST_UART
 	  uart4SendRecTest();
-//		static uint8_t Res;
-//		if((__HAL_UART_GET_FLAG(&huart4,UART_FLAG_RXNE)!=RESET))  //接收中断(接收到的数据必须是0x0d 0x0a结尾)
-//		{
-//				HAL_UART_Receive(&huart4,&Res,1,1000); 
-//				testRecBuf[testCount++]=Res;
-//			  if(Res=='\n'){
-//			    testRecBuf[testCount++]=0;
-//					UART4_485_SEND;
-//					HAL_UART_Transmit(&huart4,(uint8_t *)testRecBuf,(uint16_t)strlen((char *)testRecBuf),1000);
-//					UART4_485_REC;
-//					testCount = 0;
-//				}
-//			 
-//		}
-//		HAL_UART_IRQHandler(&huart4);	
+
 	#else
 		uint8_t Res=0;
 		if((__HAL_UART_GET_FLAG(&huart4,UART_FLAG_RXNE)!=RESET))  //接收中断(接收到的数据必须是0x0d 0x0a结尾)
 		{
-			  //rt_kprintf("read\n");
 				HAL_UART_Receive(&huart4,&Res,1,1000); 
-//				extern rt_err_t threeAxisUartRec(uint8_t dat);
-//				threeAxisUartRec(Res);
-			  modDev[USE_UART4].UartRec(Res);//回调
+			  uartDataRec(USE_UART4,Res);
 		}
 		HAL_UART_IRQHandler(&huart4);	
 	#endif
@@ -741,24 +700,7 @@ void UART5_IRQHandler(void)
 
 #ifdef TEST_UART
 	  uart5SendRecTest();
-	
-//		static uint8_t Res;
 
-//		if((__HAL_UART_GET_FLAG(&huart5,UART_FLAG_RXNE)!=RESET))  //接收中断(接收到的数据必须是0x0d 0x0a结尾)
-//		{
-
-//				HAL_UART_Receive(&huart5,&Res,1,1000); 
-//				testRecBuf[testCount++]=Res;
-//			  if(Res=='\n'){
-//			    testRecBuf[testCount++]=0;
-//		
-//					HAL_UART_Transmit(&huart5,(uint8_t *)testRecBuf,(uint16_t)strlen((char *)testRecBuf),1000);
-
-//					testCount = 0;
-//				}
-//			 
-//		}
-//		HAL_UART_IRQHandler(&huart5);	
 #else
 		uint8_t Res=0;
 		if((__HAL_UART_GET_FLAG(&huart5,UART_FLAG_RXNE)!=RESET))  //接收中断(接收到的数据必须是0x0d 0x0a结尾)
@@ -806,30 +748,13 @@ void USART6_IRQHandler(void)
 
 	#ifdef TEST_UART
 	  uart6SendRecTest();
-//		static uint8_t Res;
-//		if((__HAL_UART_GET_FLAG(&huart6,UART_FLAG_RXNE)!=RESET))  //接收中断(接收到的数据必须是0x0d 0x0a结尾)
-//		{
-//				HAL_UART_Receive(&huart6,&Res,1,1000); 
-//				testRecBuf[testCount++]=Res;
-//			  if(Res=='\n'){
-//			    testRecBuf[testCount++]=0;
-//					UART6_485_SEND;
-//					HAL_UART_Transmit(&huart6,(uint8_t *)testRecBuf,(uint16_t)strlen((char *)testRecBuf),1000);
-//					UART6_485_REC;
-//					testCount = 0;
-//				}
-//			 
-//		}
-//		HAL_UART_IRQHandler(&huart6);	
 		#else
 		uint8_t Res=0;
 		if((__HAL_UART_GET_FLAG(&huart6,UART_FLAG_RXNE)!=RESET))  //接收中断(接收到的数据必须是0x0d 0x0a结尾)
 		{
-			  //rt_kprintf("read\n");
+			  rt_kprintf("read\n");
 				HAL_UART_Receive(&huart6,&Res,1,1000); 
-//			  extern void pressSettlUartRec(uint8_t dat);
-//				pressSettlUartRec(Res);
-				modDev[USE_UART6].UartRec(Res);
+			  uartDataRec(USE_UART6,Res);
 			
 		}
 		HAL_UART_IRQHandler(&huart6);	

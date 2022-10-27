@@ -178,6 +178,8 @@ void   upKeepStateTask(void *para)
 		timeInit(5, 60,40);//¶ÁÈ¡ÈýÖá
 //		timeStop(2);
 //		timeStop(3);
+//		timeStop(0);
+//		timeStop(1);
 //		timeStop(4);
 //		timeStop(5);
 		while(1){

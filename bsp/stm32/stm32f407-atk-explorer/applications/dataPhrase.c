@@ -73,8 +73,6 @@ rt_bool_t heartRespFun(cJSON  *Json)
 		rt_kprintf("%stime:[%lu]s \r\n",sign, (uint32_t)((u64getTick_p)/1000));
 
 		rt_kprintf("%stime:[%lu]ms\r\n",sign, (uint32_t)(u64getTick_p)%1000);
-	 // uint32_t test_ms=(uint32_t)(u64getTick_p&0xFfff);
-			//rt_kprintf("time:[%lu]ms\r\n", (uint32_t)(test_ms)%1000);
 	
     extern void  subTimeStampSet(uint64_t time);
 		subTimeStampSet(u64getTick_p);

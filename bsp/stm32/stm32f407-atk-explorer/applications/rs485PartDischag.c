@@ -7,58 +7,16 @@
 
 const static char sign[]="[局放]";
 partDischargeStru partDiscStru_p;
-#define  MSGPOOL_LEN   1024 //485数据最大量  大于1k需要修改此处
-static rt_mutex_t partDischagMutex = RT_NULL;  //局放互斥量 
-
-//队列的定义
-
-static uint8_t partDischagQuePool[MSGPOOL_LEN];  //局放对列池
-struct  rt_messagequeue partDischagmque;//局放队列
 
 #define   SLAVE_ADDR     0X01
 #define   LENTH          1024  //工作环流用到的最大接收buf长度
-//#define   LARGE_TIMES    100 //放大倍数  后期如果需要 读取寄存器0x000b 有可能放大10倍
-extern uint8_t packBuf[TX_RX_MAX_BUF_SIZE];
-static rt_bool_t  recFlag = RT_FALSE; //每个循环发送一次 发完 RT_TRUE 接收完成或者接收超时置为 RT_FALSE
 
 
- void partDischagUartSend(uint8_t *buf,int len)
+static void partDischagUartSend(uint8_t *buf,int len)
 {
 		rs485UartSend(chanl.partDischag,buf, len);
 	
 }
-//串口接收后丢到队列里
-rt_err_t partDischagUartRec(uint8_t dat)
-{
-	  if(recFlag==RT_TRUE){
-				return rt_mq_send(&partDischagmque, &dat, 1);  //收到数据后就往队列里丢
-		}
-		else
-			  return RT_FALSE;
-}
-//创建局放用到的互斥量和消息队列
-void  partDischagMutexQueueCreat()
-{
-	  rt_kprintf("%sinit partDischagmque start.\n",sign);
-	  partDischagMutex = rt_mutex_create("partDischagMutex", RT_IPC_FLAG_FIFO);
-    if (partDischagMutex == RT_NULL)
-    {
-        rt_kprintf("%screate partDischagMutex failed.\n",sign);
-        return ;
-    }
-		rt_kprintf("%screate partDischagMutex succ.\n",sign);
-//////////////////////////////////消息队列//////////////////////////////////
-		
-		int result = rt_mq_init(&partDischagmque,"partDischagmque",&partDischagQuePool[0],1,sizeof(partDischagQuePool),RT_IPC_FLAG_FIFO);       
-		if (result != RT_EOK)
-    {
-        rt_kprintf("%sinit partDischagmque failed.\n",sign);
-        return ;
-    }
-		rt_kprintf("%sinit partDischagmque succ.\n",sign);
-}
-
-
 
 //读取幅值 频率 放电总能量
 //01 03 0300 0006 C58C
@@ -70,9 +28,7 @@ void readPdFreqDischarge()
 	  uint8_t  *buf = RT_NULL;
 		buf = rt_malloc(LENTH);
 	  uint16_t len = modbusReadReg(SLAVE_ADDR,0x0300,18,buf);
-//	  uint16_t ret =0;
-	  recFlag = RT_TRUE;
-		rt_mutex_take(partDischagMutex,RT_WAITING_FOREVER);
+		rt_mutex_take(modDev[chanl.partDischag].uartMutex,RT_WAITING_FOREVER);
 	  //485发送buf  len  等待modbus回应
 		partDischagUartSend(buf,len);
 	  rt_kprintf("%sPdFreqDiach send:",sign);
@@ -82,10 +38,10 @@ void readPdFreqDischarge()
 		rt_kprintf("\n");
 		memset(buf,0,LENTH);
     len=0;
-		if(rt_mq_recv(&partDischagmque, buf+len, 1, 3000) == RT_EOK){//第一次接收时间放长点  相应时间有可能比较久
+		if(rt_mq_recv(modDev[chanl.partDischag].uartMessque, buf+len, 1, 3000) == RT_EOK){//第一次接收时间放长点  相应时间有可能比较久
 				len++;
 		}
-		while(rt_mq_recv(&partDischagmque, buf+len, 1, 10) == RT_EOK){//115200 波特率1ms 10个数据
+		while(rt_mq_recv(modDev[chanl.partDischag].uartMessque, buf+len, 1, 10) == RT_EOK){//115200 波特率1ms 10个数据
 				len++;
 		}
 		if(len!=0){
@@ -132,9 +88,8 @@ void readPdFreqDischarge()
 			  partDiscStru_p.dischargeC=0;
 			  rt_kprintf("%sPdFreqDiach read fail\n",sign);
 		}
-    //
-		recFlag = RT_FALSE;
-	  rt_mutex_release(partDischagMutex);
+
+	  rt_mutex_release(modDev[chanl.partDischag].uartMutex);
 		rt_free(buf);
 	  buf=RT_NULL;
 
@@ -150,9 +105,7 @@ rt_bool_t readPartDischgWarning()
 	  uint8_t  *buf = RT_NULL;
 		buf = rt_malloc(LENTH);
 	  uint16_t len = modbusReadBitReg(SLAVE_ADDR,0x0001,8,buf);//读取8个bit
-//	  uint16_t ret =0;
-	  recFlag = RT_TRUE;
-		rt_mutex_take(partDischagMutex,RT_WAITING_FOREVER);
+		rt_mutex_take(modDev[chanl.partDischag].uartMutex,RT_WAITING_FOREVER);
 	  //485发送buf  len  等待modbus回应
 		partDischagUartSend(buf,len);
 	  rt_kprintf("%sreadPd send:",sign);
@@ -162,10 +115,10 @@ rt_bool_t readPartDischgWarning()
 		rt_kprintf("\n");
 		memset(buf,0,LENTH);
     len=0;
-		if(rt_mq_recv(&partDischagmque, buf+len, 1, 3000) == RT_EOK){//第一次接收时间放长点  相应时间有可能比较久
+		if(rt_mq_recv(modDev[chanl.partDischag].uartMessque, buf+len, 1, 3000) == RT_EOK){//第一次接收时间放长点  相应时间有可能比较久
 				len++;
 		}
-		while(rt_mq_recv(&partDischagmque, buf+len, 1, 10) == RT_EOK){//115200 波特率1ms 10个数据
+		while(rt_mq_recv(modDev[chanl.partDischag].uartMessque, buf+len, 1, 10) == RT_EOK){//115200 波特率1ms 10个数据
 				len++;
 		}
 		rt_kprintf("%srec:",sign);
@@ -193,11 +146,10 @@ rt_bool_t readPartDischgWarning()
 				partDiscStru_p.alarm.c=0;
 			  rt_kprintf("%s提取alarm fail\r\n",sign);
 		}
-    //
-	  rt_mutex_release(partDischagMutex);
+   
+	  rt_mutex_release(modDev[chanl.partDischag].uartMutex);
 		rt_free(buf);
 	  buf=RT_NULL;
-		recFlag = RT_FALSE;
 		if(partDiscStru_p.alarm.a||partDiscStru_p.alarm.b||partDiscStru_p.alarm.c)
 				return RT_TRUE;
 		else 

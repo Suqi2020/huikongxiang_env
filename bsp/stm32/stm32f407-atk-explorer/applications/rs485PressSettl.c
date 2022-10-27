@@ -1,63 +1,22 @@
 #include "rs485PressSettl.h"
 
-//<<压差式沉降仪 GY-STC-2000>> 默认波特率9600  modbus地址 0xb1(有误) 见机身标签后2位
+//<<压差式沉降仪 GY-STC-2000>> 默认波特率9600  modbus地址 0xb1(有误) 见机身标签后2位  协议文档有误
 //修改设备地址 FF FF 03 0A＋设备完整的长地址＋01＋短地址 
 //   FF FF 03 0A 6E 01 20 21 09 08 00 B1 01 01
 //  24+红色，24-黑色，A+蓝色，B-绿色
 const static char sign[]="[沉降仪]";
-static rt_mutex_t pressSettlMutex = RT_NULL;
-#define  MSGPOOL_LEN   200 //485数据最大量  大于1k需要修改此处
-//队列的定义
-static struct  rt_messagequeue pressSettlmque;
-static uint8_t pressSettlQuePool[MSGPOOL_LEN];  //
-static rt_bool_t  recFlag = RT_FALSE; //每个循环发送一次 发完 RT_TRUE 接收完成或者接收超时置为 RT_FALSE
-
 
 #define   SLAVE_ADDR     0X01 
 #define   LENTH          50  //工作环流用到的最大接收buf长度
-//#define   LARGE_TIMES    100 //放大倍数  后期如果需要 读取寄存器0x000b 有可能放大10倍
-extern uint8_t packBuf[TX_RX_MAX_BUF_SIZE];
+
 
 pressSettlStru pressSettle;
 
 
 //打包串口发送 
- void pressSettlUartSend(uint8_t *buf,int len)
+static void pressSettlUartSend(uint8_t *buf,int len)
 {
-
 		rs485UartSend(chanl.pressSettl,buf, len);
-
-}
-//串口接收后丢到队列里
-rt_err_t pressSettlUartRec(uint8_t dat)
-{
-	
-		if(recFlag==RT_TRUE){
-				return rt_mq_send(&pressSettlmque, &dat, 1);  //收到数据后就往队列里丢
-		}
-		else
-			  return RT_FALSE;
-}
-
-//
-//创建环流用到的互斥量和消息队列  main中调用
-void  pressSettlMutexQueueCreat()
-{
-	  pressSettlMutex = rt_mutex_create("pressSettlMutex", RT_IPC_FLAG_FIFO);
-    if (pressSettlMutex == RT_NULL)
-    {
-        rt_kprintf("%screate pressSettlMutex failed.\n",sign);
-        return ;
-    }
-		
-//////////////////////////////////消息队列//////////////////////////////////
-		
-		int result = rt_mq_init(&pressSettlmque,"pressSettlmque",&pressSettlQuePool[0],1,sizeof(pressSettlQuePool),RT_IPC_FLAG_FIFO);       
-		if (result != RT_EOK)
-    {
-        rt_kprintf("%sinit pressSettlmque failed.\n",sign);
-        return ;
-    }
 }
 
 ///////////////////////////////////////读写寄存器相关操作////////////////////////////////////////
@@ -89,9 +48,7 @@ void readPSTempHeight()
 	  uint8_t  *buf = RT_NULL;
 		buf = rt_malloc(LENTH);
 	  uint16_t len = psReadReg(SLAVE_ADDR,0X0001,2,buf);
-//	  uint16_t ret =0;
-	  recFlag = RT_TRUE;
-		rt_mutex_take(pressSettlMutex,RT_WAITING_FOREVER);
+		rt_mutex_take(modDev[chanl.pressSettl].uartMutex,RT_WAITING_FOREVER);
 	  //485发送buf  len  等待modbus回应
 		pressSettlUartSend(buf,len);
 	  rt_kprintf("%spressSettl send:",sign);
@@ -101,10 +58,11 @@ void readPSTempHeight()
 		rt_kprintf("\n");
     len=0;
 		memset(buf,0,LENTH);
-		if(rt_mq_recv(&pressSettlmque, buf+len, 1, 3000) == RT_EOK){//第一次接收时间放长点  相应时间有可能比较久
+		
+		if(rt_mq_recv(modDev[chanl.pressSettl].uartMessque, buf+len, 1, 3000) == RT_EOK){//第一次接收时间放长点  相应时间有可能比较久
 				len++;
 		}
-		while(rt_mq_recv(&pressSettlmque, buf+len, 1, 10) == RT_EOK){//115200 波特率1ms 10个数据
+		while(rt_mq_recv(modDev[chanl.pressSettl].uartMessque, buf+len, 1, 10) == RT_EOK){//115200 波特率1ms 10个数据
 				len++;
 		}
 		if(len!=0){
@@ -134,9 +92,7 @@ void readPSTempHeight()
 			  pressSettle.height=0;
 			  rt_kprintf("%stemp height read fail\n",sign);
 		}
-    //
-		recFlag = RT_FALSE;
-	  rt_mutex_release(pressSettlMutex);
+	  rt_mutex_release(modDev[chanl.pressSettl].uartMutex);
 		rt_free(buf);
 	  buf=RT_NULL;
 
