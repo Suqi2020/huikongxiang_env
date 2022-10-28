@@ -160,6 +160,8 @@ void   upKeepStateTask(void *para)
     
 	  uartConfFlashRead();//根据flash存储重新配置串口
 	  devIDFlashRead();//必须放到uartConfFlashRead后边 配置chanl各项参数后才能使用
+	  extern void uartReconfig();
+	  uartReconfig();
 		extern void uartIrqEnaAfterQueue();
 		uartIrqEnaAfterQueue();//串口中断中用到了队列  开启中断需要放到后边
 

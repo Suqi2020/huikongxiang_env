@@ -42,7 +42,7 @@
 
 #define RT_USING_DEVICE
 #define RT_USING_CONSOLE
-#define RT_CONSOLEBUF_SIZE 2048  //后期需要该小
+#define RT_CONSOLEBUF_SIZE 128
 #define RT_CONSOLE_DEVICE_NAME "uart1"
 #define RT_VER_NUM 0x50000
 #define ARCH_ARM
@@ -235,6 +235,7 @@
 #define BSP_USING_UART4
 #define BSP_USING_UART5
 #define BSP_USING_UART6
+#define BSP_USING_ON_CHIP_FLASH
 #define BSP_USING_SPI
 #define BSP_USING_SPI1
 #define BSP_USING_ADC

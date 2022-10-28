@@ -351,7 +351,7 @@ int tick()
 		rt_kprintf("[tick][%lu]-ms\r\n",rtc_ms);
 	  return 0;
 }
-FINSH_FUNCTION_EXPORT(tick, tick finsh);//FINSH_FUNCTION_EXPORT_CMD
+//FINSH_FUNCTION_EXPORT(tick, tick finsh);//FINSH_FUNCTION_EXPORT_CMD
 MSH_CMD_EXPORT(tick,tick stamp);//FINSH_FUNCTION_EXPORT_CMD
 
 uint32_t 	offLTimes;
@@ -383,6 +383,6 @@ int offline()
 		}
 		return 0;
 }
-FINSH_FUNCTION_EXPORT(offline, offline finsh);//FINSH_FUNCTION_EXPORT_CMD
+//FINSH_FUNCTION_EXPORT(offline, offline finsh);//FINSH_FUNCTION_EXPORT_CMD
 MSH_CMD_EXPORT(offline,offline stamp);//FINSH_FUNCTION_EXPORT_CMD
 

@@ -70,7 +70,9 @@
 //         3、增加json格式打包devRegJsonPack  用json自带代替sprintf 增加数据包 465Byte增加到586Byte 谨慎使用
 //V0.28    增加配置多个modbus到同一个串口上  需要同类型的放到一起  比如 局放和环流  三轴和沉降仪   20221027
 //V0.29    增加配置多个文件夹到keil中      20221028
-#define APP_VER       ((0<<8)+29)//0x0105 表示1.5版本
+//V0.30    增加flash存储  最后4K           20221028
+//         增加at指令来配置modbus  example[modbus 接地环流 uart5 12]
+#define APP_VER       ((0<<8)+30)//0x0105 表示1.5版本
 const char date[]="20221028";
 
 static    rt_thread_t tid 	= RT_NULL;
@@ -159,6 +161,8 @@ int main(void)
 //		rt_kprintf("%s\n",tet);
     rt_kprintf("\n%s%s  ver=%02d.%02d\n",sign,date,(uint8_t)(APP_VER>>8),(uint8_t)APP_VER);
 	  rt_err_t result;
+	  extern void  flashTest();
+	  flashTest();
 //////////////////////////////////////信号量//////////////////////////////
 	  w5500Iqr_semp = rt_sem_create("w5500Iqr_semp",0, RT_IPC_FLAG_FIFO);
 		if (w5500Iqr_semp == RT_NULL)
@@ -195,11 +199,11 @@ int main(void)
 		
 
 ////////////////////////////////任务////////////////////////////////////
-    tid =  rt_thread_create("w5500",w5500Task,RT_NULL,1024,2, 10 );
-		if(tid!=NULL){
-				rt_thread_startup(tid);													 
-				rt_kprintf("%sRTcreat w5500Task task\r\n",sign);
-		}
+//    tid =  rt_thread_create("w5500",w5500Task,RT_NULL,1024,2, 10 );
+//		if(tid!=NULL){
+//				rt_thread_startup(tid);													 
+//				rt_kprintf("%sRTcreat w5500Task task\r\n",sign);
+//		}
 		tid =  rt_thread_create("netRec",netDataRecTask,RT_NULL,1024,2, 10 );
 		if(tid!=NULL){
 				rt_thread_startup(tid);													 
@@ -212,11 +216,11 @@ int main(void)
 		}
 
 		
-		tid =  rt_thread_create("upKeep",upKeepStateTask,RT_NULL,1024,2, 10 );
-		if(tid!=NULL){
-				rt_thread_startup(tid);													 
-				rt_kprintf("%sRTcreat upKeepStateTask \r\n",sign);
-		}
+//		tid =  rt_thread_create("upKeep",upKeepStateTask,RT_NULL,1024,2, 10 );
+//		if(tid!=NULL){
+//				rt_thread_startup(tid);													 
+//				rt_kprintf("%sRTcreat upKeepStateTask \r\n",sign);
+//		}
 		
 
 		//队列初始化之后再开启串口中断接收
