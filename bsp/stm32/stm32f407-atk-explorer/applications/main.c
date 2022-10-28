@@ -69,9 +69,9 @@
 //         2、修复接收数后死机问题 接收完json数据没有释放掉                      20221026
 //         3、增加json格式打包devRegJsonPack  用json自带代替sprintf 增加数据包 465Byte增加到586Byte 谨慎使用
 //V0.28    增加配置多个modbus到同一个串口上  需要同类型的放到一起  比如 局放和环流  三轴和沉降仪   20221027
-
-#define APP_VER       ((0<<8)+28)//0x0105 表示1.5版本
-const char date[]="20221027";
+//V0.29    增加配置多个文件夹到keil中      20221028
+#define APP_VER       ((0<<8)+29)//0x0105 表示1.5版本
+const char date[]="20221028";
 
 static    rt_thread_t tid 	= RT_NULL;
 

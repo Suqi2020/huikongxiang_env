@@ -4,7 +4,7 @@
 #include "stm32f4xx_hal.h"
 #include "stdio.h"
 #include "types.h"
-#define __GNUC__
+//#define __GNUC__
 
 typedef  void (*pFunction)(void);
 

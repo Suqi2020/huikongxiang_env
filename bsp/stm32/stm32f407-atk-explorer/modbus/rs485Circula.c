@@ -581,7 +581,7 @@ uint16_t 	cirCulaDataPack()
 		
 		mcu.repDataMessID =mcu.upMessID;
 		upMessIdAdd();
-		rt_kprintf("%sreg len:%d\r\n",sign,len);
+		rt_kprintf("%scircula len:%d\r\n",sign,len);
 		
 		for(int i=0;i<len;i++)
 				rt_kprintf("%02x",packBuf[i]);
