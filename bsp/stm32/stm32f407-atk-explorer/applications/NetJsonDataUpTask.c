@@ -166,18 +166,18 @@ void   upKeepStateTask(void *para)
 		uartIrqEnaAfterQueue();//串口中断中用到了队列  开启中断需要放到后边
 
 	
-	  cirCurrConf();//公众电流初始化 modbus配置
-	  readPSTempHeight();//读取压差式沉降仪
-	  readThreeTempAcc();//读取三轴
-		rt_thread_mdelay(2000);//延时2秒为了局放读取
-		readPartDischgWarning();//局放初始化比较久 放后边读取
+//	  cirCurrConf();//公众电流初始化 modbus配置
+//	  readPSTempHeight();//读取压差式沉降仪
+//	  readThreeTempAcc();//读取三轴
+//		rt_thread_mdelay(2000);//延时2秒为了局放读取
+//		readPartDischgWarning();//局放初始化比较久 放后边读取
 
-		timeInit(0, 30,2);//心跳定时  定时30秒 第一次28秒就来
-		timeInit(1, 5,0);//注册 注册成功后定时器就关闭
-		timeInit(2, 60,10);//读取环流
-		timeInit(3, 60,20);//读取局放
-		timeInit(4, 60,30);//读取压差式沉降仪
-		timeInit(5, 60,40);//读取三轴
+//		timeInit(0, 30,2);//心跳定时  定时30秒 第一次28秒就来
+//		timeInit(1, 5,0);//注册 注册成功后定时器就关闭
+//		timeInit(2, 60,10);//读取环流
+//		timeInit(3, 60,20);//读取局放
+//		timeInit(4, 60,30);//读取压差式沉降仪
+//		timeInit(5, 60,40);//读取三轴
 //		timeStop(2);
 //		timeStop(3);
 //		timeStop(0);
@@ -186,8 +186,8 @@ void   upKeepStateTask(void *para)
 //		timeStop(5);
 		while(1){
 
-				timeOutRunFun();
-				timeInc();
+//				timeOutRunFun();
+//				timeInc();
 				rt_thread_mdelay(1000);
 		}
 }

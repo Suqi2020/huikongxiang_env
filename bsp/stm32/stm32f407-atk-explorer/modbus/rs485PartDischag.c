@@ -28,7 +28,7 @@ void readPdFreqDischarge()
 	  uint8_t  *buf = RT_NULL;
 		buf = rt_malloc(LENTH);
 	  uint16_t len = modbusReadReg(SLAVE_ADDR,0x0300,18,buf);
-		rt_mutex_take(modDev[chanl.partDischag].uartMutex,RT_WAITING_FOREVER);
+		rt_mutex_take(uartDev[chanl.partDischag].uartMutex,RT_WAITING_FOREVER);
 	  //485发送buf  len  等待modbus回应
 		partDischagUartSend(buf,len);
 	  rt_kprintf("%sPdFreqDiach send:",sign);
@@ -38,10 +38,10 @@ void readPdFreqDischarge()
 		rt_kprintf("\n");
 		memset(buf,0,LENTH);
     len=0;
-		if(rt_mq_recv(modDev[chanl.partDischag].uartMessque, buf+len, 1, 3000) == RT_EOK){//第一次接收时间放长点  相应时间有可能比较久
+		if(rt_mq_recv(uartDev[chanl.partDischag].uartMessque, buf+len, 1, 3000) == RT_EOK){//第一次接收时间放长点  相应时间有可能比较久
 				len++;
 		}
-		while(rt_mq_recv(modDev[chanl.partDischag].uartMessque, buf+len, 1, 10) == RT_EOK){//115200 波特率1ms 10个数据
+		while(rt_mq_recv(uartDev[chanl.partDischag].uartMessque, buf+len, 1, 10) == RT_EOK){//115200 波特率1ms 10个数据
 				len++;
 		}
 		if(len!=0){
@@ -52,7 +52,7 @@ void readPdFreqDischarge()
 				rt_kprintf("\n");
 		}
 		//提取环流值 第一步判断crc 第二部提取
-		modDev[chanl.partDischag].offline=RT_FALSE;
+		uartDev[chanl.partDischag].offline=RT_FALSE;
 		int ret2= modbusRespCheck(SLAVE_ADDR,buf,len,RT_TRUE);
 		if(0 ==  ret2){//刷新读取到的值
 
@@ -73,7 +73,7 @@ void readPdFreqDischarge()
 		else{//读不到给0
 				if(ret2==2){
 						//rt_kprintf("%sERR:请检查485接线或者供电\r\n",sign);
-						modDev[chanl.partDischag].offline=RT_TRUE;
+						uartDev[chanl.partDischag].offline=RT_TRUE;
 				}
 				partDiscStru_p.amplitudeA=0;
 				partDiscStru_p.freqA     =0;
@@ -89,7 +89,7 @@ void readPdFreqDischarge()
 			  rt_kprintf("%sPdFreqDiach read fail\n",sign);
 		}
 
-	  rt_mutex_release(modDev[chanl.partDischag].uartMutex);
+	  rt_mutex_release(uartDev[chanl.partDischag].uartMutex);
 		rt_free(buf);
 	  buf=RT_NULL;
 
@@ -105,7 +105,7 @@ rt_bool_t readPartDischgWarning()
 	  uint8_t  *buf = RT_NULL;
 		buf = rt_malloc(LENTH);
 	  uint16_t len = modbusReadBitReg(SLAVE_ADDR,0x0001,8,buf);//读取8个bit
-		rt_mutex_take(modDev[chanl.partDischag].uartMutex,RT_WAITING_FOREVER);
+		rt_mutex_take(uartDev[chanl.partDischag].uartMutex,RT_WAITING_FOREVER);
 	  //485发送buf  len  等待modbus回应
 		partDischagUartSend(buf,len);
 	  rt_kprintf("%sreadPd send:",sign);
@@ -115,10 +115,10 @@ rt_bool_t readPartDischgWarning()
 		rt_kprintf("\n");
 		memset(buf,0,LENTH);
     len=0;
-		if(rt_mq_recv(modDev[chanl.partDischag].uartMessque, buf+len, 1, 3000) == RT_EOK){//第一次接收时间放长点  相应时间有可能比较久
+		if(rt_mq_recv(uartDev[chanl.partDischag].uartMessque, buf+len, 1, 3000) == RT_EOK){//第一次接收时间放长点  相应时间有可能比较久
 				len++;
 		}
-		while(rt_mq_recv(modDev[chanl.partDischag].uartMessque, buf+len, 1, 10) == RT_EOK){//115200 波特率1ms 10个数据
+		while(rt_mq_recv(uartDev[chanl.partDischag].uartMessque, buf+len, 1, 10) == RT_EOK){//115200 波特率1ms 10个数据
 				len++;
 		}
 		rt_kprintf("%srec:",sign);
@@ -126,7 +126,7 @@ rt_bool_t readPartDischgWarning()
 				rt_kprintf("%x ",buf[j]);
 		}
 		rt_kprintf("\n");
-		modDev[chanl.partDischag].offline=RT_FALSE;
+		uartDev[chanl.partDischag].offline=RT_FALSE;
 		//提取环流值 第一步判断crc 第二部提取
 		int ret2=modbusRespCheck(SLAVE_ADDR,buf,len,RT_TRUE);
 		if(0 == ret2){//刷新读取到的值
@@ -139,7 +139,7 @@ rt_bool_t readPartDischgWarning()
 		else{
 				if(ret2==2){
 						//rt_kprintf("%sERR:请检查485接线或者供电\r\n",sign);
-					  modDev[chanl.partDischag].offline=RT_TRUE;
+					  uartDev[chanl.partDischag].offline=RT_TRUE;
 				}
 				partDiscStru_p.alarm.a=0;
 				partDiscStru_p.alarm.b=0;
@@ -147,7 +147,7 @@ rt_bool_t readPartDischgWarning()
 			  rt_kprintf("%s提取alarm fail\r\n",sign);
 		}
    
-	  rt_mutex_release(modDev[chanl.partDischag].uartMutex);
+	  rt_mutex_release(uartDev[chanl.partDischag].uartMutex);
 		rt_free(buf);
 	  buf=RT_NULL;
 		if(partDiscStru_p.alarm.a||partDiscStru_p.alarm.b||partDiscStru_p.alarm.c)

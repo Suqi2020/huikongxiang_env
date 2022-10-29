@@ -6,7 +6,7 @@ extern uint16_t RTU_CRC(uint8_t *puchMsg ,uint16_t usDataLen);
 uint8_t   packBuf[TX_RX_MAX_BUF_SIZE];  //与net发送buff大小一致  通过邮箱传递给NetTxBuffer 进行发送出去
 mcuParazStru mcu ={0};
 
-rs485ParaStru devi[UART_NUM];//目前4路485设备
+rs485ParaStru devi[MODBUS_NUM];//目前4路485设备
 //上行messageID自增  每次打包后自增1
 uint32_t upMessIdAdd()
 {
@@ -176,7 +176,7 @@ uint16_t devRegJsonPack()
 		Array = cJSON_CreateArray();
 		if (Array == NULL) return 0;
 		cJSON_AddItemToObject(root, "params", Array);
-		for (int i = 0; i < UART_NUM; i++)
+		for (int i = 0; i < MODBUS_NUM; i++)
 		{
 			nodeobj = cJSON_CreateObject();
 			cJSON_AddItemToArray(Array, nodeobj);
@@ -257,7 +257,7 @@ uint16_t devRegPack()
 		rt_strcpy((char *)packBuf+len,str);
     len+=rt_strlen(str);
 	
-		for(int i=0;i<UART_NUM;i++){
+		for(int i=0;i<MODBUS_NUM;i++){
 				rt_sprintf(str,"{\"model\":\"%s\",",devi[i].model);
 				rt_strcpy((char *)packBuf+len,str);
 				len+=rt_strlen(str);
@@ -289,7 +289,7 @@ uint16_t devRegPack()
 				rt_sprintf(str,"\"type\":\"%s\"}",devi[i].type);
 				rt_strcpy((char *)packBuf+len,str);
 				len+=rt_strlen(str);
-				if(i+1==UART_NUM){//拷贝 ] 号
+				if(i+1==MODBUS_NUM){//拷贝 ] 号
 						rt_strcpy((char *)packBuf+len,"],");
 						len+=2;
 				}

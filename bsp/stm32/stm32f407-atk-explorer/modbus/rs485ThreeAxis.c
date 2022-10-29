@@ -40,7 +40,7 @@ void readThreeTempAcc()
 	  uint8_t  *buf = RT_NULL;
 		buf = rt_malloc(LENTH);
 	  uint16_t len = psReadReg(SLAVE_ADDR,0X0001,4,buf);
-		rt_mutex_take(modDev[chanl.threeAxis].uartMutex,RT_WAITING_FOREVER);
+		rt_mutex_take(uartDev[chanl.threeAxis].uartMutex,RT_WAITING_FOREVER);
 	  //485发送buf  len  等待modbus回应
 		threeAxisUartSend(buf,len);
 	  rt_kprintf("%sthreeAxis send:",sign);
@@ -50,10 +50,10 @@ void readThreeTempAcc()
 		rt_kprintf("\n");
     len=0;
 		memset(buf,0,LENTH);
-		if(rt_mq_recv(modDev[chanl.threeAxis].uartMessque, buf+len, 1, 3000) == RT_EOK){//第一次接收时间放长点  相应时间有可能比较久
+		if(rt_mq_recv(uartDev[chanl.threeAxis].uartMessque, buf+len, 1, 3000) == RT_EOK){//第一次接收时间放长点  相应时间有可能比较久
 				len++;
 		}
-		while(rt_mq_recv(modDev[chanl.threeAxis].uartMessque, buf+len, 1, 10) == RT_EOK){//115200 波特率1ms 10个数据
+		while(rt_mq_recv(uartDev[chanl.threeAxis].uartMessque, buf+len, 1, 10) == RT_EOK){//115200 波特率1ms 10个数据
 				len++;
 		}
 		if(len!=0){
@@ -63,7 +63,7 @@ void readThreeTempAcc()
 				}
 				rt_kprintf("\n");
 		}
-		modDev[chanl.threeAxis].offline=RT_FALSE;
+		uartDev[chanl.threeAxis].offline=RT_FALSE;
 		//提取环流值 第一步判断crc 第二部提取
 		int ret2=modbusRespCheck(SLAVE_ADDR,buf,len,RT_TRUE);
 		if(0 ==  ret2){//刷新读取到的值
@@ -78,14 +78,14 @@ void readThreeTempAcc()
 		} 
 		else{//读不到给0
 				if(ret2==2){
-					  modDev[chanl.threeAxis].offline=RT_TRUE;
+					  uartDev[chanl.threeAxis].offline=RT_TRUE;
 				}
 			  threeAxis.acclrationX	= 0;
 			  threeAxis.acclrationY = 0;
 			  threeAxis.acclrationY = 0;
 			  rt_kprintf("%stemp height read fail\n",sign);
 		}
-	  rt_mutex_release(modDev[chanl.threeAxis].uartMutex);
+	  rt_mutex_release(uartDev[chanl.threeAxis].uartMutex);
 		rt_free(buf);
 	  buf=RT_NULL;
 

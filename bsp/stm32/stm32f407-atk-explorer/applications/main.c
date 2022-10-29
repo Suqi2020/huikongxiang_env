@@ -124,21 +124,21 @@ static void timeout1(void *parameter)
 			  if(alarmTick>=100){
 						alarmTick=100;// 1 2 3 最终10秒提醒一次
 				}
-				if(modDev[chanl.cirCula].offline==RT_TRUE){
-						rt_kprintf("%sERR:请检查<<环流>>485接线或电源\n",sign);
-				}
-				if(modDev[chanl.partDischag].offline==RT_TRUE){
-						rt_kprintf("%sERR:请检查<<局放>>485接线或电源\n",sign);
-				}
-				if(modDev[chanl.pressSettl].offline==RT_TRUE){
-						rt_kprintf("%sERR:请检查<<沉降仪>>485接线或电源\n",sign);
-				}
-				if(modDev[chanl.threeAxis].offline==RT_TRUE){
-						rt_kprintf("%sERR:请检查<<三轴测振仪>>485接线或电源\n",sign);
-				}
-				if(gbNetState ==RT_FALSE){
-						rt_kprintf("%sERR:网络故障\n",sign);
-				}
+//				if(uartDev[chanl.cirCula].offline==RT_TRUE){
+//						rt_kprintf("%sERR:请检查<<环流>>485接线或电源\n",sign);
+//				}
+//				if(uartDev[chanl.partDischag].offline==RT_TRUE){
+//						rt_kprintf("%sERR:请检查<<局放>>485接线或电源\n",sign);
+//				}
+//				if(uartDev[chanl.pressSettl].offline==RT_TRUE){
+//						rt_kprintf("%sERR:请检查<<沉降仪>>485接线或电源\n",sign);
+//				}
+//				if(uartDev[chanl.threeAxis].offline==RT_TRUE){
+//						rt_kprintf("%sERR:请检查<<三轴测振仪>>485接线或电源\n",sign);
+//				}
+//				if(gbNetState ==RT_FALSE){
+//						rt_kprintf("%sERR:网络故障\n",sign);
+//				}
 		}
 }
 
@@ -216,11 +216,11 @@ int main(void)
 		}
 
 		
-//		tid =  rt_thread_create("upKeep",upKeepStateTask,RT_NULL,1024,2, 10 );
-//		if(tid!=NULL){
-//				rt_thread_startup(tid);													 
-//				rt_kprintf("%sRTcreat upKeepStateTask \r\n",sign);
-//		}
+		tid =  rt_thread_create("upKeep",upKeepStateTask,RT_NULL,1024,2, 10 );
+		if(tid!=NULL){
+				rt_thread_startup(tid);													 
+				rt_kprintf("%sRTcreat upKeepStateTask \r\n",sign);
+		}
 		
 
 		//队列初始化之后再开启串口中断接收
