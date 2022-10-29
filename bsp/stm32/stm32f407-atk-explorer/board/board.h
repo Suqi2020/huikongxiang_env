@@ -33,7 +33,7 @@
 #include "rs485Circula.h"
 #include "rs485PartDischag.h"
 #include "uartReconf.h"
-
+#include "stmflash.h"
 
 extern UART_HandleTypeDef huart4;
 extern UART_HandleTypeDef huart5;

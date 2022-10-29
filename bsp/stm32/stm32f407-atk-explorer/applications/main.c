@@ -71,9 +71,10 @@
 //V0.28    增加配置多个modbus到同一个串口上  需要同类型的放到一起  比如 局放和环流  三轴和沉降仪   20221027
 //V0.29    增加配置多个文件夹到keil中      20221028
 //V0.30    增加flash存储  最后4K           20221028
-//         增加at指令来配置modbus  example[modbus 接地环流 uart5 12]
-#define APP_VER       ((0<<8)+30)//0x0105 表示1.5版本
-const char date[]="20221028";
+//V0.31    增加at指令来配置modbus  example[modbus 接地环流 uart5 12]
+//				 mobus+设备名称+端口+设备地址(0-关闭设备)+采集时间(秒)           20221029
+#define APP_VER       ((0<<8)+31)//0x0105 表示1.5版本
+const char date[]="20221029";
 
 static    rt_thread_t tid 	= RT_NULL;
 
@@ -124,21 +125,21 @@ static void timeout1(void *parameter)
 			  if(alarmTick>=100){
 						alarmTick=100;// 1 2 3 最终10秒提醒一次
 				}
-//				if(uartDev[chanl.cirCula].offline==RT_TRUE){
-//						rt_kprintf("%sERR:请检查<<环流>>485接线或电源\n",sign);
-//				}
-//				if(uartDev[chanl.partDischag].offline==RT_TRUE){
-//						rt_kprintf("%sERR:请检查<<局放>>485接线或电源\n",sign);
-//				}
-//				if(uartDev[chanl.pressSettl].offline==RT_TRUE){
-//						rt_kprintf("%sERR:请检查<<沉降仪>>485接线或电源\n",sign);
-//				}
-//				if(uartDev[chanl.threeAxis].offline==RT_TRUE){
-//						rt_kprintf("%sERR:请检查<<三轴测振仪>>485接线或电源\n",sign);
-//				}
-//				if(gbNetState ==RT_FALSE){
-//						rt_kprintf("%sERR:网络故障\n",sign);
-//				}
+				if(uartDev[modbusFlash[CIRCULA].useUartNum].offline==RT_TRUE){
+						rt_kprintf("%sERR:请检查<<环流>>485接线或电源\n",sign);
+				}
+				if(uartDev[modbusFlash[PARTDISCHAG].useUartNum].offline==RT_TRUE){
+						rt_kprintf("%sERR:请检查<<局放>>485接线或电源\n",sign);
+				}
+				if(uartDev[modbusFlash[PRESSSETTL].useUartNum].offline==RT_TRUE){
+						rt_kprintf("%sERR:请检查<<沉降仪>>485接线或电源\n",sign);
+				}
+				if(uartDev[modbusFlash[THREEAXIS].useUartNum].offline==RT_TRUE){
+						rt_kprintf("%sERR:请检查<<三轴测振仪>>485接线或电源\n",sign);
+				}
+				if(gbNetState ==RT_FALSE){
+						rt_kprintf("%sERR:网络故障\n",sign);
+				}
 		}
 }
 
@@ -161,8 +162,8 @@ int main(void)
 //		rt_kprintf("%s\n",tet);
     rt_kprintf("\n%s%s  ver=%02d.%02d\n",sign,date,(uint8_t)(APP_VER>>8),(uint8_t)APP_VER);
 	  rt_err_t result;
-	  extern void  flashTest();
-	  flashTest();
+//	  extern void  flashTest();
+//	  flashTest();
 //////////////////////////////////////信号量//////////////////////////////
 	  w5500Iqr_semp = rt_sem_create("w5500Iqr_semp",0, RT_IPC_FLAG_FIFO);
 		if (w5500Iqr_semp == RT_NULL)
@@ -199,11 +200,11 @@ int main(void)
 		
 
 ////////////////////////////////任务////////////////////////////////////
-//    tid =  rt_thread_create("w5500",w5500Task,RT_NULL,1024,2, 10 );
-//		if(tid!=NULL){
-//				rt_thread_startup(tid);													 
-//				rt_kprintf("%sRTcreat w5500Task task\r\n",sign);
-//		}
+    tid =  rt_thread_create("w5500",w5500Task,RT_NULL,1024,2, 10 );
+		if(tid!=NULL){
+				rt_thread_startup(tid);													 
+				rt_kprintf("%sRTcreat w5500Task task\r\n",sign);
+		}
 		tid =  rt_thread_create("netRec",netDataRecTask,RT_NULL,1024,2, 10 );
 		if(tid!=NULL){
 				rt_thread_startup(tid);													 

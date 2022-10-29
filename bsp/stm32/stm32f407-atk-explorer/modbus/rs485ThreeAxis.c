@@ -15,14 +15,14 @@
 const static char sign[]="[三轴]";
 threeAxisStru threeAxis;
 
-#define   SLAVE_ADDR     0X02 
+//#define   SLAVE_ADDR     0X02 
 #define   LENTH          50  //工作环流用到的最大接收buf长度
 
 
 //打包串口发送 
 static void threeAxisUartSend(uint8_t *buf,int len)
 {
-		rs485UartSend(chanl.threeAxis,buf, len);
+		rs485UartSend(modbusFlash[THREEAXIS].useUartNum,buf, len);
 }
 
 ///////////////////////////////////////读写寄存器相关操作////////////////////////////////////////
@@ -39,8 +39,8 @@ void readThreeTempAcc()
 	  uint8_t offset=3;//add+regadd+len
 	  uint8_t  *buf = RT_NULL;
 		buf = rt_malloc(LENTH);
-	  uint16_t len = psReadReg(SLAVE_ADDR,0X0001,4,buf);
-		rt_mutex_take(uartDev[chanl.threeAxis].uartMutex,RT_WAITING_FOREVER);
+	  uint16_t len = psReadReg(modbusFlash[THREEAXIS].slaveAddr,0X0001,4,buf);
+		rt_mutex_take(uartDev[modbusFlash[THREEAXIS].useUartNum].uartMutex,RT_WAITING_FOREVER);
 	  //485发送buf  len  等待modbus回应
 		threeAxisUartSend(buf,len);
 	  rt_kprintf("%sthreeAxis send:",sign);
@@ -50,10 +50,10 @@ void readThreeTempAcc()
 		rt_kprintf("\n");
     len=0;
 		memset(buf,0,LENTH);
-		if(rt_mq_recv(uartDev[chanl.threeAxis].uartMessque, buf+len, 1, 3000) == RT_EOK){//第一次接收时间放长点  相应时间有可能比较久
+		if(rt_mq_recv(uartDev[modbusFlash[THREEAXIS].useUartNum].uartMessque, buf+len, 1, 3000) == RT_EOK){//第一次接收时间放长点  相应时间有可能比较久
 				len++;
 		}
-		while(rt_mq_recv(uartDev[chanl.threeAxis].uartMessque, buf+len, 1, 10) == RT_EOK){//115200 波特率1ms 10个数据
+		while(rt_mq_recv(uartDev[modbusFlash[THREEAXIS].useUartNum].uartMessque, buf+len, 1, 10) == RT_EOK){//115200 波特率1ms 10个数据
 				len++;
 		}
 		if(len!=0){
@@ -63,9 +63,9 @@ void readThreeTempAcc()
 				}
 				rt_kprintf("\n");
 		}
-		uartDev[chanl.threeAxis].offline=RT_FALSE;
+		uartDev[modbusFlash[THREEAXIS].useUartNum].offline=RT_FALSE;
 		//提取环流值 第一步判断crc 第二部提取
-		int ret2=modbusRespCheck(SLAVE_ADDR,buf,len,RT_TRUE);
+		int ret2=modbusRespCheck(modbusFlash[THREEAXIS].slaveAddr,buf,len,RT_TRUE);
 		if(0 ==  ret2){//刷新读取到的值
 
         threeAxis.temp	=(buf[offset]<<8)+buf[offset+1];offset+=2;
@@ -78,14 +78,14 @@ void readThreeTempAcc()
 		} 
 		else{//读不到给0
 				if(ret2==2){
-					  uartDev[chanl.threeAxis].offline=RT_TRUE;
+					  uartDev[modbusFlash[THREEAXIS].useUartNum].offline=RT_TRUE;
 				}
 			  threeAxis.acclrationX	= 0;
 			  threeAxis.acclrationY = 0;
 			  threeAxis.acclrationY = 0;
 			  rt_kprintf("%stemp height read fail\n",sign);
 		}
-	  rt_mutex_release(uartDev[chanl.threeAxis].uartMutex);
+	  rt_mutex_release(uartDev[modbusFlash[THREEAXIS].useUartNum].uartMutex);
 		rt_free(buf);
 	  buf=RT_NULL;
 
@@ -148,7 +148,7 @@ void t3AxisTempAccPack()
 		rt_strcpy((char *)packBuf+len,str);
 		len+=rt_strlen(str);
 		
-		rt_sprintf(str,"\"deviceId\":\"%s\",",devi[chanl.threeAxis].ID);
+		rt_sprintf(str,"\"deviceId\":\"%s\",",devi[THREEAXIS].ID);
 		rt_strcpy((char *)packBuf+len,str);
 		len+=rt_strlen(str);
 
@@ -197,7 +197,7 @@ void t3AxisTempAccPack()
 		upMessIdAdd();
 		rt_kprintf("%sThreeAx len:%d\r\n",sign,len);
 		
-		for(int i=0;i<len;i++)
-				rt_kprintf("%02x",packBuf[i]);
+//		for(int i=0;i<len;i++)
+//				rt_kprintf("%02x",packBuf[i]);
 		rt_kprintf("\r\n%slen：%d str0:%x str1:%x str[2]:%d  str[3]:%d\r\n",sign,len,packBuf[0],packBuf[1],packBuf[2],packBuf[3]);
 }

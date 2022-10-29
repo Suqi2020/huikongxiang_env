@@ -15,7 +15,15 @@
 ////////////////////////////////////////////////////////////////////////////////// 	
 
 //FLASH起始地址
-#define STM32_FLASH_BASE 0x08000000 	//STM32 FLASH的起始地址
+
+
+#define  STM32_FLASH_BASE 0x08000000//STM32 FLASH的起始地址
+#define  STM_FLASH_SIZE       0X00100000//总大小
+#define  USE_FLASH_SIZE       0X1000  // 开启4kflash存储
+#define  FLASH_SAVE_ADDR  (STM32_FLASH_BASE+STM_FLASH_SIZE-USE_FLASH_SIZE)  
+
+
+
 #define FLASH_WAITETIME  50000          //FLASH等待超时时间
 
 //FLASH 扇区的起始地址

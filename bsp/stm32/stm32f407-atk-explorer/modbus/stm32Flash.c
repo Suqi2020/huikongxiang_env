@@ -1,8 +1,4 @@
 #include "board.h"
-#define  FLASH_START_ADDR 0x08000000
-#define  STM_FLASH_SIZE       0X00100000
-#define  USE_FLASH_SIZE       0X1000  // ¿ªÆô4kflash´æ´¢
-#define  FLASH_SAVE_ADDR  (FLASH_START_ADDR+STM_FLASH_SIZE-USE_FLASH_SIZE)  
 
 
 #include "stmflash.h"

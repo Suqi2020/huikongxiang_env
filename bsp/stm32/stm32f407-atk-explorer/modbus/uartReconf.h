@@ -31,29 +31,30 @@ typedef struct{
 	 rt_bool_t 	workFlag;
 	 uint16_t  	slaveAddr; //0-255
 	 uartEnum  	useUartNum;
+	 uint32_t   colTime;
 }modbusFlashStru;
 
 
-extern modbusFlashStru  modbusFlash[];//需要存储到flash的设备配置
+extern modbusFlashStru  modbusFlash[MODBUS_NUM];//需要存储到flash的设备配置
 
 
 typedef enum{
-     huanLiu=0,
-     juFang,
-     chenJiangYi,
-     sanZhou
+     CIRCULA=0,
+     PARTDISCHAG,//partDischag,
+     PRESSSETTL,//pressSettl,
+     THREEAXIS //threeAxis
 }modbNumEnum;
 
-typedef struct{
-		uartEnum cirCula;
-	  uartEnum partDischag;
-		uartEnum pressSettl;
-		uartEnum threeAxis;
-}uartChanlStru;// 使用的对应的哪个串口
-extern uartChanlStru chanl;
+//typedef struct{
+//		uartEnum cirCula;
+//	  uartEnum partDischag;
+//		uartEnum pressSettl;
+//		uartEnum threeAxis;
+//}uartChanlStru;// 使用的对应的哪个串口
+//extern uartChanlStru chanl;
 extern uartConfStru  uartDev[];
 extern void rs485UartSend(uint8_t chanl,uint8_t *buf,int len);
-extern void uartConfFlashRead(void);
+extern void uartMutexQueueCfg(void);
 
 extern rt_err_t uartDataRec(uartEnum uartNum,uint8_t dat);
 

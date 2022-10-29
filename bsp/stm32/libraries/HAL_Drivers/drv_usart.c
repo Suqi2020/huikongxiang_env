@@ -752,7 +752,7 @@ void USART6_IRQHandler(void)
 		uint8_t Res=0;
 		if((__HAL_UART_GET_FLAG(&huart6,UART_FLAG_RXNE)!=RESET))  //接收中断(接收到的数据必须是0x0d 0x0a结尾)
 		{
-			  rt_kprintf("read\n");
+//			  rt_kprintf("read\n");
 				HAL_UART_Receive(&huart6,&Res,1,1000); 
 			  uartDataRec(USE_UART6,Res);
 			

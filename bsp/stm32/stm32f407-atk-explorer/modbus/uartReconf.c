@@ -6,7 +6,7 @@
 
 const static char sign[]="[uartRecfg]";
 uartConfStru  uartDev[UART_NUM];
-uartChanlStru  chanl={USE_DIS_UART,USE_DIS_UART,USE_DIS_UART,USE_DIS_UART};
+//uartChanlStru  chanl={USE_DIS_UART,USE_DIS_UART,USE_DIS_UART,USE_DIS_UART};
 static rt_mutex_t uartMutex[UART_NUM] ;//= {RT_NULL}; //创建4个串口的互斥量保护
 #define  MSGPOOL_LEN   1024 //485数据最大量  大于1k需要修改此处
 //队列的定义
@@ -51,13 +51,13 @@ void uartReconfig()
 {
 		for(int i=0;i<UART_NUM;i++){
 				if(uartDev[i].bps==0){//没用到的串口 给个默认波特率 
-					  rt_kprintf("%sUART[%d] no use\n",sign,i);
+					 // rt_kprintf("%sport[%d] no use\n",sign,i+1);
 					  uartDev[i].bps=4800;
 				}
 		}
-		for(int i=0;i<UART_NUM;i++){
-				rt_kprintf("%sUART%d bps[%d]\n",sign,i,uartDev[i].bps);
-		}
+//		for(int i=0;i<UART_NUM;i++){
+//				rt_kprintf("%sport%d bps[%d]\n",sign,i+1,uartDev[i].bps);
+//		}
 		MX_UART4_Init(uartDev[USE_UART4].bps	);
 		MX_USART2_UART_Init(uartDev[USE_UART2].bps	);
 		MX_USART3_UART_Init(uartDev[USE_UART3].bps	);
@@ -89,19 +89,8 @@ void uartSingConf(int num)
 	}
 }
 //note：需要加入检测同一个串口波特率不同的情况
-void uartConfFlashRead()
+void uartMutexQueueCfg()
 {
-	
-	
-//		uartDev[USE_UART2].bps	=115200;
-//		uartDev[USE_UART3].bps	=115200;
-//		uartDev[USE_UART6].bps =9600;
-//		uartDev[USE_UART4].bps	=9600;
-//	
-//	  chanl.cirCula		  =USE_UART3;//使用串口2
-//	  chanl.partDischag =USE_UART3;//使用串口3
-//	  chanl.pressSettl	=USE_UART4;//使用串口6
-//	  chanl.threeAxis   =USE_UART4;//使用串口4
 	
 		uartDev[USE_UART2].uartMutex	=uartMutex[USE_UART2];
 		uartDev[USE_UART3].uartMutex	=uartMutex[USE_UART3];
@@ -156,12 +145,12 @@ uint16 atoi16(char* str,uint16 base);
 //////////////////////////////////////////////////////////////////////////////
 //modbusName 需要跟uartBps modbusChanl一一对应
 
-const static char  modbusName[MODBUS_NUM][20] ={"接地环流",  "局放",             "沉降仪",          "三轴测振仪"};
-const static int   modbusBps[MODBUS_NUM]      ={115200,       115200  ,           9600,             9600};
-static uartEnum    *modbusChanl[MODBUS_NUM]   ={&chanl.cirCula,&chanl.partDischag,&chanl.pressSettl,&chanl.threeAxis};
+const static char  modbusName[MODBUS_NUM][20] ={"接地环流","局放","沉降仪","三轴测振仪","备用"};
+const static int   modbusBps[MODBUS_NUM]      ={115200,  115200  ,9600,9600,4800};
+//static uartEnum    *modbusChanl[MODBUS_NUM]   ={&modbusFlash[CIRCULA].useUartNum,&modbusFlash[PARTDISCHAG].useUartNum,&modbusFlash[PRESSSETTL].useUartNum,&modbusFlash[THREEAXIS].useUartNum};
 //////////////////////////////////////////////////////////////////////////////
 //同样 下边定义需要一一对应起来
-const static char     UartName[UART_NUM][6] ={"uart1", "uart2",  "uart3",  "uart4"};
+const static char     UartName[UART_NUM][6] ={"port1", "port2",  "port3",  "port4"};
 const static uartEnum UartNum[UART_NUM]     ={USE_UART2,USE_UART3,USE_UART6,USE_UART4};
 //////////////////////////////////////////////////////////////////////////////
 modbusFlashStru  modbusFlash[MODBUS_NUM]  __attribute__ ((aligned (4)));
@@ -170,61 +159,81 @@ modbusFlashStru  modbusFlash[MODBUS_NUM]  __attribute__ ((aligned (4)));
 //		uartDev[USE_UART6].bps =9600;
 //		uartDev[USE_UART4].bps	=9600;
 //	
-//	  chanl.cirCula		  =USE_UART3;//使用串口2
-//	  chanl.partDischag =USE_UART3;//使用串口3
-//	  chanl.pressSettl	=USE_UART4;//使用串口6
-//	  chanl.threeAxis   =USE_UART4;//使用串口4
+//	  modbusFlash[CIRCULA].useUartNum		  =USE_UART3;//使用串口2
+//	  modbusFlash[PARTDISCHAG].useUartNum =USE_UART3;//使用串口3
+//	  modbusFlash[PRESSSETTL].useUartNum	=USE_UART4;//使用串口6
+//	  modbusFlash[THREEAXIS].useUartNum   =USE_UART4;//使用串口4
 
+
+void  modbusFlashRead()
+{
+		for(int i=0;i<MODBUS_NUM;i++){
+				if(modbusFlash[i].workFlag	==RT_TRUE){//
+						uartDev[modbusFlash[i].useUartNum].bps =modbusBps[i];
+					  rt_kprintf("%s启动 %10s 波特率%6d %s  slavAddr=%2d 采集间隔%d\n",sign,modbusName[i],modbusBps[i],UartName[modbusFlash[i].useUartNum],modbusFlash[i].slaveAddr,modbusFlash[i].colTime);
+				}
+				else
+					 rt_kprintf("%s停止 %s\n",sign,modbusName[i]);
+		}
+}
+//modbus   局放 port2 2 60
 static void modbus(int argc, char *argv[])
 {
 	  int i,j;
-		if (argc != 4)
+		if (argc != 5)
 		{
-				rt_kprintf("ERR input argc\n");
+				rt_kprintf("%sERR input argc\n",sign);
 				goto ERR;
 		}
 		int reslt=atoi16(argv[3],10);
-		if((reslt==0)||(reslt>255)){
-				rt_kprintf("err:argv[3] between 0 and 255 %d\n",argv[3]);
+    int setTime =atoi16(argv[4],10);
+		if(setTime<60){
+				rt_kprintf("%serr:argv[4] 采集时间>60 now is%d\n",sign,time);
+				goto ERR;
+		}
+		if(reslt>255){
+				rt_kprintf("%serr:argv[3] between 0 and 255 %d\n",sign,argv[3]);
 				goto ERR;
 		}
 	 for(i=0;i<MODBUS_NUM;i++){
 				if(0==rt_strcmp((char *)modbusName[i], argv[1])){
-					  rt_kprintf("get modbusName \n");
+					  //rt_kprintf("%sget modbusName \n",sign);
 						for(j=0;j<UART_NUM;j++){
 								if(0==rt_strcmp((char *)UartName[j], argv[2])){
-									  rt_kprintf("get UartName \n");
-										*modbusChanl[j]= UartNum[j];
 										uartDev[UartNum[j]].bps =modbusBps[i];
-									  uartSingConf(UartNum[j]);
-									  modbusFlash[i].workFlag	  =RT_TRUE;//启用当前设备
 									  modbusFlash[i].useUartNum =UartNum[j];
 									  modbusFlash[i].slaveAddr	=reslt;
+									  modbusFlash[i].colTime=setTime;
+									  if(reslt==0)
+												modbusFlash[i].workFlag	  =RT_FALSE;//启用当前设备
+										else{
+											  modbusFlash[i].workFlag	  =RT_TRUE;//启用当前设备
+											  uartSingConf(UartNum[j]);
+										}
+										STMFLASH_Write(FLASH_SAVE_ADDR,(uint32_t*)modbusFlash,sizeof(modbusFlash));
 										//写入flash中
-										break;
+										return;
 								}
 						}
 				}
 		}
 		if(i==MODBUS_NUM){
-				rt_kprintf("err:argv[1]\n");
+				rt_kprintf("%serr:argv[1]\n",sign);
 				goto ERR;
 		}
 		if(j==UART_NUM){
-				rt_kprintf("err:argv[2]\n");
+				rt_kprintf("%serr:argv[2]\n",sign);
 				goto ERR;
 		}
 
-		
-
-
-   // uartReconfig();
-		//uartConfFlashRead();//根据配置   flash存储重新配置串口
 		return;//正确跳出
 		ERR:
-		rt_kprintf("for example mobus+设备名称+串口+设备地址\n");
+		rt_kprintf("%sfor example mobus+设备名称+端口+设备地址(0-关闭设备)+采集时间(秒)\n",sign);
 		for( i=0;i<UART_NUM;i++){
-				rt_kprintf("[modbus %10s %s %d]\n",modbusName[i],UartName[i],i+1);
+				rt_kprintf("%s on [modbus %10s %s %d  120]\n",sign,modbusName[i],UartName[i],i+1);
+		}
+		for( i=0;i<UART_NUM;i++){
+				rt_kprintf("%s off [modbus %10s %s 0 120]\n",sign,modbusName[i],UartName[i]);
 		}
 }
 //FINSH_FUNCTION_EXPORT(modbus, offline finsh);//FINSH_FUNCTION_EXPORT_CMD

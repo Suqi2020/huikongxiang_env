@@ -32,9 +32,9 @@ uint8 dns_server[4]={114,114,114,114};									/*定义W5500默认DNS*/
 uint16 local_port=5000;	                       					/*定义本地端口*/
 
 /*定义远端IP信息*/
-//uint8  remote_ip[4]={192,168,1,109};											/*远端IP地址*/
-uint16 remote_port=5005;																/*远端端口号*/
-uint8  remote_ip[4]={192,168,16,6};											/*远端IP地址*/
+uint8  remote_ip[4]={192,168,1,109};											/*远端IP地址*/
+uint16 remote_port=8080;																/*远端端口号*/
+//uint8  remote_ip[4]={192,168,16,6};											/*远端IP地址*/
 
 #else
 

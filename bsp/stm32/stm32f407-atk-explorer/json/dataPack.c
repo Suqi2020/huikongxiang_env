@@ -80,8 +80,8 @@ uint16_t heartUpPack()
 		upMessIdAdd();
 		rt_kprintf("%sheart len:%d\r\n",sign,len);
 		
-		for(int i=0;i<len;i++)
-				rt_kprintf("%02x",packBuf[i]);
+//		for(int i=0;i<len;i++)
+//				rt_kprintf("%02x",packBuf[i]);
 		rt_kprintf("\r\n%slen£º%d str0:%x str1:%x str[2]:%d  str[3]:%d\r\n",sign,len,packBuf[0],packBuf[1],packBuf[2],packBuf[3]);
 		//rt_kprintf("heart:%s \n",packBuf);
 		return len;
@@ -226,8 +226,8 @@ uint16_t devRegJsonPack()
 		upMessIdAdd();
 		rt_kprintf("%scirCula len:%d\r\n",sign,len);
 		
-		for(int i=0;i<len;i++)
-				rt_kprintf("%02x",packBuf[i]);
+//		for(int i=0;i<len;i++)
+//				rt_kprintf("%02x",packBuf[i]);
 		rt_kprintf("\r\n%slen£º%d str0:%x str1:%x str[2]:%d  str[3]:%d\r\n",sign,len,packBuf[0],packBuf[1],packBuf[2],packBuf[3]);
 		//rt_kprintf("heart:%s \n",packBuf);
 		return len;
@@ -319,8 +319,8 @@ uint16_t devRegPack()
 		upMessIdAdd();
 		rt_kprintf("%sreg len:%d\r\n",sign,len);
 		
-		for(int i=0;i<len;i++)
-				rt_kprintf("%02x",packBuf[i]);
+//		for(int i=0;i<len;i++)
+//				rt_kprintf("%02x",packBuf[i]);
 		rt_kprintf("\r\n%slen£º%d str0:%x str1:%x str[2]:%d  str[3]:%d\r\n",sign,len,packBuf[0],packBuf[1],packBuf[2],packBuf[3]);
 		//rt_kprintf("heart:%s \n",packBuf);
 		return len;

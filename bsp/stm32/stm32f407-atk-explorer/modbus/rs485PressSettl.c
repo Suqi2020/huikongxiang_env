@@ -6,7 +6,7 @@
 //  24+红色，24-黑色，A+蓝色，B-绿色
 const static char sign[]="[沉降仪]";
 
-#define   SLAVE_ADDR     0X01 
+//#define   SLAVE_ADDR     0X01 
 #define   LENTH          50  //工作环流用到的最大接收buf长度
 
 
@@ -16,7 +16,7 @@ pressSettlStru pressSettle;
 //打包串口发送 
 static void pressSettlUartSend(uint8_t *buf,int len)
 {
-		rs485UartSend(chanl.pressSettl,buf, len);
+		rs485UartSend(modbusFlash[PRESSSETTL].useUartNum,buf, len);
 }
 
 ///////////////////////////////////////读写寄存器相关操作////////////////////////////////////////
@@ -47,8 +47,8 @@ void readPSTempHeight()
 	  uint8_t offset=3;//add+regadd+len
 	  uint8_t  *buf = RT_NULL;
 		buf = rt_malloc(LENTH);
-	  uint16_t len = psReadReg(SLAVE_ADDR,0X0001,2,buf);
-		rt_mutex_take(uartDev[chanl.pressSettl].uartMutex,RT_WAITING_FOREVER);
+	  uint16_t len = psReadReg(modbusFlash[PRESSSETTL].slaveAddr,0X0001,2,buf);
+		rt_mutex_take(uartDev[modbusFlash[PRESSSETTL].useUartNum].uartMutex,RT_WAITING_FOREVER);
 	  //485发送buf  len  等待modbus回应
 		pressSettlUartSend(buf,len);
 	  rt_kprintf("%spressSettl send:",sign);
@@ -59,10 +59,10 @@ void readPSTempHeight()
     len=0;
 		memset(buf,0,LENTH);
 		
-		if(rt_mq_recv(uartDev[chanl.pressSettl].uartMessque, buf+len, 1, 3000) == RT_EOK){//第一次接收时间放长点  相应时间有可能比较久
+		if(rt_mq_recv(uartDev[modbusFlash[PRESSSETTL].useUartNum].uartMessque, buf+len, 1, 3000) == RT_EOK){//第一次接收时间放长点  相应时间有可能比较久
 				len++;
 		}
-		while(rt_mq_recv(uartDev[chanl.pressSettl].uartMessque, buf+len, 1, 10) == RT_EOK){//115200 波特率1ms 10个数据
+		while(rt_mq_recv(uartDev[modbusFlash[PRESSSETTL].useUartNum].uartMessque, buf+len, 1, 10) == RT_EOK){//115200 波特率1ms 10个数据
 				len++;
 		}
 		if(len!=0){
@@ -73,8 +73,8 @@ void readPSTempHeight()
 				rt_kprintf("\n");
 		}
 		//提取环流值 第一步判断crc 第二部提取
-		uartDev[chanl.pressSettl].offline=RT_FALSE;
-		int ret2=modbusRespCheck(SLAVE_ADDR,buf,len,RT_TRUE);
+		uartDev[modbusFlash[PRESSSETTL].useUartNum].offline=RT_FALSE;
+		int ret2=modbusRespCheck(modbusFlash[PRESSSETTL].slaveAddr,buf,len,RT_TRUE);
 		if(0 == ret2){//刷新读取到的值
 
         pressSettle.temp	=(buf[offset]<<8)+buf[offset+1];offset+=2;
@@ -86,13 +86,13 @@ void readPSTempHeight()
 		else{//读不到给0
 				if(ret2==2){
 						//rt_kprintf("%sERR:请检查485接线或者供电\r\n",sign);
-					  uartDev[chanl.pressSettl].offline=RT_TRUE;
+					  uartDev[modbusFlash[PRESSSETTL].useUartNum].offline=RT_TRUE;
 				}
 			  pressSettle.temp	=0;
 			  pressSettle.height=0;
 			  rt_kprintf("%stemp height read fail\n",sign);
 		}
-	  rt_mutex_release(uartDev[chanl.pressSettl].uartMutex);
+	  rt_mutex_release(uartDev[modbusFlash[PRESSSETTL].useUartNum].uartMutex);
 		rt_free(buf);
 	  buf=RT_NULL;
 
@@ -154,7 +154,7 @@ void PSTempHeightPack()
 		rt_strcpy((char *)packBuf+len,str);
 		len+=rt_strlen(str);
 		
-		rt_sprintf(str,"\"deviceId\":\"%s\",",devi[chanl.pressSettl].ID);
+		rt_sprintf(str,"\"deviceId\":\"%s\",",devi[PRESSSETTL].ID);
 		rt_strcpy((char *)packBuf+len,str);
 		len+=rt_strlen(str);
 
@@ -198,7 +198,7 @@ void PSTempHeightPack()
 		upMessIdAdd();
 		rt_kprintf("%spressSet len:%d\r\n",sign,len);
 		
-		for(int i=0;i<len;i++)
-				rt_kprintf("%02x",packBuf[i]);
+//		for(int i=0;i<len;i++)
+//				rt_kprintf("%02x",packBuf[i]);
 		rt_kprintf("\r\n%slen：%d str0:%x str1:%x str[2]:%d  str[3]:%d\r\n",sign,len,packBuf[0],packBuf[1],packBuf[2],packBuf[3]);
 }
