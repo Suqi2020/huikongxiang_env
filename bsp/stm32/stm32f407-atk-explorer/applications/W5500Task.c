@@ -7,14 +7,14 @@ const static char task[]="[w55task]";
 rt_sem_t  w5500Iqr_semp = RT_NULL;//w5500有数据时候中断来临
 
 /***************----- 网络参数变量定义 -----***************/
-unsigned char Gateway_IP[4];//网关IP地址 
-unsigned char Sub_Mask[4];	//子网掩码 
-unsigned char Phy_Addr[6];	//物理地址(MAC) 
-unsigned char IP_Addr[4];	//本机IP地址 
+//unsigned char Gateway_IP[4];//网关IP地址 
+//unsigned char Sub_Mask[4];	//子网掩码 
+//unsigned char Phy_Addr[6];	//物理地址(MAC) 
+//unsigned char IP_Addr[4];	//本机IP地址 
 
-unsigned char S0_Port[2];	//端口0的端口号(5000) 
-unsigned char S0_DIP[4];	//端口0目的IP地址 
-unsigned char S0_DPort[2];	//端口0目的端口号(6000) 
+//unsigned char S0_Port[2];	//端口0的端口号(5000) 
+//unsigned char S0_DIP[4];	//端口0目的IP地址 
+//unsigned char S0_DPort[2];	//端口0目的端口号(6000) 
 
 
 
@@ -36,43 +36,43 @@ rt_bool_t  gbNetState =RT_FALSE;   //联网状态  false 断网  true联网
 * 返回值  : 无
 * 说明    : 网关、掩码、物理地址、本机IP地址、端口号、目的IP地址、目的端口号、端口工作模式
 *******************************************************************************/
-void Load_Net_Parameters(void)
-{
-	Gateway_IP[0] = 192;//加载网关参数
-	Gateway_IP[1] = 168;
-	Gateway_IP[2] = 1;
-	Gateway_IP[3] = 1;
+//void Load_Net_Parameters(void)
+//{
+//	Gateway_IP[0] = 192;//加载网关参数
+//	Gateway_IP[1] = 168;
+//	Gateway_IP[2] = 1;
+//	Gateway_IP[3] = 1;
 
-	Sub_Mask[0]=255;//加载子网掩码
-	Sub_Mask[1]=255;
-	Sub_Mask[2]=255;
-	Sub_Mask[3]=0;
+//	Sub_Mask[0]=255;//加载子网掩码
+//	Sub_Mask[1]=255;
+//	Sub_Mask[2]=255;
+//	Sub_Mask[3]=0;
 
-	Phy_Addr[0]=0x0c;//加载物理地址
-	Phy_Addr[1]=0x29;
-	Phy_Addr[2]=0xab;
-	Phy_Addr[3]=0x7c;
-	Phy_Addr[4]=0x00;
-	Phy_Addr[5]=0x01;
+//	Phy_Addr[0]=0x0c;//加载物理地址
+//	Phy_Addr[1]=0x29;
+//	Phy_Addr[2]=0xab;
+//	Phy_Addr[3]=0x7c;
+//	Phy_Addr[4]=0x00;
+//	Phy_Addr[5]=0x01;
 
-	IP_Addr[0]=192;//加载本机IP地址
-	IP_Addr[1]=168;
-	IP_Addr[2]=1;
-	IP_Addr[3]=199;
+//	IP_Addr[0]=192;//加载本机IP地址
+//	IP_Addr[1]=168;
+//	IP_Addr[2]=1;
+//	IP_Addr[3]=199;
 
-	S0_Port[0] = 0x13;//加载端口0的端口号5000 
-	S0_Port[1] = 0x88;
+//	S0_Port[0] = 0x13;//加载端口0的端口号5000 
+//	S0_Port[1] = 0x88;
 
-	S0_DIP[0]=192;//加载端口0的目的IP地址
-	S0_DIP[1]=168;
-	S0_DIP[2]=1;
-	S0_DIP[3]=190;
-	
-	S0_DPort[0] = 0x17;//加载端口0的目的端口号6000
-	S0_DPort[1] = 0x70;
+//	S0_DIP[0]=192;//加载端口0的目的IP地址
+//	S0_DIP[1]=168;
+//	S0_DIP[2]=1;
+//	S0_DIP[3]=190;
+//	
+//	S0_DPort[0] = 0x17;//加载端口0的目的端口号6000
+//	S0_DPort[1] = 0x70;
 
-	S0_Mode=TCP_CLIENT;//加载端口0的工作模式,TCP客户端模式
-}
+//	S0_Mode=TCP_CLIENT;//加载端口0的工作模式,TCP客户端模式
+//}
 
 void  w5500Task(void *parameter)
 {
@@ -80,7 +80,8 @@ void  w5500Task(void *parameter)
 	W5500_enum W5500State=W5500InitEnum;
   static uint8_t dhcpTick=0;
 	static uint8_t rstW5500Ct=0;
-
+ STMFLASH_Read(FLASH_IP_SAVE_ADDR,(uint32_t*)&netIpFlash,sizeof(netIpFlash));
+	
   while(1) 														/*循环执行的函数*/ 
   {
 		switch(W5500State)
@@ -99,8 +100,8 @@ void  w5500Task(void *parameter)
 						}
 						else{
 							  set_w5500_ip();
-								rt_kprintf("%sW5500 服务器IP:%d.%d.%d.%d\r\n",task,remote_ip[0],remote_ip[1],remote_ip[2],remote_ip[3]);
-								rt_kprintf("%sW5500 监听端口:%d \r\n",task,remote_port);
+								rt_kprintf("%sW5500 服务器IP:%d.%d.%d.%d\r\n",task,netIpFlash.remoteIp[0],netIpFlash.remoteIp[1],netIpFlash.remoteIp[2],netIpFlash.remoteIp[3]);
+								rt_kprintf("%sW5500 监听端口:%d \r\n",task,netIpFlash.remotePort);
 								W5500State=W5500NetOKEnum;
 							  rt_sem_release(w5500Iqr_semp);
 								break;
@@ -121,7 +122,7 @@ void  w5500Task(void *parameter)
 			      static int count=0;      
 						if(ret==RT_EOK){
 								W5500ISR();//w5500
-								loopback_tcpc(SOCK_TCPC, local_port);//W5500内部自动维护网络连接 此处只读寄存器
+								loopback_tcpc(SOCK_TCPC, netIpFlash.remotePort);//W5500内部自动维护网络连接 此处只读寄存器
 						}
 
 					  if(gbNetState ==RT_FALSE){//没联网  重新初始化

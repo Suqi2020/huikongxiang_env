@@ -21,7 +21,7 @@
 #define  STM_FLASH_SIZE       0X00100000//总大小
 #define  USE_FLASH_SIZE       0X1000  // 开启4kflash存储
 #define  FLASH_SAVE_ADDR  (STM32_FLASH_BASE+STM_FLASH_SIZE-USE_FLASH_SIZE)  
-
+#define  FLASH_IP_SAVE_ADDR   (FLASH_SAVE_ADDR+0X200)
 
 
 #define FLASH_WAITETIME  50000          //FLASH等待超时时间

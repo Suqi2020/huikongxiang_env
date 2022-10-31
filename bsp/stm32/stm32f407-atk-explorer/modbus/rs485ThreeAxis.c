@@ -67,13 +67,11 @@ void readThreeTempAcc()
 		//提取环流值 第一步判断crc 第二部提取
 		int ret2=modbusRespCheck(modbusFlash[THREEAXIS].slaveAddr,buf,len,RT_TRUE);
 		if(0 ==  ret2){//刷新读取到的值
-
         threeAxis.temp	=(buf[offset]<<8)+buf[offset+1];offset+=2;
 			  threeAxis.acclrationX = (buf[offset]<<8)+buf[offset+1];offset+=2;
 				threeAxis.acclrationY = (buf[offset]<<8)+buf[offset+1];offset+=2;
 				threeAxis.acclrationZ = (buf[offset]<<8)+buf[offset+1];offset+=2;
         float temp=(float)((float)threeAxis.temp/100); 
-
 			  rt_kprintf("%stemp:%0.2f*C ACC:X%dmg Y%dmg Z%dmg ok\n",sign,temp,threeAxis.acclrationX,threeAxis.acclrationY,threeAxis.acclrationZ);  
 		} 
 		else{//读不到给0

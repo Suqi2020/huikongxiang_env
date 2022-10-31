@@ -25,32 +25,32 @@ EEPROM_MSG_STR EEPROM_MSG;															/*EEPROM存储信息结构体*/
 uint8 mac[6]={0x00,0x08,0xdc,0x11,0x11,0x11};
 #if 1
 /*定义默认IP信息*/
-uint8 local_ip[4]  ={192,168,16,88};											/*定义W5500默认IP地址*/
+//uint8 local_ip[4]  ={192,168,16,88};											/*定义W5500默认IP地址*/
 uint8 subnet[4]    ={255,255,255,0};										/*定义W5500默认子网掩码*/
-uint8 gateway[4]   ={192,168,16,1};											/*定义W5500默认网关*/
+//uint8 gateway[4]   ={192,168,16,1};											/*定义W5500默认网关*/
 uint8 dns_server[4]={114,114,114,114};									/*定义W5500默认DNS*/
 uint16 local_port=5000;	                       					/*定义本地端口*/
 
 /*定义远端IP信息*/
-uint8  remote_ip[4]={192,168,1,109};											/*远端IP地址*/
-uint16 remote_port=8080;																/*远端端口号*/
+//uint8  remote_ip[4]={192,168,1,109};											/*远端IP地址*/
+//uint16 remote_port=8080;																/*远端端口号*/
 //uint8  remote_ip[4]={192,168,16,6};											/*远端IP地址*/
 
 #else
 
-uint8 local_ip[4]  ={192,168,1,88};											/*定义W5500默认IP地址*/
+//uint8 local_ip[4]  ={192,168,1,88};											/*定义W5500默认IP地址*/
 uint8 subnet[4]    ={255,255,255,0};										/*定义W5500默认子网掩码*/
-uint8 gateway[4]   ={192,168,1,1};											/*定义W5500默认网关*/
+//uint8 gateway[4]   ={192,168,1,1};											/*定义W5500默认网关*/
 uint8 dns_server[4]={114,114,114,114};									/*定义W5500默认DNS*/
 
 uint16 local_port=5000;	                       					/*定义本地端口*/
 
-uint16 remote_port=11001;																
-uint8  remote_ip[4]={192,168,1,102};											/*????ip*/
+//uint16 remote_port=11001;																
+//uint8  remote_ip[4]={192,168,1,102};											/*????ip*/
 #endif
 
 /*IP配置方法选择，请自行选择*/
-const uint8	ip_from = IP_FROM_DHCP;//IP_FROM_DEFINE;				///IP_FROM_DHCP
+const uint8	ip_from = IP_FROM_DEFINE;//IP_FROM_DEFINE;//IP_FROM_DEFINE;				///IP_FROM_DHCP
 
 uint8   dhcp_ok   = 0;													   			/*dhcp成功获取IP*/
 uint32	ms        = 0;															  	/*毫秒计数*/
@@ -64,15 +64,16 @@ volatile uint8_t	    ntptimer  = 0;															  	/*NPT秒计数*/
 */
 void set_w5500_ip(void)
 {	
+	mac[5]=netIpFlash.macaddr;
 		
    /*复制定义的配置信息到配置结构体*/
 	memcpy(ConfigMsg.mac, mac, 6);
-	memcpy(ConfigMsg.lip,local_ip,4);
+	memcpy(ConfigMsg.lip,netIpFlash.localIp,4);
 	memcpy(ConfigMsg.sub,subnet,4);
-	memcpy(ConfigMsg.gw,gateway,4);
+	memcpy(ConfigMsg.gw,netIpFlash.gateway,4);
 	memcpy(ConfigMsg.dns,dns_server,4);
 	if(ip_from==IP_FROM_DEFINE)	
-		printf("%s 使用定义的IP信息配置W5500\r\n",sign);
+		printf("%s使用定义的IP信息配置W5500\r\n",sign);
 	
 	
 
@@ -82,7 +83,7 @@ void set_w5500_ip(void)
 		/*复制DHCP获取的配置信息到配置结构体*/
 		if(dhcp_ok==1)
 		{
-			printf("%s IP from DHCP\r\n",sign);	 
+			printf("%sIP from DHCP\r\n",sign);	 
 			memcpy(ConfigMsg.lip,DHCP_GET.lip, 4);
 			memcpy(ConfigMsg.sub,DHCP_GET.sub, 4);
 			memcpy(ConfigMsg.gw,DHCP_GET.gw, 4);
@@ -90,8 +91,8 @@ void set_w5500_ip(void)
 		}
 		else
 		{
-			printf("%s DHCP子程序未运行,或者不成功\r\n",sign);
-			printf("%s 使用定义的IP信息配置W5500\r\n",sign);
+			printf("%sDHCP子程序未运行,或者不成功\r\n",sign);
+			printf("%s使用定义的IP信息配置W5500\r\n",sign);
 		}
 	}
 		
@@ -104,12 +105,12 @@ void set_w5500_ip(void)
 	setGAR(ConfigMsg.gw);
 	setSIPR(ConfigMsg.lip);
 	
-	getSIPR (local_ip);			
-	printf("%s W5500 IP地址   : %d.%d.%d.%d\r\n", sign,local_ip[0],local_ip[1],local_ip[2],local_ip[3]);
+	getSIPR (netIpFlash.localIp);			
+	printf("%sW5500 IP地址   : %d.%d.%d.%d\r\n", sign,netIpFlash.localIp[0],netIpFlash.localIp[1],netIpFlash.localIp[2],netIpFlash.localIp[3]);
 	getSUBR(subnet);
-	printf("%s W5500 子网掩码 : %d.%d.%d.%d\r\n",sign, subnet[0],subnet[1],subnet[2],subnet[3]);
-	getGAR(gateway);
-	printf("%s W5500 网关     : %d.%d.%d.%d\r\n",sign, gateway[0],gateway[1],gateway[2],gateway[3]);
+	printf("%sW5500 子网掩码 : %d.%d.%d.%d\r\n",sign, subnet[0],subnet[1],subnet[2],subnet[3]);
+	getGAR(netIpFlash.gateway);
+	printf("%sW5500 网关     : %d.%d.%d.%d\r\n",sign, netIpFlash.gateway[0],netIpFlash.gateway[1],netIpFlash.gateway[2],netIpFlash.gateway[3]);
 }
 
 /**
@@ -291,4 +292,83 @@ uint16 wiz_read_buf(uint32 addrbsb, uint8* buf,uint16 len)
 
 
 
+netIpFlashStru netIpFlash  __attribute__ ((aligned (4)));;
+
+static void net(int argc, char *argv[])
+{
+	  if(ip_from != IP_FROM_DEFINE){
+				printf("%sERR:use IP_FROM_DHCP\r\n",sign);
+				return;
+		}
+		if(argc!=1){
+				goto ERR;
+		}
+		int i,j;
+		if(0==rt_strcmp((char *)"macaddr", argv[1])){
+				if(argc!=3){
+					goto ERR;
+				}
+				mac[5]=atoi16(argv[2],10);
+				netIpFlash.macaddr=mac[5];
+				rt_kprintf("%sfor macaddr OK\n",sign);
+				STMFLASH_Write(FLASH_IP_SAVE_ADDR,(uint32_t*)&netIpFlash,sizeof(netIpFlash));
+		}
+		else 	if(0==rt_strcmp((char *)"localIp", argv[1])){
+				if(argc!=6){
+					goto ERR;
+				}
+				netIpFlash.localIp[0] =atoi16(argv[2],10);
+				netIpFlash.localIp[1] =atoi16(argv[3],10);
+				netIpFlash.localIp[2] =atoi16(argv[4],10);
+				netIpFlash.localIp[3] =atoi16(argv[5],10);
+
+				rt_kprintf("%sfor localIp OK\n",sign);
+				STMFLASH_Write(FLASH_IP_SAVE_ADDR,(uint32_t*)&netIpFlash,sizeof(netIpFlash));
+		}
+		else 	if(0==rt_strcmp((char *)"gateway", argv[1])){
+				if(argc!=6){
+					goto ERR;
+				}
+			  netIpFlash.gateway[0] =atoi16(argv[2],10);
+				netIpFlash.gateway[1] =atoi16(argv[3],10);
+				netIpFlash.gateway[2] =atoi16(argv[4],10);
+				netIpFlash.gateway[3] =atoi16(argv[5],10); 
+	
+				rt_kprintf("%sfor gateway OK\n",sign);
+				STMFLASH_Write(FLASH_IP_SAVE_ADDR,(uint32_t*)&netIpFlash,sizeof(netIpFlash));
+		}
+		else 	if(0==rt_strcmp((char *)"remoteIp", argv[1])){
+				if(argc!=6){
+					goto ERR;
+				}
+			  netIpFlash.remoteIp[0] =atoi16(argv[2],10);
+				netIpFlash.remoteIp[1] =atoi16(argv[3],10);
+				netIpFlash.remoteIp[2] =atoi16(argv[4],10);
+				netIpFlash.remoteIp[3] =atoi16(argv[5],10);
+		
+				rt_kprintf("%sfor remoteIp OK\n",sign);
+				STMFLASH_Write(FLASH_IP_SAVE_ADDR,(uint32_t*)&netIpFlash,sizeof(netIpFlash));
+		}
+		else 	if(0==rt_strcmp((char *)"remotePort", argv[1])){
+				if(argc!=3){
+					goto ERR;
+				}
+				netIpFlash.remotePort=atoi32(argv[2],10);
+
+		
+				rt_kprintf("%sfor remotePort OK\n",sign);
+				STMFLASH_Write(FLASH_IP_SAVE_ADDR,(uint32_t*)&netIpFlash,sizeof(netIpFlash));
+		}
+		
+		return;
+		ERR:
+		rt_kprintf("%sfor example\n",sign);
+		rt_kprintf("%s[net macaddr 100]\n",sign);
+		rt_kprintf("%s[net localIp 192 168 1 122]\n",sign);
+		rt_kprintf("%s[net gateway 192 168 1 1]\n",sign);
+		rt_kprintf("%s[net remoteIp 192 168 1 100]\n",sign);
+		rt_kprintf("%s[net remotePort 8080]\n",sign);
+
+}
+MSH_CMD_EXPORT(net,ip port config);//FINSH_FUNCTION_EXPORT_CMD
 

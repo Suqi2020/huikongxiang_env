@@ -73,6 +73,9 @@
 //V0.30    增加flash存储  最后4K           20221028
 //V0.31    增加at指令来配置modbus  example[modbus 接地环流 uart5 12]
 //				 mobus+设备名称+端口+设备地址(0-关闭设备)+采集时间(秒)           20221029
+//V0.32    增加mdbus配置时候 检查不同类型设备用同一个端口
+//         检查同类型设备用同一个设备地址用同一个端口
+//         实现ip地址的配置和存储到flash中            20221031
 #define APP_VER       ((0<<8)+31)//0x0105 表示1.5版本
 const char date[]="20221029";
 
@@ -111,6 +114,7 @@ static void timeout1(void *parameter)
 		static int count=0;
 	  static int alarmTick=10;
 		extern rt_bool_t gbNetState;
+	  extern void modbusWorkErrCheck(void);
 	  count++;
 	  
 		if(gbNetState==RT_TRUE){
@@ -125,18 +129,7 @@ static void timeout1(void *parameter)
 			  if(alarmTick>=100){
 						alarmTick=100;// 1 2 3 最终10秒提醒一次
 				}
-				if(uartDev[modbusFlash[CIRCULA].useUartNum].offline==RT_TRUE){
-						rt_kprintf("%sERR:请检查<<环流>>485接线或电源\n",sign);
-				}
-				if(uartDev[modbusFlash[PARTDISCHAG].useUartNum].offline==RT_TRUE){
-						rt_kprintf("%sERR:请检查<<局放>>485接线或电源\n",sign);
-				}
-				if(uartDev[modbusFlash[PRESSSETTL].useUartNum].offline==RT_TRUE){
-						rt_kprintf("%sERR:请检查<<沉降仪>>485接线或电源\n",sign);
-				}
-				if(uartDev[modbusFlash[THREEAXIS].useUartNum].offline==RT_TRUE){
-						rt_kprintf("%sERR:请检查<<三轴测振仪>>485接线或电源\n",sign);
-				}
+			  modbusWorkErrCheck();//modbus 错误工作状态打印
 				if(gbNetState ==RT_FALSE){
 						rt_kprintf("%sERR:网络故障\n",sign);
 				}

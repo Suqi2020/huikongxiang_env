@@ -55,8 +55,7 @@ void readPdFreqDischarge()
 		uartDev[modbusFlash[PARTDISCHAG].useUartNum].offline=RT_FALSE;
 		int ret2= modbusRespCheck(modbusFlash[PARTDISCHAG].slaveAddr,buf,len,RT_TRUE);
 		if(0 ==  ret2){//刷新读取到的值
-
-
+			
 				partDiscStru_p.amplitudeA=(buf[offset]<<24)+(buf[offset+1]<<16)+(buf[offset+2]<<8)+buf[offset+3];offset+=4;
 				partDiscStru_p.freqA     =(buf[offset]<<24)+(buf[offset+1]<<16)+(buf[offset+2]<<8)+buf[offset+3];offset+=4;
 			  partDiscStru_p.dischargeA=(buf[offset]<<24)+(buf[offset+1]<<16)+(buf[offset+2]<<8)+buf[offset+3];offset+=4;

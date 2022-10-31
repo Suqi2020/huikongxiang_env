@@ -68,7 +68,7 @@ void uartReconfig()
 
 void uartSingConf(int num)
 {
-	rt_kprintf("%sUART single conf\n");
+	//rt_kprintf("%sUART single conf\n");
 	switch(num){
 		case USE_UART2:
 			MX_USART2_UART_Init(uartDev[USE_UART2].bps	);
@@ -145,13 +145,13 @@ uint16 atoi16(char* str,uint16 base);
 //////////////////////////////////////////////////////////////////////////////
 //modbusName 需要跟uartBps modbusChanl一一对应
 
-const static char  modbusName[MODBUS_NUM][20] ={"接地环流","局放","沉降仪","三轴测振仪","备用"};
-const static int   modbusBps[MODBUS_NUM]      ={115200,  115200  ,9600,9600,4800};
+//const static char  modbusName[MODBUS_NUM][20] ={"接地环流","局放","沉降仪","三轴测振仪","备用"};
+//const static int   modbusBps[MODBUS_NUM]      ={115200,  115200  ,9600,9600,4800};
 //static uartEnum    *modbusChanl[MODBUS_NUM]   ={&modbusFlash[CIRCULA].useUartNum,&modbusFlash[PARTDISCHAG].useUartNum,&modbusFlash[PRESSSETTL].useUartNum,&modbusFlash[THREEAXIS].useUartNum};
 //////////////////////////////////////////////////////////////////////////////
 //同样 下边定义需要一一对应起来
-const static char     UartName[UART_NUM][6] ={"port1", "port2",  "port3",  "port4"};
-const static uartEnum UartNum[UART_NUM]     ={USE_UART2,USE_UART3,USE_UART6,USE_UART4};
+//const static char     UartName[UART_NUM][6] ={"port1", "port2",  "port3",  "port4"};//重映射一个名称
+//const static uartEnum UartNum[UART_NUM]     ={USE_UART2,USE_UART3,USE_UART6,USE_UART4};
 //////////////////////////////////////////////////////////////////////////////
 modbusFlashStru  modbusFlash[MODBUS_NUM]  __attribute__ ((aligned (4)));
 //		uartDev[USE_UART2].bps	=115200;
@@ -164,8 +164,62 @@ modbusFlashStru  modbusFlash[MODBUS_NUM]  __attribute__ ((aligned (4)));
 //	  modbusFlash[PRESSSETTL].useUartNum	=USE_UART4;//使用串口6
 //	  modbusFlash[THREEAXIS].useUartNum   =USE_UART4;//使用串口4
 
+//检查同类型设备用同一个设备地址用同一个端口
+static rt_bool_t modbusSameTypeUseSameAddr()
+{
+//		if((modbusFlash[a].workFlag==RT_TRUE)&&(modbusFlash[b].workFlag==RT_TRUE)){
+//				if(modbusFlash[a].useUartNum  ==modbusFlash[b].useUartNum){
+//						if(modbusFlash[a].slaveAddr  ==modbusFlash[b].slaveAddr){
+//							 rt_kprintf("%sERR:%s %s 设备地址重复\n",sign,modbusName[a],modbusName[b]);
+//							 return RT_TRUE;
+//						}
+//				}
+//		}
+//		return  RT_FALSE;
+		
+		
+		
+		for(int i=0;i<MODBUS_NUM;i++){
+				for(int j=i+1;j<MODBUS_NUM;j++){
+						if(modbusFlash[i].useUartNum==modbusFlash[j].useUartNum){
+								if(modbusFlash[i].workFlag==RT_TRUE){
+										if(modbusFlash[j].workFlag==RT_TRUE){
+												if(modbusType[i]==modbusType[j]){
+														if(modbusFlash[i].slaveAddr  ==modbusFlash[j].slaveAddr){
+																rt_kprintf("%sERR:%s %s 同类型同端口设备使用了相同地址\n",sign,modbusName[i],modbusName[j]);
+																return RT_TRUE;
+														}
+												}
+										}
+								}
+						}
+				}
+		}
+		return  RT_FALSE;
+}
+//检查不同类型设备用同一个端口
+//modbusType
+static rt_bool_t modbusDifTypeUseSamePort(void)
+{
+		for(int i=0;i<MODBUS_NUM;i++){
+				for(int j=i+1;j<MODBUS_NUM;j++){
+						if(modbusFlash[i].useUartNum==modbusFlash[j].useUartNum){
+								if(modbusFlash[i].workFlag==RT_TRUE){
+										if(modbusFlash[j].workFlag==RT_TRUE){
+												if(modbusType[i]!=modbusType[j]){
+														rt_kprintf("%sERR:%s %s 不同类型设备使用了同一个端口\n",sign,modbusName[i],modbusName[j]);
+														return RT_TRUE;
+												}
+										}
+								}
+						}
+				}
+		}
+		return  RT_FALSE;
+}
 
-void  modbusFlashRead()
+//打印参数
+void  modbusPrintRead()
 {
 		for(int i=0;i<MODBUS_NUM;i++){
 				if(modbusFlash[i].workFlag	==RT_TRUE){//
@@ -176,9 +230,34 @@ void  modbusFlashRead()
 					 rt_kprintf("%s停止 %s\n",sign,modbusName[i]);
 		}
 }
+//modbus工作异常检测
+void modbusWorkErrCheck()
+{
+		for(int i=0;i<MODBUS_NUM;i++){
+				if(modbusFlash[i].workFlag	==RT_TRUE){  
+						if(uartDev[modbusFlash[i].useUartNum].offline==RT_TRUE){
+								rt_kprintf("%sERR:请检查<<%s>>%s 485接线或电源\n",sign,modbusName[i],UartName[modbusFlash[i].useUartNum]);
+						}
+				}
+		}
+		rt_bool_t a=RT_FALSE,c=RT_FALSE;
+		//检查同类型设备用同一个设备地址
+		a	=	modbusSameTypeUseSameAddr();
+		//检查不同类型设备用同一个端口
+		c	=	modbusDifTypeUseSamePort();
+		if((a==RT_TRUE)||(c==RT_TRUE)){
+				modbusPrintRead();
+		}
+		
+		
+}
+
+
 //modbus   局放 port2 2 60
 static void modbus(int argc, char *argv[])
 {
+	  extern void timeStop(upDataTimEnum num);
+	  extern void timeInit(upDataTimEnum num,int value,int firstCnt);
 	  int i,j;
 		if (argc != 5)
 		{
@@ -204,11 +283,16 @@ static void modbus(int argc, char *argv[])
 									  modbusFlash[i].useUartNum =UartNum[j];
 									  modbusFlash[i].slaveAddr	=reslt;
 									  modbusFlash[i].colTime=setTime;
-									  if(reslt==0)
-												modbusFlash[i].workFlag	  =RT_FALSE;//启用当前设备
+									  if(reslt==0){
+												modbusFlash[i].workFlag	  =RT_FALSE;//停用当前设备
+												rt_kprintf("%s停用%s\n",sign,modbusName[i]);
+											  timeStop(i);
+										}
 										else{
+											 rt_kprintf("%s启用%s\n",sign,modbusName[i]);
 											  modbusFlash[i].workFlag	  =RT_TRUE;//启用当前设备
 											  uartSingConf(UartNum[j]);
+											  timeInit(i,modbusFlash[i].colTime,10+5*i);
 										}
 										STMFLASH_Write(FLASH_SAVE_ADDR,(uint32_t*)modbusFlash,sizeof(modbusFlash));
 										//写入flash中
@@ -228,14 +312,15 @@ static void modbus(int argc, char *argv[])
 
 		return;//正确跳出
 		ERR:
-		rt_kprintf("%sfor example mobus+设备名称+端口+设备地址(0-关闭设备)+采集时间(秒)\n",sign);
+		rt_kprintf("%sfor example:modbus+设备名称(波特率)+端口+设备地址(0-关闭设备)+采集间隔(秒)\n",sign);
+		rt_kprintf("%sNOTE:括号内对参数进行解释,不需要输入\n",sign);
 		for( i=0;i<UART_NUM;i++){
-				rt_kprintf("%s on [modbus %10s %s %d  120]\n",sign,modbusName[i],UartName[i],i+1);
+				rt_kprintf("%son  [modbus %10s(%6d) %s %d(addr) 120(秒)]\n",sign,modbusName[i],modbusBps[i],UartName[i],i+1);
 		}
 		for( i=0;i<UART_NUM;i++){
-				rt_kprintf("%s off [modbus %10s %s 0 120]\n",sign,modbusName[i],UartName[i]);
+				rt_kprintf("%soff [modbus %10s(%6d) %s 0(addr) 120(秒)]\n",sign,modbusName[i],modbusBps[i],UartName[i]);
 		}
 }
 //FINSH_FUNCTION_EXPORT(modbus, offline finsh);//FINSH_FUNCTION_EXPORT_CMD
-MSH_CMD_EXPORT(modbus,offline stamp);//FINSH_FUNCTION_EXPORT_CMD
+MSH_CMD_EXPORT(modbus,port slaveaddr config);//FINSH_FUNCTION_EXPORT_CMD
 
