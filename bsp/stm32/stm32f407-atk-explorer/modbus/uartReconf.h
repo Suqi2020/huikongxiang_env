@@ -38,27 +38,20 @@ typedef struct{
 
 
 //////////////////////////////增加传感器需要修改下边 一一对应////////////////////////////////////////
-#define   MODBUS_NUM      4
+#define   MODBUS_NUM      10
 extern modbusFlashStru  modbusFlash[MODBUS_NUM];//需要存储到flash的设备配置
 typedef enum{
-     CIRCULA=0,
-     PARTDISCHAG,//partDischag,
-     PRESSSETTL,//pressSettl,
-     THREEAXIS //threeAxis
+     CIRCULA=0, 	PARTDISCHAG,			PRESSSETTL, 			THREEAXIS,			CH4,		O2		,H2S,			CO,			TEMPHUM,			WATERLEVEL
 }modbNumEnum;
 
 typedef enum{
-
-		CIRCULA_TIME=0,
-	  PARTDISCHAG_TIME,
-		PRESSSETTL_TIME,
-		THREEAXIS_TIME,
-		HEART_TIME=10,
-		REG_TIME=11
+		CIRCULA_TIME=0,PARTDISCHAG_TIME,PRESSSETTL_TIME,THREEAXIS_TIME,CH4_TIME,O2_TIME,H2S_TIME,CO_TIME,TEMPHUM_TIME,WATERLEVEL_TIME,
+		HEART_TIME=20,
+		REG_TIME
 }upDataTimEnum;//需要与modbusName 名称一一对应 来实现代码精简高效
-const static char  modbusName[MODBUS_NUM][20] ={"接地环流","局放","沉降仪","三轴测振仪"};
-const static int   modbusBps[MODBUS_NUM]      ={115200,   115200  ,9600,   9600};
-const static int   modbusType[MODBUS_NUM]     ={1,        1,       2,      2};//想同类型的modbus设备名称相同
+const static char  modbusName[MODBUS_NUM][20] ={"接地环流","局放","沉降仪","三轴测振仪","甲烷","氧气","硫化氢","一氧化碳","温湿度","水位"};
+const static int   modbusBps[MODBUS_NUM]      ={115200,   115200  ,9600,   9600,   9600,   9600,   9600,   9600,   9600,   9600};
+const static int   modbusType[MODBUS_NUM]     ={1,        1,       2,      2, 		 3,  			3,  		3,  		3,  		3,  		3};//想同类型的modbus设备名称相同
 /////////////////////////////////////////////////////////////////////////////////////////////////////
 
 extern uartConfStru  uartDev[];

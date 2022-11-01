@@ -34,6 +34,7 @@
 #include "rs485PartDischag.h"
 #include "uartReconf.h"
 #include "stmflash.h"
+#include "rs485Gas.h"
 
 extern UART_HandleTypeDef huart4;
 extern UART_HandleTypeDef huart5;

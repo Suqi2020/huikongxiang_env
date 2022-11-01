@@ -55,9 +55,9 @@ void uartReconfig()
 					  uartDev[i].bps=4800;
 				}
 		}
-//		for(int i=0;i<UART_NUM;i++){
-//				rt_kprintf("%sport%d bps[%d]\n",sign,i+1,uartDev[i].bps);
-//		}
+		for(int i=0;i<UART_NUM;i++){
+				rt_kprintf("%sport%d bps[%d]\n",sign,i+1,uartDev[i].bps);
+		}
 		MX_UART4_Init(uartDev[USE_UART4].bps	);
 		MX_USART2_UART_Init(uartDev[USE_UART2].bps	);
 		MX_USART3_UART_Init(uartDev[USE_UART3].bps	);
@@ -274,7 +274,7 @@ static void modbus(int argc, char *argv[])
 				rt_kprintf("%serr:argv[3] between 0 and 255 %d\n",sign,argv[3]);
 				goto ERR;
 		}
-	 for(i=0;i<MODBUS_NUM;i++){
+	  for(i=0;i<MODBUS_NUM;i++){
 				if(0==rt_strcmp((char *)modbusName[i], argv[1])){
 					  //rt_kprintf("%sget modbusName \n",sign);
 						for(j=0;j<UART_NUM;j++){
@@ -309,16 +309,15 @@ static void modbus(int argc, char *argv[])
 				rt_kprintf("%serr:argv[2]\n",sign);
 				goto ERR;
 		}
-
 		return;//正确跳出
 		ERR:
-		rt_kprintf("%sfor example:modbus+设备名称(波特率)+端口+设备地址(0-关闭设备)+采集间隔(秒)\n",sign);
+		rt_kprintf("%sfor example:modbus+设备名称(波特率)+端口(port1-port4)+设备地址(0-关闭设备)+采集间隔(秒)\n",sign);
 		rt_kprintf("%sNOTE:括号内对参数进行解释,不需要输入\n",sign);
-		for( i=0;i<UART_NUM;i++){
-				rt_kprintf("%son  [modbus %10s(%6d) %s %d(addr) 120(秒)]\n",sign,modbusName[i],modbusBps[i],UartName[i],i+1);
+		for( i=0;i<MODBUS_NUM;i++){
+				rt_kprintf("%son  [modbus %10s(%6d) %s %d 120]\n",sign,modbusName[i],modbusBps[i],UartName[0],i+1);
 		}
-		for( i=0;i<UART_NUM;i++){
-				rt_kprintf("%soff [modbus %10s(%6d) %s 0(addr) 120(秒)]\n",sign,modbusName[i],modbusBps[i],UartName[i]);
+		for( i=0;i<MODBUS_NUM;i++){
+				rt_kprintf("%soff [modbus %10s(%6d) %s 0 120]\n",sign,modbusName[i],modbusBps[i],UartName[3]);
 		}
 }
 //FINSH_FUNCTION_EXPORT(modbus, offline finsh);//FINSH_FUNCTION_EXPORT_CMD

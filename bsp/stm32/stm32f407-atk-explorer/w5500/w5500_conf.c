@@ -15,11 +15,14 @@
 #include "w5500.h"
 #include "dhcp.h"
 #include "board.h"
+/*IP配置方法选择，请自行选择*/
+const uint8	ip_from = IP_FROM_DEFINE;//IP_FROM_DEFINE;//IP_FROM_DEFINE;				///IP_FROM_DHCP
+
 
 const static char sign[]="[w55Conf]";
 extern SPI_HandleTypeDef hspi1;
-CONFIG_MSG  ConfigMsg;																	/*配置结构体*/
-EEPROM_MSG_STR EEPROM_MSG;															/*EEPROM存储信息结构体*/
+CONFIG_MSG  		ConfigMsg;																	/*配置结构体*/
+EEPROM_MSG_STR  EEPROM_MSG;															/*EEPROM存储信息结构体*/
 
 /*定义MAC地址,如果多块W5500网络适配板在同一现场工作，请使用不同的MAC地址*/
 uint8 mac[6]={0x00,0x08,0xdc,0x11,0x11,0x11};
@@ -49,8 +52,7 @@ uint16 local_port=5000;	                       					/*定义本地端口*/
 //uint8  remote_ip[4]={192,168,1,102};											/*????ip*/
 #endif
 
-/*IP配置方法选择，请自行选择*/
-const uint8	ip_from = IP_FROM_DEFINE;//IP_FROM_DEFINE;//IP_FROM_DEFINE;				///IP_FROM_DHCP
+
 
 uint8   dhcp_ok   = 0;													   			/*dhcp成功获取IP*/
 uint32	ms        = 0;															  	/*毫秒计数*/
@@ -300,7 +302,7 @@ static void net(int argc, char *argv[])
 				printf("%sERR:use IP_FROM_DHCP\r\n",sign);
 				return;
 		}
-		if(argc!=1){
+		if(argc==1){
 				goto ERR;
 		}
 		int i,j;

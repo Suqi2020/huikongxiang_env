@@ -943,6 +943,36 @@
               <FileType>1</FileType>
               <FilePath>modbus\crc.c</FilePath>
             </File>
+            <File>
+              <FileName>rs485CH4.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>.\modbus\rs485CH4.c</FilePath>
+            </File>
+            <File>
+              <FileName>rs485CO.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>.\modbus\rs485CO.c</FilePath>
+            </File>
+            <File>
+              <FileName>rs485H2S.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>.\modbus\rs485H2S.c</FilePath>
+            </File>
+            <File>
+              <FileName>rs485O2.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>.\modbus\rs485O2.c</FilePath>
+            </File>
+            <File>
+              <FileName>rs485WaterLev.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>.\modbus\rs485WaterLev.c</FilePath>
+            </File>
+            <File>
+              <FileName>rs485TempHum.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>.\modbus\rs485TempHum.c</FilePath>
+            </File>
           </Files>
         </Group>
         <Group>

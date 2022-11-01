@@ -67,7 +67,7 @@ static void timeInc()
 //定时时间到
 static int timeOut()
 {
-	  for(upDataTimEnum i=0;i<TIM_NUM;i++){
+	  for(int i=0;i<TIM_NUM;i++){
 				if(tim[i].count!=0xFFFF){
 						if(tim[i].count>=tim[i].threshoVal){
 							timeStart(i);
@@ -116,7 +116,7 @@ static void  timeOutRunFun()
 				}
 				cirCulaDataPack();
 				rt_mb_send_wait(&mbNetSendData, (rt_ubase_t)&packBuf,RT_WAITING_FOREVER);
-				rt_kprintf("%stimer 2 out\r\n",task);
+				rt_kprintf("%sCIRCULA_TIME out\r\n",task);
 				break;
 			case PARTDISCHAG_TIME://读取局放
         readPdFreqDischarge();
@@ -128,7 +128,7 @@ static void  timeOutRunFun()
 				}
 				partDisDataPack();
 				rt_mb_send_wait(&mbNetSendData, (rt_ubase_t)&packBuf,RT_WAITING_FOREVER);
-				rt_kprintf("%stimer 3 out\r\n",task);
+				rt_kprintf("%sPARTDISCHAG_TIME out\r\n",task);
 				break;
 			case PRESSSETTL_TIME:
 //				rt_kprintf("timer 4 in\r\n");
@@ -139,13 +139,34 @@ static void  timeOutRunFun()
 				readPSTempHeight();
 				PSTempHeightPack();
 				rt_mb_send_wait(&mbNetSendData, (rt_ubase_t)&packBuf,RT_WAITING_FOREVER);
-				rt_kprintf("%stimer 4 out\r\n",task);
+				rt_kprintf("%sPRESSSETTL_TIMEout\r\n",task);
 				break;
 			case THREEAXIS_TIME:
 				readThreeTempAcc();
 				t3AxisTempAccPack();
 				rt_mb_send_wait(&mbNetSendData, (rt_ubase_t)&packBuf,RT_WAITING_FOREVER);
-				rt_kprintf("%stimer 5 out\r\n",task);
+				rt_kprintf("%sTHREEAXIS_TIMEout\r\n",task);
+				break;
+			case  CH4_TIME:
+				break;
+			case  O2_TIME:
+				break;
+			case  H2S_TIME:
+				break;
+			case  CO_TIME://4种气体在一起读取 所以前三个不使用 只在此处读取并打包发送  关闭时候只需要关闭CO就可以把所有气体全部关闭
+			if(modbusFlash[CH4].workFlag==RT_TRUE)	
+				readCH4();
+			if(modbusFlash[CO].workFlag ==RT_TRUE)	
+				readCO();
+			if(modbusFlash[H2S].workFlag==RT_TRUE)	
+				readH2S();
+			if(modbusFlash[O2].workFlag ==RT_TRUE)	
+				readO2();
+			  rt_kprintf("%sCO_TIME out\r\n",task);
+				break;
+			case  TEMPHUM_TIME:
+				break;
+			case  WATERLEVEL_TIME:
 				break;
 			default:
 				break;
@@ -154,15 +175,22 @@ static void  timeOutRunFun()
 //启动定时器列表
 void startTimeList()
 {
-		modbusFlash[CIRCULA].    modbusRead=&cirCurrConf;//回调函数映射
-		modbusFlash[PRESSSETTL]. modbusRead=&readPSTempHeight;//回调函数映射
-		modbusFlash[THREEAXIS].  modbusRead=&readThreeTempAcc;//回调函数映射
+		modbusFlash[CIRCULA].    modbusRead=	&cirCurrConf;//回调函数映射
+		modbusFlash[PRESSSETTL]. modbusRead=	&readPSTempHeight;//回调函数映射
+		modbusFlash[THREEAXIS].  modbusRead=	&readThreeTempAcc;//回调函数映射
 		modbusFlash[PARTDISCHAG].modbusRead=(void *)&readPartDischgWarning;//回调函数映射
+		modbusFlash[CH4].  modbusRead=	&readCH4;//回调函数映射
+		modbusFlash[O2].  modbusRead =	&readO2;//回调函数映射
+		modbusFlash[H2S].  modbusRead=	&readH2S;//回调函数映射
+		modbusFlash[CO].  modbusRead =	&readCO;//回调函数映射
+	  rt_thread_mdelay(2000);
+	
 	  for(int i=0;i<MODBUS_NUM;i++){
 				if(modbusFlash[i].workFlag==RT_TRUE){
 						modbusFlash[i].modbusRead();
-						timeInit(i,modbusFlash[i].colTime,10);//读取环流
-					  //rt_kprintf("start %s",modbusName[i]);
+					  rt_thread_mdelay(100);
+						timeInit(i,modbusFlash[i].colTime,10+i*2);//读取环流
+					  //rt_kprintf("time start %s",modbusName[i]);
 				}
 				else{
 					 timeStop(i);//停止
