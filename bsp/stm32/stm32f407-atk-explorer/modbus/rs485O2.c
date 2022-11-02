@@ -24,7 +24,7 @@ void readO2()
 	  uint8_t offset=3;//add+regadd+len
 	  uint8_t  *buf = RT_NULL;
 		buf = rt_malloc(LENTH);
-	  uint16_t len = modbusReadReg(modbusFlash[O2].slaveAddr,0X0002,2,buf);
+	  uint16_t len = modbusReadReg(modbusFlash[O2].slaveAddr,0X0002,READ_03,2,buf);
 		rt_mutex_take(uartDev[modbusFlash[O2].useUartNum].uartMutex,RT_WAITING_FOREVER);
 	  //485发送buf  len  等待modbus回应
 		o2UartSend(buf,len);

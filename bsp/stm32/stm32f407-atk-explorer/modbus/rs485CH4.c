@@ -27,7 +27,7 @@ void readCH4()
 	  uint8_t offset=3;//add+regadd+len
 	  uint8_t  *buf = RT_NULL;
 		buf = rt_malloc(LENTH);
-	  uint16_t len = modbusReadReg(modbusFlash[CH4].slaveAddr,0X0002,2,buf);
+	  uint16_t len = modbusReadReg(modbusFlash[CH4].slaveAddr,0X0002,READ_03,2,buf);
 	 //rt_kprintf("%sCH4 take %d\n",modbusFlash[CH4].useUartNum);
 		rt_mutex_take(uartDev[modbusFlash[CH4].useUartNum].uartMutex,RT_WAITING_FOREVER);
 	  //485发送buf  len  等待modbus回应
@@ -60,7 +60,7 @@ void readCH4()
         gas.ch4	=(buf[offset]<<24)+(buf[offset+1]<<16)+(buf[offset+2]<<8)+buf[offset+3];offset+=4;
 
         float cont=(float)((float)gas.ch4	/1000);
-			  rt_kprintf("%s浓度值:%0.4fmol/Lread ok\n",sign,cont);  
+			  rt_kprintf("%s浓度值:%0.2fmol/Lread ok\n",sign,cont);  
 		} 
 		else{//读不到给0
 				if(ret2==2){

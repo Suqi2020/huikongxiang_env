@@ -224,11 +224,29 @@ void  modbusPrintRead()
 		for(int i=0;i<MODBUS_NUM;i++){
 				if(modbusFlash[i].workFlag	==RT_TRUE){//
 						uartDev[modbusFlash[i].useUartNum].bps =modbusBps[i];
-					  rt_kprintf("%s启动 %10s 波特率%6d %s  slavAddr=%2d 采集间隔%d\n",sign,modbusName[i],modbusBps[i],UartName[modbusFlash[i].useUartNum],modbusFlash[i].slaveAddr,modbusFlash[i].colTime);
+					  rt_kprintf("%s启动 %-10s 波特率%6d %s  slavAddr=%2d 采集间隔%d\n",sign,modbusName[i],modbusBps[i],UartName[modbusFlash[i].useUartNum],modbusFlash[i].slaveAddr,modbusFlash[i].colTime);
 				}
 				else
 					 rt_kprintf("%s停止 %s\n",sign,modbusName[i]);
 		}
+}
+//存在配置错误-返回true 不存在-返回false
+//检查的目的 不要重复配置串口 有可能把正常的设备配置成错误的波特率 导致设备不能用
+ rt_bool_t errConfigCheck()
+{
+		rt_bool_t a=RT_FALSE,c=RT_FALSE;
+		//检查同类型设备用同一个设备地址
+		a	=	modbusSameTypeUseSameAddr();
+		//检查不同类型设备用同一个端口
+		c	=	modbusDifTypeUseSamePort();
+
+		if((a==RT_TRUE)||(c==RT_TRUE)){
+				for(int i=0;i<MODBUS_NUM;i++){
+						rt_kprintf("%s 类型[%d],%-10s,port[%-03d],addr[%d]\n",sign,modbusType[i],modbusName[i],modbusFlash[i].useUartNum,modbusFlash[i].slaveAddr);
+				}
+			  return RT_TRUE;
+		}
+		return RT_FALSE;
 }
 //modbus工作异常检测
 void modbusWorkErrCheck()
@@ -240,20 +258,11 @@ void modbusWorkErrCheck()
 						}
 				}
 		}
-		rt_bool_t a=RT_FALSE,c=RT_FALSE;
-		//检查同类型设备用同一个设备地址
-		a	=	modbusSameTypeUseSameAddr();
-		//检查不同类型设备用同一个端口
-		c	=	modbusDifTypeUseSamePort();
-		if((a==RT_TRUE)||(c==RT_TRUE)){
-				modbusPrintRead();
-		}
-		
-		
 }
 
 
 //modbus   局放 port2 2 60
+//使用前提条件必须启用upKeepStateTask中参数以及回调函数初始化才能使用
 static void modbus(int argc, char *argv[])
 {
 	  extern void timeStop(upDataTimEnum num);
@@ -279,23 +288,33 @@ static void modbus(int argc, char *argv[])
 					  //rt_kprintf("%sget modbusName \n",sign);
 						for(j=0;j<UART_NUM;j++){
 								if(0==rt_strcmp((char *)UartName[j], argv[2])){
-										uartDev[UartNum[j]].bps =modbusBps[i];
-									  modbusFlash[i].useUartNum =UartNum[j];
-									  modbusFlash[i].slaveAddr	=reslt;
-									  modbusFlash[i].colTime=setTime;
+
 									  if(reslt==0){
 												modbusFlash[i].workFlag	  =RT_FALSE;//停用当前设备
 												rt_kprintf("%s停用%s\n",sign,modbusName[i]);
 											  timeStop(i);
 										}
 										else{
-											 rt_kprintf("%s启用%s\n",sign,modbusName[i]);
-											  modbusFlash[i].workFlag	  =RT_TRUE;//启用当前设备
-											  uartSingConf(UartNum[j]);
-											  timeInit(i,modbusFlash[i].colTime,10+5*i);
+												uartDev[UartNum[j]].bps =modbusBps[i];
+												modbusFlash[i].useUartNum =UartNum[j];
+												modbusFlash[i].slaveAddr	=reslt;
+												modbusFlash[i].colTime=setTime;
+											  
+											  modbusFlash[i].workFlag	  =RT_TRUE;//启用当前设备 为了errCheck
+											  if(errConfigCheck()==RT_FALSE){//重复配置没有错误 重新配置串口 并启用
+	
+														uartSingConf(UartNum[j]);
+														timeInit(i,modbusFlash[i].colTime,10+5*i);
+														modbusFlash[i].modbusRead();//回调函数
+													  rt_kprintf("%s启用%s\n",sign,modbusName[i]);
+												}
+												else
+													 	modbusFlash[i].workFlag	  =RT_FALSE;//停用当前设备
 										}
 										STMFLASH_Write(FLASH_SAVE_ADDR,(uint32_t*)modbusFlash,sizeof(modbusFlash));
 										//写入flash中
+										modbusWorkErrCheck();//errConfigCheck();
+										modbusPrintRead();
 										return;
 								}
 						}
@@ -309,15 +328,16 @@ static void modbus(int argc, char *argv[])
 				rt_kprintf("%serr:argv[2]\n",sign);
 				goto ERR;
 		}
+
 		return;//正确跳出
 		ERR:
 		rt_kprintf("%sfor example:modbus+设备名称(波特率)+端口(port1-port4)+设备地址(0-关闭设备)+采集间隔(秒)\n",sign);
 		rt_kprintf("%sNOTE:括号内对参数进行解释,不需要输入\n",sign);
 		for( i=0;i<MODBUS_NUM;i++){
-				rt_kprintf("%son  [modbus %10s(%6d) %s %d 120]\n",sign,modbusName[i],modbusBps[i],UartName[0],i+1);
+				rt_kprintf("%son  [modbus %-10s(%6d) %s %d 120]\n",sign,modbusName[i],modbusBps[i],UartName[0],i+1);
 		}
 		for( i=0;i<MODBUS_NUM;i++){
-				rt_kprintf("%soff [modbus %10s(%6d) %s 0 120]\n",sign,modbusName[i],modbusBps[i],UartName[3]);
+				rt_kprintf("%soff [modbus %-10s(%6d) %s 0 120]\n",sign,modbusName[i],modbusBps[i],UartName[3]);
 		}
 }
 //FINSH_FUNCTION_EXPORT(modbus, offline finsh);//FINSH_FUNCTION_EXPORT_CMD

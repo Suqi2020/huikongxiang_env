@@ -76,8 +76,9 @@
 //V0.32    增加mdbus配置时候 检查不同类型设备用同一个端口
 //         检查同类型设备用同一个设备地址用同一个端口
 //         实现ip地址的配置和存储到flash中            20221031
-////4种气体在一起读取 所以前三个不使用 只在CO定时器地方读取并打包发送  关闭时候只需要关闭CO就可以把所有气体全部关闭
+//V0.33//4种气体在一起读取 所以前三个不使用 只在CO定时器地方读取并打包发送  关闭时候只需要关闭CO就可以把所有气体全部关闭
 //         CO默认气体是4  为了方便打包把气体数据打包在一起    20221101
+//V0.34    加入温湿度和水位读取 每个传感器只支持一种       20221102  
 #define APP_VER       ((0<<8)+33)//0x0105 表示1.5版本
 const char date[]="20221101";
 
@@ -131,7 +132,9 @@ static void timeout1(void *parameter)
 			  if(alarmTick>=100){
 						alarmTick=100;// 1 2 3 最终10秒提醒一次
 				}
-			  modbusWorkErrCheck();//modbus 错误工作状态打印
+				modbusWorkErrCheck();//modbus 错误工作状态打印
+				errConfigCheck();//	modbusWorkErrCheck();//errConfigCheck();
+				//modbusPrintRead();
 				if(gbNetState ==RT_FALSE){
 						rt_kprintf("%sERR:网络故障\n",sign);
 				}

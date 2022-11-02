@@ -14,11 +14,11 @@ const static char sign[]="[modbus]";
 //读一个或多个寄存器
 //MQTTLenString test;
 //// out --输出数据
-uint8_t modbusReadReg(uint16_t slavAddr,uint16_t regAddr,uint16_t len,uint8_t * out)
+uint8_t modbusReadReg(uint16_t slavAddr,uint16_t regAddr,uint8_t cmd,uint16_t len,uint8_t * out)
 {
 		int i=0;
 	  out[i]=slavAddr;					 			i++;
-	  out[i]=READ;      					 		i++;
+	  out[i]=cmd;      					 		i++;
 	  out[i]=(uint8_t)(regAddr>>8);   i++;
 	  out[i]=(uint8_t) regAddr;       i++;
 		out[i]=(uint8_t)(len>>8);       i++;

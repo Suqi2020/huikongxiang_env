@@ -59,7 +59,7 @@ extern void rs485UartSend(uint8_t chanl,uint8_t *buf,int len);
 extern void uartMutexQueueCfg(void);
 extern rt_err_t uartDataRec(uartEnum uartNum,uint8_t dat);
 
-
+rt_bool_t errConfigCheck(void);
 
 
 

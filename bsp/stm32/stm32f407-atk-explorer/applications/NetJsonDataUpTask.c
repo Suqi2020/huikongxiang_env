@@ -179,10 +179,15 @@ void startTimeList()
 		modbusFlash[PRESSSETTL]. modbusRead=	&readPSTempHeight;//回调函数映射
 		modbusFlash[THREEAXIS].  modbusRead=	&readThreeTempAcc;//回调函数映射
 		modbusFlash[PARTDISCHAG].modbusRead=(void *)&readPartDischgWarning;//回调函数映射
-		modbusFlash[CH4].  modbusRead=	&readCH4;//回调函数映射
-		modbusFlash[O2].  modbusRead =	&readO2;//回调函数映射
-		modbusFlash[H2S].  modbusRead=	&readH2S;//回调函数映射
-		modbusFlash[CO].  modbusRead =	&readCO;//回调函数映射
+		modbusFlash[CH4]. modbusRead			 =	&readCH4;//回调函数映射
+		modbusFlash[O2].  modbusRead 			 =	&readO2;//回调函数映射
+		modbusFlash[H2S]. modbusRead			 =	&readH2S;//回调函数映射
+		modbusFlash[CO].  modbusRead 			 =	&readCO;//回调函数映射
+		modbusFlash[TEMPHUM].  modbusRead  =  &readTempHum;
+		modbusFlash[WATERLEVEL].modbusRead = 	&readWaterLevel;
+
+	
+	
 	  rt_thread_mdelay(2000);
 	
 	  for(int i=0;i<MODBUS_NUM;i++){

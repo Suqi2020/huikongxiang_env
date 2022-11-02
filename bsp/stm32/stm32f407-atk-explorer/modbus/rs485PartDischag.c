@@ -27,7 +27,7 @@ void readPdFreqDischarge()
 	  uint8_t offset=3;//add+regadd+len
 	  uint8_t  *buf = RT_NULL;
 		buf = rt_malloc(LENTH);
-	  uint16_t len = modbusReadReg(modbusFlash[PARTDISCHAG].slaveAddr,0x0300,18,buf);
+	  uint16_t len = modbusReadReg(modbusFlash[PARTDISCHAG].slaveAddr,0x0300,READ_03,18,buf);
 		rt_mutex_take(uartDev[modbusFlash[PARTDISCHAG].useUartNum].uartMutex,RT_WAITING_FOREVER);
 	  //485发送buf  len  等待modbus回应
 		partDischagUartSend(buf,len);

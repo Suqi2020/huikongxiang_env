@@ -47,7 +47,7 @@ void readCirCurrAndWaring()
 	  uint8_t  *buf = RT_NULL;
 		buf = rt_malloc(LENTH);
 	  //uint8_t   buf[100]
-	  uint16_t len = modbusReadReg(modbusFlash[CIRCULA].slaveAddr,0x0023,12,buf);
+	  uint16_t len = modbusReadReg(modbusFlash[CIRCULA].slaveAddr,0x0023,READ_03,12,buf);
 	  //485发送buf  len  等待modbus回应
 	  //recFlag = RT_TRUE;
 	  cirCurrUartSend(buf,len);
@@ -142,7 +142,7 @@ uint16_t readAcqInterv()
 	  uint8_t offset=3;//add+regadd+len
 	  uint8_t  *buf = RT_NULL;
 		buf = rt_malloc(LENTH);
-	  uint16_t len = modbusReadReg(modbusFlash[CIRCULA].slaveAddr,0x0004,1,buf);
+	  uint16_t len = modbusReadReg(modbusFlash[CIRCULA].slaveAddr,0x0004,READ_03,1,buf);
 	  uint16_t ret =0;
 		//recFlag = RT_TRUE;
 		rt_mutex_take(uartDev[modbusFlash[CIRCULA].useUartNum].uartMutex,RT_WAITING_FOREVER);
@@ -244,7 +244,7 @@ uint32_t readThresholdVal()
 	  uint8_t offset=3;//add+regadd+len
 	  uint8_t  *buf = RT_NULL;
 		buf = rt_malloc(LENTH);
-	  uint16_t len = modbusReadReg(modbusFlash[CIRCULA].slaveAddr,0x0009,4,buf);
+	  uint16_t len = modbusReadReg(modbusFlash[CIRCULA].slaveAddr,0x0009,READ_03,4,buf);
 	  uint32_t ret =0;		
 	  //recFlag = RT_TRUE;
 
@@ -346,7 +346,7 @@ uint16_t readPoint()
 	  uint8_t offset=3;//add+regadd+len
 	  uint8_t  *buf = RT_NULL;
 		buf = rt_malloc(LENTH);
-	  uint16_t len = modbusReadReg(modbusFlash[CIRCULA].slaveAddr,0x000B,1,buf);
+	  uint16_t len = modbusReadReg(modbusFlash[CIRCULA].slaveAddr,0x000B,READ_03,1,buf);
 	  uint16_t ret =0;
 	//	recFlag = RT_TRUE;
 		rt_mutex_take(uartDev[modbusFlash[CIRCULA].useUartNum].uartMutex,RT_WAITING_FOREVER);

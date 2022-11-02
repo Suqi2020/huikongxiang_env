@@ -973,6 +973,11 @@
               <FileType>1</FileType>
               <FilePath>.\modbus\rs485TempHum.c</FilePath>
             </File>
+            <File>
+              <FileName>digConv.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>.\modbus\digConv.c</FilePath>
+            </File>
           </Files>
         </Group>
         <Group>
