@@ -3,31 +3,22 @@ char name1[]="接地环流";
 char name2[]="局放";
 char name3[]="沉降仪";
 char name4[]="三轴测振仪";
-//? modbusName????? ?????UFT8??
-extern int enc_unicode_to_utf8_one(uint16_t unic, unsigned char *pOutput,  int outSize);  
-uint8_t changname[20];
+//与 modbusName的汉字相同 不过此处为UFT8格式
+
+//后期需要从flash中读取ID  需要给所有设备编号 
 void  devIDFlashRead()
 {
 	  //MODBUS_NUM
 	
 	
 	
-	  stm32_flash_read(FLASH_SAVE_ADDR,(uint8_t*)modbusFlash,sizeof(modbusFlash));
+	  stm32_flash_read(FLASH_SAVE_ADDR,(uint32_t*)modbusFlash,sizeof(modbusFlash));
 		rt_strcpy(mcu.devID  ,"1000000000001");
 		rt_strcpy(devi[CIRCULA].ID,"A000000000001");
 		rt_strcpy(devi[CIRCULA].model,"GY280");
 		rt_strcpy(devi[CIRCULA].type,"1");
 		rt_strcpy(devi[CIRCULA].name,name1);
-	
-	
-	 int ret=enc_unicode_to_utf8_one(0xbdd3, changname, 20);  
-		rt_kprintf("utf8 change test %d\n",ret);
-   for(int i=0;i<20;i++)
-	    rt_kprintf("%02x",changname[i]);
-		rt_kprintf("\n");
-	   for(int i=0;i<strlen(name1);i++)
-	    rt_kprintf("%02x",name1[i]);
-	rt_kprintf("\n");
+
 		rt_strcpy(devi[PARTDISCHAG].ID,"A000000000002");
 		rt_strcpy(devi[PARTDISCHAG].model,"GY281");
 		rt_strcpy(devi[PARTDISCHAG].type,"2");

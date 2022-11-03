@@ -6,6 +6,16 @@
 #include "dataPack.h"
 
 
+#define  SAME_DEV_NUM         40
+#define  STM32_FLASH_BASE     0x08000000//STM32 FLASH的起始地址
+#define  STM_FLASH_SIZE       0X00100000//总大小
+#define  USE_FLASH_SIZE       0X4000  // 开启10kflash存储
+
+
+#define  FLASH_IP_SAVE_ADDR  (STM32_FLASH_BASE+STM_FLASH_SIZE-USE_FLASH_SIZE)  
+#define  FLASH_SAVE_ADDR     (FLASH_IP_SAVE_ADDR+0X400)
+
+
 /////////////////////////////////////////////////////////////////////////////////////////////////////
 ////////////////////////////////////////串口设置需要修改此处/////////////////////////////////////////
 #define   UART_NUM        4//一共4路串口

@@ -80,8 +80,7 @@ void  w5500Task(void *parameter)
 	W5500_enum W5500State=W5500InitEnum;
   static uint8_t dhcpTick=0;
 	static uint8_t rstW5500Ct=0;
- STMFLASH_Read(FLASH_IP_SAVE_ADDR,(uint32_t*)&netIpFlash,sizeof(netIpFlash));
-	
+  stm32_flash_read(FLASH_IP_SAVE_ADDR,(uint8_t*)&netIpFlash,sizeof(netIpFlash));
   while(1) 														/*循环执行的函数*/ 
   {
 		switch(W5500State)

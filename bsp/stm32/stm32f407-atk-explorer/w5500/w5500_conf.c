@@ -313,7 +313,8 @@ static void net(int argc, char *argv[])
 				mac[5]=atoi16(argv[2],10);
 				netIpFlash.macaddr=mac[5];
 				rt_kprintf("%sfor macaddr OK\n",sign);
-				STMFLASH_Write(FLASH_IP_SAVE_ADDR,(uint32_t*)&netIpFlash,sizeof(netIpFlash));
+				stm32_flash_erase(FLASH_IP_SAVE_ADDR, sizeof(netIpFlash));
+				stm32_flash_write(FLASH_IP_SAVE_ADDR,(uint8_t*)&netIpFlash,sizeof(netIpFlash));
 		}
 		else 	if(0==rt_strcmp((char *)"localIp", argv[1])){
 				if(argc!=6){
@@ -325,7 +326,8 @@ static void net(int argc, char *argv[])
 				netIpFlash.localIp[3] =atoi16(argv[5],10);
 
 				rt_kprintf("%sfor localIp OK\n",sign);
-				STMFLASH_Write(FLASH_IP_SAVE_ADDR,(uint32_t*)&netIpFlash,sizeof(netIpFlash));
+				stm32_flash_erase(FLASH_IP_SAVE_ADDR, sizeof(netIpFlash));
+				stm32_flash_write(FLASH_IP_SAVE_ADDR,(uint8_t*)&netIpFlash,sizeof(netIpFlash));
 		}
 		else 	if(0==rt_strcmp((char *)"gateway", argv[1])){
 				if(argc!=6){
@@ -337,7 +339,8 @@ static void net(int argc, char *argv[])
 				netIpFlash.gateway[3] =atoi16(argv[5],10); 
 	
 				rt_kprintf("%sfor gateway OK\n",sign);
-				STMFLASH_Write(FLASH_IP_SAVE_ADDR,(uint32_t*)&netIpFlash,sizeof(netIpFlash));
+				stm32_flash_erase(FLASH_IP_SAVE_ADDR, sizeof(netIpFlash));
+				stm32_flash_write(FLASH_IP_SAVE_ADDR,(uint8_t*)&netIpFlash,sizeof(netIpFlash));
 		}
 		else 	if(0==rt_strcmp((char *)"remoteIp", argv[1])){
 				if(argc!=6){
@@ -349,7 +352,9 @@ static void net(int argc, char *argv[])
 				netIpFlash.remoteIp[3] =atoi16(argv[5],10);
 		
 				rt_kprintf("%sfor remoteIp OK\n",sign);
-				STMFLASH_Write(FLASH_IP_SAVE_ADDR,(uint32_t*)&netIpFlash,sizeof(netIpFlash));
+				stm32_flash_erase(FLASH_IP_SAVE_ADDR, sizeof(netIpFlash));
+				stm32_flash_write(FLASH_IP_SAVE_ADDR,(uint8_t*)&netIpFlash,sizeof(netIpFlash));
+				//STMFLASH_Write(FLASH_IP_SAVE_ADDR,(uint32_t*)&netIpFlash,sizeof(netIpFlash));
 		}
 		else 	if(0==rt_strcmp((char *)"remotePort", argv[1])){
 				if(argc!=3){
@@ -359,7 +364,9 @@ static void net(int argc, char *argv[])
 
 		
 				rt_kprintf("%sfor remotePort OK\n",sign);
-				STMFLASH_Write(FLASH_IP_SAVE_ADDR,(uint32_t*)&netIpFlash,sizeof(netIpFlash));
+				stm32_flash_erase(FLASH_IP_SAVE_ADDR, sizeof(netIpFlash));
+				stm32_flash_write(FLASH_IP_SAVE_ADDR,(uint8_t*)&netIpFlash,sizeof(netIpFlash));
+
 		}
 		
 		return;

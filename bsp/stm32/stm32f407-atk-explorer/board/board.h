@@ -15,6 +15,7 @@
 #include <stm32f4xx.h>
 #include "drv_common.h"
 #include "drv_gpio.h"
+#include "drv_flash.h"
 #include "test_hardware.h"
 #include "main.h"
 //#include "W5500p.h"	
@@ -33,10 +34,11 @@
 #include "rs485Circula.h"
 #include "rs485PartDischag.h"
 #include "uartReconf.h"
-#include "stmflash.h"
+//#include "stmflash.h"
 #include "rs485Gas.h"
 #include "rs485WaterLev.h"
 #include "rs485TempHum.h"
+
 
 extern UART_HandleTypeDef huart4;
 extern UART_HandleTypeDef huart5;

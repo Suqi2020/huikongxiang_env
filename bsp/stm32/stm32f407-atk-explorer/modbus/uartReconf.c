@@ -311,7 +311,8 @@ static void modbus(int argc, char *argv[])
 												else
 													 	modbusFlash[i].workFlag	  =RT_FALSE;//停用当前设备
 										}
-										STMFLASH_Write(FLASH_SAVE_ADDR,(uint32_t*)modbusFlash,sizeof(modbusFlash));
+										stm32_flash_erase(FLASH_SAVE_ADDR, sizeof(modbusFlash));
+										stm32_flash_write(FLASH_SAVE_ADDR,(uint8_t*)modbusFlash,sizeof(modbusFlash));
 										//写入flash中
 										modbusWorkErrCheck();//errConfigCheck();
 										modbusPrintRead();
