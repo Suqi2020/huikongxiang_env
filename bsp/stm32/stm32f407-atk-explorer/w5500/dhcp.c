@@ -17,7 +17,7 @@
 #include "dhcp.h"
 #include "utility.h"
 #include "w5500_conf.h"
-#include "rtthread.h"
+#include "board.h"
 //#define DHCP_DEBUG
 const static char sign[]="[dhcp]";
 DHCP_Get DHCP_GET;
@@ -809,8 +809,8 @@ int  do_dhcp(void)
 		  dhcp_ok=1;                  
 			set_w5500_ip();                                /*将获取到的IP地址写入W5500寄存器*/ 
 					rt_kprintf("%s 已从DHCP服务器成功获得IP地址\r\n",sign);
-			rt_kprintf("%sW5500 服务器IP:%d.%d.%d.%d\r\n",sign,netIpFlash.remoteIp[0],netIpFlash.remoteIp[1],netIpFlash.remoteIp[2],netIpFlash.remoteIp[3]);
-			rt_kprintf("%sW5500 监听端口:%d \r\n",sign,netIpFlash.remotePort);
+			rt_kprintf("%sW5500 服务器IP:%d.%d.%d.%d\r\n",sign,packFLash.netIpFlash.remoteIp[0],packFLash.netIpFlash.remoteIp[1],packFLash.netIpFlash.remoteIp[2],packFLash.netIpFlash.remoteIp[3]);
+			rt_kprintf("%sW5500 监听端口:%d \r\n",sign,packFLash.netIpFlash.remotePort);
       return RT_TRUE;
 //	    break;
 		

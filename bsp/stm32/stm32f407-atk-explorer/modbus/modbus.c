@@ -111,7 +111,61 @@ int  modbusRespCheck(uint16_t slavAddr,uint8_t *buf,uint16_t len,rt_bool_t readF
 }
 
 
+#define   LENTH          200
+extern uartConfStru  uartDev[UART_NUM];
+void modbusCommRead(uartEnum uartNum,uint8_t cmd,uint16_t slavAddr,uint16_t regAddr,uint16_t reglen)
+{
+	  uint8_t offset=3;//add+regadd+len
+	  uint8_t  *buf = RT_NULL;
+		buf = rt_malloc(LENTH);
+	  //uint16_t len = psReadReg(modbusFlash[THREEAXIS].slaveAddr,0X0001,4,buf);
+	  uint16_t len=modbusReadReg( slavAddr, regAddr, cmd, reglen,buf);
+		rt_mutex_take(uartDev[uartNum].uartMutex,RT_WAITING_FOREVER);
+	  //485发送buf  len  等待modbus回应
+	
+	  rs485UartSend(uartNum,buf,len);
+	  rt_kprintf("%sthreeAxis send:",sign);
+		for(int j=0;j<len;j++){
+				rt_kprintf("%x ",buf[j]);
+		}
+		rt_kprintf("\n");
+    len=0;
+		memset(buf,0,LENTH);
+		if(rt_mq_recv(uartDev[uartNum].uartMessque, buf+len, 1, 3000) == RT_EOK){//第一次接收时间放长点  相应时间有可能比较久
+				len++;
+		}
+		while(rt_mq_recv(uartDev[uartNum].uartMessque, buf+len, 1, 10) == RT_EOK){//115200 波特率1ms 10个数据
+				len++;
+		}
+		if(len!=0){
+				rt_kprintf("%srec:",sign);
+				for(int j=0;j<len;j++){
+						rt_kprintf("%x ",buf[j]);
+				}
+				rt_kprintf("\n");
+		}
+//		uartDev[uartNum].offline=RT_FALSE;
+		//提取环流值 第一步判断crc 第二部提取
+		int ret2=modbusRespCheck(slavAddr,buf,len,RT_TRUE);
+		if(0 ==  ret2){//刷新读取到的值
+         rt_kprintf("%sread ok 有效数据为\n",sign);//
+			
+			   for(int k=3;k<reglen*2;k++)//偏移3 有效数据长度为 reglen*2
+			     rt_kprintf("%x ",buf[k]);
+			   rt_kprintf("\n");
+		} 
+		else{//读不到给0
+				if(ret2==2){
+//					  uartDev[uartNumm].offline=RT_TRUE;
+				}
 
+			  rt_kprintf("%sread fail\n",sign);
+		}
+	  rt_mutex_release(uartDev[uartNum].uartMutex);
+		rt_free(buf);
+	  buf=RT_NULL;
+
+}
 
 
 

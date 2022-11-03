@@ -10,16 +10,7 @@
 //		rt_kprintf("%s[net gateway 192 168 10 1]\n");
 //		rt_kprintf("%s[net remoteIp 192 168 1 100]\n");
 //		rt_kprintf("%s[net remotePort 8080]\n");
-typedef struct{
-		
-	  uint8_t  localIp[4];
-	  uint8_t  gateway[4];
-	  uint8_t  remoteIp[4];
-    uint16_t   remotePort; 
-	  uint8_t  macaddr;
-	  uint8_t  rev;
-}netIpFlashStru;
-extern  netIpFlashStru netIpFlash;
+
 typedef  void (*pFunction)(void);
 
 extern uint8    remote_ip[4];                            	  /* ‘∂∂ÀIPµÿ÷∑                   */

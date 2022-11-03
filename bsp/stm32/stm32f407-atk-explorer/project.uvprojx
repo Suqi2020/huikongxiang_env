@@ -929,11 +929,6 @@
               <FilePath>modbus\modbus.c</FilePath>
             </File>
             <File>
-              <FileName>stm32Flash.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>modbus\stm32Flash.c</FilePath>
-            </File>
-            <File>
               <FileName>uartReconf.c</FileName>
               <FileType>1</FileType>
               <FilePath>modbus\uartReconf.c</FilePath>
@@ -944,39 +939,14 @@
               <FilePath>modbus\crc.c</FilePath>
             </File>
             <File>
-              <FileName>rs485CH4.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>.\modbus\rs485CH4.c</FilePath>
-            </File>
-            <File>
-              <FileName>rs485CO.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>.\modbus\rs485CO.c</FilePath>
-            </File>
-            <File>
-              <FileName>rs485H2S.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>.\modbus\rs485H2S.c</FilePath>
-            </File>
-            <File>
-              <FileName>rs485O2.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>.\modbus\rs485O2.c</FilePath>
-            </File>
-            <File>
-              <FileName>rs485WaterLev.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>.\modbus\rs485WaterLev.c</FilePath>
-            </File>
-            <File>
-              <FileName>rs485TempHum.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>.\modbus\rs485TempHum.c</FilePath>
-            </File>
-            <File>
               <FileName>digConv.c</FileName>
               <FileType>1</FileType>
               <FilePath>.\modbus\digConv.c</FilePath>
+            </File>
+            <File>
+              <FileName>flashSave.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>.\modbus\flashSave.c</FilePath>
             </File>
           </Files>
         </Group>
@@ -1007,11 +977,6 @@
               <FileName>w5500_conf.c</FileName>
               <FileType>1</FileType>
               <FilePath>w5500\w5500_conf.c</FilePath>
-            </File>
-            <File>
-              <FileName>tcp_demo.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>w5500\tcp_demo.c</FilePath>
             </File>
             <File>
               <FileName>socket.c</FileName>

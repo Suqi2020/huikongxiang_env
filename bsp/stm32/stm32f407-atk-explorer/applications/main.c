@@ -80,7 +80,8 @@
 //         CO默认气体是4  为了方便打包把气体数据打包在一起    20221101
 //V0.34    加入温湿度和水位读取 每个传感器只支持一种       20221102  
 //V0.35    更改flash读写 调用drv_falsh_f4.c库函数          20221103
-#define APP_VER       ((0<<8)+35)//0x0105 表示1.5版本
+//V0.36    更改modbus读取为通用傻瓜式读取 mcu不介入具体数字含义  20221103
+#define APP_VER       ((0<<8)+36)//0x0105 表示1.5版本
 const char date[]="20221103";
 
 static    rt_thread_t tid 	= RT_NULL;
@@ -133,8 +134,6 @@ static void timeout1(void *parameter)
 			  if(alarmTick>=100){
 						alarmTick=100;// 1 2 3 最终10秒提醒一次
 				}
-				modbusWorkErrCheck();//modbus 错误工作状态打印
-				errConfigCheck();//	modbusWorkErrCheck();//errConfigCheck();
 				//modbusPrintRead();
 				if(gbNetState ==RT_FALSE){
 						rt_kprintf("%sERR:网络故障\n",sign);
@@ -160,6 +159,8 @@ int main(void)
 
 //		rt_kprintf("%s\n",tet);
     rt_kprintf("\n%s%s  ver=%02d.%02d\n",sign,date,(uint8_t)(APP_VER>>8),(uint8_t)APP_VER);
+		stm32_flash_read(FLASH_IP_SAVE_ADDR,    (uint8_t*)&packFLash,   sizeof(packFLash));
+		stm32_flash_read(FLASH_MODBUS_SAVE_ADDR,(uint8_t*)modbusDevSave,sizeof(modbusDevSave));
 	  rt_err_t result;
 //	  extern void  flashTest();
 //	  flashTest();

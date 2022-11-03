@@ -17,7 +17,7 @@ extern void  	readThreeTempAcc(void);
 extern void		t3AxisTempAccPack(void);
 extern void 	devIDFlashRead(void);
 extern void 	cirCurrConf(void);
-#define TIM_NUM  MODBUS_NUM+2 //目前支持6路定时器  
+#define TIM_NUM  2 //目前支持6路定时器  
 typedef struct 
 {
 		uint16_t count;     //计数
@@ -107,66 +107,7 @@ static void  timeOutRunFun()
 				else
 						timeStop(REG_TIME);
 				rt_kprintf("%sreg timer out\r\n",task);
-				break;
-			case CIRCULA_TIME://读取环流
-			  readCirCurrAndWaring();
-			  if(cirCurrWaringcheck()==RT_TRUE){//先发报警状态 再发数据
-						cirCurrWaringEventPack();
-					  rt_thread_mdelay(1000);//延时1秒再发下一包
-				}
-				cirCulaDataPack();
-				rt_mb_send_wait(&mbNetSendData, (rt_ubase_t)&packBuf,RT_WAITING_FOREVER);
-				rt_kprintf("%sCIRCULA_TIME out\r\n",task);
-				break;
-			case PARTDISCHAG_TIME://读取局放
-        readPdFreqDischarge();
-			  if(readPartDischgWarning()==RT_TRUE){
-						partDisWaringEventPack();
-					  rt_mb_send_wait(&mbNetSendData, (rt_ubase_t)&packBuf,RT_WAITING_FOREVER);
-					  rt_thread_mdelay(1000);//延时1秒再发下一包
-						rt_kprintf("\r\n");
-				}
-				partDisDataPack();
-				rt_mb_send_wait(&mbNetSendData, (rt_ubase_t)&packBuf,RT_WAITING_FOREVER);
-				rt_kprintf("%sPARTDISCHAG_TIME out\r\n",task);
-				break;
-			case PRESSSETTL_TIME:
-//				rt_kprintf("timer 4 in\r\n");
-//				w5500_16KDataTest();
-//			  rt_kprintf("timer 4 in2\r\n");
-//			  extern void netSend(uint8_t *data,int len);
-//			  netSend(packBuf,TX_RX_MAX_BUF_SIZE);
-				readPSTempHeight();
-				PSTempHeightPack();
-				rt_mb_send_wait(&mbNetSendData, (rt_ubase_t)&packBuf,RT_WAITING_FOREVER);
-				rt_kprintf("%sPRESSSETTL_TIMEout\r\n",task);
-				break;
-			case THREEAXIS_TIME:
-				readThreeTempAcc();
-				t3AxisTempAccPack();
-				rt_mb_send_wait(&mbNetSendData, (rt_ubase_t)&packBuf,RT_WAITING_FOREVER);
-				rt_kprintf("%sTHREEAXIS_TIMEout\r\n",task);
-				break;
-			case  CH4_TIME:
-				break;
-			case  O2_TIME:
-				break;
-			case  H2S_TIME:
-				break;
-			case  CO_TIME://4种气体在一起读取 所以前三个不使用 只在此处读取并打包发送  关闭时候只需要关闭CO就可以把所有气体全部关闭
-			if(modbusFlash[CH4].workFlag==RT_TRUE)	
-				readCH4();
-			if(modbusFlash[CO].workFlag ==RT_TRUE)	
-				readCO();
-			if(modbusFlash[H2S].workFlag==RT_TRUE)	
-				readH2S();
-			if(modbusFlash[O2].workFlag ==RT_TRUE)	
-				readO2();
-			  rt_kprintf("%sCO_TIME out\r\n",task);
-				break;
-			case  TEMPHUM_TIME:
-				break;
-			case  WATERLEVEL_TIME:
+
 				break;
 			default:
 				break;
@@ -175,34 +116,6 @@ static void  timeOutRunFun()
 //启动定时器列表
 void startTimeList()
 {
-		modbusFlash[CIRCULA].    modbusRead=	&cirCurrConf;//回调函数映射
-		modbusFlash[PRESSSETTL]. modbusRead=	&readPSTempHeight;//回调函数映射
-		modbusFlash[THREEAXIS].  modbusRead=	&readThreeTempAcc;//回调函数映射
-		modbusFlash[PARTDISCHAG].modbusRead=(void *)&readPartDischgWarning;//回调函数映射
-		modbusFlash[CH4]. modbusRead			 =	&readCH4;//回调函数映射
-		modbusFlash[O2].  modbusRead 			 =	&readO2;//回调函数映射
-		modbusFlash[H2S]. modbusRead			 =	&readH2S;//回调函数映射
-		modbusFlash[CO].  modbusRead 			 =	&readCO;//回调函数映射
-		modbusFlash[TEMPHUM].  modbusRead  =  &readTempHum;
-		modbusFlash[WATERLEVEL].modbusRead = 	&readWaterLevel;
-
-	
-	
-	  rt_thread_mdelay(2000);
-	
-	  for(int i=0;i<MODBUS_NUM;i++){
-				if(modbusFlash[i].workFlag==RT_TRUE){
-						modbusFlash[i].modbusRead();
-					  rt_thread_mdelay(100);
-						timeInit(i,modbusFlash[i].colTime,10+i*2);//读取环流
-					  //rt_kprintf("time start %s",modbusName[i]);
-				}
-				else{
-					 timeStop(i);//停止
-					 //rt_kprintf("stop %s",modbusName[i]);
-				}
-		}
-
 		timeInit(HEART_TIME, 120,2);//心跳定时  定时30秒 第一次28秒就来
 		timeInit(REG_TIME, 5,0);//注册 注册成功后定时器就关闭
 }
@@ -214,17 +127,22 @@ void   upKeepStateTask(void *para)
 		extern void modbusPrintRead();
 		extern void uartReconfig();
 		extern void uartIrqEnaAfterQueue();
+	  extern void  printfWorkModbus();
+	  extern void  modbusReadData(int count);
+	  int count;
 	  uartMutexQueueCfg();//根据flash存储重新配置串口
-	  devIDFlashRead();//必须放到uartMutexQueueCfg后边 配置chanl各项参数后才能使用
-		modbusPrintRead();//modbus配置从flash中读取
+	  //devIDFlashRead();//必须放到uartMutexQueueCfg后边 配置chanl各项参数后才能使用
+		//modbusPrintRead();//modbus配置从flash中读取
 	  uartReconfig();//串口重新配置
 		uartIrqEnaAfterQueue();//串口中断中用到了队列  开启中断需要放到后边
     startTimeList();//开启计时器列表
-	
+	  printfWorkModbus();
 		while(1){
 
 				timeOutRunFun();
 				timeInc();
+			  count++;
+			  modbusReadData( count);
 				rt_thread_mdelay(1000);
 		}
 }
