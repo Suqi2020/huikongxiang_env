@@ -113,8 +113,9 @@ int  modbusRespCheck(uint16_t slavAddr,uint8_t *buf,uint16_t len,rt_bool_t readF
 
 #define   LENTH          200
 extern uartConfStru  uartDev[UART_NUM];
-void modbusCommRead(uartEnum uartNum,uint8_t cmd,uint16_t slavAddr,uint16_t regAddr,uint16_t reglen)
+rt_bool_t modbusCommRead(uartEnum uartNum,uint8_t cmd,uint16_t slavAddr,uint16_t regAddr,uint16_t reglen)
 {
+	  rt_bool_t ret=RT_TRUE;
 	  uint8_t offset=3;//add+regadd+len
 	  uint8_t  *buf = RT_NULL;
 		buf = rt_malloc(LENTH);
@@ -124,9 +125,9 @@ void modbusCommRead(uartEnum uartNum,uint8_t cmd,uint16_t slavAddr,uint16_t regA
 	  //485发送buf  len  等待modbus回应
 	
 	  rs485UartSend(uartNum,buf,len);
-	  rt_kprintf("%sthreeAxis send:",sign);
+	  rt_kprintf("%s send[port%d]:",sign,uartNum+1);
 		for(int j=0;j<len;j++){
-				rt_kprintf("%x ",buf[j]);
+				rt_kprintf("%02x ",buf[j]);
 		}
 		rt_kprintf("\n");
     len=0;
@@ -140,7 +141,7 @@ void modbusCommRead(uartEnum uartNum,uint8_t cmd,uint16_t slavAddr,uint16_t regA
 		if(len!=0){
 				rt_kprintf("%srec:",sign);
 				for(int j=0;j<len;j++){
-						rt_kprintf("%x ",buf[j]);
+						rt_kprintf("%02x ",buf[j]);
 				}
 				rt_kprintf("\n");
 		}
@@ -148,23 +149,23 @@ void modbusCommRead(uartEnum uartNum,uint8_t cmd,uint16_t slavAddr,uint16_t regA
 		//提取环流值 第一步判断crc 第二部提取
 		int ret2=modbusRespCheck(slavAddr,buf,len,RT_TRUE);
 		if(0 ==  ret2){//刷新读取到的值
-         rt_kprintf("%sread ok 有效数据为\n",sign);//
+			rt_kprintf("%sread ok valid data:",sign);//
 			
-			   for(int k=3;k<reglen*2;k++)//偏移3 有效数据长度为 reglen*2
-			     rt_kprintf("%x ",buf[k]);
+			   for(int k=0;k<reglen*2;k++)//偏移3 有效数据长度为 reglen*2
+						rt_kprintf("%02x ",buf[k+3]);
 			   rt_kprintf("\n");
 		} 
 		else{//读不到给0
 				if(ret2==2){
 //					  uartDev[uartNumm].offline=RT_TRUE;
 				}
-
+        ret=RT_FALSE;
 			  rt_kprintf("%sread fail\n",sign);
 		}
 	  rt_mutex_release(uartDev[uartNum].uartMutex);
 		rt_free(buf);
 	  buf=RT_NULL;
-
+    return ret;
 }
 
 

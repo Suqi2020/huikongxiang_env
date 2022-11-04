@@ -899,31 +899,6 @@
           <GroupName>Modbus</GroupName>
           <Files>
             <File>
-              <FileName>rs485ThreeAxis.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>modbus\rs485ThreeAxis.c</FilePath>
-            </File>
-            <File>
-              <FileName>rs485Circula.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>modbus\rs485Circula.c</FilePath>
-            </File>
-            <File>
-              <FileName>rs485PartDischag.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>modbus\rs485PartDischag.c</FilePath>
-            </File>
-            <File>
-              <FileName>rs485PressSettl.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>modbus\rs485PressSettl.c</FilePath>
-            </File>
-            <File>
-              <FileName>devNameUtf8.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>modbus\devNameUtf8.c</FilePath>
-            </File>
-            <File>
               <FileName>modbus.c</FileName>
               <FileType>1</FileType>
               <FilePath>modbus\modbus.c</FilePath>

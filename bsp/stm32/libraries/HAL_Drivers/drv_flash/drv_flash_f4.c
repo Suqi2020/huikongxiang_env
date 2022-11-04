@@ -340,7 +340,7 @@ int stm32_flash_erase(rt_uint32_t addr, size_t size)
     EraseInitStruct.VoltageRange  = FLASH_VOLTAGE_RANGE_3;
     EraseInitStruct.Sector        = FirstSector;
     EraseInitStruct.NbSectors     = NbOfSectors;
-
+    //rt_kprintf("erase first %d total %d\n",FirstSector,NbOfSectors);
     if (HAL_FLASHEx_Erase(&EraseInitStruct, (uint32_t *)&SECTORError) != HAL_OK)
     {
         result = -RT_ERROR;

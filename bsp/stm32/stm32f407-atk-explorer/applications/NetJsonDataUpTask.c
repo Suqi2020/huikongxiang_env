@@ -124,11 +124,13 @@ void startTimeList()
 //上行数据的维护以及重发
 void   upKeepStateTask(void *para)
 {
-		extern void modbusPrintRead();
-		extern void uartReconfig();
-		extern void uartIrqEnaAfterQueue();
+		extern void  modbusPrintRead();
+		extern void  uartReconfig();
+		extern void  uartIrqEnaAfterQueue();
 	  extern void  printfWorkModbus();
 	  extern void  modbusReadData(int count);
+	  extern void  modbusDevErrCheck();
+    extern void  clearUartData();
 	  int count;
 	  uartMutexQueueCfg();//根据flash存储重新配置串口
 	  //devIDFlashRead();//必须放到uartMutexQueueCfg后边 配置chanl各项参数后才能使用
@@ -137,13 +139,23 @@ void   upKeepStateTask(void *para)
 		uartIrqEnaAfterQueue();//串口中断中用到了队列  开启中断需要放到后边
     startTimeList();//开启计时器列表
 	  printfWorkModbus();
+	  modbusDevErrCheck();
+	  clearUartData();
+	  uint8_t test[]="test\n";
 		while(1){
 
 				timeOutRunFun();
 				timeInc();
 			  count++;
 			  modbusReadData( count);
+			
+//			rs485UartSend(0,test,sizeof(test)-1);
+//			rs485UartSend(1,test,sizeof(test)-1);
+//			rs485UartSend(2,test,sizeof(test)-1);
+//			rs485UartSend(3,test,sizeof(test)-1);
+
 				rt_thread_mdelay(1000);
+//			rt_kprintf("%ssend ok\r\n",task);
 		}
 }
 

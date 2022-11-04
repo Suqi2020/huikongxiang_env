@@ -81,6 +81,9 @@
 //V0.34    加入温湿度和水位读取 每个传感器只支持一种       20221102  
 //V0.35    更改flash读写 调用drv_falsh_f4.c库函数          20221103
 //V0.36    更改modbus读取为通用傻瓜式读取 mcu不介入具体数字含义  20221103
+//V0.36    加入错误检测 devid重复 检查挂在同一个串口下边的modbus设备有同样的设备地址  
+//         上电打印modbus配置过的设备      
+//          开启128kflash空间来存储配置modbus设备(擦除最小单位是128K) 目前最大支持200个       20221104
 #define APP_VER       ((0<<8)+36)//0x0105 表示1.5版本
 const char date[]="20221103";
 
@@ -112,14 +115,14 @@ const static char sign[]="[main]";
 static rt_timer_t timer1;
 
 //static int cnt = 0;
-/* 定时器1超时函数 */
-//10秒提醒一次 uart offline状态
+/* 定时器1超时函数   100ms基准*/
+
 static void timeout1(void *parameter)
 {
 		static int count=0;
 	  static int alarmTick=10;
 		extern rt_bool_t gbNetState;
-	  extern void modbusWorkErrCheck(void);
+	  void printfNorespModbus(char *sign);
 	  count++;
 	  
 		if(gbNetState==RT_TRUE){
@@ -130,11 +133,11 @@ static void timeout1(void *parameter)
 		else
 				HAL_GPIO_TogglePin(LED_GPIO_Port, LED_Pin);
 		if(count%alarmTick==0){
-			  alarmTick+=20;
-			  if(alarmTick>=100){
-						alarmTick=100;// 1 2 3 最终10秒提醒一次
+			  alarmTick+=200;
+			  if(alarmTick>=600){
+						alarmTick=600;// 1 2 3 最终10秒提醒一次
 				}
-				//modbusPrintRead();
+			  printfNorespModbus((char *)sign);
 				if(gbNetState ==RT_FALSE){
 						rt_kprintf("%sERR:网络故障\n",sign);
 				}
@@ -200,23 +203,23 @@ int main(void)
 		
 
 ////////////////////////////////任务////////////////////////////////////
-    tid =  rt_thread_create("w5500",w5500Task,RT_NULL,1024,2, 10 );
-		if(tid!=NULL){
-				rt_thread_startup(tid);													 
-				rt_kprintf("%sRTcreat w5500Task task\r\n",sign);
-		}
-		tid =  rt_thread_create("netRec",netDataRecTask,RT_NULL,1024,2, 10 );
-		if(tid!=NULL){
-				rt_thread_startup(tid);													 
-				rt_kprintf("%sRTcreat netDataRecTask \r\n",sign);
-		}
-		tid =  rt_thread_create("netSend",netDataSendTask,RT_NULL,1024,2, 10 );
-		if(tid!=NULL){
-				rt_thread_startup(tid);													 
-				rt_kprintf("%sRTcreat netDataSendTask \r\n",sign);
-		}
+//    tid =  rt_thread_create("w5500",w5500Task,RT_NULL,1024,2, 10 );
+//		if(tid!=NULL){
+//				rt_thread_startup(tid);													 
+//				rt_kprintf("%sRTcreat w5500Task task\r\n",sign);
+//		}
+//		tid =  rt_thread_create("netRec",netDataRecTask,RT_NULL,1024,2, 10 );
+//		if(tid!=NULL){
+//				rt_thread_startup(tid);													 
+//				rt_kprintf("%sRTcreat netDataRecTask \r\n",sign);
+//		}
+//		tid =  rt_thread_create("netSend",netDataSendTask,RT_NULL,1024,2, 10 );
+//		if(tid!=NULL){
+//				rt_thread_startup(tid);													 
+//				rt_kprintf("%sRTcreat netDataSendTask \r\n",sign);
+//		}
 
-		
+//		
 		tid =  rt_thread_create("upKeep",upKeepStateTask,RT_NULL,1024,2, 10 );
 		if(tid!=NULL){
 				rt_thread_startup(tid);													 

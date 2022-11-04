@@ -56,12 +56,13 @@ void uartReconfig()
 				}
 		}
 		for(int i=0;i<UART_NUM;i++){
-				rt_kprintf("%sport%d bps[%d]\n",sign,i+1,packFLash.port[i].bps);
+				rt_kprintf("%sport%d bps[%d] calTime[%d]\n",sign,i+1,packFLash.port[i].bps,packFLash.port[i].calTime);
 		}
-		MX_UART4_Init(packFLash.port[0].bps);
-		MX_USART2_UART_Init(packFLash.port[1].bps);
-		MX_USART3_UART_Init(packFLash.port[2].bps);
-		MX_USART6_UART_Init(packFLash.port[3].bps);
+		
+		MX_USART2_UART_Init(packFLash.port[0].bps);
+		MX_USART3_UART_Init(packFLash.port[1].bps);
+		MX_USART6_UART_Init(packFLash.port[2].bps);
+		MX_UART4_Init(packFLash.port[3].bps);	
 	  rt_kprintf("%sUART re config\n",sign);
 
 }
@@ -138,3 +139,12 @@ void rs485UartSend(uint8_t chanl,uint8_t *buf,int len)
 		}
 }
 
+//滤除没有正式接收数据前  杂乱数据的干扰
+void clearUartData()
+{
+	  uint8_t dat;
+	  for(int i=0;i<UART_NUM;i++){
+			while(rt_mq_recv(uartDev[i].uartMessque,&dat, 1, 1000) == RT_EOK){//115200 波特率1ms 10个数据
+			}
+		}
+}

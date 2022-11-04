@@ -4,19 +4,19 @@
 
 #include  "board.h"
 
-#define  DEV_NUM         100   //最大支持100个传感器
+#define  DEV_NUM         200   //最大支持200个传感器
 
-#define  STM32_FLASH_BASE     0x08000000//STM32 FLASH的起始地址
-#define  STM_FLASH_SIZE       0X00100000//总大小
-#define  USE_FLASH_SIZE       0X4000  // 开启10kflash存储
-
-#define  FLASH_IP_SAVE_ADDR  (STM32_FLASH_BASE+STM_FLASH_SIZE-USE_FLASH_SIZE)  
+//#define  STM32_FLASH_BASE     0x08000000//STM32 FLASH的起始地址
+//#define  STM_FLASH_SIZE       0X00100000//总大小
+//#define  USE_FLASH_SIZE       0X4000  // 开启10kflash存储
+#define  ADDR_FLASH_SECTOR_11       ((uint32_t)0x080E0000) /* Base @ of Sector 11, 128 Kbytes */
+#define  FLASH_IP_SAVE_ADDR    			 ADDR_FLASH_SECTOR_11  //最后一个扇区 128K字节 (STM32_FLASH_BASE+STM_FLASH_SIZE-USE_FLASH_SIZE)  
 #define  FLASH_MODBUS_SAVE_ADDR     (FLASH_IP_SAVE_ADDR+0X400)
 //#define  FLASH_SAVE_ADDR     (FLASH_IP_SAVE_ADDR+0X400)
 //////////////////////////////////////////////
 //需要保存到flash的数据
 typedef struct{
-		char  devID[16];
+		char  devID[20];
 	  char  model[8];
 		char  name[20];
 	
@@ -27,7 +27,7 @@ typedef struct{
 	  uint16_t regAddr;
 	  uint16_t regLen;
 }modbusDevSaveStru;
-extern modbusDevSaveStru  modbusDevSave[DEV_NUM];
+extern modbusDevSaveStru  modbusDevSave[DEV_NUM];//66*200 =12k
 
 typedef enum{
 		USE_UART2=0,
