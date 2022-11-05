@@ -100,7 +100,7 @@ static void  timeOutRunFun()
 				break;
 			case REG_TIME://注册 注册成功后定时器就关闭
 			  if(gbRegFlag==RT_FALSE){
-					  devRegPack();//devRegJsonPack();
+					  devRegJsonPack();//devRegPack();//devRegJsonPack();
 						rt_mb_send_wait(&mbNetSendData, (rt_ubase_t)&packBuf,RT_WAITING_FOREVER); 
 					  timeStop(REG_TIME);//正式使用时候需要去掉
 				}
@@ -149,11 +149,6 @@ void   upKeepStateTask(void *para)
 			  count++;
 			  modbusReadData( count);
 			
-//			rs485UartSend(0,test,sizeof(test)-1);
-//			rs485UartSend(1,test,sizeof(test)-1);
-//			rs485UartSend(2,test,sizeof(test)-1);
-//			rs485UartSend(3,test,sizeof(test)-1);
-
 				rt_thread_mdelay(1000);
 //			rt_kprintf("%ssend ok\r\n",task);
 		}

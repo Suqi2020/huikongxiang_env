@@ -37,7 +37,7 @@ typedef  struct
 }rs485ParaStru;
 
 extern uint8_t packBuf[TX_RX_MAX_BUF_SIZE];
-extern  rs485ParaStru devi[];
+//extern  rs485ParaStru devi[];
 extern  uint32_t  utcTime(void);
 extern  uint32_t upMessIdAdd(void);
 /**************************/

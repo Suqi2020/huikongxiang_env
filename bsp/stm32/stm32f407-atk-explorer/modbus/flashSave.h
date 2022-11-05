@@ -55,8 +55,8 @@ typedef struct{
 typedef struct{
 		uint32_t bps;
     uint16_t calTime;	
-
-	  uint8_t rev[2];
+    uint8_t  delayTime;//100ms的整数倍  端口下边挂载的传感器采集间隔时间  局放2秒
+	  uint8_t rev;
 }uartSaveStru;
 extern uartSaveStru  port[UART_NUM];
 
@@ -65,7 +65,7 @@ typedef struct{
 	  uint8_t  localIp[4];
 	  uint8_t  gateway[4];
 	  uint8_t  remoteIp[4];
-    uint16_t   remotePort; 
+    uint16_t remotePort; 
 	  uint8_t  macaddr;
 	  uint8_t  rev;
 }netIpFlashStru;

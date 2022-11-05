@@ -83,9 +83,10 @@ static void net(int argc, char *argv[])
 
 }
 MSH_CMD_EXPORT(net,ip port config);//FINSH_FUNCTION_EXPORT_CMD
-
+static const uint8_t portStr[UART_NUM][6]={"port1","port2","port3","port4"};
 static void uart(int argc, char *argv[])
 {
+	  
 		if(argc==1){
 				goto ERR;
 		}
@@ -99,47 +100,59 @@ static void uart(int argc, char *argv[])
 			else
 				goto ERR;
 		}
-		if(0==rt_strcmp((char *)"port1", argv[1])){
-				if(argc!=4){
-					goto ERR;
+		for(int i=0;i<UART_NUM;i++){
+				if(0==rt_strcmp((char *)portStr[i], argv[1])){
+						if(argc!=5){
+							goto ERR;
+						}
+						packFLash.port[i].bps     =atoi32(argv[2],10);
+						packFLash.port[i].calTime =atoi32(argv[3],10);
+						packFLash.port[i].delayTime=atoi32(argv[4],10);
+						MX_USART2_UART_Init(packFLash.port[i].bps);
+						rt_kprintf("%sport1 config\n",sign);
 				}
-				packFLash.port[0].bps     =atoi32(argv[2],10);
-				packFLash.port[0].calTime =atoi32(argv[3],10);
-				MX_USART2_UART_Init(packFLash.port[0].bps);
-				rt_kprintf("%sport1 config\n",sign);
 		}
-		else if(0==rt_strcmp((char *)"port2", argv[1])){
-				if(argc!=4){
-					goto ERR;
-				}
-				packFLash.port[1].bps     =atoi32(argv[2],10);
-				packFLash.port[1].calTime =atoi32(argv[3],10);
-				MX_USART3_UART_Init(packFLash.port[1].bps);
-				rt_kprintf("%sport2 config\n",sign);
-		}
-		else if(0==rt_strcmp((char *)"port3", argv[1])){
-				if(argc!=4){
-					goto ERR;
-				}
-				packFLash.port[2].bps     =atoi32(argv[2],10);
-				packFLash.port[2].calTime =atoi32(argv[3],10);
-				MX_USART6_UART_Init(packFLash.port[2].bps);
-				rt_kprintf("%sport3 config\n",sign);
-		}
-		else if(0==rt_strcmp((char *)"port4", argv[1])){
-				if(argc!=4){
-					goto ERR;
-				}
-				packFLash.port[3].bps     =atoi32(argv[2],10);
-				packFLash.port[3].calTime =atoi32(argv[3],10);
-				MX_UART4_Init(packFLash.port[3].bps);	
-				rt_kprintf("%sport4 config\n",sign);
-		}
+//		if(0==rt_strcmp((char *)"port1", argv[1])){
+//				if(argc!=4){
+//					goto ERR;
+//				}
+//				packFLash.port[0].bps     =atoi32(argv[2],10);
+//				packFLash.port[0].calTime =atoi32(argv[3],10);
+//				MX_USART2_UART_Init(packFLash.port[0].bps);
+//				rt_kprintf("%sport1 config\n",sign);
+//		}
+//		else if(0==rt_strcmp((char *)"port2", argv[1])){
+//				if(argc!=4){
+//					goto ERR;
+//				}
+//				packFLash.port[1].bps     =atoi32(argv[2],10);
+//				packFLash.port[1].calTime =atoi32(argv[3],10);
+//				MX_USART3_UART_Init(packFLash.port[1].bps);
+//				rt_kprintf("%sport2 config\n",sign);
+//		}
+//		else if(0==rt_strcmp((char *)"port3", argv[1])){
+//				if(argc!=4){
+//					goto ERR;
+//				}
+//				packFLash.port[2].bps     =atoi32(argv[2],10);
+//				packFLash.port[2].calTime =atoi32(argv[3],10);
+//				MX_USART6_UART_Init(packFLash.port[2].bps);
+//				rt_kprintf("%sport3 config\n",sign);
+//		}
+//		else if(0==rt_strcmp((char *)"port4", argv[1])){
+//				if(argc!=4){
+//					goto ERR;
+//				}
+//				packFLash.port[3].bps     =atoi32(argv[2],10);
+//				packFLash.port[3].calTime =atoi32(argv[3],10);
+//				MX_UART4_Init(packFLash.port[3].bps);	
+//				rt_kprintf("%sport4 config\n",sign);
+//		}
 		return;
 		ERR:
-		rt_kprintf("%s[uart 端口(1-4) 波特率 串口采集时间]\n",sign);
+		rt_kprintf("%s[uart 端口(1-4) 波特率 串口采集时间(s) 串口下modbus采集间隔(ms)]\n",sign);
 		rt_kprintf("%sfor example\n",sign);
-		rt_kprintf("%s[uart port1 9600 120]\n",sign);
+		rt_kprintf("%s[uart port1 9600 120 1]\n",sign);
 
 		rt_kprintf("%s[uart save]\n",sign);
 
@@ -288,22 +301,52 @@ rt_bool_t  modbusCheckWork(uint8_t port)
 
 
 
-extern  rt_bool_t modbusCommRead(uartEnum uartNum,uint8_t cmd,uint16_t slavAddr,uint16_t regAddr,uint16_t reglen);
+extern  rt_bool_t modbusCommRead(modbusDevSaveStru modbus,uint8_t *out);
+//void  modbusReadData(int count)
+//{
+//	  for(int i=0;i<UART_NUM;i++){
+//				if((count+i*5)%(packFLash.port[i].calTime)==0){//错开5秒 避免4路同时到达
+//						rt_kprintf("%sport%d time is up\n",sign,i+1);
+//					    uint8_t *readBuf=rt_malloc(200);
+//					
+//					
+//						for(int j=0;j<DEV_NUM;j++){
+//							 if(modbusDevSave[j].port==(i+1)){//存在合法的port 就打包头部 头部只打包一次
+//								 rt_kprintf("%s read%s %s\n",sign,modbusDevSave[j].devID,modbusDevSave[j].name);
+//								 if(RT_FALSE== modbusCommRead(modbusDevSave[j],readBuf))//执行到此处打包param和data
+//										errNumFlag[j]=RT_TRUE;//modbus 不回应
+//								 else{
+//										errNumFlag[j]=RT_FALSE;
+//								rt_kprintf("%scheck data:",sign);//
+//								
+//									 for(int k=0;k<modbusDevSave[j].regLen*2;k++)
+//											rt_kprintf("%02x ",readBuf[k]);
+//									 rt_kprintf("\n");
+//								 }
+//								 rt_thread_mdelay(packFLash.port[i].delayTime*100);// 局放GY-JF100-C01和别的设备挂载在同一个串口的情况下连续读取设备会导致局放读取失败 此处需要延时2秒
+//							 
+//							 }
+//						}
+//					rt_free(readBuf);
+//					readBuf=RT_NULL;
+//						
+//						
+//				}
+//		}
+//}
+
+extern uint16_t uartModbusJsonPack(int num);
 void  modbusReadData(int count)
 {
 	  for(int i=0;i<UART_NUM;i++){
 				if((count+i*5)%(packFLash.port[i].calTime)==0){//错开5秒 避免4路同时到达
 						rt_kprintf("%sport%d time is up\n",sign,i+1);
-						for(int j=0;j<DEV_NUM;j++){
-							 if(modbusDevSave[j].port==(i+1)){
-								 rt_kprintf("%s read%s %s\n",sign,modbusDevSave[j].devID,modbusDevSave[j].name);
-								 if(RT_FALSE== modbusCommRead(i,modbusDevSave[j].regCmd,modbusDevSave[j].devAddr,modbusDevSave[j].regAddr,modbusDevSave[j].regLen))
-									 errNumFlag[j]=RT_TRUE;//modbus 不回应
-								 else
-									 errNumFlag[j]=RT_FALSE;
-							 }
-						}
+					  uartModbusJsonPack(i);
+						
+						
 				}
 		}
 }
+
+
 

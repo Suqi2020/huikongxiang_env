@@ -56,7 +56,8 @@ void uartReconfig()
 				}
 		}
 		for(int i=0;i<UART_NUM;i++){
-				rt_kprintf("%sport%d bps[%d] calTime[%d]\n",sign,i+1,packFLash.port[i].bps,packFLash.port[i].calTime);
+				rt_kprintf("%sport%d bps[%d] calTime[%d]s delayTme[%d*100]ms\n",\
+			  sign,i+1,packFLash.port[i].bps,packFLash.port[i].calTime,packFLash.port[i].delayTime);
 		}
 		
 		MX_USART2_UART_Init(packFLash.port[0].bps);
@@ -144,7 +145,7 @@ void clearUartData()
 {
 	  uint8_t dat;
 	  for(int i=0;i<UART_NUM;i++){
-			while(rt_mq_recv(uartDev[i].uartMessque,&dat, 1, 1000) == RT_EOK){//115200 波特率1ms 10个数据
-			}
+				while(rt_mq_recv(uartDev[i].uartMessque,&dat, 1, 1000) == RT_EOK){//115200 波特率1ms 10个数据
+				}
 		}
 }
