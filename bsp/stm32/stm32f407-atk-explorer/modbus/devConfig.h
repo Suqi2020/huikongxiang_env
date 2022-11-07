@@ -70,9 +70,24 @@ typedef struct{
 	  uint8_t  rev;
 }netIpFlashStru;
 
+#define  ANALOG_NUM   8//8路模拟量
+
 typedef struct{
-		uartSaveStru  port[UART_NUM];
+		char  devID[20];
+	  char  model[8];
+		char  name[20];
+	
+    uint8_t port; //1-8
+	  uint8_t rev;//
+	  uint16_t calTime; //采集间隔时间
+	
+
+}analogDevStru;
+
+typedef struct{
+		uartSaveStru   port[UART_NUM];
 		netIpFlashStru netIpFlash;
+	  analogDevStru  analog[ANALOG_NUM];
 }packIpUartStru;
 extern packIpUartStru packFLash;
 extern rt_bool_t  modbusCheckWork(uint8_t port);

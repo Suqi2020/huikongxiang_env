@@ -1,6 +1,6 @@
 #ifndef  __UART_RECONFIG_H__
 #define  __UART_RECONFIG_H__
-#include "flashsave.h"
+//#include "flashsave.h"
 #include "board.h"
 #include "dataPack.h"
 

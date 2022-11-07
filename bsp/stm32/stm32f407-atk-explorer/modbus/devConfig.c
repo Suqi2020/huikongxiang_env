@@ -1,4 +1,4 @@
-#include  "flashsave.h"
+#include  "devConfig.h"
 #include "utility.h"
 const static char sign[]="[flashSave]";
 extern  uint8 mac[6];
@@ -16,16 +16,16 @@ static void net(int argc, char *argv[])
 				goto ERR;
 		}
 		if(argc==2){
-			if(0==rt_strcmp((char *)"save", argv[1])){
-				rt_kprintf("%snet save OK\n",sign);
-				stm32_flash_erase(FLASH_IP_SAVE_ADDR, sizeof(packFLash));//每次擦除128k字节数据 存储时候需要一起存储
-				stm32_flash_write(FLASH_IP_SAVE_ADDR,(uint8_t*)&packFLash,sizeof(packFLash));
-				stm32_flash_write(FLASH_MODBUS_SAVE_ADDR,(uint8_t*)modbusDevSave,sizeof(modbusDevSave));
-		  }
-			else
+//			if(0==rt_strcmp((char *)"save", argv[1])){
+//				rt_kprintf("%snet save OK\n",sign);
+//				stm32_flash_erase(FLASH_IP_SAVE_ADDR, sizeof(packFLash));//每次擦除128k字节数据 存储时候需要一起存储
+//				stm32_flash_write(FLASH_IP_SAVE_ADDR,(uint8_t*)&packFLash,sizeof(packFLash));
+//				stm32_flash_write(FLASH_MODBUS_SAVE_ADDR,(uint8_t*)modbusDevSave,sizeof(modbusDevSave));
+//		  }
+//			else
 				goto ERR;
 		}
-		int i;
+//		int i;
 		if(0==rt_strcmp((char *)"macaddr", argv[1])){
 				if(argc!=3){
 					goto ERR;
@@ -91,13 +91,13 @@ static void uart(int argc, char *argv[])
 				goto ERR;
 		}
 		if(argc==2){
-			if(0==rt_strcmp((char *)"save", argv[1])){
-				rt_kprintf("%suart save OK\n",sign);
-				stm32_flash_erase(FLASH_IP_SAVE_ADDR, sizeof(packFLash));//每次擦除128k字节数据 存储时候需要一起存储
-				stm32_flash_write(FLASH_IP_SAVE_ADDR,(uint8_t*)&packFLash,sizeof(packFLash));
-				stm32_flash_write(FLASH_MODBUS_SAVE_ADDR,(uint8_t*)modbusDevSave,sizeof(modbusDevSave));
-		  }
-			else
+//			if(0==rt_strcmp((char *)"save", argv[1])){
+//				rt_kprintf("%suart save OK\n",sign);
+//				stm32_flash_erase(FLASH_IP_SAVE_ADDR, sizeof(packFLash));//每次擦除128k字节数据 存储时候需要一起存储
+//				stm32_flash_write(FLASH_IP_SAVE_ADDR,(uint8_t*)&packFLash,sizeof(packFLash));
+//				stm32_flash_write(FLASH_MODBUS_SAVE_ADDR,(uint8_t*)modbusDevSave,sizeof(modbusDevSave));
+//		  }
+//			else
 				goto ERR;
 		}
 		for(int i=0;i<UART_NUM;i++){
@@ -112,50 +112,12 @@ static void uart(int argc, char *argv[])
 						rt_kprintf("%sport1 config\n",sign);
 				}
 		}
-//		if(0==rt_strcmp((char *)"port1", argv[1])){
-//				if(argc!=4){
-//					goto ERR;
-//				}
-//				packFLash.port[0].bps     =atoi32(argv[2],10);
-//				packFLash.port[0].calTime =atoi32(argv[3],10);
-//				MX_USART2_UART_Init(packFLash.port[0].bps);
-//				rt_kprintf("%sport1 config\n",sign);
-//		}
-//		else if(0==rt_strcmp((char *)"port2", argv[1])){
-//				if(argc!=4){
-//					goto ERR;
-//				}
-//				packFLash.port[1].bps     =atoi32(argv[2],10);
-//				packFLash.port[1].calTime =atoi32(argv[3],10);
-//				MX_USART3_UART_Init(packFLash.port[1].bps);
-//				rt_kprintf("%sport2 config\n",sign);
-//		}
-//		else if(0==rt_strcmp((char *)"port3", argv[1])){
-//				if(argc!=4){
-//					goto ERR;
-//				}
-//				packFLash.port[2].bps     =atoi32(argv[2],10);
-//				packFLash.port[2].calTime =atoi32(argv[3],10);
-//				MX_USART6_UART_Init(packFLash.port[2].bps);
-//				rt_kprintf("%sport3 config\n",sign);
-//		}
-//		else if(0==rt_strcmp((char *)"port4", argv[1])){
-//				if(argc!=4){
-//					goto ERR;
-//				}
-//				packFLash.port[3].bps     =atoi32(argv[2],10);
-//				packFLash.port[3].calTime =atoi32(argv[3],10);
-//				MX_UART4_Init(packFLash.port[3].bps);	
-//				rt_kprintf("%sport4 config\n",sign);
-//		}
 		return;
 		ERR:
 		rt_kprintf("%s[uart 端口(1-4) 波特率 串口采集时间(s) 串口下modbus采集间隔(ms)]\n",sign);
 		rt_kprintf("%sfor example\n",sign);
 		rt_kprintf("%s[uart port1 9600 120 1]\n",sign);
-
 		rt_kprintf("%s[uart save]\n",sign);
-
 }
 MSH_CMD_EXPORT(uart,uart config);//FINSH_FUNCTION_EXPORT_CMD
 //打印配置的modbus参数
@@ -228,19 +190,8 @@ static void modbus(int argc, char *argv[])
 	  int i;
 		if (argc != 9)
 		{
-			  if(argc==2){
-						if(0==rt_strcmp((char *)"save", argv[1])){
-							rt_kprintf("%smodbus save OK\n",sign);
-							stm32_flash_erase(FLASH_MODBUS_SAVE_ADDR, sizeof(modbusDevSave));//每次擦除128k字节数据 存储时候需要一起存储
-							stm32_flash_write(FLASH_MODBUS_SAVE_ADDR,(uint8_t*)modbusDevSave,sizeof(modbusDevSave));
-							stm32_flash_write(FLASH_IP_SAVE_ADDR,(uint8_t*)&packFLash,sizeof(packFLash));
-							return;
-						}
-				}
-				else{
-						rt_kprintf("%sERR input argc\n",sign);
-						goto ERR;
-				}
+				rt_kprintf("%sERR input argc\n",sign);
+				goto ERR;
 		}
 	  for(i=0;i<DEV_NUM;i++){
 				if(0==rt_strcmp((char *)modbusDevSave[i].devID, argv[3])){//找到了设置过的设备 基于唯一ID
@@ -252,11 +203,11 @@ static void modbus(int argc, char *argv[])
 						modbusDevSave[i].regAddr=atoi16(argv[7],16);
 						modbusDevSave[i].regLen =atoi16(argv[8],16);
 				  	if(modbusCheckWork(modbusDevSave[i].port)==RT_TRUE){//0xff 停用  1-4启动
-								rt_kprintf("%s%s reon\n",sign,modbusDevSave[i].devID);
-								rt_kprintf("test 3 NO[%d]\n",i);
+								rt_kprintf("%s%s reon NO[%d]\n",sign,modbusDevSave[i].devID,i);
+								//rt_kprintf("test 3 NO[%d]\n",i);
 						}
 						else{
-							  rt_kprintf("test 4\n");
+							  //rt_kprintf("test 4\n");
 							  rt_kprintf("%s%s off\n",sign,modbusDevSave[i].devID);
 						}
 						return;
@@ -277,7 +228,7 @@ static void modbus(int argc, char *argv[])
 						return;
 				}
 		}
-		return;//正确跳出
+//		return;//正确跳出
 		ERR:
 		rt_kprintf("%sexample:《modbus  局放   GY280   devid     port[hex]    devaddr[hex]  regcmd[hex]   regaddr[hex]  reglen[hex]》\n",sign);
 		rt_kprintf("                    modbus   名称   类型   设备ID 	 端口      设备地址   寄存器命令   寄存器地址 寄存器长度\n");
@@ -302,38 +253,7 @@ rt_bool_t  modbusCheckWork(uint8_t port)
 
 
 extern  rt_bool_t modbusCommRead(modbusDevSaveStru modbus,uint8_t *out);
-//void  modbusReadData(int count)
-//{
-//	  for(int i=0;i<UART_NUM;i++){
-//				if((count+i*5)%(packFLash.port[i].calTime)==0){//错开5秒 避免4路同时到达
-//						rt_kprintf("%sport%d time is up\n",sign,i+1);
-//					    uint8_t *readBuf=rt_malloc(200);
-//					
-//					
-//						for(int j=0;j<DEV_NUM;j++){
-//							 if(modbusDevSave[j].port==(i+1)){//存在合法的port 就打包头部 头部只打包一次
-//								 rt_kprintf("%s read%s %s\n",sign,modbusDevSave[j].devID,modbusDevSave[j].name);
-//								 if(RT_FALSE== modbusCommRead(modbusDevSave[j],readBuf))//执行到此处打包param和data
-//										errNumFlag[j]=RT_TRUE;//modbus 不回应
-//								 else{
-//										errNumFlag[j]=RT_FALSE;
-//								rt_kprintf("%scheck data:",sign);//
-//								
-//									 for(int k=0;k<modbusDevSave[j].regLen*2;k++)
-//											rt_kprintf("%02x ",readBuf[k]);
-//									 rt_kprintf("\n");
-//								 }
-//								 rt_thread_mdelay(packFLash.port[i].delayTime*100);// 局放GY-JF100-C01和别的设备挂载在同一个串口的情况下连续读取设备会导致局放读取失败 此处需要延时2秒
-//							 
-//							 }
-//						}
-//					rt_free(readBuf);
-//					readBuf=RT_NULL;
-//						
-//						
-//				}
-//		}
-//}
+
 
 extern uint16_t uartModbusJsonPack(int num);
 void  modbusReadData(int count)
@@ -342,11 +262,120 @@ void  modbusReadData(int count)
 				if((count+i*5)%(packFLash.port[i].calTime)==0){//错开5秒 避免4路同时到达
 						rt_kprintf("%sport%d time is up\n",sign,i+1);
 					  uartModbusJsonPack(i);
-						
-						
 				}
 		}
 }
+//1-4启用  其它关闭
+rt_bool_t  analogCheckWork(uint8_t port)
+{
+		if((port==1)||(port==2)||(port==3)||(port==4)||(port==5)||(port==6)||(port==7)||(port==8)){
+			 return RT_TRUE;
+		}
+		return RT_FALSE;
+}
 
 
+
+
+//analog  名称   类型    设备ID 	       端口      采集间隔
+//
+//analog  局放  温度 GY280  GYNJLXSD000000458  3     120
+//analog  局放  湿度 GY280  GYNJLXSD000000458  4     120
+//anolog 数据量比较小 每次统一上传8个通道  按照第一路设置的时间上传
+static void analog(int argc, char *argv[])
+{
+	  
+		if(argc!=6){
+				goto ERR;
+		}
+
+		
+		
+	  for(int i=0;i<ANALOG_NUM;i++){
+			  int ret=(uint8_t)atoi16(argv[4],10); 
+				if(packFLash.analog[i].port==ret){//找到了设置过的设备 基于唯一ID
+						rt_strcpy(packFLash.analog[i].name,argv[1]);
+						rt_strcpy(packFLash.analog[i].model,argv[2]);
+						packFLash.analog[i].port = (uint8_t)atoi16(argv[4],10); 
+						packFLash.analog[i].calTime=(uint8_t)atoi16(argv[5],10); 
+	
+				  	if(analogCheckWork(packFLash.analog[i].port)==RT_TRUE){//0xff 停用  1-4启动
+								rt_kprintf("%s%s reon NO[%d]\n",sign,packFLash.analog[i].devID,i);
+								//rt_kprintf("test 3 NO[%d]\n",i);
+						}
+						else{
+							  //rt_kprintf("test 4\n");
+							  rt_kprintf("%s%s off\n",sign,packFLash.analog[i].devID);
+						}
+						return;
+				}
+		}
+	  for(int i=0;i<ANALOG_NUM;i++){
+//			  uint8_t ret= (uint8_t)atoi16(argv[4],10); 
+				if(analogCheckWork(packFLash.analog[i].port)==RT_FALSE){//0xff 停用  1-4启动
+						rt_strcpy(packFLash.analog[i].name,argv[1]);
+						rt_strcpy(packFLash.analog[i].model,argv[2]);
+						rt_strcpy(packFLash.analog[i].devID,argv[3]);
+						packFLash.analog[i].port =  (uint8_t)atoi16(argv[4],10); 
+						packFLash.analog[i].calTime=(uint8_t)atoi16(argv[5],10); 
+	
+						rt_kprintf("test 5 NO[%d] %d %d %d %d\n",i,modbusDevSave[i].devAddr,modbusDevSave[i].regCmd,modbusDevSave[i].regAddr,modbusDevSave[i].regLen);							
+						rt_kprintf("%s%s on\n",sign,modbusDevSave[i].devID);
+						return;
+				}
+		}
+
+		ERR:
+		rt_kprintf("%s[analog  名称   类型    设备ID 	       端口      采集间隔(S)]\n",sign);
+		rt_kprintf("%sfor example\n",sign);
+		rt_kprintf("%s[analog 温湿度   GY282  GYNJLXSD000000459 1 120]\n",sign);
+		//rt_kprintf("%s[analog save]\n",sign);
+		
+}
+MSH_CMD_EXPORT(analog,analog config);//FINSH_FUNCTION_EXPORT_CMD
+
+
+
+
+static void flash(int argc, char *argv[])
+{
+	  
+		if(argc==1){
+				goto ERR;
+		}
+		if(argc==2){
+			if(0==rt_strcmp((char *)"save", argv[1])){
+				rt_kprintf("%slash save OK\n",sign);
+				stm32_flash_erase(FLASH_IP_SAVE_ADDR, sizeof(packFLash));//每次擦除128k字节数据 存储时候需要一起存储
+				stm32_flash_write(FLASH_IP_SAVE_ADDR,(uint8_t*)&packFLash,sizeof(packFLash));
+				stm32_flash_write(FLASH_MODBUS_SAVE_ADDR,(uint8_t*)modbusDevSave,sizeof(modbusDevSave));
+		  }
+			else
+				goto ERR;
+		}
+	
+		return;
+		ERR:
+		//rt_kprintf("%sfor example\n",sign);
+		rt_kprintf("%s[flash save]\n",sign);
+}
+MSH_CMD_EXPORT(flash,flash save);//FINSH_FUNCTION_EXPORT_CMD
+
+
+void printfWorkAnalog()
+{	
+
+		rt_kprintf("%sanalog 启动\n<<名称   类型    设备ID 	       端口      采集间隔(S)>>\n",sign);
+	  for(int i=0;i<DEV_NUM;i++){
+				if(modbusCheckWork(packFLash.analog[i].port)==RT_TRUE){
+						rt_kprintf("%-10s ",packFLash.analog[i].name);
+						rt_kprintf("%s ",packFLash.analog[i].model);
+						rt_kprintf("%s ",packFLash.analog[i].devID);
+						rt_kprintf("[%d] ",packFLash.analog[i].port);
+
+						rt_kprintf("%d ",packFLash.analog[i].calTime);			
+						rt_kprintf("\n");
+				}
+		}
+}
 

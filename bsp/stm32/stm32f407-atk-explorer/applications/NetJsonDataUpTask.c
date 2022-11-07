@@ -131,6 +131,8 @@ void   upKeepStateTask(void *para)
 	  extern void  modbusReadData(int count);
 	  extern void  modbusDevErrCheck();
     extern void  clearUartData();
+	  extern uint16_t analogJsonPack(int count);
+	  extern void  printfWorkAnalog();
 	  int count;
 	  uartMutexQueueCfg();//根据flash存储重新配置串口
 	  //devIDFlashRead();//必须放到uartMutexQueueCfg后边 配置chanl各项参数后才能使用
@@ -139,6 +141,7 @@ void   upKeepStateTask(void *para)
 		uartIrqEnaAfterQueue();//串口中断中用到了队列  开启中断需要放到后边
     startTimeList();//开启计时器列表
 	  printfWorkModbus();
+	  printfWorkAnalog();
 	  modbusDevErrCheck();
 	  clearUartData();
 	  uint8_t test[]="test\n";
@@ -147,8 +150,8 @@ void   upKeepStateTask(void *para)
 				timeOutRunFun();
 				timeInc();
 			  count++;
-			  modbusReadData( count);
-			
+			  modbusReadData( count);//modbus数据定期上传
+			  analogJsonPack( count);//analog数据定期上传
 				rt_thread_mdelay(1000);
 //			rt_kprintf("%ssend ok\r\n",task);
 		}

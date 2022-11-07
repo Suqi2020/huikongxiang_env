@@ -457,11 +457,10 @@ uint16_t devRegJsonPack()
 
 extern rt_bool_t modbusCommRead(modbusDevSaveStru modbus,uint8_t *out);
 extern rt_bool_t errNumFlag[DEV_NUM];
-//打包的时候读取modbus  NUM 第几路
+//打包的时候读取modbus  NUM 第几路  
+//返回数据长度
 uint16_t uartModbusJsonPack(int num)
 {
-		uint8_t *readBuf=rt_malloc(250);
-		
 		char* out = NULL;
 		//创建数组
 		cJSON* Array = NULL;
@@ -474,28 +473,26 @@ uint16_t uartModbusJsonPack(int num)
 		cJSON_AddNumberToObject(root, "mid",mcu.upMessID);
 		cJSON_AddStringToObject(root, "packetType","CMD_REPORTDATA");
 		cJSON_AddStringToObject(root, "acuID","100000000000001");
+	  cJSON_AddStringToObject(root, "modbusType","RS-485");
 		{
 			Array = cJSON_CreateArray();
 			if (Array == NULL) return 0;
 			cJSON_AddItemToObject(root, "params", Array);
 			for (int i = 0; i < DEV_NUM; i++)
-			{
-								 
+			{				 
 				if(modbusDevSave[i].port==num+1){//端口合法
-					
 						 rt_kprintf("%s read%s %s\n",sign,modbusDevSave[i].devID,modbusDevSave[i].name);
+					
+					   uint8_t *readBuf=rt_malloc(modbusDevSave[i].regLen*2); //存储16进制数
 						 if(RT_FALSE== modbusCommRead(modbusDevSave[i],readBuf))//执行到此处打包param和data
 								errNumFlag[i]=RT_TRUE;//modbus 不回应
 						 else
 								errNumFlag[i]=RT_FALSE;
-		
-						 uint8_t *sprBuf=rt_malloc(modbusDevSave[i].regLen*4+1);//二进制数据的2倍 +1
+		         
+						 uint8_t *sprBuf =rt_malloc(modbusDevSave[i].regLen*4+1);//存储16进制数的字符串 (16进制数据的2倍 +1)
 						 for(int k=0;k<modbusDevSave[i].regLen*2;k++)
 								sprintf((char*)sprBuf+k*2,"%02x",readBuf[k]);//16进制数据格式化字符串
 						 sprBuf[modbusDevSave[i].regLen*4+1]=0;//末尾补0		
-						 
-						 
-
 						nodeobj = cJSON_CreateObject();
 						cJSON_AddItemToArray(Array, nodeobj);
 						cJSON_AddItemToObject(nodeobj,"deviceId",cJSON_CreateString(modbusDevSave[i].devID));
@@ -509,13 +506,14 @@ uint16_t uartModbusJsonPack(int num)
 						cJSON_AddItemToObject(nodeobj,"regdata",cJSON_CreateString((char*)sprBuf));
 						rt_free(sprBuf);
 						sprBuf=RT_NULL;
+						rt_free(readBuf);
+						readBuf=RT_NULL;
+						
 						rt_thread_mdelay(packFLash.port[num].delayTime*100);// 局放GY-JF100-C01和别的设备挂载在同一个串口的情况下连续读取设备会导致局放读取失败 此处需要延时2秒
-					 
 				}
 			}
 		}
-		rt_free(readBuf);
-		readBuf=RT_NULL;
+
 
 		char time[20];
 		sprintf(time,"%d",utcTime());

@@ -38,7 +38,7 @@
 //#include "rs485Gas.h"
 //#include "rs485WaterLev.h"
 //#include "rs485TempHum.h"
-#include "flashsave.h"
+#include "devconfig.h"
 
 extern UART_HandleTypeDef huart4;
 extern UART_HandleTypeDef huart5;

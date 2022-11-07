@@ -113,8 +113,6 @@ int  modbusRespCheck(uint16_t slavAddr,uint8_t *buf,uint16_t len,rt_bool_t readF
 
 #define   LENTH          200
 extern uartConfStru  uartDev[UART_NUM];
-//rt_bool_t modbusCommRead(uartEnum uartNum,uint8_t cmd,uint16_t slavAddr,uint16_t regAddr,uint16_t reglen)
-
 
 rt_bool_t modbusCommRead(modbusDevSaveStru modbus,uint8_t *out)
 {
