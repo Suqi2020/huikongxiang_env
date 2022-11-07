@@ -84,6 +84,30 @@ static void net(int argc, char *argv[])
 }
 MSH_CMD_EXPORT(net,ip port config);//FINSH_FUNCTION_EXPORT_CMD
 static const uint8_t portStr[UART_NUM][6]={"port1","port2","port3","port4"};
+
+
+void uartSingConf(int num)
+{
+	//rt_kprintf("%sUART single conf\n");
+	switch(num){
+		case USE_UART2:
+			MX_USART2_UART_Init(packFLash.port[USE_UART2].bps);
+		  rt_kprintf("%sUART conf uart2 bps=%d\n",sign,packFLash.port[USE_UART2].bps);
+			break;
+		case USE_UART3:
+			MX_USART3_UART_Init(packFLash.port[USE_UART3].bps)	;
+		  rt_kprintf("%sUART conf uart3 bps=%d\n",sign,packFLash.port[USE_UART3].bps);
+			break;
+	  case USE_UART4:
+			MX_UART4_Init(packFLash.port[USE_UART4].bps);
+		  rt_kprintf("%sUART conf uart4 bps=%d\n",sign,packFLash.port[USE_UART4].bps);
+			break;
+		case USE_UART6:
+			MX_USART6_UART_Init(packFLash.port[USE_UART6].bps));
+		  rt_kprintf("%sUART conf uart6 bps=%d\n",sign,packFLash.port[USE_UART6].bps);
+			break;
+	}
+}
 static void uart(int argc, char *argv[])
 {
 	  
@@ -108,8 +132,9 @@ static void uart(int argc, char *argv[])
 						packFLash.port[i].bps     =atoi32(argv[2],10);
 						packFLash.port[i].calTime =atoi32(argv[3],10);
 						packFLash.port[i].delayTime=atoi32(argv[4],10);
-						MX_USART2_UART_Init(packFLash.port[i].bps);
-						rt_kprintf("%sport1 config\n",sign);
+						//MX_USART2_UART_Init(packFLash.port[i].bps);
+						uartSingConf(i);
+						rt_kprintf("%sport%d config\n",sign,i);
 				}
 		}
 		return;

@@ -919,9 +919,14 @@
               <FilePath>.\modbus\digConv.c</FilePath>
             </File>
             <File>
-              <FileName>flashSave.c</FileName>
+              <FileName>devConfig.c</FileName>
               <FileType>1</FileType>
-              <FilePath>.\modbus\flashSave.c</FilePath>
+              <FilePath>.\modbus\devConfig.c</FilePath>
+            </File>
+            <File>
+              <FileName>analog.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>.\modbus\analog.c</FilePath>
             </File>
           </Files>
         </Group>

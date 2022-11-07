@@ -88,6 +88,7 @@
 //         故连续读取设备情况下需要延时2秒继续读取                   20221105
 //V0.39    修改存储参数命令统一为 flash save                      
 //         增加模拟配置                                            20221107
+//         存在bug  uart 的MX_USART2_UART_Init(packFLash.port[i].bps); 中
 #define APP_VER       ((0<<8)+37)//0x0105 表示1.5版本
 const char date[]="20221104";
 
