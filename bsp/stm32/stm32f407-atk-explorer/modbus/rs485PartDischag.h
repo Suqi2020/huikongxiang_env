@@ -27,9 +27,10 @@ typedef struct{
 	  uint8_t rev[3];
 }partDischargeStru;
 
-extern partDischargeStru partDisc;
+//extern partDischargeStru partDisc;
 
-void readPdFreqDischarge(void);
+void readPdFreqDischarge(int num);
+
 //extern rt_bool_t  PartDischgWarningCheck(void);
 extern rt_bool_t readPartDischgWarning(void);
 extern void  partDisWaringEventPack(void);

@@ -24,17 +24,17 @@ typedef  struct
 extern mcuParazStru mcu;
 
 
-typedef  struct
-{
+//typedef  struct
+//{
 
-	  char  ID[16];
-	  char  model[16];
-		char  name[20];
-		char  ip[20];
-		char  port[8];
-	  char  type[4];
-    	
-}rs485ParaStru;
+//	  char  ID[16];
+//	  char  model[16];
+//		char  name[20];
+//		char  ip[20];
+//		char  port[8];
+//	  char  type[4];
+//    	
+//}rs485ParaStru;
 
 extern uint8_t packBuf[TX_RX_MAX_BUF_SIZE];
 //extern  rs485ParaStru devi[];

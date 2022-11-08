@@ -1,8 +1,9 @@
 #include "board.h"
 
 
-#include "stmflash.h"
-//////////////////////////////////////////////////////////////////////////////////	 
+//#include "stmflash.h"
+
+const static char sign[]="[flash]";////////////////////////////////////////////////////	 
 //本程序只供学习使用，未经作者许可，不得用于其它任何用途
 //ALIENTEK STM32F429开发板
 //STM32内部FLASH读写 驱动代码	   
@@ -14,120 +15,703 @@
 //Copyright(C) 广州市星翼电子科技有限公司 2014-2024
 //All rights reserved									  
 ////////////////////////////////////////////////////////////////////////////////// 	
+packIpUartStru packFLash   __attribute__ ((aligned (4)));
+modbusFlashStru sheet      __attribute__ ((aligned (4)));
+const static char     UartName[UART_NUM][6] ={"port1", "port2",  "port3",  "port4"};//重映射一个名称
+const static uartEnum UartNum[UART_NUM]     ={USE_UART2,USE_UART3,USE_UART6,USE_UART4};//重映射一个名称
 
-const uint8_t TEXT_Buffer[]={"STM32 FLASH TEST"};
-#define TEXT_LENTH sizeof(TEXT_Buffer)	 		  	//数组长度	
-#define SIZE TEXT_LENTH/4+((TEXT_LENTH%4)?1:0)
+extern void uartSingConf(int num,int bps);
 
-uint8_t datatemp[100]={0};
-void  flashTest()
+static void flash(int argc, char *argv[])
 {
-		//STMFLASH_Write(FLASH_SAVE_ADDR,(uint32_t*)TEXT_Buffer,SIZE);
-			STMFLASH_Read(FLASH_SAVE_ADDR,(uint32_t*)datatemp,SIZE);
-	rt_kprintf("Flash Read:%s\n",TEXT_Buffer);
-}
-//读取指定地址的字(32位数据) 
-//faddr:读地址 
-//返回值:对应数据.
-uint32_t STMFLASH_ReadWord(uint32_t faddr)
-{
-	return *(volatile uint32_t*)faddr; 
-}
-
-//获取某个地址所在的flash扇区
-//addr:flash地址
-//返回值:0~11,即addr所在的扇区
-uint8_t STMFLASH_GetFlashSector(uint32_t addr)
-{
-	if(addr<ADDR_FLASH_SECTOR_1)return FLASH_SECTOR_0;
-	else if(addr<ADDR_FLASH_SECTOR_2)return FLASH_SECTOR_1;
-	else if(addr<ADDR_FLASH_SECTOR_3)return FLASH_SECTOR_2;
-	else if(addr<ADDR_FLASH_SECTOR_4)return FLASH_SECTOR_3;
-	else if(addr<ADDR_FLASH_SECTOR_5)return FLASH_SECTOR_4;
-	else if(addr<ADDR_FLASH_SECTOR_6)return FLASH_SECTOR_5;
-	else if(addr<ADDR_FLASH_SECTOR_7)return FLASH_SECTOR_6;
-	else if(addr<ADDR_FLASH_SECTOR_8)return FLASH_SECTOR_7;
-	else if(addr<ADDR_FLASH_SECTOR_9)return FLASH_SECTOR_8;
-	else if(addr<ADDR_FLASH_SECTOR_10)return FLASH_SECTOR_9;
-	else if(addr<ADDR_FLASH_SECTOR_11)return FLASH_SECTOR_10;   
-	return FLASH_SECTOR_11;	
-}
-
-//从指定地址开始写入指定长度的数据
-//特别注意:因为STM32F4的扇区实在太大,没办法本地保存扇区数据,所以本函数
-//         写地址如果非0XFF,那么会先擦除整个扇区且不保存扇区数据.所以
-//         写非0XFF的地址,将导致整个扇区数据丢失.建议写之前确保扇区里
-//         没有重要数据,最好是整个扇区先擦除了,然后慢慢往后写. 
-//该函数对OTP区域也有效!可以用来写OTP区!
-//OTP区域地址范围:0X1FFF7800~0X1FFF7A0F(注意：最后16字节，用于OTP数据块锁定，别乱写！！)
-//WriteAddr:起始地址(此地址必须为4的倍数!!)
-//pBuffer:数据指针
-//NumToWrite:字(32位)数(就是要写入的32位数据的个数.) 
-void STMFLASH_Write(uint32_t WriteAddr,uint32_t *pBuffer,uint32_t NumToWrite)	
-{ 
-	FLASH_EraseInitTypeDef FlashEraseInit;
-	HAL_StatusTypeDef FlashStatus=HAL_OK;
-	uint32_t SectorError=0;
-	uint32_t addrx=0;
-	uint32_t endaddr=0;	
-	if(WriteAddr<STM32_FLASH_BASE||WriteAddr%4)return;	//非法地址
-    
-	HAL_FLASH_Unlock();             //解锁	
-	addrx=WriteAddr;				//写入的起始地址
-	endaddr=WriteAddr+NumToWrite*4;	//写入的结束地址
-    
-	if(addrx<0X1FFF0000)
-	{
-		while(addrx<endaddr)		//扫清一切障碍.(对非FFFFFFFF的地方,先擦除)
-		{
-			 if(STMFLASH_ReadWord(addrx)!=0XFFFFFFFF)//有非0XFFFFFFFF的地方,要擦除这个扇区
-			{   
-				FlashEraseInit.TypeErase=FLASH_TYPEERASE_SECTORS;       //擦除类型，扇区擦除 
-				FlashEraseInit.Sector=STMFLASH_GetFlashSector(addrx);   //要擦除的扇区
-				FlashEraseInit.NbSectors=1;                             //一次只擦除一个扇区
-				FlashEraseInit.VoltageRange=FLASH_VOLTAGE_RANGE_3;      //电压范围，VCC=2.7~3.6V之间!!
-				if(HAL_FLASHEx_Erase(&FlashEraseInit,&SectorError)!=HAL_OK) 
-				{
-					break;//发生错误了	
-				}
-				}else addrx+=4;
-				FLASH_WaitForLastOperation(FLASH_WAITETIME);                //等待上次操作完成
+		if(argc==1){
+				goto ERR;
 		}
-	}
-	FlashStatus=FLASH_WaitForLastOperation(FLASH_WAITETIME);            //等待上次操作完成
-	if(FlashStatus==HAL_OK)
-	{
-		 while(WriteAddr<endaddr)//写数据
-		 {
-			if(HAL_FLASH_Program(FLASH_TYPEPROGRAM_WORD,WriteAddr,*pBuffer)!=HAL_OK)//写入数据
-			{ 
-				break;	//写入异常
+		if(argc==2){
+			if(0==rt_strcmp((char *)"save", argv[1])){
+				rt_kprintf("%sflash save OK\n",sign);
+				stm32_flash_erase(FLASH_IP_SAVE_ADDR, sizeof(packFLash));//每次擦除128k字节数据 存储时候需要一起存储
+				stm32_flash_write(FLASH_IP_SAVE_ADDR,(uint8_t*)&packFLash,sizeof(packFLash));
+				stm32_flash_write(FLASH_MODBUS_SAVE_ADDR,(uint8_t*)&sheet,sizeof(sheet));
+		  }
+			else
+				goto ERR;
+		}
+		return;
+		ERR:
+		//rt_kprintf("%sfor example\n",sign);
+		rt_kprintf("%s[flash save]\n",sign);
+}
+MSH_CMD_EXPORT(flash,flash save);//FINSH_FUNCTION_EXPORT_CMD
+
+
+
+//modbus+设备名称(波特率)+ID+model+端口(port1-port4)+设备地址(0/255-关闭设备)+采集间隔(秒)
+		
+		
+		
+		
+void printModbusDevList()
+{
+	  rt_kprintf("%s printf modbus device list\n",sign);
+		for(int i=0;i<MODBUS_NUM;i++){
+			switch(i)
+			{
+				case CIRCULA:
+					for(int j=0;j<CIRCULA_485_NUM;j++){//核对有没有配置过
+							if(sheet.cirCula[j].workFlag==RT_TRUE){
+									rt_kprintf("%s modbus ",sign);
+									rt_kprintf("%-10s ",modbusName[i]);
+									rt_kprintf("%s ",sheet.cirCula[j].ID);
+									rt_kprintf("%s ",sheet.cirCula[j].model);
+									rt_kprintf("%s ",UartName[sheet.cirCula[j].useUartNum]);
+									rt_kprintf("%d ",sheet.cirCula[j].slaveAddr);
+									rt_kprintf("%d \n",sheet.cirCulaColTime);
+							}
+					}
+				break;
+				case PARTDISCHAG:
+					for(int j=0;j<PARTDISCHAG_485_NUM;j++){//核对有没有配置过
+							if(sheet.partDischag[j].workFlag==RT_TRUE){
+									rt_kprintf("%s modbus ",sign);
+									rt_kprintf("%-10s ",modbusName[i]);
+									rt_kprintf("%s ",sheet.partDischag[j].ID);
+									rt_kprintf("%s ",sheet.partDischag[j].model);
+									rt_kprintf("%s ",UartName[sheet.partDischag[j].useUartNum]);
+									rt_kprintf("%d ",sheet.partDischag[j].slaveAddr);
+									rt_kprintf("%d \n",sheet.partDischagColTime);
+							}
+					}
+				break;
+				case PRESSSETTL:
+					for(int j=0;j<PRESSSETTL_485_NUM;j++){//核对有没有配置过
+							if(sheet.pressSetl[j].workFlag==RT_TRUE){
+									rt_kprintf("%s modbus ",sign);
+									rt_kprintf("%-10s ",modbusName[i]);
+									rt_kprintf("%s ",sheet.pressSetl[j].ID);
+									rt_kprintf("%s ",sheet.pressSetl[j].model);
+									rt_kprintf("%s ",UartName[sheet.pressSetl[j].useUartNum]);
+									rt_kprintf("%d ",sheet.pressSetl[j].slaveAddr);
+									rt_kprintf("%d \n",sheet.pressSetlColTime);
+							}
+					}
+				break;
+				case THREEAXIS:
+					for(int j=0;j<THREEAXIS_485_NUM;j++){//核对有没有配置过
+							if(sheet.threeAxiss[j].workFlag==RT_TRUE){
+									rt_kprintf("%s modbus ",sign);
+									rt_kprintf("%-10s ",modbusName[i]);
+									rt_kprintf("%s ",sheet.threeAxiss[j].ID);
+									rt_kprintf("%s ",sheet.threeAxiss[j].model);
+									rt_kprintf("%s ",UartName[sheet.threeAxiss[j].useUartNum]);
+									rt_kprintf("%d ",sheet.threeAxiss[j].slaveAddr);
+									rt_kprintf("%d \n",sheet.threeAxissColTime);
+							}
+					}
+				break;
+				case CH4:
+					for(int j=0;j<CH4_485_NUM;j++){//核对有没有配置过
+							if(sheet.ch4[j].workFlag==RT_TRUE){
+									rt_kprintf("%s modbus ",sign);
+									rt_kprintf("%-10s ",modbusName[i]);
+									rt_kprintf("%s ",sheet.ch4[j].ID);
+									rt_kprintf("%s ",sheet.ch4[j].model);
+									rt_kprintf("%s ",UartName[sheet.ch4[j].useUartNum]);
+									rt_kprintf("%d ",sheet.ch4[j].slaveAddr);
+									rt_kprintf("%d \n",sheet.ch4ColTime);
+							}
+					}
+				break;
+				case O2:
+					for(int j=0;j<O2_485_NUM;j++){//核对有没有配置过
+							if(sheet.o2[j].workFlag==RT_TRUE){
+									rt_kprintf("%s modbus ",sign);
+									rt_kprintf("%-10s ",modbusName[i]);
+									rt_kprintf("%s ",sheet.o2[j].ID);
+									rt_kprintf("%s ",sheet.o2[j].model);
+									rt_kprintf("%s ",UartName[sheet.o2[j].useUartNum]);
+									rt_kprintf("%d ",sheet.o2[j].slaveAddr);
+									rt_kprintf("%d \n",sheet.o2ColTime);
+							}
+					}
+				break;
+				case H2S:
+					for(int j=0;j<H2S_485_NUM;j++){//核对有没有配置过
+							if(sheet.h2s[j].workFlag==RT_TRUE){
+									rt_kprintf("%s modbus ",sign);
+									rt_kprintf("%-10s ",modbusName[i]);
+									rt_kprintf("%s ",sheet.h2s[j].ID);
+									rt_kprintf("%s ",sheet.h2s[j].model);
+									rt_kprintf("%s ",UartName[sheet.h2s[j].useUartNum]);
+									rt_kprintf("%d ",sheet.h2s[j].slaveAddr);
+									rt_kprintf("%d \n",sheet.h2sColTime);
+							}
+					}
+				break;
+				case CO:
+					for(int j=0;j<CO_485_NUM;j++){//核对有没有配置过
+							if(sheet.co[j].workFlag==RT_TRUE){
+									rt_kprintf("%s modbus ",sign);
+									rt_kprintf("%-10s ",modbusName[i]);
+									rt_kprintf("%s ",sheet.co[j].ID);
+									rt_kprintf("%s ",sheet.co[j].model);
+									rt_kprintf("%s ",UartName[sheet.co[j].useUartNum]);
+									rt_kprintf("%d ",sheet.co[j].slaveAddr);
+									rt_kprintf("%d \n",sheet.coColTime);
+							}
+					}
+				break;
+				case TEMPHUM:
+					for(int j=0;j<TEMPHUM_485_NUM;j++){//核对有没有配置过
+							if(sheet.partDischag[j].workFlag==RT_TRUE){
+									rt_kprintf("%s modbus ",sign);
+									rt_kprintf("%-10s ",modbusName[i]);
+									rt_kprintf("%s ",sheet.tempHum[j].ID);
+									rt_kprintf("%s ",sheet.tempHum[j].model);
+									rt_kprintf("%s ",UartName[sheet.tempHum[j].useUartNum]);
+									rt_kprintf("%d ",sheet.tempHum[j].slaveAddr);
+									rt_kprintf("%d \n",sheet.tempHumColTime);
+							}
+					}
+				break;
+				case WATERLEVEL:
+					for(int j=0;j<WATERLEV_485_NUM;j++){//核对有没有配置过
+							if(sheet.waterLev[j].workFlag==RT_TRUE){
+									rt_kprintf("%s modbus ",sign);
+									rt_kprintf("%-10s ",modbusName[i]);
+									rt_kprintf("%s ",sheet.waterLev[j].ID);
+									rt_kprintf("%s ",sheet.waterLev[j].model);
+									rt_kprintf("%s ",UartName[sheet.waterLev[j].useUartNum]);
+									rt_kprintf("%d ",sheet.waterLev[j].slaveAddr);
+									rt_kprintf("%d \n",sheet.waterLevColTime);
+							}
+					}
+				break;
+				default:
+				break;
 			}
-			WriteAddr+=4;
-			pBuffer++;
-		}  
-	}
-	HAL_FLASH_Lock();           //上锁
-} 
-
-//从指定地址开始读出指定长度的数据
-//ReadAddr:起始地址
-//pBuffer:数据指针
-//NumToRead:字(32位)数
-void STMFLASH_Read(uint32_t ReadAddr,uint32_t *pBuffer,uint32_t NumToRead)   	
-{
-	uint32_t i;
-	for(i=0;i<NumToRead;i++)
-	{
-		pBuffer[i]=STMFLASH_ReadWord(ReadAddr);//读取4个字节.
-		ReadAddr+=4;//偏移4个字节.	
-	}
+		}
 }
 
-//////////////////////////////////////////测试用///////////////////////////////////////////
-//WriteAddr:起始地址
-//WriteData:要写入的数据
-void Test_Write(uint32_t WriteAddr,uint32_t WriteData)   	
+static int circulaConf(int uartnum,char *argv[])
 {
-	STMFLASH_Write(WriteAddr,&WriteData,1);//写入一个字 
+	int i=0;
+	int ret=0;
+	int slaveAddr=atoi32(argv[5],10);
+	sheet.cirCulaColTime=atoi32(argv[6],10);
+	for( i=0;i<CIRCULA_485_NUM;i++){//核对有没有配置过
+			if(rt_strcmp(sheet.cirCula[i].ID,argv[2])==0){//配置过
+					if((slaveAddr==0)||(slaveAddr==255)){//关闭
+							sheet.cirCula[i].workFlag=RT_FALSE;//关闭
+					}
+					else{
+							sheet.cirCula[i].workFlag=RT_TRUE;//打开
+					}
+					sheet.cirCula[i].slaveAddr=slaveAddr;	
+					sheet.cirCula[i].useUartNum=UartNum[uartnum];
+					rt_strcpy(sheet.cirCula[i].model,argv[3]);
+					rt_kprintf("%s circula reconfig %d\n",sign,i);
+					ret =1;
+					break;
+			}
+	}
+	if(i==CIRCULA_485_NUM){//没有配置过
+			for(int j=0;j<CIRCULA_485_NUM;j++){
+					if(sheet.cirCula[j].workFlag!=RT_TRUE){
+							sheet.cirCula[j].workFlag=RT_TRUE;//打开
+							sheet.cirCula[j].slaveAddr=slaveAddr;	
+							sheet.cirCula[j].useUartNum=UartNum[uartnum];
+							rt_strcpy(sheet.cirCula[j].model,argv[3]);
+							rt_strcpy(sheet.cirCula[j].ID,argv[2]);
+							rt_kprintf("%s circula config %d\n",sign,j);
+							ret =1;
+							break;
+					}
+			}
+	}
+	return ret;
 }
+
+static int partDischagConf(int uartnum,char *argv[])
+{
+	int i=0;
+	int ret=0;
+	int slaveAddr=atoi32(argv[5],10);
+	//sheet.cirCulaColTime=atoi32(argv[6],10);
+	sheet.partDischagColTime=atoi32(argv[6],10);
+	for( i=0;i<PARTDISCHAG_485_NUM;i++){//核对有没有配置过
+			if(rt_strcmp(sheet.partDischag[i].ID,argv[2])==0){//配置过
+					if((slaveAddr==0)||(slaveAddr==255)){//关闭
+							sheet.partDischag[i].workFlag=RT_FALSE;//关闭
+					}
+					else{
+							sheet.partDischag[i].workFlag=RT_TRUE;//打开
+					}
+					sheet.partDischag[i].slaveAddr=slaveAddr;	
+					sheet.partDischag[i].useUartNum=UartNum[uartnum];
+					rt_strcpy(sheet.partDischag[i].model,argv[3]);
+					rt_kprintf("%s partDischag reconfig %d\n",sign,i);
+					ret =1;
+					break;
+			}
+	}
+	if(i==PARTDISCHAG_485_NUM){//没有配置过
+			for(int j=0;j<PARTDISCHAG_485_NUM;j++){
+					if(sheet.partDischag[j].workFlag!=RT_TRUE){
+							sheet.partDischag[j].workFlag=RT_TRUE;//打开
+							sheet.partDischag[j].slaveAddr=slaveAddr;	
+							sheet.partDischag[j].useUartNum=UartNum[uartnum];
+							rt_strcpy(sheet.partDischag[j].model,argv[3]);
+							rt_strcpy(sheet.partDischag[j].ID,argv[2]);
+							rt_kprintf("%s partDischag config %d\n",sign,j);
+							ret =1;
+							break;
+					}
+			}
+	}
+	return ret;
+}
+
+static int pressSettlConf(int uartnum,char *argv[])
+{
+	int i=0;
+	int ret=0;
+	int slaveAddr=atoi32(argv[5],10);
+	//sheet.cirCulaColTime=atoi32(argv[6],10);
+	sheet.pressSetlColTime=atoi32(argv[6],10);
+	for( i=0;i<PRESSSETTL_485_NUM;i++){//核对有没有配置过
+			if(rt_strcmp(sheet.pressSetl[i].ID,argv[2])==0){//配置过
+					if((slaveAddr==0)||(slaveAddr==255)){//关闭
+							sheet.pressSetl[i].workFlag=RT_FALSE;//关闭
+					}
+					else{
+							sheet.pressSetl[i].workFlag=RT_TRUE;//打开
+					}
+					sheet.pressSetl[i].slaveAddr=slaveAddr;	
+					sheet.pressSetl[i].useUartNum=UartNum[uartnum];
+					rt_strcpy(sheet.pressSetl[i].model,argv[3]);
+					rt_kprintf("%s pressSettl reconfig %d\n",sign,i);
+					ret =1;
+					break;
+			}
+	}
+	if(i==PRESSSETTL_485_NUM){//没有配置过
+			for(int j=0;j<PRESSSETTL_485_NUM;j++){
+					if(sheet.pressSetl[j].workFlag!=RT_TRUE){
+							sheet.pressSetl[j].workFlag=RT_TRUE;//打开
+							sheet.pressSetl[j].slaveAddr=slaveAddr;	
+							sheet.pressSetl[j].useUartNum=UartNum[uartnum];
+							rt_strcpy(sheet.pressSetl[j].model,argv[3]);
+							rt_strcpy(sheet.pressSetl[j].ID,argv[2]);
+							rt_kprintf("%s pressSettl config %d\n",sign,j);
+							ret =1;
+							break;
+					}
+			}
+	}
+	return ret;
+}
+
+
+static int threeAxisConf(int uartnum,char *argv[])
+{
+	int i=0;
+	int ret=0;
+	int slaveAddr=atoi32(argv[5],10);
+	//sheet.cirCulaColTime=atoi32(argv[6],10);
+	sheet.threeAxissColTime =atoi32(argv[6],10);
+	for( i=0;i<THREEAXIS_485_NUM;i++){//核对有没有配置过
+			if(rt_strcmp(sheet.threeAxiss[i].ID,argv[2])==0){//配置过
+					if((slaveAddr==0)||(slaveAddr==255)){//关闭
+							sheet.threeAxiss[i].workFlag=RT_FALSE;//关闭
+					}
+					else{
+							sheet.threeAxiss[i].workFlag=RT_TRUE;//打开
+					}
+					sheet.threeAxiss[i].slaveAddr=slaveAddr;	
+					sheet.threeAxiss[i].useUartNum=UartNum[uartnum];
+					rt_strcpy(sheet.threeAxiss[i].model,argv[3]);
+					rt_kprintf("%s threeaxis reconfig %d\n",sign,i);
+					ret =1;
+					break;
+			}
+	}
+	if(i==THREEAXIS_485_NUM){//没有配置过
+			for(int j=0;j<THREEAXIS_485_NUM;j++){
+					if(sheet.threeAxiss[j].workFlag!=RT_TRUE){
+							sheet.threeAxiss[j].workFlag=RT_TRUE;//打开
+							sheet.threeAxiss[j].slaveAddr=slaveAddr;	
+							sheet.threeAxiss[j].useUartNum=UartNum[uartnum];
+							rt_strcpy(sheet.threeAxiss[j].model,argv[3]);
+							rt_strcpy(sheet.threeAxiss[j].ID,argv[2]);
+							rt_kprintf("%s threeaxis config %d\n",sign,j);
+							ret =1;
+							break;
+					}
+			}
+	}
+	return ret;
+}
+static int ch4Conf(int uartnum,char *argv[])
+{
+	int i=0;
+	int ret=0;
+	int slaveAddr=atoi32(argv[5],10);
+	//sheet.cirCulaColTime=atoi32(argv[6],10);
+	sheet.ch4ColTime=atoi32(argv[6],10);
+	for( i=0;i<CH4_485_NUM;i++){//核对有没有配置过
+			if(rt_strcmp(sheet.ch4[i].ID,argv[2])==0){//配置过
+					if((slaveAddr==0)||(slaveAddr==255)){//关闭
+							sheet.ch4[i].workFlag=RT_FALSE;//关闭
+					}
+					else{
+							sheet.ch4[i].workFlag=RT_TRUE;//打开
+					}
+					sheet.ch4[i].slaveAddr=slaveAddr;	
+					sheet.ch4[i].useUartNum=UartNum[uartnum];
+					rt_strcpy(sheet.ch4[i].model,argv[3]);
+					rt_kprintf("%s ch4 reconfig %d\n",sign,i);
+					ret =1;
+					break;
+			}
+	}
+	if(i==CH4_485_NUM){//没有配置过
+			for(int j=0;j<CH4_485_NUM;j++){
+					if(sheet.ch4[j].workFlag!=RT_TRUE){
+							sheet.ch4[j].workFlag=RT_TRUE;//打开
+							sheet.ch4[j].slaveAddr=slaveAddr;	
+							sheet.ch4[j].useUartNum=UartNum[uartnum];
+							rt_strcpy(sheet.ch4[j].model,argv[3]);
+							rt_strcpy(sheet.ch4[j].ID,argv[2]);
+							rt_kprintf("%s ch4 config %d\n",sign,j);
+							ret =1;
+							break;
+					}
+			}
+	}
+	return ret;
+}
+static int coConf(int uartnum,char *argv[])
+{
+	int i=0;
+	int ret=0;
+	int slaveAddr=atoi32(argv[5],10);
+	//sheet.cirCulaColTime=atoi32(argv[6],10);
+	sheet.coColTime=atoi32(argv[6],10);
+	for( i=0;i<CO_485_NUM;i++){//核对有没有配置过
+			if(rt_strcmp(sheet.co[i].ID,argv[2])==0){//配置过
+					if((slaveAddr==0)||(slaveAddr==255)){//关闭
+							sheet.co[i].workFlag=RT_FALSE;//关闭
+					}
+					else{
+							sheet.co[i].workFlag=RT_TRUE;//打开
+					}
+					sheet.co[i].slaveAddr=slaveAddr;	
+					sheet.co[i].useUartNum=UartNum[uartnum];
+					rt_strcpy(sheet.co[i].model,argv[3]);
+					rt_kprintf("%s co reconfig %d\n",sign,i);
+					ret =1;
+					break;
+			}
+	}
+	if(i==CO_485_NUM){//没有配置过
+			for(int j=0;j<CO_485_NUM;j++){
+					if(sheet.co[j].workFlag!=RT_TRUE){
+							sheet.co[j].workFlag=RT_TRUE;//打开
+							sheet.co[j].slaveAddr=slaveAddr;	
+							sheet.co[j].useUartNum=UartNum[uartnum];
+							rt_strcpy(sheet.co[j].model,argv[3]);
+							rt_strcpy(sheet.co[j].ID,argv[2]);
+							rt_kprintf("%s co config %d\n",sign,j);
+							ret =1;
+							break;
+					}
+			}
+	}
+	return ret;
+}
+static int h2sConf(int uartnum,char *argv[])
+{
+	int i=0;
+	int ret=0;
+	int slaveAddr=atoi32(argv[5],10);
+	//sheet.cirCulaColTime=atoi32(argv[6],10);
+	sheet.h2sColTime=atoi32(argv[6],10);
+	for( i=0;i<H2S_485_NUM;i++){//核对有没有配置过
+			if(rt_strcmp(sheet.h2s[i].ID,argv[2])==0){//配置过
+					if((slaveAddr==0)||(slaveAddr==255)){//关闭
+							sheet.h2s[i].workFlag=RT_FALSE;//关闭
+					}
+					else{
+							sheet.h2s[i].workFlag=RT_TRUE;//打开
+					}
+					sheet.h2s[i].slaveAddr=slaveAddr;	
+					sheet.h2s[i].useUartNum=UartNum[uartnum];
+					rt_strcpy(sheet.h2s[i].model,argv[3]);
+					rt_kprintf("%s h2s reconfig %d\n",sign,i);
+					ret =1;
+					break;
+			}
+	}
+	if(i==H2S_485_NUM){//没有配置过
+			for(int j=0;j<H2S_485_NUM;j++){
+					if(sheet.h2s[j].workFlag!=RT_TRUE){
+							sheet.h2s[j].workFlag=RT_TRUE;//打开
+							sheet.h2s[j].slaveAddr=slaveAddr;	
+							sheet.h2s[j].useUartNum=UartNum[uartnum];
+							rt_strcpy(sheet.h2s[j].model,argv[3]);
+							rt_strcpy(sheet.h2s[j].ID,argv[2]);
+							rt_kprintf("%s h2s config %d\n",sign,j);
+							ret =1;
+							break;
+					}
+			}
+	}
+	return ret;
+}
+static int o2Conf(int uartnum,char *argv[])
+{
+	int i=0;
+	int ret=0;
+	int slaveAddr=atoi32(argv[5],10);
+	//sheet.cirCulaColTime=atoi32(argv[6],10);
+	sheet.o2ColTime=atoi32(argv[6],10);
+	for( i=0;i<O2_485_NUM;i++){//核对有没有配置过
+			if(rt_strcmp(sheet.o2[i].ID,argv[2])==0){//配置过
+					if((slaveAddr==0)||(slaveAddr==255)){//关闭
+							sheet.o2[i].workFlag=RT_FALSE;//关闭
+					}
+					else{
+							sheet.o2[i].workFlag=RT_TRUE;//打开
+					}
+					sheet.o2[i].slaveAddr=slaveAddr;	
+					sheet.o2[i].useUartNum=UartNum[uartnum];
+					rt_strcpy(sheet.o2[i].model,argv[3]);
+					rt_kprintf("%s o2 reconfig %d\n",sign,i);
+					ret =1;
+					break;
+			}
+	}
+	if(i==O2_485_NUM){//没有配置过
+			for(int j=0;j<O2_485_NUM;j++){
+					if(sheet.o2[j].workFlag!=RT_TRUE){
+							sheet.o2[j].workFlag=RT_TRUE;//打开
+							sheet.o2[j].slaveAddr=slaveAddr;	
+							sheet.o2[j].useUartNum=UartNum[uartnum];
+							rt_strcpy(sheet.o2[j].model,argv[3]);
+							rt_strcpy(sheet.o2[j].ID,argv[2]);
+							rt_kprintf("%s o2 config %d\n",sign,j);
+							ret =1;
+							break;
+					}
+			}
+	}
+	return ret;
+}
+static int waterLevConf(int uartnum,char *argv[])
+{
+	int i=0;
+	int ret=0;
+	int slaveAddr=atoi32(argv[5],10);
+	//sheet.cirCulaColTime=atoi32(argv[6],10);
+	sheet.waterLevColTime=atoi32(argv[6],10);
+	for( i=0;i<WATERLEV_485_NUM;i++){//核对有没有配置过
+			if(rt_strcmp(sheet.waterLev[i].ID,argv[2])==0){//配置过
+					if((slaveAddr==0)||(slaveAddr==255)){//关闭
+							sheet.waterLev[i].workFlag=RT_FALSE;//关闭
+					}
+					else{
+							sheet.waterLev[i].workFlag=RT_TRUE;//打开
+					}
+					sheet.waterLev[i].slaveAddr=slaveAddr;	
+					sheet.waterLev[i].useUartNum=UartNum[uartnum];
+					rt_strcpy(sheet.waterLev[i].model,argv[3]);
+					rt_kprintf("%s waterLev reconfig %d\n",sign,i);
+					ret =1;
+					break;
+			}
+	}
+	if(i==WATERLEV_485_NUM){//没有配置过
+			for(int j=0;j<WATERLEV_485_NUM;j++){
+					if(sheet.waterLev[j].workFlag!=RT_TRUE){
+							sheet.waterLev[j].workFlag=RT_TRUE;//打开
+							sheet.waterLev[j].slaveAddr=slaveAddr;	
+							sheet.waterLev[j].useUartNum=UartNum[uartnum];
+							rt_strcpy(sheet.waterLev[j].model,argv[3]);
+							rt_strcpy(sheet.waterLev[j].ID,argv[2]);
+							rt_kprintf("%s waterLev config %d\n",sign,j);
+							ret =1;
+							break;
+					}
+			}
+	}
+	return ret;
+}
+static int tempHumConf(int uartnum,char *argv[])
+{
+	int i=0;
+	int ret=0;
+	int slaveAddr=atoi32(argv[5],10);
+	//sheet.cirCulaColTime=atoi32(argv[6],10);
+	sheet.tempHumColTime=atoi32(argv[6],10);
+	for( i=0;i<TEMPHUM_485_NUM;i++){//核对有没有配置过
+			if(rt_strcmp(sheet.tempHum[i].ID,argv[2])==0){//配置过
+					if((slaveAddr==0)||(slaveAddr==255)){//关闭
+							sheet.tempHum[i].workFlag=RT_FALSE;//关闭
+					}
+					else{
+							sheet.tempHum[i].workFlag=RT_TRUE;//打开
+					}
+					sheet.tempHum[i].slaveAddr=slaveAddr;	
+					sheet.tempHum[i].useUartNum=UartNum[uartnum];
+					rt_strcpy(sheet.tempHum[i].model,argv[3]);
+					rt_kprintf("%s tempHum reconfig %d\n",sign,i);
+					ret =1;
+					break;
+			}
+	}
+	if(i==TEMPHUM_485_NUM){//没有配置过
+			for(int j=0;j<TEMPHUM_485_NUM;j++){
+					if(sheet.tempHum[j].workFlag!=RT_TRUE){
+							sheet.tempHum[j].workFlag=RT_TRUE;//打开
+							sheet.tempHum[j].slaveAddr=slaveAddr;	
+							sheet.tempHum[j].useUartNum=UartNum[uartnum];
+							rt_strcpy(sheet.tempHum[j].model,argv[3]);
+							rt_strcpy(sheet.tempHum[j].ID,argv[2]);
+							rt_kprintf("%s tempHum config %d\n",sign,j);
+							ret =1;
+							break;
+					}
+			}
+	}
+	return ret;
+}
+int modbusConf(int modbusnum,int uartnum,char *argv[])
+{
+	  int ret=0,i;
+	  //int slaveAddr=atoi32(argv[5],10);//提取设备地址 前面已经核对过
+		rt_kprintf("conf:%d %d\n",modbusnum,uartnum);
+		switch(modbusnum)
+		{
+			case CIRCULA:
+				ret =circulaConf(uartnum,argv);
+			break;
+			case PARTDISCHAG:
+				ret=partDischagConf(uartnum,argv);
+			break;
+			case PRESSSETTL:
+				ret=pressSettlConf(uartnum,argv);
+			break;
+			case THREEAXIS:
+				ret=threeAxisConf(uartnum,argv);
+			break;
+			case CH4:
+				ret=ch4Conf(uartnum,argv);
+			break;
+			case O2:
+				ret=o2Conf(uartnum,argv);
+			break;
+			case H2S:
+				ret=h2sConf(uartnum,argv);
+      break;
+      case CO:
+				ret=coConf(uartnum,argv);
+      break;
+      case TEMPHUM:
+				ret=tempHumConf(uartnum,argv);
+      break;
+      case WATERLEVEL:
+				ret=waterLevConf(uartnum,argv);
+			break;
+			default:
+			break;
+		}
+		return ret;
+}
+
+//相同种类的传感器必须挂到同一个port下边
+//每种传感器最后一次输入的采集时间为最终采集时间
+//modbus   局放 port2 2 60
+//使用前提条件必须启用upKeepStateTask中参数以及回调函数初始化才能使用
+//核对名称 核对地址 核对port才能写入
+//modbus+设备名称(波特率)+ID+model+端口(port1-port4)+设备地址(0/255-关闭设备)+采集间隔(秒)
+static void modbus(int argc, char *argv[])
+{
+	  extern void timeStop(upDataTimEnum num);
+	  extern void timeInit(upDataTimEnum num,int value,int firstCnt);
+	  int i,j;
+		if (argc != 7)
+		{
+				rt_kprintf("%sERR input argc\n",sign);
+				goto ERR;
+		}
+		uint8_t slaveaddr=atoi16(argv[5],10);
+    int setTime =atoi16(argv[6],10);
+		if(setTime<60){
+				rt_kprintf("%serr:argv[6] 采集时间>60 now is%d\n",sign,time);
+				goto ERR;
+		}
+		if(slaveaddr>255){
+				rt_kprintf("%serr:argv[5] between 0 and 255 %d\n",sign,argv[5]);
+				goto ERR;
+		}
+		for(i=0;i<MODBUS_NUM;i++){
+				if(0==rt_strcmp((char *)modbusName[i], argv[1])){
+						for(j=0;j<UART_NUM;j++){
+								if(0==rt_strcmp((char *)UartName[j], argv[4])){//串口 合法
+										break;
+								}
+						}
+						break;
+				}
+		}
+		if(i==MODBUS_NUM){
+				rt_kprintf("%serr:argv[1]\n",sign);
+			  for(int j=0;j<MODBUS_NUM;j++)
+					rt_kprintf("%s ",modbusName[j]);
+			  rt_kprintf("\n ");
+				goto ERR;
+		}
+		if(j==UART_NUM){
+				rt_kprintf("%serr:argv[2]\n",sign);
+				for(int j=0;j<UART_NUM;j++)
+					rt_kprintf("%s ",UartName[j]);
+			  rt_kprintf("\n ");
+				goto ERR;
+		}
+		if(1==modbusConf(i,j,argv))//配置modbus参数到表中
+				return;//正确跳出
+		ERR:
+		rt_kprintf("%sfor example:modbus+设备名称(波特率)+ID+model+端口(port1-port4)+设备地址(0/255-关闭设备)+采集间隔(秒)\n",sign);
+		rt_kprintf("%sNOTE:括号内对参数进行解释,不需要输入\n",sign);
+}
+//FINSH_FUNCTION_EXPORT(modbus, offline finsh);//FINSH_FUNCTION_EXPORT_CMD
+MSH_CMD_EXPORT(modbus,port slaveaddr config);//FINSH_FUNCTION_EXPORT_CMD
+
+
+
+static const uint8_t portStr[UART_NUM][6]={"port1","port2","port3","port4"};
+
+static void uart(int argc, char *argv[])
+{
+	  
+		if(argc!=3){
+				goto ERR;
+		}
+		for(int i=0;i<UART_NUM;i++){
+				if(0==rt_strcmp((char *)portStr[i], argv[1])){
+						packFLash.uartBps[i]     =atoi32(argv[2],10);
+						//MX_USART2_UART_Init(packFLash.port[i].bps);
+						uartSingConf(i,packFLash.uartBps[i]);
+						rt_kprintf("%sport%d config\n",sign,i+1);
+						return;
+				}
+		}
+
+		ERR:
+		rt_kprintf("%s[uart 端口(1-4) 波特率]\n",sign);
+		rt_kprintf("%sfor example\n",sign);
+		rt_kprintf("%s[uart port1 9600 ]\n",sign);
+
+}
+MSH_CMD_EXPORT(uart,uart config);//FINSH_FUNCTION_EXPORT_CMD

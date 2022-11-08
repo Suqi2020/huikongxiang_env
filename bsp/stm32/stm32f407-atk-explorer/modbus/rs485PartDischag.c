@@ -1,112 +1,113 @@
-//#include <board.h>
+#include <board.h>
 //#include "rs485PartDischag.h"
-////<<¾Ö·ÅÔÚÏß¼ì²â --GY-JF100-C01>>  GZPD-1000µçÀÂ¾Ö·Å
-////ÏìÓ¦Ê±¼ä²»È·¶¨ ×î³¤1.7Ãë ÓÐÊ±ºò³¤ ÓÐÊ±ºò¶Ì
-////           Ä¬ÈÏ²¨ÌØÂÊ115200
+//#include "stmflash.h"
+//<<¾Ö·ÅÔÚÏß¼ì²â --GY-JF100-C01>>  GZPD-1000µçÀÂ¾Ö·Å
+//ÏìÓ¦Ê±¼ä²»È·¶¨ ×î³¤1.7Ãë ÓÐÊ±ºò³¤ ÓÐÊ±ºò¶Ì
+//           Ä¬ÈÏ²¨ÌØÂÊ115200
 
 
-//const static char sign[]="[¾Ö·Å]";
-//partDischargeStru partDiscStru_p;
+const static char sign[]="[¾Ö·Å]";
+partDischargeStru partDiscStru_p[PARTDISCHAG_485_NUM];
 
-////#define   SLAVE_ADDR     0X01
-//#define   LENTH          1024  //¹¤×÷»·Á÷ÓÃµ½µÄ×î´ó½ÓÊÕbuf³¤¶È
+//#define   SLAVE_ADDR     0X01
+#define   LENTH          1024  //¹¤×÷»·Á÷ÓÃµ½µÄ×î´ó½ÓÊÕbuf³¤¶È
 
 
-//static void partDischagUartSend(uint8_t *buf,int len)
-//{
-//		rs485UartSend(modbusFlash[PARTDISCHAG].useUartNum,buf, len);
-//	
-//}
+static void partDischagUartSend(int num,uint8_t *buf,int len)
+{
+		rs485UartSend(sheet.partDischag[num].useUartNum,buf, len);
+	
+}
 
-////¶ÁÈ¡·ùÖµ ÆµÂÊ ·Åµç×ÜÄÜÁ¿
-////01 03 0300 0006 C58C
-////01 03 24 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 7B A1 
+//¶ÁÈ¡·ùÖµ ÆµÂÊ ·Åµç×ÜÄÜÁ¿
+//01 03 0300 0006 C58C
+//01 03 24 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 7B A1 
 
-//void readPdFreqDischarge()
-//{
-//	  uint8_t offset=3;//add+regadd+len
-//	  uint8_t  *buf = RT_NULL;
-//		buf = rt_malloc(LENTH);
-//	  uint16_t len = modbusReadReg(modbusFlash[PARTDISCHAG].slaveAddr,0x0300,READ_03,18,buf);
-//		rt_mutex_take(uartDev[modbusFlash[PARTDISCHAG].useUartNum].uartMutex,RT_WAITING_FOREVER);
-//	  //485·¢ËÍbuf  len  µÈ´ýmodbus»ØÓ¦
-//		partDischagUartSend(buf,len);
-//	  rt_kprintf("%sPdFreqDiach send:",sign);
-//		for(int j=0;j<len;j++){
-//				rt_kprintf("%x ",buf[j]);
-//		}
-//		rt_kprintf("\n");
-//		memset(buf,0,LENTH);
-//    len=0;
-//		if(rt_mq_recv(uartDev[modbusFlash[PARTDISCHAG].useUartNum].uartMessque, buf+len, 1, 3000) == RT_EOK){//µÚÒ»´Î½ÓÊÕÊ±¼ä·Å³¤µã  ÏàÓ¦Ê±¼äÓÐ¿ÉÄÜ±È½Ï¾Ã
-//				len++;
-//		}
-//		while(rt_mq_recv(uartDev[modbusFlash[PARTDISCHAG].useUartNum].uartMessque, buf+len, 1, 10) == RT_EOK){//115200 ²¨ÌØÂÊ1ms 10¸öÊý¾Ý
-//				len++;
-//		}
-//		if(len!=0){
-//				rt_kprintf("%srec:",sign);
-//				for(int j=0;j<len;j++){
-//						rt_kprintf("%x ",buf[j]);
-//				}
-//				rt_kprintf("\n");
-//		}
-//		//ÌáÈ¡»·Á÷Öµ µÚÒ»²½ÅÐ¶Ïcrc µÚ¶þ²¿ÌáÈ¡
+void readPdFreqDischarge(int num)
+{
+	  uint8_t offset=3;//add+regadd+len
+	  uint8_t  *buf = RT_NULL;
+		buf = rt_malloc(LENTH);
+	  uint16_t len = modbusReadReg(sheet.partDischag[num].slaveAddr,0x0300,READ_03,18,buf);
+		rt_mutex_take(uartDev[sheet.partDischag[num].useUartNum].uartMutex,RT_WAITING_FOREVER);
+	  //485·¢ËÍbuf  len  µÈ´ýmodbus»ØÓ¦
+		partDischagUartSend(num,buf,len);
+	  rt_kprintf("%sPdFreqDiach send:",sign);
+		for(int j=0;j<len;j++){
+				rt_kprintf("%x ",buf[j]);
+		}
+		rt_kprintf("\n");
+		memset(buf,0,LENTH);
+    len=0;
+		if(rt_mq_recv(uartDev[sheet.partDischag[num].useUartNum].uartMessque, buf+len, 1, 3000) == RT_EOK){//µÚÒ»´Î½ÓÊÕÊ±¼ä·Å³¤µã  ÏàÓ¦Ê±¼äÓÐ¿ÉÄÜ±È½Ï¾Ã
+				len++;
+		}
+		while(rt_mq_recv(uartDev[sheet.partDischag[num].useUartNum].uartMessque, buf+len, 1, 10) == RT_EOK){//115200 ²¨ÌØÂÊ1ms 10¸öÊý¾Ý
+				len++;
+		}
+		if(len!=0){
+				rt_kprintf("%srec:",sign);
+				for(int j=0;j<len;j++){
+						rt_kprintf("%x ",buf[j]);
+				}
+				rt_kprintf("\n");
+		}
+		//ÌáÈ¡»·Á÷Öµ µÚÒ»²½ÅÐ¶Ïcrc µÚ¶þ²¿ÌáÈ¡
 //		uartDev[modbusFlash[PARTDISCHAG].useUartNum].offline=RT_FALSE;
-//		int ret2= modbusRespCheck(modbusFlash[PARTDISCHAG].slaveAddr,buf,len,RT_TRUE);
-//		if(0 ==  ret2){//Ë¢ÐÂ¶ÁÈ¡µ½µÄÖµ
-//			
-//				partDiscStru_p.amplitudeA=(buf[offset]<<24)+(buf[offset+1]<<16)+(buf[offset+2]<<8)+buf[offset+3];offset+=4;
-//				partDiscStru_p.freqA     =(buf[offset]<<24)+(buf[offset+1]<<16)+(buf[offset+2]<<8)+buf[offset+3];offset+=4;
-//			  partDiscStru_p.dischargeA=(buf[offset]<<24)+(buf[offset+1]<<16)+(buf[offset+2]<<8)+buf[offset+3];offset+=4;
-//			
-//				partDiscStru_p.amplitudeB=(buf[offset]<<24)+(buf[offset+1]<<16)+(buf[offset+2]<<8)+buf[offset+3];offset+=4;
-//				partDiscStru_p.freqB     =(buf[offset]<<24)+(buf[offset+1]<<16)+(buf[offset+2]<<8)+buf[offset+3];offset+=4;
-//			  partDiscStru_p.dischargeB=(buf[offset]<<24)+(buf[offset+1]<<16)+(buf[offset+2]<<8)+buf[offset+3];offset+=4;
-//			
-//				partDiscStru_p.amplitudeC=(buf[offset]<<24)+(buf[offset+1]<<16)+(buf[offset+2]<<8)+buf[offset+3];offset+=4;
-//				partDiscStru_p.freqC     =(buf[offset]<<24)+(buf[offset+1]<<16)+(buf[offset+2]<<8)+buf[offset+3];offset+=4;
-//			  partDiscStru_p.dischargeC=(buf[offset]<<24)+(buf[offset+1]<<16)+(buf[offset+2]<<8)+buf[offset+3];offset+=4;
-//			  rt_kprintf("%sPdFreqDiach read ok\n",sign);
-//		} 
-//		else{//¶Á²»µ½¸ø0
-//				if(ret2==2){
-//						//rt_kprintf("%sERR:Çë¼ì²é485½ÓÏß»òÕß¹©µç\r\n",sign);
+		int ret2= modbusRespCheck(sheet.partDischag[num].slaveAddr,buf,len,RT_TRUE);
+		if(0 ==  ret2){//Ë¢ÐÂ¶ÁÈ¡µ½µÄÖµ
+			
+				partDiscStru_p[num].amplitudeA=(buf[offset]<<24)+(buf[offset+1]<<16)+(buf[offset+2]<<8)+buf[offset+3];offset+=4;
+				partDiscStru_p[num].freqA     =(buf[offset]<<24)+(buf[offset+1]<<16)+(buf[offset+2]<<8)+buf[offset+3];offset+=4;
+			  partDiscStru_p[num].dischargeA=(buf[offset]<<24)+(buf[offset+1]<<16)+(buf[offset+2]<<8)+buf[offset+3];offset+=4;
+			
+				partDiscStru_p[num].amplitudeB=(buf[offset]<<24)+(buf[offset+1]<<16)+(buf[offset+2]<<8)+buf[offset+3];offset+=4;
+				partDiscStru_p[num].freqB     =(buf[offset]<<24)+(buf[offset+1]<<16)+(buf[offset+2]<<8)+buf[offset+3];offset+=4;
+			  partDiscStru_p[num].dischargeB=(buf[offset]<<24)+(buf[offset+1]<<16)+(buf[offset+2]<<8)+buf[offset+3];offset+=4;
+			
+				partDiscStru_p[num].amplitudeC=(buf[offset]<<24)+(buf[offset+1]<<16)+(buf[offset+2]<<8)+buf[offset+3];offset+=4;
+				partDiscStru_p[num].freqC     =(buf[offset]<<24)+(buf[offset+1]<<16)+(buf[offset+2]<<8)+buf[offset+3];offset+=4;
+			  partDiscStru_p[num].dischargeC=(buf[offset]<<24)+(buf[offset+1]<<16)+(buf[offset+2]<<8)+buf[offset+3];offset+=4;
+			  rt_kprintf("%sPdFreqDiach read ok\n",sign);
+		} 
+		else{//¶Á²»µ½¸ø0
+				if(ret2==2){
+						//rt_kprintf("%sERR:Çë¼ì²é485½ÓÏß»òÕß¹©µç\r\n",sign);
 //						uartDev[modbusFlash[PARTDISCHAG].useUartNum].offline=RT_TRUE;
-//				}
-//				partDiscStru_p.amplitudeA=0;
-//				partDiscStru_p.freqA     =0;
-//			  partDiscStru_p.dischargeA=0;
-//			
-//				partDiscStru_p.amplitudeB=0;
-//				partDiscStru_p.freqB     =0;
-//			  partDiscStru_p.dischargeB=0;
-//			
-//				partDiscStru_p.amplitudeC=0;
-//				partDiscStru_p.freqC     =0;
-//			  partDiscStru_p.dischargeC=0;
-//			  rt_kprintf("%sPdFreqDiach read fail\n",sign);
-//		}
+				}
+				partDiscStru_p[num].amplitudeA=0;
+				partDiscStru_p[num].freqA     =0;
+			  partDiscStru_p[num].dischargeA=0;
+			
+				partDiscStru_p[num].amplitudeB=0;
+				partDiscStru_p[num].freqB     =0;
+			  partDiscStru_p[num].dischargeB=0;
+			
+				partDiscStru_p[num].amplitudeC=0;
+				partDiscStru_p[num].freqC     =0;
+			  partDiscStru_p[num].dischargeC=0;
+			  rt_kprintf("%sPdFreqDiach read fail\n",sign);
+		}
 
-//	  rt_mutex_release(uartDev[modbusFlash[PARTDISCHAG].useUartNum].uartMutex);
-//		rt_free(buf);
-//	  buf=RT_NULL;
+	  rt_mutex_release(uartDev[sheet.partDischag[num].useUartNum].uartMutex);
+		rt_free(buf);
+	  buf=RT_NULL;
 
-//}
+}
 
-////¶ÁÈ¡¾Ö·Å±¨¾¯×´Ì¬ 
-////·¢ 01 01 0001 0008 6C0C
-////ÊÕ 01 01 01 00 51 88 
+//¶ÁÈ¡¾Ö·Å±¨¾¯×´Ì¬ 
+//·¢ 01 01 0001 0008 6C0C
+//ÊÕ 01 01 01 00 51 88 
 
-//rt_bool_t readPartDischgWarning()
+//rt_bool_t readPartDischgWarning(int num)
 //{
 //	  uint8_t offset=3;//add+regadd+len
 //	  uint8_t  *buf = RT_NULL;
 //		buf = rt_malloc(LENTH);
-//	  uint16_t len = modbusReadBitReg(modbusFlash[PARTDISCHAG].slaveAddr,0x0001,8,buf);//¶ÁÈ¡8¸öbit
-//		rt_mutex_take(uartDev[modbusFlash[PARTDISCHAG].useUartNum].uartMutex,RT_WAITING_FOREVER);
+//	  uint16_t len = modbusReadBitReg(sheet.partDischag[num].slaveAddr,0x0001,8,buf);//¶ÁÈ¡8¸öbit
+//		rt_mutex_take(uartDev[sheet.partDischag[num].useUartNum].uartMutex,RT_WAITING_FOREVER);
 //	  //485·¢ËÍbuf  len  µÈ´ýmodbus»ØÓ¦
-//		partDischagUartSend(buf,len);
+//		partDischagUartSend(num,buf,len);
 //	  rt_kprintf("%sreadPd send:",sign);
 //		for(int j=0;j<len;j++){
 //				rt_kprintf("%x ",buf[j]);
@@ -114,10 +115,10 @@
 //		rt_kprintf("\n");
 //		memset(buf,0,LENTH);
 //    len=0;
-//		if(rt_mq_recv(uartDev[modbusFlash[PARTDISCHAG].useUartNum].uartMessque, buf+len, 1, 3000) == RT_EOK){//µÚÒ»´Î½ÓÊÕÊ±¼ä·Å³¤µã  ÏàÓ¦Ê±¼äÓÐ¿ÉÄÜ±È½Ï¾Ã
+//		if(rt_mq_recv(uartDev[sheet.partDischag[num].useUartNum].uartMessque, buf+len, 1, 3000) == RT_EOK){//µÚÒ»´Î½ÓÊÕÊ±¼ä·Å³¤µã  ÏàÓ¦Ê±¼äÓÐ¿ÉÄÜ±È½Ï¾Ã
 //				len++;
 //		}
-//		while(rt_mq_recv(uartDev[modbusFlash[PARTDISCHAG].useUartNum].uartMessque, buf+len, 1, 10) == RT_EOK){//115200 ²¨ÌØÂÊ1ms 10¸öÊý¾Ý
+//		while(rt_mq_recv(uartDev[sheet.partDischag[num].useUartNum].uartMessque, buf+len, 1, 10) == RT_EOK){//115200 ²¨ÌØÂÊ1ms 10¸öÊý¾Ý
 //				len++;
 //		}
 //		rt_kprintf("%srec:",sign);
@@ -125,74 +126,74 @@
 //				rt_kprintf("%x ",buf[j]);
 //		}
 //		rt_kprintf("\n");
-//		uartDev[modbusFlash[PARTDISCHAG].useUartNum].offline=RT_FALSE;
+////		uartDev[modbusFlash[PARTDISCHAG].useUartNum].offline=RT_FALSE;
 //		//ÌáÈ¡»·Á÷Öµ µÚÒ»²½ÅÐ¶Ïcrc µÚ¶þ²¿ÌáÈ¡
-//		int ret2=modbusRespCheck(modbusFlash[PARTDISCHAG].slaveAddr,buf,len,RT_TRUE);
+//		int ret2=modbusRespCheck(sheet.partDischag[num].slaveAddr,buf,len,RT_TRUE);
 //		if(0 == ret2){//Ë¢ÐÂ¶ÁÈ¡µ½µÄÖµ
 //     
-//			  partDiscStru_p.alarm.a=(buf[offset]>>0)&0x01;
-//				partDiscStru_p.alarm.b=(buf[offset]>>1)&0x01;
-//			  partDiscStru_p.alarm.c=(buf[offset]>>2)&0x01;
+//			  partDiscStru_p[num].alarm.a=(buf[offset]>>0)&0x01;
+//				partDiscStru_p[num].alarm.b=(buf[offset]>>1)&0x01;
+//			  partDiscStru_p[num].alarm.c=(buf[offset]>>2)&0x01;
 //			  rt_kprintf("%sÌáÈ¡alarm OK\r\n",sign);
 //		} 
 //		else{
 //				if(ret2==2){
 //						//rt_kprintf("%sERR:Çë¼ì²é485½ÓÏß»òÕß¹©µç\r\n",sign);
-//					  uartDev[modbusFlash[PARTDISCHAG].useUartNum].offline=RT_TRUE;
+////					  uartDev[modbusFlash[PARTDISCHAG].useUartNum].offline=RT_TRUE;
 //				}
-//				partDiscStru_p.alarm.a=0;
-//				partDiscStru_p.alarm.b=0;
-//				partDiscStru_p.alarm.c=0;
+//				partDiscStru_p[num].alarm.a=0;
+//				partDiscStru_p[num].alarm.b=0;
+//				partDiscStru_p[num].alarm.c=0;
 //			  rt_kprintf("%sÌáÈ¡alarm fail\r\n",sign);
 //		}
 //   
-//	  rt_mutex_release(uartDev[modbusFlash[PARTDISCHAG].useUartNum].uartMutex);
+//	  rt_mutex_release(uartDev[sheet.partDischag[num].useUartNum].uartMutex);
 //		rt_free(buf);
 //	  buf=RT_NULL;
-//		if(partDiscStru_p.alarm.a||partDiscStru_p.alarm.b||partDiscStru_p.alarm.c)
+//		if(partDiscStru_p[num].alarm.a||partDiscStru_p[num].alarm.b||partDiscStru_p[num].alarm.c)
 //				return RT_TRUE;
 //		else 
 //			  return RT_FALSE;
 //}
 
-//void  partDisWaringEventPack()
-//{
-//		rt_kprintf("%slater add \n\r",sign);
-//		
-//}
-///*
-//{
-//    "mid":1234,
-//    "packetType":"CMD_REPORTDATA",
-//    "param":
-//    {
-//        "identifier":"partial_discharge_monitor",
-//        "acuId":"100000000000001",
-//        "deviceId":"1000000000003", 
-//        "data":
-//        {
-//            "pdA":"",
-//            "freqA":"",
-//            "dischargeDataA":"",
-//            "prpdDataA":"",
-//            "prpsDataA":"",
-//            "pdB":"",
-//            "freqB":"",
-//            "dischargeDataB":"",
-//            "prpdDataB":"",
-//            "prpsDataB":"",
-//            "pdC":"",
-//            "freqC":"",
-//            "pdTotalC":"",
-//            "dischargeDataC":"",
-//            "prpdDataC":"",
+void  partDisWaringEventPack()
+{
+		rt_kprintf("%slater add \n\r",sign);
+		
+}
+/*
+{
+    "mid":1234,
+    "packetType":"CMD_REPORTDATA",
+    "param":
+    {
+        "identifier":"partial_discharge_monitor",
+        "acuId":"100000000000001",
+        "deviceId":"1000000000003", 
+        "data":
+        {
+            "pdA":"",
+            "freqA":"",
+            "dischargeDataA":"",
+            "prpdDataA":"",
+            "prpsDataA":"",
+            "pdB":"",
+            "freqB":"",
+            "dischargeDataB":"",
+            "prpdDataB":"",
+            "prpsDataB":"",
+            "pdC":"",
+            "freqC":"",
+            "pdTotalC":"",
+            "dischargeDataC":"",
+            "prpdDataC":"",
 
-//            "monitoringTime":"1655172531937"
-//        }
-//    },
-//    "timestamp":"1655172531937"
-//}
-//*/
+            "monitoringTime":"1655172531937"
+        }
+    },
+    "timestamp":"1655172531937"
+}
+*/
 //void  partDisDataPack()
 //{
 // 

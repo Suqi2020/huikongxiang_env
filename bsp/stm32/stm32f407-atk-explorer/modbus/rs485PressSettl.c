@@ -1,127 +1,126 @@
-//#include "rs485PressSettl.h"
+#include "board.h"
+//<<压差式沉降仪 GY-STC-2000>> 默认波特率9600  modbus地址 0xb1(有误) 见机身标签后2位  协议文档有误
+//修改设备地址 FF FF 03 0A＋设备完整的长地址＋01＋短地址 
+//   FF FF 03 0A 6E 01 20 21 09 08 00 B1 01 01
+//  24+红色，24-黑色，A+蓝色，B-绿色
+const static char sign[]="[沉降仪]";
 
-////<<压差式沉降仪 GY-STC-2000>> 默认波特率9600  modbus地址 0xb1(有误) 见机身标签后2位  协议文档有误
-////修改设备地址 FF FF 03 0A＋设备完整的长地址＋01＋短地址 
-////   FF FF 03 0A 6E 01 20 21 09 08 00 B1 01 01
-////  24+红色，24-黑色，A+蓝色，B-绿色
-//const static char sign[]="[沉降仪]";
-
-////#define   SLAVE_ADDR     0X01 
-//#define   LENTH          50  //工作环流用到的最大接收buf长度
-
-
-//pressSettlStru pressSettle;
+//#define   SLAVE_ADDR     0X01 
+#define   LENTH          50  //工作环流用到的最大接收buf长度
 
 
-////打包串口发送 
-//static void pressSettlUartSend(uint8_t *buf,int len)
-//{
-//		rs485UartSend(modbusFlash[PRESSSETTL].useUartNum,buf, len);
-//}
-
-/////////////////////////////////////////读写寄存器相关操作////////////////////////////////////////
+pressSettlStru pressSettle[PRESSSETTL_485_NUM];
 
 
+//打包串口发送 
+static void pressSettlUartSend(int num,uint8_t *buf,int len)
+{
+		rs485UartSend(sheet.pressSetl[num].useUartNum,buf, len);
+}
 
-//uint8_t psReadReg(uint16_t slavAddr,uint16_t regAddr,uint16_t len,uint8_t * out)
-//{
-//		int i=0;
-//	  out[i]=slavAddr;					 			i++;
-//	  out[i]=0x04;      					 		i++;
-//	  out[i]=(uint8_t)(regAddr>>8);   i++;
-//	  out[i]=(uint8_t) regAddr;       i++;
-//		out[i]=(uint8_t)(len>>8);       i++;
-//	  out[i]=(uint8_t) len;       		i++;
-//	  uint16_t crcRet=RTU_CRC(out ,i);
-//	  out[i]=(uint8_t)(crcRet>>8);    i++;
-//	  out[i]=crcRet;       						i++;
-//		return i;
-//}
+///////////////////////////////////////读写寄存器相关操作////////////////////////////////////////
 
 
 
-////发 1A 04 00 01 00 02 23 E0
-////收 1A 04 04 0B 1B 00 1C 23 6F
-//void readPSTempHeight()
-//{
-//	  uint8_t offset=3;//add+regadd+len
-//	  uint8_t  *buf = RT_NULL;
-//		buf = rt_malloc(LENTH);
-//	  uint16_t len = psReadReg(modbusFlash[PRESSSETTL].slaveAddr,0X0001,2,buf);
-//		rt_mutex_take(uartDev[modbusFlash[PRESSSETTL].useUartNum].uartMutex,RT_WAITING_FOREVER);
-//	  //485发送buf  len  等待modbus回应
-//		pressSettlUartSend(buf,len);
-//	  rt_kprintf("%spressSettl send:",sign);
-//		for(int j=0;j<len;j++){
-//				rt_kprintf("%x ",buf[j]);
-//		}
-//		rt_kprintf("\n");
-//    len=0;
-//		memset(buf,0,LENTH);
-//		
-//		if(rt_mq_recv(uartDev[modbusFlash[PRESSSETTL].useUartNum].uartMessque, buf+len, 1, 3000) == RT_EOK){//第一次接收时间放长点  相应时间有可能比较久
-//				len++;
-//		}
-//		while(rt_mq_recv(uartDev[modbusFlash[PRESSSETTL].useUartNum].uartMessque, buf+len, 1, 10) == RT_EOK){//115200 波特率1ms 10个数据
-//				len++;
-//		}
-//		if(len!=0){
-//				rt_kprintf("%srec:",sign);
-//				for(int j=0;j<len;j++){
-//						rt_kprintf("%x ",buf[j]);
-//				}
-//				rt_kprintf("\n");
-//		}
-//		//提取环流值 第一步判断crc 第二部提取
-//		uartDev[modbusFlash[PRESSSETTL].useUartNum].offline=RT_FALSE;
-//		int ret2=modbusRespCheck(modbusFlash[PRESSSETTL].slaveAddr,buf,len,RT_TRUE);
-//		if(0 == ret2){//刷新读取到的值
+uint8_t psReadReg(uint16_t slavAddr,uint16_t regAddr,uint16_t len,uint8_t * out)
+{
+		int i=0;
+	  out[i]=slavAddr;					 			i++;
+	  out[i]=0x04;      					 		i++;
+	  out[i]=(uint8_t)(regAddr>>8);   i++;
+	  out[i]=(uint8_t) regAddr;       i++;
+		out[i]=(uint8_t)(len>>8);       i++;
+	  out[i]=(uint8_t) len;       		i++;
+	  uint16_t crcRet=RTU_CRC(out ,i);
+	  out[i]=(uint8_t)(crcRet>>8);    i++;
+	  out[i]=crcRet;       						i++;
+		return i;
+}
 
-//        pressSettle.temp	=(buf[offset]<<8)+buf[offset+1];offset+=2;
-//			  pressSettle.height=(buf[offset]<<8)+buf[offset+1];
-//        float temp=(float)((float)pressSettle.temp/100);
-//			  float heigh=(float)((float)pressSettle.height/10);
-//			  rt_kprintf("%stemp:%0.2f*C height:%0.1fmm read ok\n",sign,temp,heigh);  
-//		} 
-//		else{//读不到给0
-//				if(ret2==2){
-//						//rt_kprintf("%sERR:请检查485接线或者供电\r\n",sign);
+
+
+//发 1A 04 00 01 00 02 23 E0
+//收 1A 04 04 0B 1B 00 1C 23 6F
+void readPSTempHeight(int num)
+{
+	  uint8_t offset=3;//add+regadd+len
+	  uint8_t  *buf = RT_NULL;
+		buf = rt_malloc(LENTH);
+	  uint16_t len = psReadReg(sheet.pressSetl[num].slaveAddr,0X0001,2,buf);
+		rt_mutex_take(uartDev[sheet.pressSetl[num].useUartNum].uartMutex,RT_WAITING_FOREVER);
+	  //485发送buf  len  等待modbus回应
+		pressSettlUartSend(num,buf,len);
+	  rt_kprintf("%spressSettl send:",sign);
+		for(int j=0;j<len;j++){
+				rt_kprintf("%x ",buf[j]);
+		}
+		rt_kprintf("\n");
+    len=0;
+		memset(buf,0,LENTH);
+		
+		if(rt_mq_recv(uartDev[sheet.pressSetl[num].useUartNum].uartMessque, buf+len, 1, 3000) == RT_EOK){//第一次接收时间放长点  相应时间有可能比较久
+				len++;
+		}
+		while(rt_mq_recv(uartDev[sheet.pressSetl[num].useUartNum].uartMessque, buf+len, 1, 10) == RT_EOK){//115200 波特率1ms 10个数据
+				len++;
+		}
+		if(len!=0){
+				rt_kprintf("%srec:",sign);
+				for(int j=0;j<len;j++){
+						rt_kprintf("%x ",buf[j]);
+				}
+				rt_kprintf("\n");
+		}
+		//提取环流值 第一步判断crc 第二部提取
+	//	uartDev[modbusFlash[PRESSSETTL].useUartNum].offline=RT_FALSE;
+		int ret2=modbusRespCheck(sheet.pressSetl[num].slaveAddr,buf,len,RT_TRUE);
+		if(0 == ret2){//刷新读取到的值
+
+        pressSettle[num].temp	=(buf[offset]<<8)+buf[offset+1];offset+=2;
+			  pressSettle[num].height=(buf[offset]<<8)+buf[offset+1];
+        float temp=(float)((float)pressSettle[num].temp/100);
+			  float heigh=(float)((float)pressSettle[num].height/10);
+			  rt_kprintf("%stemp:%0.2f*C height:%0.1fmm read ok\n",sign,temp,heigh);  
+		} 
+		else{//读不到给0
+				if(ret2==2){
+						//rt_kprintf("%sERR:请检查485接线或者供电\r\n",sign);
 //					  uartDev[modbusFlash[PRESSSETTL].useUartNum].offline=RT_TRUE;
-//				}
-//			  pressSettle.temp	=0;
-//			  pressSettle.height=0;
-//			  rt_kprintf("%stemp height read fail\n",sign);
-//		}
-//	  rt_mutex_release(uartDev[modbusFlash[PRESSSETTL].useUartNum].uartMutex);
-//		rt_free(buf);
-//	  buf=RT_NULL;
+				}
+			  pressSettle[num].temp	=0;
+			  pressSettle[num].height=0;
+			  rt_kprintf("%stemp height read fail\n",sign);
+		}
+	  rt_mutex_release(uartDev[sheet.pressSetl[num].useUartNum].uartMutex);
+		rt_free(buf);
+	  buf=RT_NULL;
 
+}
+
+
+
+/////////////////////////////////////////JSON格式打包//////////////////////////////////////////
+//温度高度值打包
+
+
+
+//{
+//        "mid":1234,
+//        "packetType?:"CMD_REPORTDATA",    
+//        "param":
+//        {
+//                "identifier":"pressure_settler_monitor",
+//                "acuId":"100000000000001",
+//                "deviceId":"1000000000004",?
+//                "data":
+//                {
+//                        "temp":"22.75", //?
+//                        "height":"0.8",//mm
+//                        "monitoringTime":"1655172531937"
+//                }
+//        },
+//        "timestamp":"1655172531937"
 //}
-
-
-
-///////////////////////////////////////////JSON格式打包//////////////////////////////////////////
-////温度高度值打包
-
-
-
-////{
-////        "mid":1234,
-////        "packetType?:"CMD_REPORTDATA",    
-////        "param":
-////        {
-////                "identifier":"pressure_settler_monitor",
-////                "acuId":"100000000000001",
-////                "deviceId":"1000000000004",?
-////                "data":
-////                {
-////                        "temp":"22.75", //?
-////                        "height":"0.8",//mm
-////                        "monitoringTime":"1655172531937"
-////                }
-////        },
-////        "timestamp":"1655172531937"
-////}
 
 
 //void PSTempHeightPack()

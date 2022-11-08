@@ -88,12 +88,12 @@ typedef struct
     uint16_t point; //非modbus真实值  此处读取modbus后经过了转换便于直接计算  0-值为100  1-2 值为10
 } CIRCURStru;
 
-extern CIRCURStru  cirCurStru_p;
+extern CIRCURStru  cirCurStru_p[];
 
-void readCirCurrAndWaring(void);
+//void readCirCurrAndWaring(void);
 rt_bool_t cirCurrWaringcheck(void);
 uint16_t 	cirCulaDataPack(void);
 void  cirCurrWaringEventPack(void);
-
+void readCirCurrAndWaring(int num);
 
 #endif

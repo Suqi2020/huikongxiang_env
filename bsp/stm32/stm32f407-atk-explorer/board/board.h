@@ -31,14 +31,18 @@
 #include "dataPhrase.h"
 #include "crc.h"
 #include "modbus.h"
-//#include "rs485Circula.h"
-//#include "rs485PartDischag.h"
+#include "utility.h"
 #include "uartReconf.h"
-//#include "stmflash.h"
-//#include "rs485Gas.h"
-//#include "rs485WaterLev.h"
-//#include "rs485TempHum.h"
-#include "devconfig.h"
+#include "stmflash.h"
+#include "rs485ThreeAxis.h"
+#include "rs485Circula.h"
+#include "rs485PartDischag.h"
+#include "rs485PressSettl.h"
+#include "rs485Gas.h"
+#include "rs485WaterLev.h"
+#include "rs485TempHum.h"
+#include "cJSON.h"
+
 
 extern UART_HandleTypeDef huart4;
 extern UART_HandleTypeDef huart5;

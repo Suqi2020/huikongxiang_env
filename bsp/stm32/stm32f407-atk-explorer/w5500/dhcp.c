@@ -17,6 +17,7 @@
 #include "dhcp.h"
 #include "utility.h"
 #include "w5500_conf.h"
+#include "rtthread.h"
 #include "board.h"
 //#define DHCP_DEBUG
 const static char sign[]="[dhcp]";

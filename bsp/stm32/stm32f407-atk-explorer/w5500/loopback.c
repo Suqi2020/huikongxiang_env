@@ -198,7 +198,7 @@ void loopback_tcpc(SOCKET s, uint16 port)
 			{				
 				ch_status[s] = 1;
 				socket(s, Sn_MR_TCP, port, 0x00);  			//connect(SOCK_TCPC,remote_ip,remote_port);                /*socket连接服务器*/ 
-				connect(s, packFLash.netIpFlash.remoteIp, packFLash.netIpFlash.remotePort);
+				connect(s, packFLash.netIpFlash.remoteIp,packFLash.netIpFlash.remotePort);
 				rt_kprintf("%sw5500 coning\r\n",sign);
 			}			
 //			rt_kprintf("w5500 cloes %d\r\n",I_STATUS[s]);

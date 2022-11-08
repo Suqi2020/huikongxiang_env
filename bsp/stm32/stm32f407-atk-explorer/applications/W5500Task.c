@@ -80,7 +80,7 @@ void  w5500Task(void *parameter)
 	W5500_enum W5500State=W5500InitEnum;
   static uint8_t dhcpTick=0;
 	static uint8_t rstW5500Ct=0;
-  
+//  stm32_flash_read(FLASH_IP_SAVE_ADDR,(uint8_t*)&netIpFlash,sizeof(netIpFlash));
   while(1) 														/*循环执行的函数*/ 
   {
 		switch(W5500State)
@@ -99,7 +99,8 @@ void  w5500Task(void *parameter)
 						}
 						else{
 							  set_w5500_ip();
-								rt_kprintf("%sW5500 服务器IP:%d.%d.%d.%d\r\n",task,packFLash.netIpFlash.remoteIp[0],packFLash.netIpFlash.remoteIp[1],packFLash.netIpFlash.remoteIp[2],packFLash.netIpFlash.remoteIp[3]);
+								rt_kprintf("%sW5500 服务器IP:%d.%d.%d.%d\r\n",task,packFLash.netIpFlash.remoteIp[0],\
+							      packFLash.netIpFlash.remoteIp[1],packFLash.netIpFlash.remoteIp[2],packFLash.netIpFlash.remoteIp[3]);
 								rt_kprintf("%sW5500 监听端口:%d \r\n",task,packFLash.netIpFlash.remotePort);
 								W5500State=W5500NetOKEnum;
 							  rt_sem_release(w5500Iqr_semp);

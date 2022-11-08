@@ -89,8 +89,9 @@
 //V0.39    修改存储参数命令统一为 flash save                      
 //         增加模拟配置                                            20221107
 //         存在bug  uart 的MX_USART2_UART_Init(packFLash.port[i].bps); 中
-#define APP_VER       ((0<<8)+37)//0x0105 表示1.5版本
-const char date[]="20221104";
+//V0.40    修改傻瓜式为指定传感器        20221108
+#define APP_VER       ((0<<8)+35)//0x0105 表示1.5版本
+const char date[]="20221103";
 
 static    rt_thread_t tid 	= RT_NULL;
 
@@ -120,14 +121,14 @@ const static char sign[]="[main]";
 static rt_timer_t timer1;
 
 //static int cnt = 0;
-/* 定时器1超时函数   100ms基准*/
-
+/* 定时器1超时函数 */
+//10秒提醒一次 uart offline状态
 static void timeout1(void *parameter)
 {
 		static int count=0;
 	  static int alarmTick=10;
 		extern rt_bool_t gbNetState;
-	  void printfNorespModbus(char *sign);
+	  extern void modbusWorkErrCheck(void);
 	  count++;
 	  
 		if(gbNetState==RT_TRUE){
@@ -138,14 +139,16 @@ static void timeout1(void *parameter)
 		else
 				HAL_GPIO_TogglePin(LED_GPIO_Port, LED_Pin);
 		if(count%alarmTick==0){
-			  alarmTick+=200;
-			  if(alarmTick>=600){
-						alarmTick=600;// 1 2 3 最终10秒提醒一次
+			  alarmTick+=20;
+			  if(alarmTick>=100){
+						alarmTick=100;// 1 2 3 最终10秒提醒一次
 				}
-			  printfNorespModbus((char *)sign);
-				if(gbNetState ==RT_FALSE){
-						rt_kprintf("%sERR:网络故障\n",sign);
-				}
+//				modbusWorkErrCheck();//modbus 错误工作状态打印
+//				errConfigCheck();//	modbusWorkErrCheck();//errConfigCheck();
+				//modbusPrintRead();
+//				if(gbNetState ==RT_FALSE){
+//						rt_kprintf("%sERR:网络故障\n",sign);
+//				}
 		}
 }
 
@@ -157,19 +160,11 @@ int main(void)
 		RELAY2_ON;
 		RELAY3_ON;
 		RELAY4_ON;//上电后外部485全部供
-	
-//		uint8_t tet[20];
-//	rt_strcpy((char *)tet,"局放监控");
-//	
-//	rt_kprintf("%s  %d\n",tet,strlen(tet));
-//	memset((char *)tet,0,20);
-//			strcpy((char *)tet,"局放监控");
 
-//		rt_kprintf("%s\n",tet);
     rt_kprintf("\n%s%s  ver=%02d.%02d\n",sign,date,(uint8_t)(APP_VER>>8),(uint8_t)APP_VER);
-		stm32_flash_read(FLASH_IP_SAVE_ADDR,    (uint8_t*)&packFLash,   sizeof(packFLash));
-		stm32_flash_read(FLASH_MODBUS_SAVE_ADDR,(uint8_t*)modbusDevSave,sizeof(modbusDevSave));
 	  rt_err_t result;
+		stm32_flash_read(FLASH_IP_SAVE_ADDR,    (uint8_t*)&packFLash,sizeof(packFLash));
+		stm32_flash_read(FLASH_MODBUS_SAVE_ADDR,(uint8_t*)&sheet,    sizeof(sheet));
 //	  extern void  flashTest();
 //	  flashTest();
 //////////////////////////////////////信号量//////////////////////////////
@@ -224,7 +219,7 @@ int main(void)
 //				rt_kprintf("%sRTcreat netDataSendTask \r\n",sign);
 //		}
 
-//		
+		
 		tid =  rt_thread_create("upKeep",upKeepStateTask,RT_NULL,1024,2, 10 );
 		if(tid!=NULL){
 				rt_thread_startup(tid);													 

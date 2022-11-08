@@ -7,6 +7,6 @@ typedef struct{
 	  uint16_t height;//除以10 传输float类型  单位mm
 }pressSettlStru;
 
-extern pressSettlStru pressSettle;
+extern pressSettlStru pressSettle[PRESSSETTL_485_NUM];
 
 #endif

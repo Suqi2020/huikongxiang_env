@@ -9,7 +9,7 @@
 
 
 
-extern void readTempHum(void);
+extern void readTempHum(int num);
 
 
 #endif
