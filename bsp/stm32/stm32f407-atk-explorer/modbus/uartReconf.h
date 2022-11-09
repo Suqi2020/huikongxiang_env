@@ -78,14 +78,14 @@ extern modbusFunStru modbusFun[MODBUS_NUM];
 
 //extern modbusFlashStru  modbusFlash[MODBUS_NUM];//需要存储到flash的设备配置
 typedef enum{
-     CIRCULA=0, 	PARTDISCHAG,			PRESSSETTL, 			THREEAXIS,			CH4,		O2		,H2S,			CO,			TEMPHUM,			WATERLEVEL
+     CIRCULA=0, 	PARTDISCHAG,			PRESSSETTL, 			THREEAXIS,			CH4,		O2		,H2S,			CO,			TEMPHUM,			WATERDEPTH
 }modbNumEnum;
 
 typedef enum{
-		CIRCULA_TIME=0,PARTDISCHAG_TIME,PRESSSETTL_TIME,THREEAXIS_TIME,CH4_TIME,O2_TIME,H2S_TIME,CO_TIME,TEMPHUM_TIME,WATERLEVEL_TIME,
+		CIRCULA_TIME=0,PARTDISCHAG_TIME,PRESSSETTL_TIME,THREEAXIS_TIME,CH4_TIME,O2_TIME,H2S_TIME,CO_TIME,TEMPHUM_TIME,WATERDEPTH_TIME,
 		HEART_TIME,REG_TIME
 }upDataTimEnum;//需要与modbusName 名称一一对应 来实现代码精简高效
-const static char  modbusName[MODBUS_NUM][20] ={"接地环流","局放","沉降仪","三轴测振仪","甲烷","氧气","硫化氢","一氧化碳","温湿度","水位"};
+const static char  modbusName[MODBUS_NUM][20] ={"接地环流","局放","防沉降","防外破","甲烷","氧气","硫化氢","一氧化碳","温湿度","水位"};
 const static int   modbusBps[MODBUS_NUM]      ={115200,   115200  ,9600,   9600,   9600,   9600,   9600,   9600,   9600,   9600};
 const static int   modbusType[MODBUS_NUM]     ={1,        1,       2,      2, 		 3,  			3,  		3,  		3,  		3,  		3};//想同类型的modbus设备名称相同
 /////////////////////////////////////////////////////////////////////////////////////////////////////

@@ -6,7 +6,7 @@
 //typedef struct{
 //	
 //}waterLevSru;
-extern void readWaterLevel(int num);
+extern void readWaterDepth(int num);
 
 #endif
 

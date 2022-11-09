@@ -69,12 +69,12 @@
 typedef struct
 {
 	  //环流值 放大了100倍
-		uint32_t circlCurA;
-		uint32_t circlCurB;
-	  uint32_t circlCurC;
-	  uint32_t circlCurD;//备用
+		float circlCurA;
+		float circlCurB;
+	  float circlCurC;
+	  float circlCurD;//备用
 	  //阈值
-	  uint32_t thresholdVal;
+	  //uint32_t thresholdVal;
 
 	  
 	  //报警状态  一个字节足够 方便对接modbus回应
@@ -83,15 +83,15 @@ typedef struct
 	  uint16_t warningC;
 	  uint16_t warningD;
 	  //采集间隔 单位秒
-		uint16_t AcqInterv;
+		//uint16_t AcqInterv;
 	//小数点计算数值
     uint16_t point; //非modbus真实值  此处读取modbus后经过了转换便于直接计算  0-值为100  1-2 值为10
 } CIRCURStru;
 
-extern CIRCURStru  cirCurStru_p[];
+//extern CIRCURStru  cirCurStru_p[];
 
-//void readCirCurrAndWaring(void);
-rt_bool_t cirCurrWaringcheck(void);
+void readCirCurrAndWaring(int num);
+rt_bool_t cirCurrWaringcheck(int num);
 uint16_t 	cirCulaDataPack(void);
 void  cirCurrWaringEventPack(void);
 void readCirCurrAndWaring(int num);

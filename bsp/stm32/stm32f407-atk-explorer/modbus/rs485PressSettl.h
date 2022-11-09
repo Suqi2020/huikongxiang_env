@@ -3,10 +3,33 @@
 
 #include <board.h>
 typedef struct{
-	  uint16_t temp;//除以100 传输float类型  单位0C
-	  uint16_t height;//除以10 传输float类型  单位mm
+	  float temp;//除以100 传输float类型  单位0C
+	   union {
+				float flotVal;
+				int   intVal;
+		} height;
+//float height;//除以10 传输float类型  单位mm
 }pressSettlStru;
 
-extern pressSettlStru pressSettle[PRESSSETTL_485_NUM];
+//extern pressSettlStru pressSettle[PRESSSETTL_485_NUM];
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 #endif
+
+
+

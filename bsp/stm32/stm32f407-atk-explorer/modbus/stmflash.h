@@ -47,7 +47,7 @@ typedef struct{
 #define CO_485_NUM   				  2
 #define H2S_485_NUM   			  2
 #define O2_485_NUM   				  2
-#define WATERLEV_485_NUM   	  2
+#define WATERDEPTH_485_NUM   	  2
 #define TEMPHUM_485_NUM   	  2
 typedef struct{
 			modbusStru  threeAxiss[THREEAXIS_485_NUM];
@@ -58,7 +58,7 @@ typedef struct{
 			modbusStru  co[CO_485_NUM];
 			modbusStru  h2s[H2S_485_NUM];
 			modbusStru  o2[O2_485_NUM];
-			modbusStru  waterLev[WATERLEV_485_NUM];
+			modbusStru  waterLev[WATERDEPTH_485_NUM];
 			modbusStru  tempHum[TEMPHUM_485_NUM];
 			
 			uint32_t  threeAxissColTime;

@@ -30,9 +30,9 @@ typedef struct{
 //extern partDischargeStru partDisc;
 
 void readPdFreqDischarge(int num);
-
+rt_bool_t readPartDischgWarning(int num);
 //extern rt_bool_t  PartDischgWarningCheck(void);
-extern rt_bool_t readPartDischgWarning(void);
+//extern rt_bool_t readPartDischgWarning(void);
 extern void  partDisWaringEventPack(void);
 void  partDisDataPack(void);
 #endif

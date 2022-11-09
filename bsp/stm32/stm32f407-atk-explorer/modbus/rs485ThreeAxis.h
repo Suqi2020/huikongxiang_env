@@ -4,10 +4,11 @@
 #include <board.h>
 
 typedef struct{
-		uint16_t temp;
+		float temp;
 	  uint16_t acclrationX;
 		uint16_t acclrationY;
 		uint16_t acclrationZ;
+	  
 }threeAxisStru;
-extern threeAxisStru threeAxisp[THREEAXIS_485_NUM];
+//extern threeAxisStru threeAxisp[THREEAXIS_485_NUM];
 #endif

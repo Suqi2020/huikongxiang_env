@@ -12,8 +12,8 @@
 //  24+红色，24-黑色，A+蓝色，B-绿色
 // 发 01 04 00 01 00 04 A0 09 
 // 收 01 04 08 0B CA FE 8D 00 03 03 80 C7 23 
-const static char sign[]="[三轴]";
-threeAxisStru threeAxisp[THREEAXIS_485_NUM];
+const static char sign[]="[防外破]";
+static threeAxisStru threeAxisp[THREEAXIS_485_NUM];
 
 //#define   SLAVE_ADDR     0X02 
 #define   LENTH          50  //工作环流用到的最大接收buf长度
@@ -50,10 +50,7 @@ void readThreeTempAcc(int num)
 		rt_kprintf("\n");
     len=0;
 		memset(buf,0,LENTH);
-		if(rt_mq_recv(uartDev[sheet.threeAxiss[num].useUartNum].uartMessque, buf+len, 1, 3000) == RT_EOK){//第一次接收时间放长点  相应时间有可能比较久
-				len++;
-		}
-		while(rt_mq_recv(uartDev[sheet.threeAxiss[num].useUartNum].uartMessque, buf+len, 1, 10) == RT_EOK){//115200 波特率1ms 10个数据
+		while(rt_mq_recv(uartDev[sheet.threeAxiss[num].useUartNum].uartMessque, buf+len, 1, 500) == RT_EOK){//115200 波特率1ms 10个数据
 				len++;
 		}
 		if(len!=0){
@@ -67,17 +64,18 @@ void readThreeTempAcc(int num)
 		//提取环流值 第一步判断crc 第二部提取
 		int ret2=modbusRespCheck(sheet.threeAxiss[num].slaveAddr,buf,len,RT_TRUE);
 		if(0 ==  ret2){//刷新读取到的值
-        threeAxisp[num].temp	=(buf[offset]<<8)+buf[offset+1];offset+=2;
+        int temp	=(buf[offset]<<8)+buf[offset+1];offset+=2;
 			  threeAxisp[num].acclrationX = (buf[offset]<<8)+buf[offset+1];offset+=2;
 				threeAxisp[num].acclrationY = (buf[offset]<<8)+buf[offset+1];offset+=2;
 				threeAxisp[num].acclrationZ = (buf[offset]<<8)+buf[offset+1];offset+=2;
-        float temp=(float)((float)threeAxisp[num].temp/100); 
+        threeAxisp[num].temp=(float)temp*0.0625; 
 			  rt_kprintf("%stemp:%0.2f*C ACC:X%dmg Y%dmg Z%dmg ok\n",sign,temp,threeAxisp[num].acclrationX,threeAxisp[num].acclrationY,threeAxisp[num].acclrationZ);  
 		} 
 		else{//读不到给0
 				if(ret2==2){
 //					  uartDev[modbusFlash[THREEAXIS].useUartNum].offline=RT_TRUE;
 				}
+				threeAxisp[num].temp=0;
 			  threeAxisp[num].acclrationX	= 0;
 			  threeAxisp[num].acclrationY = 0;
 			  threeAxisp[num].acclrationY = 0;
@@ -207,3 +205,125 @@ void readThreeTempAcc(int num)
 ////				rt_kprintf("%02x",packBuf[i]);
 //		rt_kprintf("\r\n%slen：%d str0:%x str1:%x str[2]:%d  str[3]:%d\r\n",sign,len,packBuf[0],packBuf[1],packBuf[2],packBuf[3]);
 //}
+
+static uint16_t threeAxisJsonPack()
+{
+		char *sprinBuf=RT_NULL;
+		sprinBuf=rt_malloc(20);//20个字符串长度 够用了
+		char* out = NULL;
+		//创建数组
+		cJSON* Array = NULL;
+		// 创建JSON Object  
+		cJSON* root = NULL;
+		cJSON* nodeobj = NULL;
+		cJSON* nodeobj_p = NULL;
+		root = cJSON_CreateObject();
+		if (root == NULL) return 0;
+		// 加入节点（键值对）
+		cJSON_AddNumberToObject(root, "mid",mcu.upMessID);
+		cJSON_AddStringToObject(root, "packetType","CMD_REPORTDATA");
+		cJSON_AddStringToObject(root, "identifier","external_breakout_prevention");
+		cJSON_AddStringToObject(root, "acuId","100000000000001");
+		
+		
+		{
+		Array = cJSON_CreateArray();
+		if (Array == NULL) return 0;
+		cJSON_AddItemToObject(root, "params", Array);
+		for (int i = 0; i < THREEAXIS_485_NUM; i++)
+		{		
+
+			if(sheet.threeAxiss[i].workFlag==RT_TRUE){
+				nodeobj = cJSON_CreateObject();
+				cJSON_AddItemToArray(Array, nodeobj);
+			  cJSON_AddItemToObject(nodeobj,"deviceId",cJSON_CreateString(sheet.threeAxiss[i].ID));
+				
+				
+				nodeobj_p= cJSON_CreateObject();
+				cJSON_AddItemToObject(nodeobj, "data", nodeobj_p);
+				
+				sprintf(sprinBuf,"%02f",threeAxisp[i].temp);
+				cJSON_AddItemToObject(nodeobj_p,"temperature",cJSON_CreateString(sprinBuf));
+				sprintf(sprinBuf,"%d",threeAxisp[i].acclrationX);
+				cJSON_AddItemToObject(nodeobj_p,"accelerationX",cJSON_CreateString(sprinBuf));
+				sprintf(sprinBuf,"%d",threeAxisp[i].acclrationY);
+				cJSON_AddItemToObject(nodeobj_p,"accelerationY",cJSON_CreateString(sprinBuf));
+				sprintf(sprinBuf,"%d",threeAxisp[i].acclrationZ);
+				cJSON_AddItemToObject(nodeobj_p,"accelerationZ",cJSON_CreateString(sprinBuf));
+
+				sprintf(sprinBuf,"%d",utcTime());
+				cJSON_AddItemToObject(nodeobj_p,"monitoringTime",cJSON_CreateString(sprinBuf));
+			}
+		}
+		}
+	
+		sprintf(sprinBuf,"%d",utcTime());
+		cJSON_AddStringToObject(root,"timestamp",sprinBuf);
+		// 打印JSON数据包  
+		out = cJSON_Print(root);
+		if(out!=NULL){
+			for(int i=0;i<rt_strlen(out);i++)
+					rt_kprintf("%c",out[i]);
+			rt_kprintf("\n");
+			rt_free(out);
+			out=NULL;
+		}
+		if(root!=NULL){
+			cJSON_Delete(root);
+			out=NULL;
+		}
+
+		//打包
+		int len=0;
+		packBuf[len]= (uint8_t)(HEAD>>8); len++;
+		packBuf[len]= (uint8_t)(HEAD);    len++;
+		len+=LENTH_LEN;//json长度最后再填写
+		
+		// 释放内存  
+		
+		
+		rt_strcpy((char *)packBuf+len,out);
+    len+=rt_strlen(out);
+	
+
+		//lenth
+	  packBuf[2]=(uint8_t)((len-LENTH_LEN-HEAD_LEN)>>8);//更新json长度
+	  packBuf[3]=(uint8_t)(len-LENTH_LEN-HEAD_LEN);
+	  uint16_t jsonBodyCrc=RTU_CRC(packBuf+HEAD_LEN+LENTH_LEN,len-HEAD_LEN-LENTH_LEN);
+	  //crc
+	  packBuf[len]=(uint8_t)(jsonBodyCrc>>8); len++;//更新crc
+	  packBuf[len]=(uint8_t)(jsonBodyCrc);    len++;
+
+		//tail
+		packBuf[len]=(uint8_t)(TAIL>>8); len++;
+		packBuf[len]=(uint8_t)(TAIL);    len++;
+		packBuf[len]=0;//len++;//结尾 补0
+		
+		mcu.devRegMessID =mcu.upMessID;
+		upMessIdAdd();
+		rt_kprintf("%sthreeAxis len:%d\r\n",sign,len);
+		rt_kprintf("\r\n%slen：%d str0:%x str1:%x str[2]:%d  str[3]:%d\r\n",sign,len,packBuf[0],packBuf[1],packBuf[2],packBuf[3]);
+
+		rt_free(sprinBuf);
+		sprinBuf=RT_NULL;
+
+		return len;
+}
+
+
+void threeAxisRead2Send(rt_bool_t netStat)
+{					
+		int workFlag=RT_FALSE;
+		for(int i=0;i<THREEAXIS_485_NUM;i++){
+				if(sheet.threeAxiss[i].workFlag==RT_TRUE){
+							readThreeTempAcc(i);
+							workFlag=RT_TRUE;
+					}
+			}
+			if(workFlag==RT_TRUE){
+					rt_kprintf("%s打包采集的THREEAXIS数据\r\n",sign);
+					threeAxisJsonPack();//circulaJsonPack();
+					if(netStat==RT_TRUE)
+							rt_mb_send_wait(&mbNetSendData, (rt_ubase_t)&packBuf,RT_WAITING_FOREVER);
+			}
+}

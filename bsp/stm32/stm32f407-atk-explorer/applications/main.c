@@ -89,8 +89,9 @@
 //V0.39    修改存储参数命令统一为 flash save                      
 //         增加模拟配置                                            20221107
 //         存在bug  uart 的MX_USART2_UART_Init(packFLash.port[i].bps); 中
-//V0.40    修改傻瓜式为指定传感器        20221108
-#define APP_VER       ((0<<8)+35)//0x0105 表示1.5版本
+//V0.40    修改傻瓜式为指定传感器       20221108
+//V0.41    所用到传感器json格式已经打包完成   20221109
+#define APP_VER       ((0<<8)+41)//0x0105 表示1.5版本
 const char date[]="20221103";
 
 static    rt_thread_t tid 	= RT_NULL;

@@ -82,12 +82,20 @@ static int timeOut()
 
 
 
-
-	
+void pressSettRead2Send(rt_bool_t netStat);
+void threeAxisRead2Send(rt_bool_t netStat);
+void partDischagRead2Send(rt_bool_t netStat);
+void circulaRead2Send(rt_bool_t netStat);
+void waterDepthRead2Send(rt_bool_t netStat);
+void tempHumRead2Send(rt_bool_t netStat);
+void o2Read2Send(rt_bool_t netStat);
+void h2sRead2Send(rt_bool_t netStat);	
+void ch4Read2Send(rt_bool_t netStat);	
+void coRead2Send(rt_bool_t netStat);	
 //定时时间到  执行相应事件
 static void  timeOutRunFun()
 {
-    extern uint16_t circulaJsonPack();
+
 	  rt_bool_t workFlag=RT_FALSE;
 		switch(timeOut()){
 			case HEART_TIME://心跳
@@ -106,165 +114,38 @@ static void  timeOutRunFun()
 				rt_kprintf("%sreg timer out\r\n",task);
 				break;
 			case CIRCULA_TIME://读取环流
-				for(int i=0;i<CIRCULA_485_NUM;i++){
-					if(sheet.cirCula[i].workFlag==RT_TRUE){
-								readCirCurrAndWaring(i);
-								workFlag=RT_TRUE;
-						}
-				}
-				if(workFlag==RT_TRUE){
-					  rt_kprintf("%s打包采集的circula数据\r\n",task);
-					  circulaJsonPack();
-					  if(gbNetState==RT_TRUE)
-								rt_mb_send_wait(&mbNetSendData, (rt_ubase_t)&packBuf,RT_WAITING_FOREVER);
-				}
+				circulaRead2Send(gbNetState);
 				rt_kprintf("%sCIRCULA_TIME out\r\n",task);
 				break;
 			case PARTDISCHAG_TIME://读取局放
-				for(int i=0;i<PARTDISCHAG_485_NUM;i++){
-					if(sheet.partDischag[i].workFlag==RT_TRUE){
-								readPdFreqDischarge(i);
-								workFlag=RT_TRUE;
-						}
-				}
-				if(workFlag==RT_TRUE){
-					  rt_kprintf("%s打包采集的PARTDISCHAG数据\r\n",task);
-					  //后期加入
-					  if(gbNetState==RT_TRUE)
-								rt_mb_send_wait(&mbNetSendData, (rt_ubase_t)&packBuf,RT_WAITING_FOREVER);
-				}
-//        readPdFreqDischarge();
-//			  if(readPartDischgWarning()==RT_TRUE){
-//						partDisWaringEventPack();
-//					  rt_mb_send_wait(&mbNetSendData, (rt_ubase_t)&packBuf,RT_WAITING_FOREVER);
-//					  rt_thread_mdelay(1000);//延时1秒再发下一包
-//						rt_kprintf("\r\n");
-//				}
-//				partDisDataPack();
-//				rt_mb_send_wait(&mbNetSendData, (rt_ubase_t)&packBuf,RT_WAITING_FOREVER);
+				partDischagRead2Send(gbNetState);
 				rt_kprintf("%sPARTDISCHAG_TIME out\r\n",task);
 				break;
 			case PRESSSETTL_TIME:
-				for(int i=0;i<PRESSSETTL_485_NUM;i++){
-					if(sheet.pressSetl[i].workFlag==RT_TRUE){
-								readPSTempHeight(i);
-								workFlag=RT_TRUE;
-						}
-				}
-				if(workFlag==RT_TRUE){
-					  rt_kprintf("%s打包采集的PRESSSETTL数据\r\n",task);
-					  //circulaJsonPack();
-					  if(gbNetState==RT_TRUE)
-								rt_mb_send_wait(&mbNetSendData, (rt_ubase_t)&packBuf,RT_WAITING_FOREVER);
-				}
+        pressSettRead2Send(gbNetState);
 				rt_kprintf("%sPRESSSETTL_TIME out\r\n",task);
-//				readPSTempHeight();
-//				PSTempHeightPack();
-//				rt_mb_send_wait(&mbNetSendData, (rt_ubase_t)&packBuf,RT_WAITING_FOREVER);
-//				rt_kprintf("%sPRESSSETTL_TIMEout\r\n",task);
 				break;
 			case THREEAXIS_TIME:
-				for(int i=0;i<THREEAXIS_485_NUM;i++){
-					if(sheet.threeAxiss[i].workFlag==RT_TRUE){
-								readThreeTempAcc(i);
-								workFlag=RT_TRUE;
-						}
-				}
-				if(workFlag==RT_TRUE){
-					  rt_kprintf("%s打包采集的THREEAXIS数据\r\n",task);
-					  //circulaJsonPack();
-					  if(gbNetState==RT_TRUE)
-								rt_mb_send_wait(&mbNetSendData, (rt_ubase_t)&packBuf,RT_WAITING_FOREVER);
-				}
-
-//				readThreeTempAcc();
-//				t3AxisTempAccPack();
-//				rt_mb_send_wait(&mbNetSendData, (rt_ubase_t)&packBuf,RT_WAITING_FOREVER);
+				threeAxisRead2Send(gbNetState);
 				rt_kprintf("%sTHREEAXIS_TIMEout\r\n",task);
 				break;
 			case  CH4_TIME:
-				for(int i=0;i<CH4_485_NUM;i++){
-					if(sheet.ch4[i].workFlag==RT_TRUE){
-								readCH4(i);
-								workFlag=RT_TRUE;
-						}
-				}
-				if(workFlag==RT_TRUE){
-					  rt_kprintf("%s打包采集的ch4数据\r\n",task);
-					  //circulaJsonPack();
-					  if(gbNetState==RT_TRUE)
-								rt_mb_send_wait(&mbNetSendData, (rt_ubase_t)&packBuf,RT_WAITING_FOREVER);
-				}
+				coRead2Send(gbNetState);
 				break;
 			case  O2_TIME:
-				for(int i=0;i<O2_485_NUM;i++){
-					if(sheet.o2[i].workFlag==RT_TRUE){
-								readO2(i);
-								workFlag=RT_TRUE;
-						}
-				}
-				if(workFlag==RT_TRUE){
-					  rt_kprintf("%s打包采集的O2数据\r\n",task);
-					  //circulaJsonPack();
-					  if(gbNetState==RT_TRUE)
-								rt_mb_send_wait(&mbNetSendData, (rt_ubase_t)&packBuf,RT_WAITING_FOREVER);
-				}
+				o2Read2Send(gbNetState);
 				break;
 			case  H2S_TIME:
-				for(int i=0;i<H2S_485_NUM;i++){
-					if(sheet.h2s[i].workFlag==RT_TRUE){
-								readH2S(i);
-								workFlag=RT_TRUE;
-						}
-				}
-				if(workFlag==RT_TRUE){
-					  rt_kprintf("%s打包采集的h2s数据\r\n",task);
-					  //circulaJsonPack();
-					  if(gbNetState==RT_TRUE)
-								rt_mb_send_wait(&mbNetSendData, (rt_ubase_t)&packBuf,RT_WAITING_FOREVER);
-				}
+				h2sRead2Send(gbNetState);
 				break;
 			case  CO_TIME://4种气体在一起读取 所以前三个不使用 只在此处读取并打包发送  关闭时候只需要关闭CO就可以把所有气体全部关闭
-				for(int i=0;i<CO_485_NUM;i++){
-					if(sheet.co[i].workFlag==RT_TRUE){
-								readCO(i);
-								workFlag=RT_TRUE;
-						}
-				}
-				if(workFlag==RT_TRUE){
-					  rt_kprintf("%s打包采集的co数据\r\n",task);
-					  //circulaJsonPack();
-					  if(gbNetState==RT_TRUE)
-								rt_mb_send_wait(&mbNetSendData, (rt_ubase_t)&packBuf,RT_WAITING_FOREVER);
-				}
+				coRead2Send(gbNetState);
 				break;
 			case  TEMPHUM_TIME:
-				for(int i=0;i<TEMPHUM_485_NUM;i++){
-					if(sheet.tempHum[i].workFlag==RT_TRUE){
-								readTempHum(i);
-								workFlag=RT_TRUE;
-						}
-				}
-				if(workFlag==RT_TRUE){
-					  rt_kprintf("%s打包采集的temphum数据\r\n",task);
-					  //circulaJsonPack();
-					  if(gbNetState==RT_TRUE)
-								rt_mb_send_wait(&mbNetSendData, (rt_ubase_t)&packBuf,RT_WAITING_FOREVER);
-				}
+				tempHumRead2Send(gbNetState);
 				break;
-			case  WATERLEVEL_TIME:
-				for(int i=0;i<WATERLEV_485_NUM;i++){
-						if(sheet.waterLev[i].workFlag==RT_TRUE){
-								readWaterLevel(i);
-								workFlag=RT_TRUE;
-						}
-				}
-				if(workFlag==RT_TRUE){
-					  rt_kprintf("%s打包采集的waterlev数据\r\n",task);
-					  //circulaJsonPack();
-					  if(gbNetState==RT_TRUE)
-								rt_mb_send_wait(&mbNetSendData, (rt_ubase_t)&packBuf,RT_WAITING_FOREVER);
-				}
+			case  WATERDEPTH_TIME:
+				waterDepthRead2Send(gbNetState);
 				break;
 			default:
 				break;
@@ -287,7 +168,7 @@ void startTimeList()
 		timeInit(O2_TIME, 				sheet.o2ColTime,30);
 		timeInit(CO_TIME, 				sheet.coColTime,35);
 		timeInit(TEMPHUM_TIME, 		sheet.tempHumColTime,40);
-		timeInit(WATERLEVEL_TIME, sheet.waterLevColTime,45);
+		timeInit(WATERDEPTH_TIME, sheet.waterLevColTime,45);
 }
 
 
@@ -300,6 +181,7 @@ void   upKeepStateTask(void *para)
 		extern void uartIrqEnaAfterQueue();
 	  extern void clearUartData();
 	  extern void printModbusDevList();
+	  extern void readMultiCirCulaPoint();
 	  uartMutexQueueCfg();//根据flash存储重新配置串口
 		//modbusPrintRead();//modbus配置从flash中读取
 	  uartReconfig();//串口重新配置
@@ -308,6 +190,8 @@ void   upKeepStateTask(void *para)
 	  
 	  printModbusDevList();
 	  clearUartData();
+	
+	  readMultiCirCulaPoint();//对于环流来讲 运行前需要提取扩大方式
 		while(1){
 
 				timeOutRunFun();

@@ -42,10 +42,8 @@ void readCO(int num)
     len=0;
 		memset(buf,0,LENTH);
 		
-		if(rt_mq_recv(uartDev[sheet.co[num].useUartNum].uartMessque, buf+len, 1, 3000) == RT_EOK){//第一次接收时间放长点  相应时间有可能比较久
-				len++;
-		}
-		while(rt_mq_recv(uartDev[sheet.co[num].useUartNum].uartMessque, buf+len, 1, 10) == RT_EOK){//115200 波特率1ms 10个数据
+
+		while(rt_mq_recv(uartDev[sheet.co[num].useUartNum].uartMessque, buf+len, 1, 500) == RT_EOK){//115200 波特率1ms 10个数据
 				len++;
 		}
 		if(len!=0){
@@ -56,7 +54,7 @@ void readCO(int num)
 				rt_kprintf("\n");
 		}
 		//提取环流值 第一步判断crc 第二部提取
-//		uartDev[modbusFlash[CO].useUartNum].offline=RT_FALSE;
+
 		int ret2=modbusRespCheck(sheet.co[num].slaveAddr,buf,len,RT_TRUE);
 		if(0 == ret2){//刷新读取到的值
         int value	=(buf[offset]<<24)+(buf[offset+1]<<16)+(buf[offset+2]<<8)+buf[offset+3];offset+=4;
@@ -64,10 +62,6 @@ void readCO(int num)
 			  rt_kprintf("%s浓度值:%0.2fmol/Lread ok\n",sign,co[num]);  
 		} 
 		else{//读不到给0
-				if(ret2==2){
-						//rt_kprintf("%sERR:请检查485接线或者供电\r\n",sign);
-//					  uartDev[modbusFlash[CO].useUartNum].offline=RT_TRUE;
-				}
 			  co[num]	=0;
 			  rt_kprintf("%s read fail\n",sign);
 		}
@@ -78,3 +72,118 @@ void readCO(int num)
 }
 
 
+
+
+
+static uint16_t coJsonPack()
+{
+		char *sprinBuf=RT_NULL;
+		sprinBuf=rt_malloc(20);//20个字符串长度 够用了
+		char* out = NULL;
+		//创建数组
+		cJSON* Array = NULL;
+		// 创建JSON Object  
+		cJSON* root = NULL;
+		cJSON* nodeobj = NULL;
+		cJSON* nodeobj_p = NULL;
+		root = cJSON_CreateObject();
+		if (root == NULL) return 0;
+		// 加入节点（键值对）
+		cJSON_AddNumberToObject(root, "mid",mcu.upMessID);
+		cJSON_AddStringToObject(root, "packetType","CMD_REPORTDATA");
+		cJSON_AddStringToObject(root, "identifier","carbon_monoxide");
+		cJSON_AddStringToObject(root, "acuId","100000000000001");
+		
+		
+		{
+		Array = cJSON_CreateArray();
+		if (Array == NULL) return 0;
+		cJSON_AddItemToObject(root, "params", Array);
+		for (int i = 0; i < CO_485_NUM; i++)
+		{		
+			if(sheet.co[i].workFlag==RT_TRUE){
+				nodeobj = cJSON_CreateObject();
+				cJSON_AddItemToArray(Array, nodeobj);
+			  cJSON_AddItemToObject(nodeobj,"deviceId",cJSON_CreateString(sheet.co[i].ID));
+				
+				
+				nodeobj_p= cJSON_CreateObject();
+				cJSON_AddItemToObject(nodeobj, "data", nodeobj_p);
+				sprintf(sprinBuf,"%02f",co[i]);
+				cJSON_AddItemToObject(nodeobj_p,"deepness",cJSON_CreateString(sprinBuf));
+				sprintf(sprinBuf,"%d",utcTime());
+				cJSON_AddItemToObject(nodeobj_p,"monitoringTime",cJSON_CreateString(sprinBuf));
+			}
+		}
+		}
+	
+		sprintf(sprinBuf,"%d",utcTime());
+		cJSON_AddStringToObject(root,"timestamp",sprinBuf);
+		// 打印JSON数据包  
+		out = cJSON_Print(root);
+		if(out!=NULL){
+			for(int i=0;i<rt_strlen(out);i++)
+					rt_kprintf("%c",out[i]);
+			rt_kprintf("\n");
+			rt_free(out);
+			out=NULL;
+		}
+		if(root!=NULL){
+			cJSON_Delete(root);
+			out=NULL;
+		}
+
+		//打包
+		int len=0;
+		packBuf[len]= (uint8_t)(HEAD>>8); len++;
+		packBuf[len]= (uint8_t)(HEAD);    len++;
+		len+=LENTH_LEN;//json长度最后再填写
+		
+		// 释放内存  
+		
+		
+		rt_strcpy((char *)packBuf+len,out);
+    len+=rt_strlen(out);
+	
+
+		//lenth
+	  packBuf[2]=(uint8_t)((len-LENTH_LEN-HEAD_LEN)>>8);//更新json长度
+	  packBuf[3]=(uint8_t)(len-LENTH_LEN-HEAD_LEN);
+	  uint16_t jsonBodyCrc=RTU_CRC(packBuf+HEAD_LEN+LENTH_LEN,len-HEAD_LEN-LENTH_LEN);
+	  //crc
+	  packBuf[len]=(uint8_t)(jsonBodyCrc>>8); len++;//更新crc
+	  packBuf[len]=(uint8_t)(jsonBodyCrc);    len++;
+
+		//tail
+		packBuf[len]=(uint8_t)(TAIL>>8); len++;
+		packBuf[len]=(uint8_t)(TAIL);    len++;
+		packBuf[len]=0;//len++;//结尾 补0
+		
+		mcu.devRegMessID =mcu.upMessID;
+		upMessIdAdd();
+		rt_kprintf("%s len:%d\r\n",sign,len);
+		rt_kprintf("\r\n%slen：%d str0:%x str1:%x str[2]:%d  str[3]:%d\r\n",sign,len,packBuf[0],packBuf[1],packBuf[2],packBuf[3]);
+
+		rt_free(sprinBuf);
+		sprinBuf=RT_NULL;
+
+		return len;
+}
+
+
+void coRead2Send(rt_bool_t netStat)
+{
+	  int workFlag=RT_FALSE;
+	  for(int i=0;i<CO_485_NUM;i++){
+			if(sheet.co[i].workFlag==RT_TRUE){
+						readCO(i);
+						workFlag=RT_TRUE;
+				}
+		}
+		if(workFlag==RT_TRUE){
+				rt_kprintf("%s打包采集的co数据\r\n",sign);
+				coJsonPack();
+				if(netStat==RT_TRUE)
+						rt_mb_send_wait(&mbNetSendData, (rt_ubase_t)&packBuf,RT_WAITING_FOREVER);
+		}
+}

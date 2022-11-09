@@ -174,8 +174,8 @@ void printModbusDevList()
 							}
 					}
 				break;
-				case WATERLEVEL:
-					for(int j=0;j<WATERLEV_485_NUM;j++){//核对有没有配置过
+				case WATERDEPTH:
+					for(int j=0;j<WATERDEPTH_485_NUM;j++){//核对有没有配置过
 							if(sheet.waterLev[j].workFlag==RT_TRUE){
 									rt_kprintf("%s modbus ",sign);
 									rt_kprintf("%-10s ",modbusName[i]);
@@ -515,7 +515,7 @@ static int waterLevConf(int uartnum,char *argv[])
 	int slaveAddr=atoi32(argv[5],10);
 	//sheet.cirCulaColTime=atoi32(argv[6],10);
 	sheet.waterLevColTime=atoi32(argv[6],10);
-	for( i=0;i<WATERLEV_485_NUM;i++){//核对有没有配置过
+	for( i=0;i<WATERDEPTH_485_NUM;i++){//核对有没有配置过
 			if(rt_strcmp(sheet.waterLev[i].ID,argv[2])==0){//配置过
 					if((slaveAddr==0)||(slaveAddr==255)){//关闭
 							sheet.waterLev[i].workFlag=RT_FALSE;//关闭
@@ -531,8 +531,8 @@ static int waterLevConf(int uartnum,char *argv[])
 					break;
 			}
 	}
-	if(i==WATERLEV_485_NUM){//没有配置过
-			for(int j=0;j<WATERLEV_485_NUM;j++){
+	if(i==WATERDEPTH_485_NUM){//没有配置过
+			for(int j=0;j<WATERDEPTH_485_NUM;j++){
 					if(sheet.waterLev[j].workFlag!=RT_TRUE){
 							sheet.waterLev[j].workFlag=RT_TRUE;//打开
 							sheet.waterLev[j].slaveAddr=slaveAddr;	
@@ -620,7 +620,7 @@ int modbusConf(int modbusnum,int uartnum,char *argv[])
       case TEMPHUM:
 				ret=tempHumConf(uartnum,argv);
       break;
-      case WATERLEVEL:
+      case WATERDEPTH:
 				ret=waterLevConf(uartnum,argv);
 			break;
 			default:
