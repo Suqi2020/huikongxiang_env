@@ -76,8 +76,8 @@ void readO2(int num)
 
 static uint16_t o2JsonPack()
 {
-		char *sprinBuf=RT_NULL;
-		sprinBuf=rt_malloc(20);//20个字符串长度 够用了
+//		char *sprinBuf=RT_NULL;
+//		sprinBuf=rt_malloc(20);//20个字符串长度 够用了
 		char* out = NULL;
 		//创建数组
 		cJSON* Array = NULL;
@@ -91,8 +91,9 @@ static uint16_t o2JsonPack()
 		cJSON_AddNumberToObject(root, "mid",mcu.upMessID);
 		cJSON_AddStringToObject(root, "packetType","CMD_REPORTDATA");
 		cJSON_AddStringToObject(root, "identifier","oxygen");
-		cJSON_AddStringToObject(root, "acuId","100000000000001");
-		
+		cJSON_AddStringToObject(root, "acuId",(char *)packFLash.acuId);
+		char *sprinBuf=RT_NULL;
+		sprinBuf=rt_malloc(20);//20个字符串长度 够用了
 		
 		{
 		Array = cJSON_CreateArray();
@@ -119,18 +120,18 @@ static uint16_t o2JsonPack()
 		sprintf(sprinBuf,"%d",utcTime());
 		cJSON_AddStringToObject(root,"timestamp",sprinBuf);
 		// 打印JSON数据包  
-		out = cJSON_Print(root);
-		if(out!=NULL){
-			for(int i=0;i<rt_strlen(out);i++)
-					rt_kprintf("%c",out[i]);
-			rt_kprintf("\n");
-			rt_free(out);
-			out=NULL;
-		}
-		if(root!=NULL){
-			cJSON_Delete(root);
-			out=NULL;
-		}
+//		out = cJSON_Print(root);
+//		if(out!=NULL){
+//			for(int i=0;i<rt_strlen(out);i++)
+//					rt_kprintf("%c",out[i]);
+//			rt_kprintf("\n");
+//			rt_free(out);
+//			out=NULL;
+//		}
+//		if(root!=NULL){
+//			cJSON_Delete(root);
+//			out=NULL;
+//		}
 
 		//打包
 		int len=0;
@@ -141,8 +142,20 @@ static uint16_t o2JsonPack()
 		// 释放内存  
 		
 		
+		out = cJSON_Print(root);
 		rt_strcpy((char *)packBuf+len,out);
-    len+=rt_strlen(out);
+		len+=rt_strlen(out);
+		if(out!=NULL){
+				for(int i=0;i<rt_strlen(out);i++)
+						rt_kprintf("%c",out[i]);
+				rt_kprintf("\n");
+				rt_free(out);
+				out=NULL;
+		}
+		if(root!=NULL){
+			cJSON_Delete(root);
+			out=NULL;
+		}
 	
 
 		//lenth

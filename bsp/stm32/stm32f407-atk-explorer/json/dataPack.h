@@ -17,7 +17,7 @@ typedef  struct
 	  uint32_t upHeartMessID;
 	  uint32_t devRegMessID;
 	  uint32_t repDataMessID;
-	  char  devID[16];
+	  //char  devID[16];
     	
 }mcuParazStru;
 

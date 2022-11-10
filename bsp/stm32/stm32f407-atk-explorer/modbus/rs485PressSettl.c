@@ -5,10 +5,17 @@
 //  24+红色，24-黑色，A+蓝色，B-绿色
 const static char sign[]="[沉降仪]";
 
-//#define   SLAVE_ADDR     0X01 
+//#define   SLAVE_ADDR     0X02 
 #define   LENTH          50  //工作环流用到的最大接收buf长度
 
-
+typedef struct{
+	  float temp;//除以100 传输float类型  单位0C
+	   union {
+				float flotVal;
+				int   intVal;
+		} height;
+//float height;//除以10 传输float类型  单位mm
+}pressSettlStru;
 static pressSettlStru pressSettle[PRESSSETTL_485_NUM];
 
 
@@ -76,7 +83,7 @@ void readPSTempHeight(int num)
         int temp	=(buf[offset]<<8)+buf[offset+1];offset+=2;
 			  pressSettle[num].height.intVal=(buf[offset]<<8)+buf[offset+1];
 			
-				pressSettle[num].temp =temp*0.0625;
+				pressSettle[num].temp =temp/100;
 				
 
 			  rt_kprintf("%stemp:%0.2f*C height:%0.1fmm read ok\n",sign,pressSettle[num].temp,pressSettle[num].height.flotVal);  
@@ -202,8 +209,6 @@ void readPSTempHeight(int num)
 //}
 static uint16_t pressSettlJsonPack()
 {
-		char *sprinBuf=RT_NULL;
-		sprinBuf=rt_malloc(20);//20个字符串长度 够用了
 		char* out = NULL;
 		//创建数组
 		cJSON* Array = NULL;
@@ -213,11 +218,13 @@ static uint16_t pressSettlJsonPack()
 		cJSON* nodeobj_p = NULL;
 		root = cJSON_CreateObject();
 		if (root == NULL) return 0;
+		char *sprinBuf=RT_NULL;
+		sprinBuf=rt_malloc(20);//20个字符串长度 够用了
 		// 加入节点（键值对）
 		cJSON_AddNumberToObject(root, "mid",mcu.upMessID);
 		cJSON_AddStringToObject(root, "packetType","CMD_REPORTDATA");
 		cJSON_AddStringToObject(root, "identifier","anti_sedimentation");
-		cJSON_AddStringToObject(root, "acuId","100000000000001");
+		cJSON_AddStringToObject(root, "acuId",(char *)packFLash.acuId);
 		
 		
 		{
@@ -248,18 +255,18 @@ static uint16_t pressSettlJsonPack()
 		sprintf(sprinBuf,"%d",utcTime());
 		cJSON_AddStringToObject(root,"timestamp",sprinBuf);
 		// 打印JSON数据包  
-		out = cJSON_Print(root);
-		if(out!=NULL){
-			for(int i=0;i<rt_strlen(out);i++)
-					rt_kprintf("%c",out[i]);
-			rt_kprintf("\n");
-			rt_free(out);
-			out=NULL;
-		}
-		if(root!=NULL){
-			cJSON_Delete(root);
-			out=NULL;
-		}
+//		out = cJSON_Print(root);
+//		if(out!=NULL){
+//			for(int i=0;i<rt_strlen(out);i++)
+//					rt_kprintf("%c",out[i]);
+//			rt_kprintf("\n");
+//			rt_free(out);
+//			out=NULL;
+//		}
+//		if(root!=NULL){
+//			cJSON_Delete(root);
+//			out=NULL;
+//		}
 
 		//打包
 		int len=0;
@@ -270,8 +277,20 @@ static uint16_t pressSettlJsonPack()
 		// 释放内存  
 		
 		
+		out = cJSON_Print(root);
 		rt_strcpy((char *)packBuf+len,out);
-    len+=rt_strlen(out);
+		len+=rt_strlen(out);
+		if(out!=NULL){
+				for(int i=0;i<rt_strlen(out);i++)
+						rt_kprintf("%c",out[i]);
+				rt_kprintf("\n");
+				rt_free(out);
+				out=NULL;
+		}
+		if(root!=NULL){
+			cJSON_Delete(root);
+			out=NULL;
+		}
 	
 
 		//lenth

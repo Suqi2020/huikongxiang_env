@@ -919,26 +919,6 @@
               <FilePath>modbus\rs485PressSettl.c</FilePath>
             </File>
             <File>
-              <FileName>modbus.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>modbus\modbus.c</FilePath>
-            </File>
-            <File>
-              <FileName>stm32Flash.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>modbus\stm32Flash.c</FilePath>
-            </File>
-            <File>
-              <FileName>uartReconf.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>modbus\uartReconf.c</FilePath>
-            </File>
-            <File>
-              <FileName>crc.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>modbus\crc.c</FilePath>
-            </File>
-            <File>
               <FileName>rs485CH4.c</FileName>
               <FileType>1</FileType>
               <FilePath>.\modbus\rs485CH4.c</FilePath>
@@ -967,6 +947,26 @@
               <FileName>rs485TempHum.c</FileName>
               <FileType>1</FileType>
               <FilePath>.\modbus\rs485TempHum.c</FilePath>
+            </File>
+            <File>
+              <FileName>modbus.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>modbus\modbus.c</FilePath>
+            </File>
+            <File>
+              <FileName>stm32Flash.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>modbus\stm32Flash.c</FilePath>
+            </File>
+            <File>
+              <FileName>uartReconf.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>modbus\uartReconf.c</FilePath>
+            </File>
+            <File>
+              <FileName>crc.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>modbus\crc.c</FilePath>
             </File>
             <File>
               <FileName>digConv.c</FileName>
@@ -1012,6 +1012,21 @@
               <FileName>socket.c</FileName>
               <FileType>1</FileType>
               <FilePath>w5500\socket.c</FilePath>
+            </File>
+          </Files>
+        </Group>
+        <Group>
+          <GroupName>Analog</GroupName>
+          <Files>
+            <File>
+              <FileName>analogTempHum.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>.\analog\analogTempHum.c</FilePath>
+            </File>
+            <File>
+              <FileName>adc.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>.\analog\adc.c</FilePath>
             </File>
           </Files>
         </Group>

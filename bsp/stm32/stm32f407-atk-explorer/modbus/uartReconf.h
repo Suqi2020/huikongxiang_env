@@ -53,6 +53,7 @@ typedef struct{
 		netIpFlashStru netIpFlash;
 	  analogDevStru  analog[ANALOG_NUM];
 	  uint32_t    uartBps[UART_NUM];
+	  char     acuId[20];
 }packIpUartStru;
 extern packIpUartStru packFLash;
 
@@ -76,13 +77,14 @@ typedef struct{
 extern modbusFunStru modbusFun[MODBUS_NUM];
 //////////////////////////////增加传感器需要修改下边 一一对应////////////////////////////////////////
 
-//extern modbusFlashStru  modbusFlash[MODBUS_NUM];//需要存储到flash的设备配置
+//extern deviceFlashStru  modbusFlash[MODBUS_NUM];//需要存储到flash的设备配置
 typedef enum{
      CIRCULA=0, 	PARTDISCHAG,			PRESSSETTL, 			THREEAXIS,			CH4,		O2		,H2S,			CO,			TEMPHUM,			WATERDEPTH
 }modbNumEnum;
 
 typedef enum{
 		CIRCULA_TIME=0,PARTDISCHAG_TIME,PRESSSETTL_TIME,THREEAXIS_TIME,CH4_TIME,O2_TIME,H2S_TIME,CO_TIME,TEMPHUM_TIME,WATERDEPTH_TIME,
+	  ANA_TEMPHUM_TIME,
 		HEART_TIME,REG_TIME
 }upDataTimEnum;//需要与modbusName 名称一一对应 来实现代码精简高效
 const static char  modbusName[MODBUS_NUM][20] ={"接地环流","局放","防沉降","防外破","甲烷","氧气","硫化氢","一氧化碳","温湿度","水位"};

@@ -55,11 +55,11 @@ void readTempHum(int num)
 		//uartDev[modbusFlash[TEMPHUM].useUartNum].offline=RT_FALSE;
 		int ret2=modbusRespCheck(sheet.tempHum[num].slaveAddr,buf,len,RT_TRUE);
 		if(0 == ret2){//刷新读取到的值
-        uint16_t read_temp	=(buf[offset+2]<<8)+buf[offset+3];offset+=2;
-			  uint16_t read_hum	=(buf[offset+2]<<8)+buf[offset+3];offset+=2;
+        uint16_t read_temp	=(buf[offset]<<8)+buf[offset+1];offset+=2;
+			  uint16_t read_hum	=(buf[offset]<<8)+buf[offset+1];offset+=2;
 			  rt_bool_t sig=RT_FALSE;
         if(read_temp&0x8000){//负数
-						read_temp=read_temp&0x8000;
+						read_temp=read_temp&0x7fff;
 						read_temp=0xffff-read_temp+1;
 					  sig=RT_TRUE;
 				}
@@ -89,8 +89,8 @@ void readTempHum(int num)
 
 static uint16_t tempHumJsonPack()
 {
-		char *sprinBuf=RT_NULL;
-		sprinBuf=rt_malloc(20);//20个字符串长度 够用了
+//		char *sprinBuf=RT_NULL;
+//		sprinBuf=rt_malloc(20);//20个字符串长度 够用了
 		char* out = NULL;
 		//创建数组
 		cJSON* Array = NULL;
@@ -104,9 +104,9 @@ static uint16_t tempHumJsonPack()
 		cJSON_AddNumberToObject(root, "mid",mcu.upMessID);
 		cJSON_AddStringToObject(root, "packetType","CMD_REPORTDATA");
 		cJSON_AddStringToObject(root, "identifier","temperature_humidity");
-		cJSON_AddStringToObject(root, "acuId","100000000000001");
-		
-		
+		cJSON_AddStringToObject(root, "acuId",(char *)packFLash.acuId);
+		char *sprinBuf=RT_NULL;
+		sprinBuf=rt_malloc(20);//20个字符串长度 够用了
 		{
 		Array = cJSON_CreateArray();
 		if (Array == NULL) return 0;
@@ -135,18 +135,18 @@ static uint16_t tempHumJsonPack()
 		sprintf(sprinBuf,"%d",utcTime());
 		cJSON_AddStringToObject(root,"timestamp",sprinBuf);
 		// 打印JSON数据包  
-		out = cJSON_Print(root);
-		if(out!=NULL){
-			for(int i=0;i<rt_strlen(out);i++)
-					rt_kprintf("%c",out[i]);
-			rt_kprintf("\n");
-			rt_free(out);
-			out=NULL;
-		}
-		if(root!=NULL){
-			cJSON_Delete(root);
-			out=NULL;
-		}
+//		out = cJSON_Print(root);
+//		if(out!=NULL){
+//			for(int i=0;i<rt_strlen(out);i++)
+//					rt_kprintf("%c",out[i]);
+//			rt_kprintf("\n");
+//			rt_free(out);
+//			out=NULL;
+//		}
+//		if(root!=NULL){
+//			cJSON_Delete(root);
+//			out=NULL;
+//		}
 
 		//打包
 		int len=0;
@@ -155,11 +155,20 @@ static uint16_t tempHumJsonPack()
 		len+=LENTH_LEN;//json长度最后再填写
 		
 		// 释放内存  
-		
-		
+		out = cJSON_Print(root);
 		rt_strcpy((char *)packBuf+len,out);
-    len+=rt_strlen(out);
-	
+		len+=rt_strlen(out);
+		if(out!=NULL){
+				for(int i=0;i<rt_strlen(out);i++)
+						rt_kprintf("%c",out[i]);
+				rt_kprintf("\n");
+				rt_free(out);
+				out=NULL;
+		}
+		if(root!=NULL){
+			cJSON_Delete(root);
+			out=NULL;
+		}
 
 		//lenth
 	  packBuf[2]=(uint8_t)((len-LENTH_LEN-HEAD_LEN)>>8);//更新json长度

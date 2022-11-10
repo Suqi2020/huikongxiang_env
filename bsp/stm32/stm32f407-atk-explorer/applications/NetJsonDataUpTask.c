@@ -17,7 +17,7 @@ extern void  	readThreeTempAcc(int num);
 extern void		t3AxisTempAccPack(void);
 //extern void 	devIDFlashRead(void);
 extern void 	cirCurrConf(void);
-#define TIM_NUM  MODBUS_NUM+2 //目前支持6路定时器  
+#define TIM_NUM  MODBUS_NUM+3+10 //目前支持6路定时器  
 typedef struct 
 {
 		uint16_t count;     //计数
@@ -72,7 +72,7 @@ static int timeOut()
 				if(tim[i].count!=0xFFFF){
 						if(tim[i].count>=tim[i].threshoVal){
 							timeStart(i);
-									//rt_kprintf("tim out %d %d\n",i,tim[i].threshoVal);
+							//rt_kprintf("tim out %d %d\n",i,tim[i].threshoVal);
 							return i;
 						}
 				}
@@ -92,6 +92,10 @@ void o2Read2Send(rt_bool_t netStat);
 void h2sRead2Send(rt_bool_t netStat);	
 void ch4Read2Send(rt_bool_t netStat);	
 void coRead2Send(rt_bool_t netStat);	
+void analogTempHumJsonPack(uint8_t chanl);
+uint16_t devRegJsonPack();
+uint16_t heartUpJsonPack();
+extern uint8_t analogTemChanl;
 //定时时间到  执行相应事件
 static void  timeOutRunFun()
 {
@@ -99,14 +103,16 @@ static void  timeOutRunFun()
 	  rt_bool_t workFlag=RT_FALSE;
 		switch(timeOut()){
 			case HEART_TIME://心跳
-				heartUpPack();
-				rt_mb_send_wait(&mbNetSendData, (rt_ubase_t)&packBuf,RT_WAITING_FOREVER); 
+				heartUpJsonPack();
+			  if(gbNetState==RT_TRUE)
+						rt_mb_send_wait(&mbNetSendData, (rt_ubase_t)&packBuf,RT_WAITING_FOREVER); 
 			  rt_kprintf("%sheart timer out\r\n",task);
 				break;
 			case REG_TIME://注册 注册成功后定时器就关闭
 			  if(gbRegFlag==RT_FALSE){
-					  devRegPack();//devRegJsonPack();
-						rt_mb_send_wait(&mbNetSendData, (rt_ubase_t)&packBuf,RT_WAITING_FOREVER); 
+					  devRegJsonPack();//devRegJsonPack();
+					  if(gbNetState==RT_TRUE)
+								rt_mb_send_wait(&mbNetSendData, (rt_ubase_t)&packBuf,RT_WAITING_FOREVER); 
 					  timeStop(REG_TIME);//正式使用时候需要去掉
 				}
 				else
@@ -130,7 +136,7 @@ static void  timeOutRunFun()
 				rt_kprintf("%sTHREEAXIS_TIMEout\r\n",task);
 				break;
 			case  CH4_TIME:
-				coRead2Send(gbNetState);
+				ch4Read2Send(gbNetState);
 				break;
 			case  O2_TIME:
 				o2Read2Send(gbNetState);
@@ -147,6 +153,11 @@ static void  timeOutRunFun()
 			case  WATERDEPTH_TIME:
 				waterDepthRead2Send(gbNetState);
 				break;
+			case  ANA_TEMPHUM_TIME:
+				analogTempHumJsonPack(analogTemChanl);
+				if(gbNetState==RT_TRUE)
+							rt_mb_send_wait(&mbNetSendData, (rt_ubase_t)&packBuf,RT_WAITING_FOREVER);
+				break;
 			default:
 				break;
 		}
@@ -156,7 +167,9 @@ modbusFunStru modbusFun[MODBUS_NUM];
 //启动定时器列表
 void startTimeList()
 {
-
+    for(int k=0;k<TIM_NUM;k++){
+			timeStop(k);
+		}
 		timeInit(HEART_TIME,      120,2);//心跳定时  定时30秒 第一次28秒就来
 		timeInit(REG_TIME,        5,0);//注册 注册成功后定时器就关闭
 		timeInit(CIRCULA_TIME, 		sheet.cirCulaColTime,5);
@@ -168,7 +181,18 @@ void startTimeList()
 		timeInit(O2_TIME, 				sheet.o2ColTime,30);
 		timeInit(CO_TIME, 				sheet.coColTime,35);
 		timeInit(TEMPHUM_TIME, 		sheet.tempHumColTime,40);
-		timeInit(WATERDEPTH_TIME, sheet.waterLevColTime,45);
+		timeInit(WATERDEPTH_TIME, sheet.waterDepthColTime,45);
+	  //启动温湿度
+	  
+	  for(int i=0;i<ANALOG_NUM;i++){
+				if(rt_strcmp(sheet.analog[i].name,analogName)==0){
+					  if(sheet.analog[i].workFlag==RT_TRUE){
+								timeInit(ANA_TEMPHUM_TIME,sheet.analog[i].colTime,30);
+								analogTemChanl=i;
+						}
+						break;
+				}
+		}
 }
 
 
@@ -182,6 +206,7 @@ void   upKeepStateTask(void *para)
 	  extern void clearUartData();
 	  extern void printModbusDevList();
 	  extern void readMultiCirCulaPoint();
+	  extern void prinfAnalogList();
 	  uartMutexQueueCfg();//根据flash存储重新配置串口
 		//modbusPrintRead();//modbus配置从flash中读取
 	  uartReconfig();//串口重新配置
@@ -189,8 +214,9 @@ void   upKeepStateTask(void *para)
     startTimeList();//开启计时器列表
 	  
 	  printModbusDevList();
+	  prinfAnalogList();
 	  clearUartData();
-	
+	  
 	  readMultiCirCulaPoint();//对于环流来讲 运行前需要提取扩大方式
 		while(1){
 

@@ -12,6 +12,13 @@
 //  24+红色，24-黑色，A+蓝色，B-绿色
 // 发 01 04 00 01 00 04 A0 09 
 // 收 01 04 08 0B CA FE 8D 00 03 03 80 C7 23 
+typedef struct{
+		float temp;
+	  uint16_t acclrationX;
+		uint16_t acclrationY;
+		uint16_t acclrationZ;
+	  
+}threeAxisStru;
 const static char sign[]="[防外破]";
 static threeAxisStru threeAxisp[THREEAXIS_485_NUM];
 
@@ -68,8 +75,8 @@ void readThreeTempAcc(int num)
 			  threeAxisp[num].acclrationX = (buf[offset]<<8)+buf[offset+1];offset+=2;
 				threeAxisp[num].acclrationY = (buf[offset]<<8)+buf[offset+1];offset+=2;
 				threeAxisp[num].acclrationZ = (buf[offset]<<8)+buf[offset+1];offset+=2;
-        threeAxisp[num].temp=(float)temp*0.0625; 
-			  rt_kprintf("%stemp:%0.2f*C ACC:X%dmg Y%dmg Z%dmg ok\n",sign,temp,threeAxisp[num].acclrationX,threeAxisp[num].acclrationY,threeAxisp[num].acclrationZ);  
+        threeAxisp[num].temp=(float)temp/100; 
+			  rt_kprintf("%stemp:%0.2f*C ACC:X%dmg Y%dmg Z%dmg ok\n",sign,threeAxisp[num].temp,threeAxisp[num].acclrationX,threeAxisp[num].acclrationY,threeAxisp[num].acclrationZ);  
 		} 
 		else{//读不到给0
 				if(ret2==2){
@@ -208,8 +215,7 @@ void readThreeTempAcc(int num)
 
 static uint16_t threeAxisJsonPack()
 {
-		char *sprinBuf=RT_NULL;
-		sprinBuf=rt_malloc(20);//20个字符串长度 够用了
+
 		char* out = NULL;
 		//创建数组
 		cJSON* Array = NULL;
@@ -223,8 +229,9 @@ static uint16_t threeAxisJsonPack()
 		cJSON_AddNumberToObject(root, "mid",mcu.upMessID);
 		cJSON_AddStringToObject(root, "packetType","CMD_REPORTDATA");
 		cJSON_AddStringToObject(root, "identifier","external_breakout_prevention");
-		cJSON_AddStringToObject(root, "acuId","100000000000001");
-		
+	  cJSON_AddStringToObject(root, "acuId",(char *)packFLash.acuId);
+		char *sprinBuf=RT_NULL;
+		sprinBuf=rt_malloc(20);//20个字符串长度 够用了
 		
 		{
 		Array = cJSON_CreateArray();
@@ -260,18 +267,18 @@ static uint16_t threeAxisJsonPack()
 		sprintf(sprinBuf,"%d",utcTime());
 		cJSON_AddStringToObject(root,"timestamp",sprinBuf);
 		// 打印JSON数据包  
-		out = cJSON_Print(root);
-		if(out!=NULL){
-			for(int i=0;i<rt_strlen(out);i++)
-					rt_kprintf("%c",out[i]);
-			rt_kprintf("\n");
-			rt_free(out);
-			out=NULL;
-		}
-		if(root!=NULL){
-			cJSON_Delete(root);
-			out=NULL;
-		}
+//		out = cJSON_Print(root);
+//		if(out!=NULL){
+//			for(int i=0;i<rt_strlen(out);i++)
+//					rt_kprintf("%c",out[i]);
+//			rt_kprintf("\n");
+//			rt_free(out);
+//			out=NULL;
+//		}
+//		if(root!=NULL){
+//			cJSON_Delete(root);
+//			out=NULL;
+//		}
 
 		//打包
 		int len=0;
@@ -281,10 +288,22 @@ static uint16_t threeAxisJsonPack()
 		
 		// 释放内存  
 		
-		
-		rt_strcpy((char *)packBuf+len,out);
-    len+=rt_strlen(out);
+
 	
+		out = cJSON_Print(root);
+		rt_strcpy((char *)packBuf+len,out);
+		len+=rt_strlen(out);
+		if(out!=NULL){
+				for(int i=0;i<rt_strlen(out);i++)
+						rt_kprintf("%c",out[i]);
+				rt_kprintf("\n");
+				rt_free(out);
+				out=NULL;
+		}
+		if(root!=NULL){
+			cJSON_Delete(root);
+			out=NULL;
+		}
 
 		//lenth
 	  packBuf[2]=(uint8_t)((len-LENTH_LEN-HEAD_LEN)>>8);//更新json长度

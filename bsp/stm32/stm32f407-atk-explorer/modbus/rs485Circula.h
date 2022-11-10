@@ -66,34 +66,34 @@
 01 03 08 00 00 00 00 00 00 00 00 95 D7
 */
 
-typedef struct
-{
-	  //环流值 放大了100倍
-		float circlCurA;
-		float circlCurB;
-	  float circlCurC;
-	  float circlCurD;//备用
-	  //阈值
-	  //uint32_t thresholdVal;
+//typedef struct
+//{
+//	  //环流值 放大了100倍
+//		float circlCurA;
+//		float circlCurB;
+//	  float circlCurC;
+//	  float circlCurD;//备用
+//	  //阈值
+//	  //uint32_t thresholdVal;
 
-	  
-	  //报警状态  一个字节足够 方便对接modbus回应
-	  uint16_t warningA;
-	  uint16_t warningB;
-	  uint16_t warningC;
-	  uint16_t warningD;
-	  //采集间隔 单位秒
-		//uint16_t AcqInterv;
-	//小数点计算数值
-    uint16_t point; //非modbus真实值  此处读取modbus后经过了转换便于直接计算  0-值为100  1-2 值为10
-} CIRCURStru;
+//	  
+//	  //报警状态  一个字节足够 方便对接modbus回应
+//	  uint16_t warningA;
+//	  uint16_t warningB;
+//	  uint16_t warningC;
+//	  uint16_t warningD;
+//	  //采集间隔 单位秒
+//		//uint16_t AcqInterv;
+//	//小数点计算数值
+//    uint16_t point; //非modbus真实值  此处读取modbus后经过了转换便于直接计算  0-值为100  1-2 值为10
+//} CIRCURStru;
 
 //extern CIRCURStru  cirCurStru_p[];
 
-void readCirCurrAndWaring(int num);
-rt_bool_t cirCurrWaringcheck(int num);
-uint16_t 	cirCulaDataPack(void);
-void  cirCurrWaringEventPack(void);
-void readCirCurrAndWaring(int num);
+//void readCirCurrAndWaring(int num);
+//rt_bool_t cirCurrWaringcheck(int num);
+//uint16_t 	cirCulaDataPack(void);
+//void  cirCurrWaringEventPack(void);
+//void readCirCurrAndWaring(int num);
 
 #endif

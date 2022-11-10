@@ -1,11 +1,11 @@
-#ifndef   __RS484WATERLEV__H__
-#define   __RS484WATERLEV__H__
+#ifndef   __RS484waterDepth__H__
+#define   __RS484waterDepth__H__
 #include "board.h"
 
 
 //typedef struct{
 //	
-//}waterLevSru;
+//}waterDepthSru;
 extern void readWaterDepth(int num);
 
 #endif

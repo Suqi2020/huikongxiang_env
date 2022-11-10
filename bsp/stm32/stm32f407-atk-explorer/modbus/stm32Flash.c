@@ -16,7 +16,7 @@ const static char sign[]="[flash]";/////////////////////////////////////////////
 //All rights reserved									  
 ////////////////////////////////////////////////////////////////////////////////// 	
 packIpUartStru packFLash   __attribute__ ((aligned (4)));
-modbusFlashStru sheet      __attribute__ ((aligned (4)));
+deviceFlashStru sheet      __attribute__ ((aligned (4)));
 const static char     UartName[UART_NUM][6] ={"port1", "port2",  "port3",  "port4"};//重映射一个名称
 const static uartEnum UartNum[UART_NUM]     ={USE_UART2,USE_UART3,USE_UART6,USE_UART4};//重映射一个名称
 
@@ -163,7 +163,7 @@ void printModbusDevList()
 				break;
 				case TEMPHUM:
 					for(int j=0;j<TEMPHUM_485_NUM;j++){//核对有没有配置过
-							if(sheet.partDischag[j].workFlag==RT_TRUE){
+							if(sheet.tempHum[j].workFlag==RT_TRUE){
 									rt_kprintf("%s modbus ",sign);
 									rt_kprintf("%-10s ",modbusName[i]);
 									rt_kprintf("%s ",sheet.tempHum[j].ID);
@@ -176,14 +176,14 @@ void printModbusDevList()
 				break;
 				case WATERDEPTH:
 					for(int j=0;j<WATERDEPTH_485_NUM;j++){//核对有没有配置过
-							if(sheet.waterLev[j].workFlag==RT_TRUE){
+							if(sheet.waterDepth[j].workFlag==RT_TRUE){
 									rt_kprintf("%s modbus ",sign);
 									rt_kprintf("%-10s ",modbusName[i]);
-									rt_kprintf("%s ",sheet.waterLev[j].ID);
-									rt_kprintf("%s ",sheet.waterLev[j].model);
-									rt_kprintf("%s ",UartName[sheet.waterLev[j].useUartNum]);
-									rt_kprintf("%d ",sheet.waterLev[j].slaveAddr);
-									rt_kprintf("%d \n",sheet.waterLevColTime);
+									rt_kprintf("%s ",sheet.waterDepth[j].ID);
+									rt_kprintf("%s ",sheet.waterDepth[j].model);
+									rt_kprintf("%s ",UartName[sheet.waterDepth[j].useUartNum]);
+									rt_kprintf("%d ",sheet.waterDepth[j].slaveAddr);
+									rt_kprintf("%d \n",sheet.waterDepthColTime);
 							}
 					}
 				break;
@@ -508,38 +508,38 @@ static int o2Conf(int uartnum,char *argv[])
 	}
 	return ret;
 }
-static int waterLevConf(int uartnum,char *argv[])
+static int waterDepthConf(int uartnum,char *argv[])
 {
 	int i=0;
 	int ret=0;
 	int slaveAddr=atoi32(argv[5],10);
 	//sheet.cirCulaColTime=atoi32(argv[6],10);
-	sheet.waterLevColTime=atoi32(argv[6],10);
+	sheet.waterDepthColTime=atoi32(argv[6],10);
 	for( i=0;i<WATERDEPTH_485_NUM;i++){//核对有没有配置过
-			if(rt_strcmp(sheet.waterLev[i].ID,argv[2])==0){//配置过
+			if(rt_strcmp(sheet.waterDepth[i].ID,argv[2])==0){//配置过
 					if((slaveAddr==0)||(slaveAddr==255)){//关闭
-							sheet.waterLev[i].workFlag=RT_FALSE;//关闭
+							sheet.waterDepth[i].workFlag=RT_FALSE;//关闭
 					}
 					else{
-							sheet.waterLev[i].workFlag=RT_TRUE;//打开
+							sheet.waterDepth[i].workFlag=RT_TRUE;//打开
 					}
-					sheet.waterLev[i].slaveAddr=slaveAddr;	
-					sheet.waterLev[i].useUartNum=UartNum[uartnum];
-					rt_strcpy(sheet.waterLev[i].model,argv[3]);
-					rt_kprintf("%s waterLev reconfig %d\n",sign,i);
+					sheet.waterDepth[i].slaveAddr=slaveAddr;	
+					sheet.waterDepth[i].useUartNum=UartNum[uartnum];
+					rt_strcpy(sheet.waterDepth[i].model,argv[3]);
+					rt_kprintf("%s waterDepth reconfig %d\n",sign,i);
 					ret =1;
 					break;
 			}
 	}
 	if(i==WATERDEPTH_485_NUM){//没有配置过
 			for(int j=0;j<WATERDEPTH_485_NUM;j++){
-					if(sheet.waterLev[j].workFlag!=RT_TRUE){
-							sheet.waterLev[j].workFlag=RT_TRUE;//打开
-							sheet.waterLev[j].slaveAddr=slaveAddr;	
-							sheet.waterLev[j].useUartNum=UartNum[uartnum];
-							rt_strcpy(sheet.waterLev[j].model,argv[3]);
-							rt_strcpy(sheet.waterLev[j].ID,argv[2]);
-							rt_kprintf("%s waterLev config %d\n",sign,j);
+					if(sheet.waterDepth[j].workFlag!=RT_TRUE){
+							sheet.waterDepth[j].workFlag=RT_TRUE;//打开
+							sheet.waterDepth[j].slaveAddr=slaveAddr;	
+							sheet.waterDepth[j].useUartNum=UartNum[uartnum];
+							rt_strcpy(sheet.waterDepth[j].model,argv[3]);
+							rt_strcpy(sheet.waterDepth[j].ID,argv[2]);
+							rt_kprintf("%s waterDepth config %d\n",sign,j);
 							ret =1;
 							break;
 					}
@@ -586,9 +586,9 @@ static int tempHumConf(int uartnum,char *argv[])
 	}
 	return ret;
 }
-int modbusConf(int modbusnum,int uartnum,char *argv[])
+static int modbusConf(int modbusnum,int uartnum,char *argv[])
 {
-	  int ret=0,i;
+	  int ret=0;
 	  //int slaveAddr=atoi32(argv[5],10);//提取设备地址 前面已经核对过
 		rt_kprintf("conf:%d %d\n",modbusnum,uartnum);
 		switch(modbusnum)
@@ -621,7 +621,7 @@ int modbusConf(int modbusnum,int uartnum,char *argv[])
 				ret=tempHumConf(uartnum,argv);
       break;
       case WATERDEPTH:
-				ret=waterLevConf(uartnum,argv);
+				ret=waterDepthConf(uartnum,argv);
 			break;
 			default:
 			break;
@@ -648,7 +648,7 @@ static void modbus(int argc, char *argv[])
 		uint8_t slaveaddr=atoi16(argv[5],10);
     int setTime =atoi16(argv[6],10);
 		if(setTime<60){
-				rt_kprintf("%serr:argv[6] 采集时间>60 now is%d\n",sign,time);
+				rt_kprintf("%serr:argv[6] 采集时间>60 now is%d\n",sign,setTime);
 				goto ERR;
 		}
 		if(slaveaddr>255){
@@ -690,7 +690,7 @@ MSH_CMD_EXPORT(modbus,port slaveaddr config);//FINSH_FUNCTION_EXPORT_CMD
 
 
 
-static const uint8_t portStr[UART_NUM][6]={"port1","port2","port3","port4"};
+//static const uint8_t portStr[UART_NUM][6]={"port1","port2","port3","port4"};
 
 static void uart(int argc, char *argv[])
 {
@@ -698,16 +698,7 @@ static void uart(int argc, char *argv[])
 		if(argc!=3){
 				goto ERR;
 		}
-		for(int i=0;i<UART_NUM;i++){
-				if(0==rt_strcmp((char *)portStr[i], argv[1])){
-						packFLash.uartBps[i]     =atoi32(argv[2],10);
-						//MX_USART2_UART_Init(packFLash.port[i].bps);
-						uartSingConf(i,packFLash.uartBps[i]);
-						rt_kprintf("%sport%d config\n",sign,i+1);
-						return;
-				}
-		}
-
+		rt_strcpy((char *)packFLash.acuId,argv[1]);
 		ERR:
 		rt_kprintf("%s[uart 端口(1-4) 波特率]\n",sign);
 		rt_kprintf("%sfor example\n",sign);
@@ -715,3 +706,118 @@ static void uart(int argc, char *argv[])
 
 }
 MSH_CMD_EXPORT(uart,uart config);//FINSH_FUNCTION_EXPORT_CMD
+
+
+
+static void acuid(int argc, char *argv[])
+{
+		if(argc!=2){
+				goto ERR;
+		}
+		rt_strcpy(packFLash.acuId,argv[1]);
+		rt_kprintf("%sacuid conf\n",sign);
+		return;
+		ERR:
+		rt_kprintf("%sfor example\n",sign);
+		rt_kprintf("%s[acuid  100000000000001]\n",sign);
+
+}
+MSH_CMD_EXPORT(acuid,acuid config);//FINSH_FUNCTION_EXPORT_CMD
+
+
+
+void prinfAnalogList()
+{
+		for(int j=0;j<ANALOG_NUM;j++){//查一遍 找到 GYNJLXSD000000499  如果
+				if(sheet.analog[j].workFlag==RT_TRUE){//没打开
+						rt_kprintf("%s analog ",sign);
+
+						rt_kprintf("%s ",sheet.analog[j].name);
+						rt_kprintf("%s ",sheet.analog[j].funName);
+						
+						rt_kprintf("%s ",sheet.analog[j].ID);
+						rt_kprintf("%s ",sheet.analog[j].model);
+						rt_kprintf("%s ",sheet.analog[j].port);
+						rt_kprintf("采集间隔 %d\n",sheet.analog[j].colTime);
+
+				}
+		}
+}
+//analog  温湿度 temperature    GYNJLXSD000000499 GY280 port1  120  
+//analog  温湿度 humidity       GYNJLXSD000000499 GY280 port2  120 
+//analog  温湿度 humidity       GYNJLXSD000000499 GY280 port2  120 
+//
+//const static char  analogName[20]="温湿度";
+//const static char  analogName1Val[2][20]={"temperature","humidity"};
+const  static  char analogPort[ANALOG_NUM][10]={"port1","port2","port3","port4","port5","port6","port7","port8"};
+
+int analogPortCheck(char *port)
+{
+	  
+	  
+		for(int i=0;i<ANALOG_NUM;i++){
+			 // rt_kprintf("%s %s\n",analogPort[i],port);
+			  if(rt_strcmp(analogPort[i],port)==0){
+						return i+1;
+				}
+		}
+	  return 0;
+}
+static void analog(int argc, char *argv[])
+{
+	  
+		if(argc!=7){
+				goto ERR;
+		}
+		if(rt_strcmp(argv[1],analogName)==0){
+			 rt_kprintf("analog 1\n");
+			 //rt_kprintf("%s %s\n",sign,analogName);
+			 if((rt_strcmp(argv[2],analogName1Val[0])==0)||(rt_strcmp(argv[2],analogName1Val[1])==0)){
+				  // rt_kprintf("%s %s %s\n",sign,analogName1Val[0],analogName1Val[1]);
+	         int port = analogPortCheck(argv[5]);
+				   if(0!=port){//打开
+							 for(int j=0;j<ANALOG_NUM;j++){//查一遍 找到 GYNJLXSD000000499  如果
+									if(sheet.analog[j].workFlag!=RT_TRUE){//没打开
+											sheet.analog[j].workFlag=RT_TRUE;
+										  rt_strcpy(sheet.analog[j].name,   argv[1]);
+										  rt_strcpy(sheet.analog[j].funName,argv[2]);
+											rt_strcpy(sheet.analog[j].model,  argv[4]);
+											rt_strcpy(sheet.analog[j].ID,     argv[3]);
+										  sheet.analog[j].port=port;
+								
+										  sheet.analog[j].colTime  = atoi16(argv[6],10);
+										  rt_kprintf("%s open chanl%d\n",sign,j+1);
+										  return;
+									}
+							 }
+					 }//关闭
+					 else{
+						 	 for(int j=0;j<ANALOG_NUM;j++){//查一遍 找到 GYNJLXSD000000499  如果
+									if(rt_strcmp(sheet.analog[j].ID,argv[3])==0){
+											sheet.analog[j].workFlag=RT_FALSE;
+										  rt_kprintf("%s close chanl%d\n",sign,j+1);
+									}
+									//rt_kprintf("%s %s %s\n",sign,sheet.analog[j].IDanalogName1Val[1]);
+							 }
+					 }
+			 }
+			 else{
+					 rt_kprintf("%sargv[6]!=%s %s\n",sign,analogName1Val[0],analogName1Val[1]);
+					 goto ERR;
+			 }
+		}
+		else{
+			  rt_kprintf("analog 2\n");
+				rt_kprintf("%sargv[1]!=%s\n",sign,analogName);
+				goto ERR;
+		}
+
+		return;
+		ERR:
+		rt_kprintf("%sfor example\n",sign);
+		rt_kprintf("%s[analog  温湿度 temperature    GYNJLXSD000000499 GY280 port1  120]\n",sign);
+		rt_kprintf("%s[port1-8 之外清除对应ID的所有参数]\n",sign);
+
+}
+MSH_CMD_EXPORT(analog,analog config);//FINSH_FUNCTION_EXPORT_CMD
+

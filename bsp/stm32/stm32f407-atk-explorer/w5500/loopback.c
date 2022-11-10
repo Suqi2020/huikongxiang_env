@@ -212,8 +212,8 @@ void loopback_tcpc(SOCKET s, uint16 port)
 			gbNetState =RT_TRUE;	
 		  offLineTimesGet =RT_FALSE;
 			offLine.relayTimer[offLine.times]=(rt_tick_get()-offLine.relayTimer[offLine.times])/1000;
-		
-			heartUpPack();
+		  extern uint16_t heartUpJsonPack();
+			heartUpJsonPack();
 		  extern struct rt_mailbox mbNetSendData;
 		  extern uint8_t   packBuf[TX_RX_MAX_BUF_SIZE];
 			rt_mb_send_wait(&mbNetSendData, (rt_ubase_t)&packBuf,RT_WAITING_FOREVER); 

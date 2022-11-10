@@ -5,6 +5,29 @@
 //响应时间不确定 最长1.7秒 有时候长 有时候短
 //           默认波特率115200
 
+ typedef struct  
+ { 
+  unsigned a:1; 
+  unsigned b:3; 
+  unsigned c:4; 
+ } bs; 
+ 
+typedef struct{
+		uint32_t amplitudeA;
+	  uint32_t freqA;
+	  uint32_t dischargeA;
+	
+		uint32_t amplitudeB;
+		uint32_t freqB;
+		uint32_t dischargeB;
+
+		uint32_t amplitudeC;
+		uint32_t freqC;
+		uint32_t dischargeC;
+	
+	  bs alarm;  //bit0 A bit1 B bit2 C
+	  uint8_t rev[3];
+}partDischargeStru;
 
 const static char sign[]="[局放]";
 static partDischargeStru partDiscStru_p[PARTDISCHAG_485_NUM];
@@ -316,8 +339,7 @@ void  partDisWaringEventPack()
 //}
 uint16_t partDischagJsonPack()
 {
-		char *sprinBuf=RT_NULL;
-		sprinBuf=rt_malloc(20);//20个字符串长度 够用了
+
 		char* out = NULL;
 		//创建数组
 		cJSON* Array = NULL;
@@ -331,8 +353,9 @@ uint16_t partDischagJsonPack()
 		cJSON_AddNumberToObject(root, "mid",mcu.upMessID);
 		cJSON_AddStringToObject(root, "packetType","CMD_REPORTDATA");
 		cJSON_AddStringToObject(root, "identifier","partial_discharge_monitor");
-		cJSON_AddStringToObject(root, "acuId","100000000000001");
-		
+		cJSON_AddStringToObject(root, "acuId",(char *)packFLash.acuId);
+		char *sprinBuf=RT_NULL;
+		sprinBuf=rt_malloc(20);//20个字符串长度 够用了
 		
 		{
 		Array = cJSON_CreateArray();
@@ -340,7 +363,7 @@ uint16_t partDischagJsonPack()
 		cJSON_AddItemToObject(root, "params", Array);
 		for (int i = 0; i < PARTDISCHAG_485_NUM; i++)
 		{		
-			rt_thread_mdelay(2000);
+			
 			if(sheet.partDischag[i].workFlag==RT_TRUE){
 				nodeobj = cJSON_CreateObject();
 				cJSON_AddItemToArray(Array, nodeobj);
@@ -388,18 +411,18 @@ uint16_t partDischagJsonPack()
 		sprintf(sprinBuf,"%d",utcTime());
 		cJSON_AddStringToObject(root,"timestamp",sprinBuf);
 		// 打印JSON数据包  
-		out = cJSON_Print(root);
-		if(out!=NULL){
-			for(int i=0;i<rt_strlen(out);i++)
-					rt_kprintf("%c",out[i]);
-			rt_kprintf("\n");
-			rt_free(out);
-			out=NULL;
-		}
-		if(root!=NULL){
-			cJSON_Delete(root);
-			out=NULL;
-		}
+//		out = cJSON_Print(root);
+//		if(out!=NULL){
+//			for(int i=0;i<rt_strlen(out);i++)
+//					rt_kprintf("%c",out[i]);
+//			rt_kprintf("\n");
+//			rt_free(out);
+//			out=NULL;
+//		}
+//		if(root!=NULL){
+//			cJSON_Delete(root);
+//			out=NULL;
+//		}
 
 		//打包
 		int len=0;
@@ -410,8 +433,20 @@ uint16_t partDischagJsonPack()
 		// 释放内存  
 		
 		
+		out = cJSON_Print(root);
 		rt_strcpy((char *)packBuf+len,out);
-    len+=rt_strlen(out);
+		len+=rt_strlen(out);
+		if(out!=NULL){
+				for(int i=0;i<rt_strlen(out);i++)
+						rt_kprintf("%c",out[i]);
+				rt_kprintf("\n");
+				rt_free(out);
+				out=NULL;
+		}
+		if(root!=NULL){
+			cJSON_Delete(root);
+			out=NULL;
+		}
 	
 
 		//lenth
@@ -442,6 +477,7 @@ void partDischagRead2Send(rt_bool_t netStat)
 		int workFlag=RT_FALSE;
 		for(int i=0;i<PARTDISCHAG_485_NUM;i++){
 			 if(sheet.partDischag[i].workFlag==RT_TRUE){
+				    rt_thread_mdelay(2000);
 						readPdFreqDischarge(i);
 						workFlag=RT_TRUE;
 				}

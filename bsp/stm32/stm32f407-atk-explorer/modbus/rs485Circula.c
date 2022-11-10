@@ -14,6 +14,27 @@
 //迅速切换其它485接口来使用 方法：只需要修改串口发送接口 和中断接收接口即可
 // rs485Circula.c-cirCurrUartSend(uint8_t *buf,int len) 和drv_uart.c-USART2_IRQHandler中
 // cirCurrUartSend(uint8_t *buf,int len)   cirCurrUartRec(uint8_t dat)
+typedef struct
+{
+	  //环流值 放大了100倍
+		float circlCurA;
+		float circlCurB;
+	  float circlCurC;
+	  float circlCurD;//备用
+	  //阈值
+	  //uint32_t thresholdVal;
+
+	  
+	  //报警状态  一个字节足够 方便对接modbus回应
+	  uint16_t warningA;
+	  uint16_t warningB;
+	  uint16_t warningC;
+	  uint16_t warningD;
+	  //采集间隔 单位秒
+		//uint16_t AcqInterv;
+	//小数点计算数值
+    uint16_t point; //非modbus真实值  此处读取modbus后经过了转换便于直接计算  0-值为100  1-2 值为10
+} CIRCURStru;
 
 const static char sign[]="[环流]";
 
@@ -601,8 +622,7 @@ void readMultiCirCulaPoint()
 
 uint16_t circulaJsonPack()
 {
-		char *sprinBuf=RT_NULL;
-		sprinBuf=rt_malloc(20);//20个字符串长度 够用了
+
 		char* out = NULL;
 		//创建数组
 		cJSON* Array = NULL;
@@ -616,60 +636,61 @@ uint16_t circulaJsonPack()
 		cJSON_AddNumberToObject(root, "mid",mcu.upMessID);
 		cJSON_AddStringToObject(root, "packetType","CMD_REPORTDATA");
 		cJSON_AddStringToObject(root, "identifier","grounding_current_monitor");
-		cJSON_AddStringToObject(root, "acuId","100000000000001");
-		
+		cJSON_AddStringToObject(root, "acuId",(char *)packFLash.acuId);
+		char *sprinBuf=RT_NULL;
+		sprinBuf=rt_malloc(20);//20个字符串长度 够用了
 		
 		{
-		Array = cJSON_CreateArray();
-		if (Array == NULL) return 0;
-		cJSON_AddItemToObject(root, "params", Array);
-		for (int i = 0; i < CIRCULA_485_NUM; i++)
-		{		
+			Array = cJSON_CreateArray();
+			if (Array == NULL) return 0;
+			cJSON_AddItemToObject(root, "params", Array);
+			for (int i = 0; i < CIRCULA_485_NUM; i++)
+			{		
 
-			if(sheet.cirCula[i].workFlag==RT_TRUE){
-				nodeobj = cJSON_CreateObject();
-				cJSON_AddItemToArray(Array, nodeobj);
-			  cJSON_AddItemToObject(nodeobj,"deviceId",cJSON_CreateString(sheet.cirCula[i].ID));
-				
-				
-				nodeobj_p= cJSON_CreateObject();
-				cJSON_AddItemToObject(nodeobj, "data", nodeobj_p);
-				
-				sprintf(sprinBuf,"%02f",cirCurStru_p[i].circlCurA);
-				cJSON_AddItemToObject(nodeobj_p,"earthCurA",cJSON_CreateString(sprinBuf));
-				cJSON_AddItemToObject(nodeobj_p,"runCurA",cJSON_CreateString(""));
-				cJSON_AddItemToObject(nodeobj_p,"loadRatioA",cJSON_CreateString(""));
-				
-				sprintf(sprinBuf,"%02f",cirCurStru_p[i].circlCurB);
-				cJSON_AddItemToObject(nodeobj_p,"earthCurB",cJSON_CreateString(sprinBuf));
-				cJSON_AddItemToObject(nodeobj_p,"runCurB",cJSON_CreateString(""));
-				cJSON_AddItemToObject(nodeobj_p,"loadRatioB",cJSON_CreateString(""));
-				
-				sprintf(sprinBuf,"%02f",cirCurStru_p[i].circlCurC);
-				cJSON_AddItemToObject(nodeobj_p,"earthCurC",cJSON_CreateString(sprinBuf));
-				cJSON_AddItemToObject(nodeobj_p,"runCurC",cJSON_CreateString(""));
-				cJSON_AddItemToObject(nodeobj_p,"loadRatioC",cJSON_CreateString(""));
-				sprintf(sprinBuf,"%d",utcTime());
-				cJSON_AddItemToObject(nodeobj_p,"monitoringTime",cJSON_CreateString(sprinBuf));
+				if(sheet.cirCula[i].workFlag==RT_TRUE){
+					nodeobj = cJSON_CreateObject();
+					cJSON_AddItemToArray(Array, nodeobj);
+					cJSON_AddItemToObject(nodeobj,"deviceId",cJSON_CreateString(sheet.cirCula[i].ID));
+					
+					
+					nodeobj_p= cJSON_CreateObject();
+					cJSON_AddItemToObject(nodeobj, "data", nodeobj_p);
+					
+					sprintf(sprinBuf,"%02f",cirCurStru_p[i].circlCurA);
+					cJSON_AddItemToObject(nodeobj_p,"earthCurA",cJSON_CreateString(sprinBuf));
+					cJSON_AddItemToObject(nodeobj_p,"runCurA",cJSON_CreateString(""));
+					cJSON_AddItemToObject(nodeobj_p,"loadRatioA",cJSON_CreateString(""));
+					
+					sprintf(sprinBuf,"%02f",cirCurStru_p[i].circlCurB);
+					cJSON_AddItemToObject(nodeobj_p,"earthCurB",cJSON_CreateString(sprinBuf));
+					cJSON_AddItemToObject(nodeobj_p,"runCurB",cJSON_CreateString(""));
+					cJSON_AddItemToObject(nodeobj_p,"loadRatioB",cJSON_CreateString(""));
+					
+					sprintf(sprinBuf,"%02f",cirCurStru_p[i].circlCurC);
+					cJSON_AddItemToObject(nodeobj_p,"earthCurC",cJSON_CreateString(sprinBuf));
+					cJSON_AddItemToObject(nodeobj_p,"runCurC",cJSON_CreateString(""));
+					cJSON_AddItemToObject(nodeobj_p,"loadRatioC",cJSON_CreateString(""));
+					sprintf(sprinBuf,"%d",utcTime());
+					cJSON_AddItemToObject(nodeobj_p,"monitoringTime",cJSON_CreateString(sprinBuf));
+				}
 			}
-		}
 		}
 	
 		sprintf(sprinBuf,"%d",utcTime());
 		cJSON_AddStringToObject(root,"timestamp",sprinBuf);
 		// 打印JSON数据包  
-		out = cJSON_Print(root);
-		if(out!=NULL){
-			for(int i=0;i<rt_strlen(out);i++)
-					rt_kprintf("%c",out[i]);
-			rt_kprintf("\n");
-			rt_free(out);
-			out=NULL;
-		}
-		if(root!=NULL){
-			cJSON_Delete(root);
-			out=NULL;
-		}
+//		out = cJSON_Print(root);
+//		if(out!=NULL){
+//			for(int i=0;i<rt_strlen(out);i++)
+//					rt_kprintf("%c",out[i]);
+//			rt_kprintf("\n");
+//			rt_free(out);
+//			out=NULL;
+//		}
+//		if(root!=NULL){
+//			cJSON_Delete(root);
+//			out=NULL;
+//		}
 
 		//打包
 		int len=0;
@@ -680,8 +701,20 @@ uint16_t circulaJsonPack()
 		// 释放内存  
 		
 		
+		out = cJSON_Print(root);
 		rt_strcpy((char *)packBuf+len,out);
-    len+=rt_strlen(out);
+		len+=rt_strlen(out);
+		if(out!=NULL){
+				for(int i=0;i<rt_strlen(out);i++)
+						rt_kprintf("%c",out[i]);
+				rt_kprintf("\n");
+				rt_free(out);
+				out=NULL;
+		}
+		if(root!=NULL){
+			cJSON_Delete(root);
+			out=NULL;
+		}
 	
 
 		//lenth

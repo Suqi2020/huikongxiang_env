@@ -91,8 +91,9 @@
 //         存在bug  uart 的MX_USART2_UART_Init(packFLash.port[i].bps); 中
 //V0.40    修改傻瓜式为指定传感器       20221108
 //V0.41    所用到传感器json格式已经打包完成   20221109
+//V0.42    接入传感器测试 修复bug    增加模拟量配置目前支持温湿度未完成 20221110
 #define APP_VER       ((0<<8)+41)//0x0105 表示1.5版本
-const char date[]="20221103";
+const char date[]="20221110";
 
 static    rt_thread_t tid 	= RT_NULL;
 
@@ -221,7 +222,7 @@ int main(void)
 //		}
 
 		
-		tid =  rt_thread_create("upKeep",upKeepStateTask,RT_NULL,1024,2, 10 );
+		tid =  rt_thread_create("upKeep",upKeepStateTask,RT_NULL,512*3,2, 10 );
 		if(tid!=NULL){
 				rt_thread_startup(tid);													 
 				rt_kprintf("%sRTcreat upKeepStateTask \r\n",sign);
