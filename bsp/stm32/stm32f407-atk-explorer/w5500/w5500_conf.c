@@ -115,6 +115,7 @@ void set_w5500_ip(void)
 	getGAR(packFLash.netIpFlash.gateway);
 	printf("%sW5500 网关     : %d.%d.%d.%d\r\n",sign, packFLash.netIpFlash.gateway[0],packFLash.netIpFlash.gateway[1],\
 													packFLash.netIpFlash.gateway[2],packFLash.netIpFlash.gateway[3]);
+	printf("%sW5500 物理地址 : %02X %02X %02X %02X %02X %02X\r\n",sign, mac[0],mac[1],mac[2],mac[3],mac[4],mac[5]);
 }
 
 /**
@@ -296,7 +297,7 @@ uint16 wiz_read_buf(uint32 addrbsb, uint8* buf,uint16 len)
 
 
 
-netIpFlashStru netIpFlash  __attribute__ ((aligned (4)));;
+//netIpFlashStru netIpFlash  __attribute__ ((aligned (4)));;
 
 static void net(int argc, char *argv[])
 {
@@ -313,43 +314,43 @@ static void net(int argc, char *argv[])
 					goto ERR;
 				}
 				mac[5]=atoi16(argv[2],10);
-				netIpFlash.macaddr=mac[5];
-				rt_kprintf("%sfor macaddr OK\n",sign);
+				packFLash.netIpFlash.macaddr=mac[5];
+				rt_kprintf("%smacaddr OK\n",sign);
 
 		}
 		else 	if(0==rt_strcmp((char *)"localIp", argv[1])){
 				if(argc!=6){
 					goto ERR;
 				}
-				netIpFlash.localIp[0] =atoi16(argv[2],10);
-				netIpFlash.localIp[1] =atoi16(argv[3],10);
-				netIpFlash.localIp[2] =atoi16(argv[4],10);
-				netIpFlash.localIp[3] =atoi16(argv[5],10);
+				packFLash.netIpFlash.localIp[0] =atoi16(argv[2],10);
+				packFLash.netIpFlash.localIp[1] =atoi16(argv[3],10);
+				packFLash.netIpFlash.localIp[2] =atoi16(argv[4],10);
+				packFLash.netIpFlash.localIp[3] =atoi16(argv[5],10);
 
-				rt_kprintf("%sfor localIp OK\n",sign);
+				rt_kprintf("%slocalIp OK\n",sign);
 		}
 		else 	if(0==rt_strcmp((char *)"gateway", argv[1])){
 				if(argc!=6){
 					goto ERR;
 				}
-			  netIpFlash.gateway[0] =atoi16(argv[2],10);
-				netIpFlash.gateway[1] =atoi16(argv[3],10);
-				netIpFlash.gateway[2] =atoi16(argv[4],10);
-				netIpFlash.gateway[3] =atoi16(argv[5],10); 
+			  packFLash.netIpFlash.gateway[0] =atoi16(argv[2],10);
+				packFLash.netIpFlash.gateway[1] =atoi16(argv[3],10);
+				packFLash.netIpFlash.gateway[2] =atoi16(argv[4],10);
+				packFLash.netIpFlash.gateway[3] =atoi16(argv[5],10); 
 	
-				rt_kprintf("%sfor gateway OK\n",sign);
+				rt_kprintf("%sgateway OK\n",sign);
 
 		}
 		else 	if(0==rt_strcmp((char *)"remoteIp", argv[1])){
 				if(argc!=6){
 					goto ERR;
 				}
-			  netIpFlash.remoteIp[0] =atoi16(argv[2],10);
-				netIpFlash.remoteIp[1] =atoi16(argv[3],10);
-				netIpFlash.remoteIp[2] =atoi16(argv[4],10);
-				netIpFlash.remoteIp[3] =atoi16(argv[5],10);
+			  packFLash.netIpFlash.remoteIp[0] =atoi16(argv[2],10);
+				packFLash.netIpFlash.remoteIp[1] =atoi16(argv[3],10);
+				packFLash.netIpFlash.remoteIp[2] =atoi16(argv[4],10);
+				packFLash.netIpFlash.remoteIp[3] =atoi16(argv[5],10);
 		
-				rt_kprintf("%sfor remoteIp OK\n",sign);
+				rt_kprintf("%sremoteIp OK\n",sign);
 
 				//STMFLASH_Write(FLASH_IP_SAVE_ADDR,(uint32_t*)&netIpFlash,sizeof(netIpFlash));
 		}
@@ -357,10 +358,10 @@ static void net(int argc, char *argv[])
 				if(argc!=3){
 					goto ERR;
 				}
-				netIpFlash.remotePort=atoi32(argv[2],10);
+				packFLash.netIpFlash.remotePort=atoi32(argv[2],10);
 
 		
-				rt_kprintf("%sfor remotePort OK\n",sign);
+				rt_kprintf("%sremotePort OK\n",sign);
 		}
 		
 		return;

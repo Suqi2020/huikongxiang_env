@@ -26,7 +26,7 @@ typedef struct{
 		uint32_t dischargeC;
 	
 	  bs alarm;  //bit0 A bit1 B bit2 C
-	  uint8_t rev[3];
+	  uint8_t respStat;
 }partDischargeStru;
 
 const static char sign[]="[¾Ö·Å]";
@@ -75,8 +75,6 @@ void readPdFreqDischarge(int num)
 				}
 				rt_kprintf("\n");
 		}
-		//ÌáÈ¡»·Á÷Öµ µÚÒ»²½ÅÐ¶Ïcrc µÚ¶þ²¿ÌáÈ¡
-//		uartDev[modbusFlash[PARTDISCHAG].useUartNum].offline=RT_FALSE;
 		int ret2= modbusRespCheck(sheet.partDischag[num].slaveAddr,buf,len,RT_TRUE);
 		if(0 ==  ret2){//Ë¢ÐÂ¶ÁÈ¡µ½µÄÖµ
 			
@@ -92,12 +90,13 @@ void readPdFreqDischarge(int num)
 				partDiscStru_p[num].freqC     =(buf[offset]<<24)+(buf[offset+1]<<16)+(buf[offset+2]<<8)+buf[offset+3];offset+=4;
 			  partDiscStru_p[num].dischargeC=(buf[offset]<<24)+(buf[offset+1]<<16)+(buf[offset+2]<<8)+buf[offset+3];offset+=4;
 			  rt_kprintf("%sPdFreqDiach read ok\n",sign);
+			  partDiscStru_p[num].respStat=1;
 		} 
 		else{//¶Á²»µ½¸ø0
 				if(ret2==2){
 						//rt_kprintf("%sERR:Çë¼ì²é485½ÓÏß»òÕß¹©µç\r\n",sign);
-//						uartDev[modbusFlash[PARTDISCHAG].useUartNum].offline=RT_TRUE;
 				}
+				partDiscStru_p[num].respStat=0;
 				partDiscStru_p[num].amplitudeA=0;
 				partDiscStru_p[num].freqA     =0;
 			  partDiscStru_p[num].dischargeA=0;
@@ -158,12 +157,12 @@ rt_bool_t readPartDischgWarning(int num)
 				partDiscStru_p[num].alarm.b=(buf[offset]>>1)&0x01;
 			  partDiscStru_p[num].alarm.c=(buf[offset]>>2)&0x01;
 			  rt_kprintf("%sÌáÈ¡alarm OK\r\n",sign);
+			  partDiscStru_p[num].respStat=1;
 		} 
 		else{
 				if(ret2==2){
-						//rt_kprintf("%sERR:Çë¼ì²é485½ÓÏß»òÕß¹©µç\r\n",sign);
-//					  uartDev[modbusFlash[PARTDISCHAG].useUartNum].offline=RT_TRUE;
 				}
+				partDiscStru_p[num].respStat=0;
 				partDiscStru_p[num].alarm.a=0;
 				partDiscStru_p[num].alarm.b=0;
 				partDiscStru_p[num].alarm.c=0;
@@ -184,159 +183,6 @@ void  partDisWaringEventPack()
 		rt_kprintf("%slater add \n\r",sign);
 		
 }
-/*
-{
-    "mid":1234,
-    "packetType":"CMD_REPORTDATA",
-    "param":
-    {
-        "identifier":"partial_discharge_monitor",
-        "acuId":"100000000000001",
-        "deviceId":"1000000000003", 
-        "data":
-        {
-            "pdA":"",
-            "freqA":"",
-            "dischargeDataA":"",
-            "prpdDataA":"",
-            "prpsDataA":"",
-            "pdB":"",
-            "freqB":"",
-            "dischargeDataB":"",
-            "prpdDataB":"",
-            "prpsDataB":"",
-            "pdC":"",
-            "freqC":"",
-            "pdTotalC":"",
-            "dischargeDataC":"",
-            "prpdDataC":"",
-
-            "monitoringTime":"1655172531937"
-        }
-    },
-    "timestamp":"1655172531937"
-}
-*/
-//void  partDisDataPack()
-//{
-// 
-//	  memset(packBuf,0,sizeof(packBuf));
-//		int len=0;
-//    //head+lenth
-//	  packBuf[len]= (uint8_t)(HEAD>>8); len++;
-//	  packBuf[len]= (uint8_t)(HEAD);    len++;
-//	  len+=LENTH_LEN;//json³¤¶È×îºóÔÙÌîÐ´
-//	  //json
-//	  char str[50]={0};//ÁÙÊ±Ê¹ÓÃµÄÊý×é
-//		rt_sprintf(str,"{\"mid\":%lu,",mcu.upMessID);
-//		rt_strcpy((char *)packBuf+len,str);
-//    len+=rt_strlen(str);
-//		
-//		rt_strcpy(str,"\"packetType\":\"CMD_REPORTDATA\",");
-//		rt_strcpy((char *)packBuf+len,str);
-//    len+=rt_strlen(str);
-//		
-//		rt_strcpy(str,"\"param\":{");
-//		rt_strcpy((char *)packBuf+len,str);
-//    len+=rt_strlen(str);
-
-//		rt_strcpy(str,"\"identifier\":\"partial_discharge_monitor\",");
-//		rt_strcpy((char *)packBuf+len,str);
-//		len+=rt_strlen(str);
-
-//		rt_sprintf(str,"\"acuId\":\"%s\",",mcu.devID);
-//		rt_strcpy((char *)packBuf+len,str);
-//		len+=rt_strlen(str);
-//		
-//		rt_sprintf(str,"\"deviceId\":\"%s\",",devi[PARTDISCHAG].ID);
-//		rt_strcpy((char *)packBuf+len,str);
-//		len+=rt_strlen(str);
-
-//		rt_strcpy(str,"\"data\":{");
-//		rt_strcpy((char *)packBuf+len,str);
-//		len+=rt_strlen(str);
-//		
-//		
-//	 	//sprintf(str,"test:%0.2f",(float)121/100);				 
-//		sprintf(str,"\"pdA\":\"%u\",",partDiscStru_p.amplitudeA);	 
-//		rt_strcpy((char *)packBuf+len,str);
-//		len+=rt_strlen(str);
-//		sprintf(str,"\"freqA\":\"%u\",",partDiscStru_p.freqA);	 
-//		rt_strcpy((char *)packBuf+len,str);
-//		len+=rt_strlen(str);
-//		sprintf(str,"\"dischargeDataA\":\"%u\",",partDiscStru_p.dischargeA);	 
-//		rt_strcpy((char *)packBuf+len,str);
-//		len+=rt_strlen(str);
-//		rt_strcpy(str,"\"prpdDataA\":\"\",");
-//		rt_strcpy((char *)packBuf+len,str);
-//		len+=rt_strlen(str);
-//		rt_strcpy(str,"\"prpsDataA\":\"\","); 
-//		rt_strcpy((char *)packBuf+len,str);
-//		len+=rt_strlen(str);
-//		
-//		sprintf(str,"\"pdB\":\"%u\",",partDiscStru_p.amplitudeA);	 
-//		rt_strcpy((char *)packBuf+len,str);
-//		len+=rt_strlen(str);
-//		sprintf(str,"\"freqB\":\"%u\",",partDiscStru_p.freqA);	 
-//		rt_strcpy((char *)packBuf+len,str);
-//		len+=rt_strlen(str);
-//		sprintf(str,"\"dischargeDataB\":\"%u\",",partDiscStru_p.dischargeA);	 
-//		rt_strcpy((char *)packBuf+len,str);
-//		len+=rt_strlen(str);
-//		rt_strcpy(str,"\"prpdDataB\":\"\",");
-//		rt_strcpy((char *)packBuf+len,str);
-//		len+=rt_strlen(str);
-//		rt_strcpy(str,"\"prpsDataB\":\"\","); 
-//		rt_strcpy((char *)packBuf+len,str);
-//		len+=rt_strlen(str);		
-
-//		sprintf(str,"\"pdC\":\"%u\",",partDiscStru_p.amplitudeA);	 
-//		rt_strcpy((char *)packBuf+len,str);
-//		len+=rt_strlen(str);
-//		sprintf(str,"\"freqC\":\"%u\",",partDiscStru_p.freqA);	 
-//		rt_strcpy((char *)packBuf+len,str);
-//		len+=rt_strlen(str);
-//		sprintf(str,"\"dischargeDataC\":\"%u\",",partDiscStru_p.dischargeA);	 
-//		rt_strcpy((char *)packBuf+len,str);
-//		len+=rt_strlen(str);
-//		rt_strcpy(str,"\"prpdDataC\":\"\",");
-//		rt_strcpy((char *)packBuf+len,str);
-//		len+=rt_strlen(str);
-//		rt_strcpy(str,"\"prpsDataC\":\"\","); 
-//		rt_strcpy((char *)packBuf+len,str);
-//		len+=rt_strlen(str);		
-//		
-//		rt_sprintf(str,"\"monitoringTime\":\"%lu\"}},",utcTime());
-//		rt_strcpy((char *)packBuf+len,str);
-//    len+=rt_strlen(str);
-//		
-//		rt_sprintf(str,"\"timestamp\":\"%lu\"}",utcTime());
-//		rt_strcpy((char *)packBuf+len,str);
-//    len+=rt_strlen(str);
-//		
-//		//lenth
-//	  packBuf[2]=(uint8_t)((len-LENTH_LEN-HEAD_LEN)>>8);//¸üÐÂjson³¤¶È
-//	  packBuf[3]=(uint8_t)(len-LENTH_LEN-HEAD_LEN);
-//	  uint16_t jsonBodyCrc=RTU_CRC(packBuf+HEAD_LEN+LENTH_LEN,len-HEAD_LEN-LENTH_LEN);
-//	  //crc
-//	  packBuf[len]=(uint8_t)(jsonBodyCrc>>8); len++;//¸üÐÂcrc
-//	  packBuf[len]=(uint8_t)(jsonBodyCrc);    len++;
-
-//		//tail
-//		packBuf[len]= (uint8_t)(TAIL>>8); len++;
-//		packBuf[len]= (uint8_t)(TAIL);    len++;
-//		packBuf[len] =0;//len++;//½áÎ² ²¹0
-//		
-//		mcu.repDataMessID =mcu.upMessID;
-//		upMessIdAdd();
-//		rt_kprintf("%spartd len:%d\r\n",sign,len);
-//		
-////		for(int i=0;i<len;i++)
-////				rt_kprintf("%02x",packBuf[i]);
-//		rt_kprintf("\r\n%slen£º%d str0:%x str1:%x str[2]:%d  str[3]:%d\r\n",sign,len,packBuf[0],packBuf[1],packBuf[2],packBuf[3]);
-//		//rt_kprintf("heart:%s \n",packBuf);
-//	
-//}
 uint16_t partDischagJsonPack()
 {
 
@@ -368,7 +214,8 @@ uint16_t partDischagJsonPack()
 				nodeobj = cJSON_CreateObject();
 				cJSON_AddItemToArray(Array, nodeobj);
 			  cJSON_AddItemToObject(nodeobj,"deviceId",cJSON_CreateString(sheet.partDischag[i].ID));
-				
+				sprintf(sprinBuf,"%d",partDiscStru_p[i].respStat);
+				cJSON_AddItemToObject(nodeobj,"responseStatus",cJSON_CreateString(sprinBuf));
 				
 				nodeobj_p= cJSON_CreateObject();
 				cJSON_AddItemToObject(nodeobj, "data", nodeobj_p);
@@ -411,19 +258,6 @@ uint16_t partDischagJsonPack()
 		sprintf(sprinBuf,"%d",utcTime());
 		cJSON_AddStringToObject(root,"timestamp",sprinBuf);
 		// ´òÓ¡JSONÊý¾Ý°ü  
-//		out = cJSON_Print(root);
-//		if(out!=NULL){
-//			for(int i=0;i<rt_strlen(out);i++)
-//					rt_kprintf("%c",out[i]);
-//			rt_kprintf("\n");
-//			rt_free(out);
-//			out=NULL;
-//		}
-//		if(root!=NULL){
-//			cJSON_Delete(root);
-//			out=NULL;
-//		}
-
 		//´ò°ü
 		int len=0;
 		packBuf[len]= (uint8_t)(HEAD>>8); len++;

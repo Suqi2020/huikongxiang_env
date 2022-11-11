@@ -211,6 +211,7 @@ static int circulaConf(int uartnum,char *argv[])
 					sheet.cirCula[i].useUartNum=UartNum[uartnum];
 					rt_strcpy(sheet.cirCula[i].model,argv[3]);
 					rt_kprintf("%s circula reconfig %d\n",sign,i);
+					rt_kprintf("%s circula OK\n",sign);
 					ret =1;
 					break;
 			}
@@ -224,6 +225,7 @@ static int circulaConf(int uartnum,char *argv[])
 							rt_strcpy(sheet.cirCula[j].model,argv[3]);
 							rt_strcpy(sheet.cirCula[j].ID,argv[2]);
 							rt_kprintf("%s circula config %d\n",sign,j);
+						  rt_kprintf("%s circula OK\n",sign);
 							ret =1;
 							break;
 					}
@@ -251,6 +253,7 @@ static int partDischagConf(int uartnum,char *argv[])
 					sheet.partDischag[i].useUartNum=UartNum[uartnum];
 					rt_strcpy(sheet.partDischag[i].model,argv[3]);
 					rt_kprintf("%s partDischag reconfig %d\n",sign,i);
+					rt_kprintf("%s partDischag OK\n",sign);
 					ret =1;
 					break;
 			}
@@ -264,6 +267,7 @@ static int partDischagConf(int uartnum,char *argv[])
 							rt_strcpy(sheet.partDischag[j].model,argv[3]);
 							rt_strcpy(sheet.partDischag[j].ID,argv[2]);
 							rt_kprintf("%s partDischag config %d\n",sign,j);
+						  rt_kprintf("%s partDischag OK\n",sign);
 							ret =1;
 							break;
 					}
@@ -291,6 +295,7 @@ static int pressSettlConf(int uartnum,char *argv[])
 					sheet.pressSetl[i].useUartNum=UartNum[uartnum];
 					rt_strcpy(sheet.pressSetl[i].model,argv[3]);
 					rt_kprintf("%s pressSettl reconfig %d\n",sign,i);
+					rt_kprintf("%s pressSettl OK\n",sign);
 					ret =1;
 					break;
 			}
@@ -304,6 +309,7 @@ static int pressSettlConf(int uartnum,char *argv[])
 							rt_strcpy(sheet.pressSetl[j].model,argv[3]);
 							rt_strcpy(sheet.pressSetl[j].ID,argv[2]);
 							rt_kprintf("%s pressSettl config %d\n",sign,j);
+						  rt_kprintf("%s pressSettl OK\n",sign);
 							ret =1;
 							break;
 					}
@@ -332,6 +338,7 @@ static int threeAxisConf(int uartnum,char *argv[])
 					sheet.threeAxiss[i].useUartNum=UartNum[uartnum];
 					rt_strcpy(sheet.threeAxiss[i].model,argv[3]);
 					rt_kprintf("%s threeaxis reconfig %d\n",sign,i);
+					rt_kprintf("%s threeaxis OK\n",sign);
 					ret =1;
 					break;
 			}
@@ -345,6 +352,7 @@ static int threeAxisConf(int uartnum,char *argv[])
 							rt_strcpy(sheet.threeAxiss[j].model,argv[3]);
 							rt_strcpy(sheet.threeAxiss[j].ID,argv[2]);
 							rt_kprintf("%s threeaxis config %d\n",sign,j);
+						  rt_kprintf("%s threeaxis OK\n",sign);
 							ret =1;
 							break;
 					}
@@ -371,6 +379,7 @@ static int ch4Conf(int uartnum,char *argv[])
 					sheet.ch4[i].useUartNum=UartNum[uartnum];
 					rt_strcpy(sheet.ch4[i].model,argv[3]);
 					rt_kprintf("%s ch4 reconfig %d\n",sign,i);
+					rt_kprintf("%s ch4 OK\n",sign);
 					ret =1;
 					break;
 			}
@@ -384,6 +393,7 @@ static int ch4Conf(int uartnum,char *argv[])
 							rt_strcpy(sheet.ch4[j].model,argv[3]);
 							rt_strcpy(sheet.ch4[j].ID,argv[2]);
 							rt_kprintf("%s ch4 config %d\n",sign,j);
+						  rt_kprintf("%s ch4 OK\n",sign);
 							ret =1;
 							break;
 					}
@@ -410,6 +420,7 @@ static int coConf(int uartnum,char *argv[])
 					sheet.co[i].useUartNum=UartNum[uartnum];
 					rt_strcpy(sheet.co[i].model,argv[3]);
 					rt_kprintf("%s co reconfig %d\n",sign,i);
+					rt_kprintf("%s co OK\n",sign);
 					ret =1;
 					break;
 			}
@@ -423,6 +434,7 @@ static int coConf(int uartnum,char *argv[])
 							rt_strcpy(sheet.co[j].model,argv[3]);
 							rt_strcpy(sheet.co[j].ID,argv[2]);
 							rt_kprintf("%s co config %d\n",sign,j);
+						  rt_kprintf("%s co OK\n",sign);
 							ret =1;
 							break;
 					}
@@ -449,6 +461,7 @@ static int h2sConf(int uartnum,char *argv[])
 					sheet.h2s[i].useUartNum=UartNum[uartnum];
 					rt_strcpy(sheet.h2s[i].model,argv[3]);
 					rt_kprintf("%s h2s reconfig %d\n",sign,i);
+					rt_kprintf("%s h2s OK\n",sign);
 					ret =1;
 					break;
 			}
@@ -462,6 +475,7 @@ static int h2sConf(int uartnum,char *argv[])
 							rt_strcpy(sheet.h2s[j].model,argv[3]);
 							rt_strcpy(sheet.h2s[j].ID,argv[2]);
 							rt_kprintf("%s h2s config %d\n",sign,j);
+						  rt_kprintf("%s h2s OK\n",sign);
 							ret =1;
 							break;
 					}
@@ -488,6 +502,7 @@ static int o2Conf(int uartnum,char *argv[])
 					sheet.o2[i].useUartNum=UartNum[uartnum];
 					rt_strcpy(sheet.o2[i].model,argv[3]);
 					rt_kprintf("%s o2 reconfig %d\n",sign,i);
+					rt_kprintf("%s o2 OK\n",sign);
 					ret =1;
 					break;
 			}
@@ -501,6 +516,7 @@ static int o2Conf(int uartnum,char *argv[])
 							rt_strcpy(sheet.o2[j].model,argv[3]);
 							rt_strcpy(sheet.o2[j].ID,argv[2]);
 							rt_kprintf("%s o2 config %d\n",sign,j);
+						  rt_kprintf("%s o2 OK\n",sign);
 							ret =1;
 							break;
 					}
@@ -527,6 +543,7 @@ static int waterDepthConf(int uartnum,char *argv[])
 					sheet.waterDepth[i].useUartNum=UartNum[uartnum];
 					rt_strcpy(sheet.waterDepth[i].model,argv[3]);
 					rt_kprintf("%s waterDepth reconfig %d\n",sign,i);
+					rt_kprintf("%s waterDepth OK\n",sign);
 					ret =1;
 					break;
 			}
@@ -540,6 +557,7 @@ static int waterDepthConf(int uartnum,char *argv[])
 							rt_strcpy(sheet.waterDepth[j].model,argv[3]);
 							rt_strcpy(sheet.waterDepth[j].ID,argv[2]);
 							rt_kprintf("%s waterDepth config %d\n",sign,j);
+						  rt_kprintf("%s waterDepth OK\n",sign);
 							ret =1;
 							break;
 					}
@@ -566,6 +584,7 @@ static int tempHumConf(int uartnum,char *argv[])
 					sheet.tempHum[i].useUartNum=UartNum[uartnum];
 					rt_strcpy(sheet.tempHum[i].model,argv[3]);
 					rt_kprintf("%s tempHum reconfig %d\n",sign,i);
+					rt_kprintf("%s tempHum OK\n",sign);
 					ret =1;
 					break;
 			}
@@ -579,6 +598,7 @@ static int tempHumConf(int uartnum,char *argv[])
 							rt_strcpy(sheet.tempHum[j].model,argv[3]);
 							rt_strcpy(sheet.tempHum[j].ID,argv[2]);
 							rt_kprintf("%s tempHum config %d\n",sign,j);
+						  rt_kprintf("%s tempHum OK\n",sign);
 							ret =1;
 							break;
 					}
@@ -692,21 +712,43 @@ MSH_CMD_EXPORT(modbus,port slaveaddr config);//FINSH_FUNCTION_EXPORT_CMD
 
 //static const uint8_t portStr[UART_NUM][6]={"port1","port2","port3","port4"};
 
+//static void uart(int argc, char *argv[])
+//{
+//	  
+//		if(argc!=3){
+//				goto ERR;
+//		}
+//		rt_strcpy((char *)packFLash.acuId,argv[1]);
+//		ERR:
+//		rt_kprintf("%s[uart 端口(1-4) 波特率]\n",sign);
+//		rt_kprintf("%sfor example\n",sign);
+//		rt_kprintf("%s[uart port1 9600]\n",sign);
+
+//}
+//MSH_CMD_EXPORT(uart,uart config);//FINSH_FUNCTION_EXPORT_CMD
+static const uint8_t portStr[UART_NUM][6]={"port1","port2","port3","port4"};
 static void uart(int argc, char *argv[])
 {
 	  
 		if(argc!=3){
 				goto ERR;
 		}
-		rt_strcpy((char *)packFLash.acuId,argv[1]);
+
+		for(int i=0;i<UART_NUM;i++){
+				if(0==rt_strcmp((char *)portStr[i], argv[1])){
+						packFLash.uartBps[i]    =atoi32(argv[2],10);
+						uartSingConf(i,packFLash.uartBps[i]);
+						rt_kprintf("%sport%d config OK\n",sign,i);
+				}
+		}
+		return;
 		ERR:
 		rt_kprintf("%s[uart 端口(1-4) 波特率]\n",sign);
 		rt_kprintf("%sfor example\n",sign);
-		rt_kprintf("%s[uart port1 9600 ]\n",sign);
+		rt_kprintf("%s[uart port1 9600]\n",sign);
 
 }
 MSH_CMD_EXPORT(uart,uart config);//FINSH_FUNCTION_EXPORT_CMD
-
 
 
 static void acuid(int argc, char *argv[])
@@ -715,7 +757,7 @@ static void acuid(int argc, char *argv[])
 				goto ERR;
 		}
 		rt_strcpy(packFLash.acuId,argv[1]);
-		rt_kprintf("%sacuid conf\n",sign);
+		rt_kprintf("%sacuid OK\n",sign);
 		return;
 		ERR:
 		rt_kprintf("%sfor example\n",sign);

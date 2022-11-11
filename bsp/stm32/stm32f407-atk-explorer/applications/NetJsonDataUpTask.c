@@ -219,7 +219,6 @@ void   upKeepStateTask(void *para)
 	  
 	  readMultiCirCulaPoint();//对于环流来讲 运行前需要提取扩大方式
 		while(1){
-
 				timeOutRunFun();
 				timeInc();
 				rt_thread_mdelay(1000);

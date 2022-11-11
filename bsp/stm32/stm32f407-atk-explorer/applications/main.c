@@ -92,11 +92,15 @@
 //V0.40    修改傻瓜式为指定传感器       20221108
 //V0.41    所用到传感器json格式已经打包完成   20221109
 //V0.42    接入传感器测试 修复bug    增加模拟量配置目前支持温湿度未完成 20221110
-#define APP_VER       ((0<<8)+41)//0x0105 表示1.5版本
-const char date[]="20221110";
+//V0.43    加入传感器响应状态上传  1-传感器响应  0-传感器不响应  20221111
+#define APP_VER       ((0<<8)+43)//0x0105 表示1.5版本
+const char date[]="20221111";
 
-static    rt_thread_t tid 	= RT_NULL;
-
+//static    rt_thread_t tid 	= RT_NULL;
+static    rt_thread_t tidW5500 	= RT_NULL;
+static    rt_thread_t tidNetRec 	= RT_NULL;
+static    rt_thread_t tidNetSend 	= RT_NULL;
+static    rt_thread_t tidUpkeep 	= RT_NULL;
 //信号量的定义
 extern  rt_sem_t  w5500Iqr_semp ;//w5500有数据时候中断来临
 
@@ -205,26 +209,26 @@ int main(void)
 		
 
 ////////////////////////////////任务////////////////////////////////////
-//    tid =  rt_thread_create("w5500",w5500Task,RT_NULL,1024,2, 10 );
-//		if(tid!=NULL){
-//				rt_thread_startup(tid);													 
-//				rt_kprintf("%sRTcreat w5500Task task\r\n",sign);
-//		}
-//		tid =  rt_thread_create("netRec",netDataRecTask,RT_NULL,1024,2, 10 );
-//		if(tid!=NULL){
-//				rt_thread_startup(tid);													 
-//				rt_kprintf("%sRTcreat netDataRecTask \r\n",sign);
-//		}
-//		tid =  rt_thread_create("netSend",netDataSendTask,RT_NULL,1024,2, 10 );
-//		if(tid!=NULL){
-//				rt_thread_startup(tid);													 
-//				rt_kprintf("%sRTcreat netDataSendTask \r\n",sign);
-//		}
+    tidW5500 =  rt_thread_create("w5500",w5500Task,RT_NULL,1024,2, 10 );
+		if(tidW5500!=NULL){
+				rt_thread_startup(tidW5500);													 
+				rt_kprintf("%sRTcreat w5500Task task\r\n",sign);
+		}
+		tidNetRec =  rt_thread_create("netRec",netDataRecTask,RT_NULL,1024,2, 10 );
+		if(tidNetRec!=NULL){
+				rt_thread_startup(tidNetRec);													 
+				rt_kprintf("%sRTcreat netDataRecTask \r\n",sign);
+		}
+		tidNetSend =  rt_thread_create("netSend",netDataSendTask,RT_NULL,1024,2, 10 );
+		if(tidNetSend!=NULL){
+				rt_thread_startup(tidNetSend);													 
+				rt_kprintf("%sRTcreat netDataSendTask \r\n",sign);
+		}
 
 		
-		tid =  rt_thread_create("upKeep",upKeepStateTask,RT_NULL,512*3,2, 10 );
-		if(tid!=NULL){
-				rt_thread_startup(tid);													 
+		tidUpkeep =  rt_thread_create("upKeep",upKeepStateTask,RT_NULL,512*3,2, 10 );
+		if(tidUpkeep!=NULL){
+				rt_thread_startup(tidUpkeep);													 
 				rt_kprintf("%sRTcreat upKeepStateTask \r\n",sign);
 		}
 		
@@ -248,4 +252,20 @@ int main(void)
 				}
     }
 }
-
+//tasklog delete
+void  tasklog(int argc, char *argv[])
+{
+		if(argc!=2){
+				goto ERR;
+		}
+		if(rt_strcmp("delete",argv[1])==0){
+				rt_thread_delete(tidW5500);
+			  rt_thread_delete(tidNetRec);
+			  rt_thread_delete(tidNetSend);
+			  rt_thread_delete(tidUpkeep);
+			  rt_kprintf("%s[tasklog delete OK]",sign);
+		}
+		ERR:
+		rt_kprintf("%s[tasklog delete]",sign);
+}
+MSH_CMD_EXPORT(tasklog,tasklog del);//FINSH_FUNCTION_EXPORT_CMD

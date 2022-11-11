@@ -30,10 +30,12 @@ typedef struct
 	  uint16_t warningB;
 	  uint16_t warningC;
 	  uint16_t warningD;
+	  
 	  //采集间隔 单位秒
 		//uint16_t AcqInterv;
 	//小数点计算数值
     uint16_t point; //非modbus真实值  此处读取modbus后经过了转换便于直接计算  0-值为100  1-2 值为10
+	  uint8_t respStat;
 } CIRCURStru;
 
 const static char sign[]="[环流]";
@@ -91,7 +93,6 @@ void readCirCurrAndWaring(int num)
 				}
 				rt_kprintf("\n");
 		}
-//		uartDev[modbusFlash[CIRCULA].useUartNum].offline=RT_FALSE;
 		//提取环流值 第一步判断crc 第二部提取
 		int ret=modbusRespCheck(sheet.cirCula[num].slaveAddr,buf,len,RT_TRUE);
 		if(0 ==  ret){//刷新读取到的值
@@ -108,12 +109,13 @@ void readCirCurrAndWaring(int num)
 			  cirCurStru_p[num].warningC	=(buf[offset]<<8)	+buf[offset+1];	offset+=2;
 			  cirCurStru_p[num].warningD	=(buf[offset]<<8)	+buf[offset+1];	offset+=2;
 			  rt_kprintf("%s提取电流、报警值成功\r\n",sign);
+			  cirCurStru_p[num].respStat=1;
 		} 
 		else{//读不到给0
 			  if(ret==2){
 						//rt_kprintf("%sERR:请检查485接线或者供电\r\n",sign);
-//						uartDev[modbusFlash[CIRCULA].useUartNum].offline=RT_TRUE;
 				}
+				cirCurStru_p[num].respStat=0;
 				cirCurStru_p[num].circlCurA=0;
 				cirCurStru_p[num].circlCurB=0;
 				cirCurStru_p[num].circlCurC=0;
@@ -393,7 +395,6 @@ static uint16_t readPoint(int num)
 		}
 		rt_kprintf("\n");
 		//提取环流值 第一步判断crc 第二部提取
-//		uartDev[modbusFlash[CIRCULA].useUartNum].offline=RT_FALSE;
 		int ret2=modbusRespCheck(sheet.cirCula[num].slaveAddr,buf,len,RT_TRUE);
 		if(0 == ret2){//刷新读取到的值
 
@@ -406,12 +407,8 @@ static uint16_t readPoint(int num)
 		} 
 		else{
 			  cirCurStru_p[num].point =100;//给个默认值
-				if(ret2==2){
-//					  uartDev[modbusFlash[CIRCULA].useUartNum].offline=RT_TRUE;
-						//rt_kprintf("%sERR:请检查485接线或者供电\r\n",sign);
-				}
+
 		}
-		//recFlag = RT_FALSE;
 	  rt_mutex_release(uartDev[sheet.cirCula[num].useUartNum].uartMutex);
 		rt_free(buf);
 	  buf=RT_NULL;
@@ -651,7 +648,8 @@ uint16_t circulaJsonPack()
 					nodeobj = cJSON_CreateObject();
 					cJSON_AddItemToArray(Array, nodeobj);
 					cJSON_AddItemToObject(nodeobj,"deviceId",cJSON_CreateString(sheet.cirCula[i].ID));
-					
+				  sprintf(sprinBuf,"%d",cirCurStru_p[i].respStat);
+				  cJSON_AddItemToObject(nodeobj,"responseStatus",cJSON_CreateString(sprinBuf));
 					
 					nodeobj_p= cJSON_CreateObject();
 					cJSON_AddItemToObject(nodeobj, "data", nodeobj_p);

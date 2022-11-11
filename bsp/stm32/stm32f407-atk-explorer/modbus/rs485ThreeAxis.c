@@ -12,12 +12,13 @@
 //  24+红色，24-黑色，A+蓝色，B-绿色
 // 发 01 04 00 01 00 04 A0 09 
 // 收 01 04 08 0B CA FE 8D 00 03 03 80 C7 23 
+
 typedef struct{
 		float temp;
 	  uint16_t acclrationX;
 		uint16_t acclrationY;
 		uint16_t acclrationZ;
-	  
+	  uint8_t  respStat;
 }threeAxisStru;
 const static char sign[]="[防外破]";
 static threeAxisStru threeAxisp[THREEAXIS_485_NUM];
@@ -76,12 +77,14 @@ void readThreeTempAcc(int num)
 				threeAxisp[num].acclrationY = (buf[offset]<<8)+buf[offset+1];offset+=2;
 				threeAxisp[num].acclrationZ = (buf[offset]<<8)+buf[offset+1];offset+=2;
         threeAxisp[num].temp=(float)temp/100; 
+			  threeAxisp[num].respStat=1;
 			  rt_kprintf("%stemp:%0.2f*C ACC:X%dmg Y%dmg Z%dmg ok\n",sign,threeAxisp[num].temp,threeAxisp[num].acclrationX,threeAxisp[num].acclrationY,threeAxisp[num].acclrationZ);  
 		} 
 		else{//读不到给0
 				if(ret2==2){
 //					  uartDev[modbusFlash[THREEAXIS].useUartNum].offline=RT_TRUE;
 				}
+				threeAxisp[num].respStat=0;
 				threeAxisp[num].temp=0;
 			  threeAxisp[num].acclrationX	= 0;
 			  threeAxisp[num].acclrationY = 0;
@@ -245,6 +248,8 @@ static uint16_t threeAxisJsonPack()
 				cJSON_AddItemToArray(Array, nodeobj);
 			  cJSON_AddItemToObject(nodeobj,"deviceId",cJSON_CreateString(sheet.threeAxiss[i].ID));
 				
+				sprintf(sprinBuf,"%d",threeAxisp[i].respStat);
+				cJSON_AddItemToObject(nodeobj,"responseStatus",cJSON_CreateString(sprinBuf));
 				
 				nodeobj_p= cJSON_CreateObject();
 				cJSON_AddItemToObject(nodeobj, "data", nodeobj_p);

@@ -10,8 +10,9 @@ const static char sign[]="[温湿度]";
 typedef struct{
 	float temp;
 	float hum; 
+	uint8_t respStat;
 }thStru;
-thStru thum[TEMPHUM_485_NUM];
+static thStru thum[TEMPHUM_485_NUM];
 //float temp[TEMPHUM_485_NUM];
 //float hum[TEMPHUM_485_NUM]; 
 //打包串口发送 
@@ -65,6 +66,7 @@ void readTempHum(int num)
 				}
 				thum[num].temp=(float)read_temp/10;
 				thum[num].hum=(float)read_hum/10;
+				thum[num].respStat=1;
 				if(sig==RT_TRUE)
 					rt_kprintf("%s温度:-%0.1fC 湿度:%0.1f\n",sign,thum[num].temp,thum[num].hum); 
 				else
@@ -75,6 +77,7 @@ void readTempHum(int num)
 						//rt_kprintf("%sERR:请检查485接线或者供电\r\n",sign);
 //					  uartDev[modbusFlash[TEMPHUM].useUartNum].offline=RT_TRUE;
 				}
+				thum[num].respStat=0;
 				thum[num].temp=0;
 				thum[num].hum=0;
 			  rt_kprintf("%s read fail\n",sign);
@@ -89,8 +92,6 @@ void readTempHum(int num)
 
 static uint16_t tempHumJsonPack()
 {
-//		char *sprinBuf=RT_NULL;
-//		sprinBuf=rt_malloc(20);//20个字符串长度 够用了
 		char* out = NULL;
 		//创建数组
 		cJSON* Array = NULL;
@@ -117,7 +118,8 @@ static uint16_t tempHumJsonPack()
 				nodeobj = cJSON_CreateObject();
 				cJSON_AddItemToArray(Array, nodeobj);
 			  cJSON_AddItemToObject(nodeobj,"deviceId",cJSON_CreateString(sheet.tempHum[i].ID));
-				
+				sprintf(sprinBuf,"%d",thum[i].respStat);
+				cJSON_AddItemToObject(nodeobj,"responseStatus",cJSON_CreateString(sprinBuf));
 				
 				nodeobj_p= cJSON_CreateObject();
 				cJSON_AddItemToObject(nodeobj, "data", nodeobj_p);
@@ -135,18 +137,6 @@ static uint16_t tempHumJsonPack()
 		sprintf(sprinBuf,"%d",utcTime());
 		cJSON_AddStringToObject(root,"timestamp",sprinBuf);
 		// 打印JSON数据包  
-//		out = cJSON_Print(root);
-//		if(out!=NULL){
-//			for(int i=0;i<rt_strlen(out);i++)
-//					rt_kprintf("%c",out[i]);
-//			rt_kprintf("\n");
-//			rt_free(out);
-//			out=NULL;
-//		}
-//		if(root!=NULL){
-//			cJSON_Delete(root);
-//			out=NULL;
-//		}
 
 		//打包
 		int len=0;

@@ -6,7 +6,6 @@
 #include "dataPack.h"
 
 
-#define  SAME_DEV_NUM         40
 
 #define   UART_NUM        4//一共4路串口
 
@@ -89,7 +88,7 @@ typedef enum{
 }upDataTimEnum;//需要与modbusName 名称一一对应 来实现代码精简高效
 const static char  modbusName[MODBUS_NUM][20] ={"接地环流","局放","防沉降","防外破","甲烷","氧气","硫化氢","一氧化碳","温湿度","水位"};
 const static int   modbusBps[MODBUS_NUM]      ={115200,   115200  ,9600,   9600,   9600,   9600,   9600,   9600,   9600,   9600};
-const static int   modbusType[MODBUS_NUM]     ={1,        1,       2,      2, 		 3,  			3,  		3,  		3,  		3,  		3};//想同类型的modbus设备名称相同
+//const static int   modbusType[MODBUS_NUM]     ={1,        1,       2,      2, 		 3,  			3,  		3,  		3,  		3,  		3};//想同类型的modbus设备名称相同
 /////////////////////////////////////////////////////////////////////////////////////////////////////
 
 extern uartConfStru  uartDev[];

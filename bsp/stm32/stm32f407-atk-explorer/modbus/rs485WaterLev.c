@@ -7,7 +7,8 @@ const static char sign[]="[水位]";
 //#define   SLAVE_ADDR     0X01 
 #define   LENTH          50  //工作环流用到的最大接收buf长度
 
-float waterDepth[WATERDEPTH_485_NUM];
+static float waterDepth[WATERDEPTH_485_NUM];
+static uint8_t respStat[WATERDEPTH_485_NUM];
 //打包串口发送 
 static void waterDepthUartSend(int num,uint8_t *buf,int len)
 {
@@ -47,20 +48,20 @@ void readWaterDepth(int num)
 				rt_kprintf("\n");
 		}
 		//提取环流值 第一步判断crc 第二部提取
-//		uartDev[modbusFlash[waterDepthEL].useUartNum].offline=RT_FALSE;
 		int ret2=modbusRespCheck(sheet.waterDepth[num].slaveAddr,buf,len,RT_TRUE);
 		if(0 == ret2){//刷新读取到的值
         uint32_t read	=(buf[offset]<<24)+(buf[offset+1]<<16)+(buf[offset+2]<<8)+buf[offset+3];offset+=4;
         extern float write_hex_to_float(uint32_t number);
 			  float waterDepth_p= write_hex_to_float(read);
-         waterDepth[num]=(float)(waterDepth_p	/9.8);
+        waterDepth[num]=(float)(waterDepth_p	/9.8);
 			  rt_kprintf("%s水深:%0.4f米\n",sign,waterDepth[num]);  
+			  respStat[num]=1;
 		} 
 		else{//读不到给0
 				if(ret2==2){
 						//rt_kprintf("%sERR:请检查485接线或者供电\r\n",sign);
-//					  uartDev[modbusFlash[waterDepthEL].useUartNum].offline=RT_TRUE;
 				}
+				respStat[num]=0;
 			  waterDepth[num]	=0;
 			  rt_kprintf("%s read fail\n",sign);
 		}
@@ -105,7 +106,8 @@ static uint16_t waterDepthJsonPack()
 				nodeobj = cJSON_CreateObject();
 				cJSON_AddItemToArray(Array, nodeobj);
 			  cJSON_AddItemToObject(nodeobj,"deviceId",cJSON_CreateString(sheet.waterDepth[i].ID));
-				
+				sprintf(sprinBuf,"%d",respStat[i]);
+				cJSON_AddItemToObject(nodeobj,"responseStatus",cJSON_CreateString(sprinBuf));
 				
 				nodeobj_p= cJSON_CreateObject();
 				cJSON_AddItemToObject(nodeobj, "data", nodeobj_p);
@@ -121,19 +123,6 @@ static uint16_t waterDepthJsonPack()
 		sprintf(sprinBuf,"%d",utcTime());
 		cJSON_AddStringToObject(root,"timestamp",sprinBuf);
 		// 打印JSON数据包  
-//		out = cJSON_Print(root);
-//		if(out!=NULL){
-//			for(int i=0;i<rt_strlen(out);i++)
-//					rt_kprintf("%c",out[i]);
-//			rt_kprintf("\n");
-//			rt_free(out);
-//			out=NULL;
-//		}
-//		if(root!=NULL){
-//			cJSON_Delete(root);
-//			out=NULL;
-//		}
-
 		//打包
 		int len=0;
 		packBuf[len]= (uint8_t)(HEAD>>8); len++;

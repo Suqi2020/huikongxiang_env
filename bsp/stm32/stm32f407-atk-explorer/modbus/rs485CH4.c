@@ -12,7 +12,8 @@ const static char sign[]="[甲烷]";
 //concentrationStru gas;
 //#define CH4_485_NUM   				10
 
-float ch4[CH4_485_NUM];
+static float ch4[CH4_485_NUM];
+static uint8_t respStat[CH4_485_NUM];
 //打包串口发送 
 static void ch4UartSend(int num,uint8_t *buf,int len)
 {
@@ -52,19 +53,19 @@ void readCH4(int num)
 				rt_kprintf("\n");
 		}
 		//提取环流值 第一步判断crc 第二部提取
-//		uartDev[modbusFlash[CH4].useUartNum].offline=RT_FALSE;
 		int ret2=modbusRespCheck(sheet.ch4[num].slaveAddr,buf,len,RT_TRUE);
 		if(0 == ret2){//刷新读取到的值
         int val	=(buf[offset]<<24)+(buf[offset+1]<<16)+(buf[offset+2]<<8)+buf[offset+3];offset+=4;
 
         ch4[num]=(float)((float)val	/1000);
+			  respStat[num]=1;
 			  rt_kprintf("%s浓度值:%0.2fmol/Lread ok\n",sign,ch4[num]);  
 		} 
 		else{//读不到给0
 				if(ret2==2){
 						//rt_kprintf("%sERR:请检查485接线或者供电\r\n",sign);
-//					  uartDev[modbusFlash[CH4].useUartNum].offline=RT_TRUE;
 				}
+				respStat[num]=0;
 			  ch4[num]=0;
 			  rt_kprintf("%s read fail\n",sign);
 		}
@@ -103,8 +104,9 @@ static uint16_t ch4JsonPack()
 				nodeobj = cJSON_CreateObject();
 				cJSON_AddItemToArray(Array, nodeobj);
 			  cJSON_AddItemToObject(nodeobj,"deviceId",cJSON_CreateString(sheet.ch4[i].ID));
-				
-				
+				sprintf(sprinBuf,"%d",respStat[i]);
+				cJSON_AddItemToObject(nodeobj,"responseStatus",cJSON_CreateString(sprinBuf));
+
 				nodeobj_p= cJSON_CreateObject();
 				cJSON_AddItemToObject(nodeobj, "data", nodeobj_p);
 				sprintf(sprinBuf,"%02f",ch4[i]);
@@ -118,18 +120,6 @@ static uint16_t ch4JsonPack()
 		sprintf(sprinBuf,"%d",utcTime());
 		cJSON_AddStringToObject(root,"timestamp",sprinBuf);
 		// 打印JSON数据包  
-//		out = cJSON_Print(root);
-//		if(out!=NULL){
-//			for(int i=0;i<rt_strlen(out);i++)
-//					rt_kprintf("%c",out[i]);
-//			rt_kprintf("\n");
-//			rt_free(out);
-//			out=NULL;
-//		}
-//		if(root!=NULL){
-//			cJSON_Delete(root);
-//			out=NULL;
-//		}
 
 		//打包
 		int len=0;

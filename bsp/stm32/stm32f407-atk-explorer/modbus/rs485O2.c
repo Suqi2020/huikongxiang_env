@@ -10,7 +10,9 @@ const static char sign[]="[氧气]";
 #define   LENTH          50  //工作环流用到的最大接收buf长度
 
 
-float o2[O2_485_NUM];
+static float o2[O2_485_NUM];
+static uint8_t respStat[O2_485_NUM];
+
 //打包串口发送 
 static void o2UartSend(int num,uint8_t *buf,int len)
 {
@@ -55,6 +57,7 @@ void readO2(int num)
         int val	=(buf[offset]<<24)+(buf[offset+1]<<16)+(buf[offset+2]<<8)+buf[offset+3];offset+=4;
 
         o2[num]=(float)((float)val	/1000);
+			  respStat[num]=1;
 			  rt_kprintf("%s浓度值:%0.2fmol/Lread ok\n",sign,o2[num]);  
 		} 
 		else{//读不到给0
@@ -62,6 +65,7 @@ void readO2(int num)
 						//rt_kprintf("%sERR:请检查485接线或者供电\r\n",sign);
 //					  uartDev[modbusFlash[O2].useUartNum].offline=RT_TRUE;
 				}
+				respStat[num]=0;
 			  o2[num]	=0;
 			  rt_kprintf("%s read fail\n",sign);
 		}
@@ -76,8 +80,6 @@ void readO2(int num)
 
 static uint16_t o2JsonPack()
 {
-//		char *sprinBuf=RT_NULL;
-//		sprinBuf=rt_malloc(20);//20个字符串长度 够用了
 		char* out = NULL;
 		//创建数组
 		cJSON* Array = NULL;
@@ -105,7 +107,8 @@ static uint16_t o2JsonPack()
 				nodeobj = cJSON_CreateObject();
 				cJSON_AddItemToArray(Array, nodeobj);
 			  cJSON_AddItemToObject(nodeobj,"deviceId",cJSON_CreateString(sheet.o2[i].ID));
-				
+				sprintf(sprinBuf,"%d",respStat[i]);
+				cJSON_AddItemToObject(nodeobj,"responseStatus",cJSON_CreateString(sprinBuf));
 				
 				nodeobj_p= cJSON_CreateObject();
 				cJSON_AddItemToObject(nodeobj, "data", nodeobj_p);
@@ -120,19 +123,6 @@ static uint16_t o2JsonPack()
 		sprintf(sprinBuf,"%d",utcTime());
 		cJSON_AddStringToObject(root,"timestamp",sprinBuf);
 		// 打印JSON数据包  
-//		out = cJSON_Print(root);
-//		if(out!=NULL){
-//			for(int i=0;i<rt_strlen(out);i++)
-//					rt_kprintf("%c",out[i]);
-//			rt_kprintf("\n");
-//			rt_free(out);
-//			out=NULL;
-//		}
-//		if(root!=NULL){
-//			cJSON_Delete(root);
-//			out=NULL;
-//		}
-
 		//打包
 		int len=0;
 		packBuf[len]= (uint8_t)(HEAD>>8); len++;

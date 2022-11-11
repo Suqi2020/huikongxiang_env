@@ -9,7 +9,8 @@ const static char sign[]="[硫化氢]";
 //#define   SLAVE_ADDR     0X01 
 #define   LENTH          50  //工作环流用到的最大接收buf长度
 
-float h2s[H2S_485_NUM];
+static float h2s[H2S_485_NUM];
+static uint8_t respStat[H2S_485_NUM];
 //打包串口发送 
 static void h2sUartSend(int num,uint8_t *buf,int len)
 {
@@ -48,19 +49,19 @@ void readH2S(int num)
 				rt_kprintf("\n");
 		}
 		//提取环流值 第一步判断crc 第二部提取
-//		uartDev[modbusFlash[H2S].useUartNum].offline=RT_FALSE;
 		int ret2=modbusRespCheck(sheet.h2s[num].slaveAddr,buf,len,RT_TRUE);
 		if(0 == ret2){//刷新读取到的值
         int val	=(buf[offset]<<24)+(buf[offset+1]<<16)+(buf[offset+2]<<8)+buf[offset+3];offset+=4;
 
         h2s[num]	=(float)((float)val	/1000);
+			  respStat[num]=1;
 			  rt_kprintf("%s浓度值:%0.2fmol/Lread ok\n",sign,h2s[num]);  
 		} 
 		else{//读不到给0
 				if(ret2==2){
 						//rt_kprintf("%sERR:请检查485接线或者供电\r\n",sign);
-//					  uartDev[modbusFlash[H2S].useUartNum].offline=RT_TRUE;
 				}
+				respStat[num]=0;
 			  h2s[num]	=0;
 			  rt_kprintf("%s read fail\n",sign);
 		}
@@ -101,7 +102,8 @@ static uint16_t h2sJsonPack()
 				nodeobj = cJSON_CreateObject();
 				cJSON_AddItemToArray(Array, nodeobj);
 			  cJSON_AddItemToObject(nodeobj,"deviceId",cJSON_CreateString(sheet.h2s[i].ID));
-				
+				sprintf(sprinBuf,"%d",respStat[i]);
+				cJSON_AddItemToObject(nodeobj,"responseStatus",cJSON_CreateString(sprinBuf));
 				
 				nodeobj_p= cJSON_CreateObject();
 				cJSON_AddItemToObject(nodeobj, "data", nodeobj_p);
@@ -116,19 +118,6 @@ static uint16_t h2sJsonPack()
 		sprintf(sprinBuf,"%d",utcTime());
 		cJSON_AddStringToObject(root,"timestamp",sprinBuf);
 		// 打印JSON数据包  
-//		out = cJSON_Print(root);
-//		if(out!=NULL){
-//			for(int i=0;i<rt_strlen(out);i++)
-//					rt_kprintf("%c",out[i]);
-//			rt_kprintf("\n");
-//			rt_free(out);
-//			out=NULL;
-//		}
-//		if(root!=NULL){
-//			cJSON_Delete(root);
-//			out=NULL;
-//		}
-
 		//打包
 		int len=0;
 		packBuf[len]= (uint8_t)(HEAD>>8); len++;
