@@ -215,7 +215,7 @@ void loopback_tcpc(SOCKET s, uint16 port)
 		  extern uint16_t heartUpJsonPack();
 			heartUpJsonPack();
 		  extern struct rt_mailbox mbNetSendData;
-		  extern uint8_t   packBuf[TX_RX_MAX_BUF_SIZE];
+//		  extern uint8_t   packBuf[TX_RX_MAX_BUF_SIZE];
 			rt_mb_send_wait(&mbNetSendData, (rt_ubase_t)&packBuf,RT_WAITING_FOREVER); 
 			break;
 		case Sn_IR_DISCON: 

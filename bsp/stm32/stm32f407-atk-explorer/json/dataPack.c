@@ -280,7 +280,7 @@ uint16_t devRegJsonPack()
 									cJSON_AddItemToArray(Array, nodeobj);
 									cJSON_AddItemToObject(nodeobj,"model",cJSON_CreateString(sheet.partDischag[j].model));
 									cJSON_AddItemToObject(nodeobj,"name",cJSON_CreateString(modbusName[i]));
-									cJSON_AddItemToObject(nodeobj,"deviceId",cJSON_CreateString(sheet.partDischag[i].ID));
+									cJSON_AddItemToObject(nodeobj,"deviceId",cJSON_CreateString(sheet.partDischag[j].ID));
 							}
 					}
 				break;

@@ -1,4 +1,4 @@
-#include "rs485Gas.h"
+#include "board.h"
 //#include "stmflash.h"
 //氧气默认地址02  波特率9600
 //02 03 00 02 00 02 65 F8

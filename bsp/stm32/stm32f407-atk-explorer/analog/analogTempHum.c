@@ -2,6 +2,7 @@
 
 
 //4-20ma 对应 adc是0.6-3V 对应温度是-40度--80度  湿度值是0-100
+// 0-3.3对应0-4096
 const char *sign="[analogTempH]";
 //num 定时器启动时候找到的对应的0-7通道
 uint8_t analogTemChanl=0;

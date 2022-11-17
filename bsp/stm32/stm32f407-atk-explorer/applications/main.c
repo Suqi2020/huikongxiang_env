@@ -93,8 +93,9 @@
 //V0.41    所用到传感器json格式已经打包完成   20221109
 //V0.42    接入传感器测试 修复bug    增加模拟量配置目前支持温湿度未完成 20221110
 //V0.43    加入传感器响应状态上传  1-传感器响应  0-传感器不响应  20221111
-#define APP_VER       ((0<<8)+43)//0x0105 表示1.5版本
-const char date[]="20221111";
+//V0.44    修复log显示问题 以及显示波特率      20221117
+#define APP_VER       ((0<<8)+44)//0x0105 表示1.5版本
+const char date[]="20221117";
 
 //static    rt_thread_t tid 	= RT_NULL;
 static    rt_thread_t tidW5500 	= RT_NULL;

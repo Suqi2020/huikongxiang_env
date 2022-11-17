@@ -61,7 +61,8 @@ void printModbusDevList()
 					for(int j=0;j<CIRCULA_485_NUM;j++){//核对有没有配置过
 							if(sheet.cirCula[j].workFlag==RT_TRUE){
 									rt_kprintf("%s modbus ",sign);
-									rt_kprintf("%-10s ",modbusName[i]);
+									rt_kprintf("%10s ",modbusName[i]);
+								  rt_kprintf("(%d)",modbusBps[i]);
 									rt_kprintf("%s ",sheet.cirCula[j].ID);
 									rt_kprintf("%s ",sheet.cirCula[j].model);
 									rt_kprintf("%s ",UartName[sheet.cirCula[j].useUartNum]);
@@ -74,7 +75,8 @@ void printModbusDevList()
 					for(int j=0;j<PARTDISCHAG_485_NUM;j++){//核对有没有配置过
 							if(sheet.partDischag[j].workFlag==RT_TRUE){
 									rt_kprintf("%s modbus ",sign);
-									rt_kprintf("%-10s ",modbusName[i]);
+									rt_kprintf("%10s ",modbusName[i]);
+									rt_kprintf("(%d)",modbusBps[i]);
 									rt_kprintf("%s ",sheet.partDischag[j].ID);
 									rt_kprintf("%s ",sheet.partDischag[j].model);
 									rt_kprintf("%s ",UartName[sheet.partDischag[j].useUartNum]);
@@ -87,7 +89,8 @@ void printModbusDevList()
 					for(int j=0;j<PRESSSETTL_485_NUM;j++){//核对有没有配置过
 							if(sheet.pressSetl[j].workFlag==RT_TRUE){
 									rt_kprintf("%s modbus ",sign);
-									rt_kprintf("%-10s ",modbusName[i]);
+									rt_kprintf("%10s ",modbusName[i]);
+								  rt_kprintf("(%d)",modbusBps[i]);
 									rt_kprintf("%s ",sheet.pressSetl[j].ID);
 									rt_kprintf("%s ",sheet.pressSetl[j].model);
 									rt_kprintf("%s ",UartName[sheet.pressSetl[j].useUartNum]);
@@ -100,7 +103,8 @@ void printModbusDevList()
 					for(int j=0;j<THREEAXIS_485_NUM;j++){//核对有没有配置过
 							if(sheet.threeAxiss[j].workFlag==RT_TRUE){
 									rt_kprintf("%s modbus ",sign);
-									rt_kprintf("%-10s ",modbusName[i]);
+									rt_kprintf("%10s ",modbusName[i]);
+								  rt_kprintf("(%d)",modbusBps[i]);
 									rt_kprintf("%s ",sheet.threeAxiss[j].ID);
 									rt_kprintf("%s ",sheet.threeAxiss[j].model);
 									rt_kprintf("%s ",UartName[sheet.threeAxiss[j].useUartNum]);
@@ -113,7 +117,8 @@ void printModbusDevList()
 					for(int j=0;j<CH4_485_NUM;j++){//核对有没有配置过
 							if(sheet.ch4[j].workFlag==RT_TRUE){
 									rt_kprintf("%s modbus ",sign);
-									rt_kprintf("%-10s ",modbusName[i]);
+									rt_kprintf("%10s ",modbusName[i]);
+								  rt_kprintf("(%d)",modbusBps[i]);
 									rt_kprintf("%s ",sheet.ch4[j].ID);
 									rt_kprintf("%s ",sheet.ch4[j].model);
 									rt_kprintf("%s ",UartName[sheet.ch4[j].useUartNum]);
@@ -126,7 +131,8 @@ void printModbusDevList()
 					for(int j=0;j<O2_485_NUM;j++){//核对有没有配置过
 							if(sheet.o2[j].workFlag==RT_TRUE){
 									rt_kprintf("%s modbus ",sign);
-									rt_kprintf("%-10s ",modbusName[i]);
+									rt_kprintf("%10s ",modbusName[i]);
+								  rt_kprintf("(%d)",modbusBps[i]);
 									rt_kprintf("%s ",sheet.o2[j].ID);
 									rt_kprintf("%s ",sheet.o2[j].model);
 									rt_kprintf("%s ",UartName[sheet.o2[j].useUartNum]);
@@ -139,7 +145,8 @@ void printModbusDevList()
 					for(int j=0;j<H2S_485_NUM;j++){//核对有没有配置过
 							if(sheet.h2s[j].workFlag==RT_TRUE){
 									rt_kprintf("%s modbus ",sign);
-									rt_kprintf("%-10s ",modbusName[i]);
+									rt_kprintf("%10s ",modbusName[i]);
+								  rt_kprintf("(%d)",modbusBps[i]);
 									rt_kprintf("%s ",sheet.h2s[j].ID);
 									rt_kprintf("%s ",sheet.h2s[j].model);
 									rt_kprintf("%s ",UartName[sheet.h2s[j].useUartNum]);
@@ -152,7 +159,8 @@ void printModbusDevList()
 					for(int j=0;j<CO_485_NUM;j++){//核对有没有配置过
 							if(sheet.co[j].workFlag==RT_TRUE){
 									rt_kprintf("%s modbus ",sign);
-									rt_kprintf("%-10s ",modbusName[i]);
+									rt_kprintf("%10s ",modbusName[i]);
+								  rt_kprintf("(%d)",modbusBps[i]);
 									rt_kprintf("%s ",sheet.co[j].ID);
 									rt_kprintf("%s ",sheet.co[j].model);
 									rt_kprintf("%s ",UartName[sheet.co[j].useUartNum]);
@@ -165,7 +173,8 @@ void printModbusDevList()
 					for(int j=0;j<TEMPHUM_485_NUM;j++){//核对有没有配置过
 							if(sheet.tempHum[j].workFlag==RT_TRUE){
 									rt_kprintf("%s modbus ",sign);
-									rt_kprintf("%-10s ",modbusName[i]);
+									rt_kprintf("%10s ",modbusName[i]);
+								  rt_kprintf("(%d)",modbusBps[i]);
 									rt_kprintf("%s ",sheet.tempHum[j].ID);
 									rt_kprintf("%s ",sheet.tempHum[j].model);
 									rt_kprintf("%s ",UartName[sheet.tempHum[j].useUartNum]);
@@ -178,7 +187,9 @@ void printModbusDevList()
 					for(int j=0;j<WATERDEPTH_485_NUM;j++){//核对有没有配置过
 							if(sheet.waterDepth[j].workFlag==RT_TRUE){
 									rt_kprintf("%s modbus ",sign);
-									rt_kprintf("%-10s ",modbusName[i]);
+									rt_kprintf("%10s",modbusName[i]);
+								  rt_kprintf("(%d)",modbusBps[i]);
+			
 									rt_kprintf("%s ",sheet.waterDepth[j].ID);
 									rt_kprintf("%s ",sheet.waterDepth[j].model);
 									rt_kprintf("%s ",UartName[sheet.waterDepth[j].useUartNum]);
@@ -660,50 +671,59 @@ static void modbus(int argc, char *argv[])
 	  extern void timeStop(upDataTimEnum num);
 	  extern void timeInit(upDataTimEnum num,int value,int firstCnt);
 	  int i,j;
-		if (argc != 7)
+		if ((argc != 7)&&(argc != 2))
 		{
 				rt_kprintf("%sERR input argc\n",sign);
 				goto ERR;
 		}
-		uint8_t slaveaddr=atoi16(argv[5],10);
-    int setTime =atoi16(argv[6],10);
-		if(setTime<60){
-				rt_kprintf("%serr:argv[6] 采集时间>60 now is%d\n",sign,setTime);
-				goto ERR;
+		if(argc==2){
+					if(0==rt_strcmp((char *)"list", argv[1])){
+							printModbusDevList();
+						  return;
+					}
 		}
-		if(slaveaddr>255){
-				rt_kprintf("%serr:argv[5] between 0 and 255 %d\n",sign,argv[5]);
-				goto ERR;
+		else{
+			uint8_t slaveaddr=atoi16(argv[5],10);
+			int setTime =atoi16(argv[6],10);
+			if(setTime<60){
+					rt_kprintf("%serr:argv[6] 采集时间>60 now is%d\n",sign,setTime);
+					goto ERR;
+			}
+			if(slaveaddr>255){
+					rt_kprintf("%serr:argv[5] between 0 and 255 %d\n",sign,argv[5]);
+					goto ERR;
+			}
+			for(i=0;i<MODBUS_NUM;i++){
+					if(0==rt_strcmp((char *)modbusName[i], argv[1])){
+							for(j=0;j<UART_NUM;j++){
+									if(0==rt_strcmp((char *)UartName[j], argv[4])){//串口 合法
+											break;
+									}
+							}
+							break;
+					}
+			}
+			if(i==MODBUS_NUM){
+					rt_kprintf("%serr:argv[1]\n",sign);
+					for(int j=0;j<MODBUS_NUM;j++)
+						rt_kprintf("%s ",modbusName[j]);
+					rt_kprintf("\n ");
+					goto ERR;
+			}
+			if(j==UART_NUM){
+					rt_kprintf("%serr:argv[2]\n",sign);
+					for(int j=0;j<UART_NUM;j++)
+						rt_kprintf("%s ",UartName[j]);
+					rt_kprintf("\n ");
+					goto ERR;
+			}
+			if(1==modbusConf(i,j,argv))//配置modbus参数到表中
+					return;//正确跳出
 		}
-		for(i=0;i<MODBUS_NUM;i++){
-				if(0==rt_strcmp((char *)modbusName[i], argv[1])){
-						for(j=0;j<UART_NUM;j++){
-								if(0==rt_strcmp((char *)UartName[j], argv[4])){//串口 合法
-										break;
-								}
-						}
-						break;
-				}
-		}
-		if(i==MODBUS_NUM){
-				rt_kprintf("%serr:argv[1]\n",sign);
-			  for(int j=0;j<MODBUS_NUM;j++)
-					rt_kprintf("%s ",modbusName[j]);
-			  rt_kprintf("\n ");
-				goto ERR;
-		}
-		if(j==UART_NUM){
-				rt_kprintf("%serr:argv[2]\n",sign);
-				for(int j=0;j<UART_NUM;j++)
-					rt_kprintf("%s ",UartName[j]);
-			  rt_kprintf("\n ");
-				goto ERR;
-		}
-		if(1==modbusConf(i,j,argv))//配置modbus参数到表中
-				return;//正确跳出
 		ERR:
 		rt_kprintf("%sfor example:modbus+设备名称(波特率)+ID+model+端口(port1-port4)+设备地址(0/255-关闭设备)+采集间隔(秒)\n",sign);
 		rt_kprintf("%sNOTE:括号内对参数进行解释,不需要输入\n",sign);
+		rt_kprintf("%smodebus list\n",sign);
 }
 //FINSH_FUNCTION_EXPORT(modbus, offline finsh);//FINSH_FUNCTION_EXPORT_CMD
 MSH_CMD_EXPORT(modbus,port slaveaddr config);//FINSH_FUNCTION_EXPORT_CMD
@@ -738,7 +758,7 @@ static void uart(int argc, char *argv[])
 				if(0==rt_strcmp((char *)portStr[i], argv[1])){
 						packFLash.uartBps[i]    =atoi32(argv[2],10);
 						uartSingConf(i,packFLash.uartBps[i]);
-						rt_kprintf("%sport%d config OK\n",sign,i);
+						rt_kprintf("%sport%d config OK\n",sign,i+1);
 				}
 		}
 		return;
