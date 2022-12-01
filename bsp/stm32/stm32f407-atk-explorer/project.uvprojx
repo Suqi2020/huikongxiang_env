@@ -52,7 +52,7 @@
           <CreateLib>0</CreateLib>
           <CreateHexFile>0</CreateHexFile>
           <DebugInformation>1</DebugInformation>
-          <BrowseInformation>1</BrowseInformation>
+          <BrowseInformation>0</BrowseInformation>
           <ListingPath>.\build\keil\List\</ListingPath>
           <HexFormatSelection>1</HexFormatSelection>
           <Merge32K>0</Merge32K>
@@ -147,7 +147,7 @@
             <RestoreSysVw>1</RestoreSysVw>
           </Target>
           <RunDebugAfterBuild>0</RunDebugAfterBuild>
-          <TargetSelection>11</TargetSelection>
+          <TargetSelection>6</TargetSelection>
           <SimDlls>
             <CpuDll></CpuDll>
             <CpuDllArguments></CpuDllArguments>
@@ -161,7 +161,7 @@
             <PeripheralDll></PeripheralDll>
             <PeripheralDllArguments></PeripheralDllArguments>
             <InitializationFile></InitializationFile>
-            <Driver>STLink\ST-LINKIII-KEIL_SWO.dll</Driver>
+            <Driver>Segger\JL2CM3.dll</Driver>
           </TargetDlls>
         </DebugOption>
         <Utilities>
@@ -362,10 +362,10 @@
             <uC99>1</uC99>
             <useXO>0</useXO>
             <VariousControls>
-              <MiscControls>--no-multibyte-chars</MiscControls>
+              <MiscControls></MiscControls>
               <Define>RT_USING_LIBC, USE_HAL_DRIVER, STM32F407xx, __CLK_TCK=RT_TICK_PER_SECOND, __STDC_LIMIT_MACROS, __RTTHREAD__, RT_USING_ARM_LIBC</Define>
               <Undefine></Undefine>
-              <IncludePath>..\libraries\HAL_Drivers;..\libraries\STM32F4xx_HAL\CMSIS\Device\ST\STM32F4xx\Include;..\..\..\components\drivers\include;applications;..\..\..\components\libc\compilers\common\include;..\libraries\HAL_Drivers\config;..\..\..\components\libc\compilers\common\extension;..\..\..\components\libc\posix\io\poll;..\..\..\libcpu\arm\cortex-m4;..\..\..\components\drivers\include;..\..\..\components\libc\posix\io\stdio;board\CubeMX_Config\Inc;..\libraries\HAL_Drivers\CMSIS\Include;..\..\..\components\drivers\spi;..\..\..\components\libc\posix\ipc;..\..\..\libcpu\arm\common;..\..\..\components\drivers\include;..\..\..\components\libc\compilers\common\extension\fcntl\octal;..\..\..\include;..\..\..\components\drivers\include;..\..\..\components\drivers\include;.;board;json;..\libraries\STM32F4xx_HAL\STM32F4xx_HAL_Driver\Inc;..\..\..\components\finsh;..\libraries\HAL_Drivers\drv_flash;board\ports;modbus;w5500</IncludePath>
+              <IncludePath>..\libraries\HAL_Drivers;..\libraries\STM32F4xx_HAL\CMSIS\Device\ST\STM32F4xx\Include;..\..\..\components\drivers\include;applications;..\..\..\components\libc\compilers\common\include;..\libraries\HAL_Drivers\config;LCD7inch;..\..\..\components\libc\compilers\common\extension;..\..\..\components\libc\posix\io\poll;..\..\..\libcpu\arm\cortex-m4;..\..\..\components\drivers\include;..\..\..\components\libc\posix\io\stdio;analog;..\libraries\HAL_Drivers\CMSIS\Include;..\..\..\components\drivers\spi;..\..\..\components\libc\posix\ipc;..\..\..\libcpu\arm\common;..\..\..\components\drivers\include;..\..\..\components\libc\compilers\common\extension\fcntl\octal;board\CubeMX_Config\Inc;..\..\..\include;..\..\..\components\drivers\include;..\..\..\components\drivers\include;.;board;json;..\libraries\STM32F4xx_HAL\STM32F4xx_HAL_Driver\Inc;..\..\..\components\finsh;..\libraries\HAL_Drivers\drv_flash;board\ports;modbus;w5500</IncludePath>
             </VariousControls>
           </Cads>
           <Aads>
@@ -406,22 +406,37 @@
       </TargetOption>
       <Groups>
         <Group>
-          <GroupName>Applications</GroupName>
+          <GroupName>analog</GroupName>
           <Files>
             <File>
-              <FileName>NetJsonDataSendTask.c</FileName>
+              <FileName>adc.c</FileName>
               <FileType>1</FileType>
-              <FilePath>applications\NetJsonDataSendTask.c</FilePath>
+              <FilePath>analog\adc.c</FilePath>
             </File>
+            <File>
+              <FileName>analogTempHum.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>analog\analogTempHum.c</FilePath>
+            </File>
+          </Files>
+        </Group>
+        <Group>
+          <GroupName>Applications</GroupName>
+          <Files>
             <File>
               <FileName>test_hardware.c</FileName>
               <FileType>1</FileType>
               <FilePath>applications\test_hardware.c</FilePath>
             </File>
             <File>
-              <FileName>W5500Task.c</FileName>
+              <FileName>NetJsonDataSendTask.c</FileName>
               <FileType>1</FileType>
-              <FilePath>applications\W5500Task.c</FilePath>
+              <FilePath>applications\NetJsonDataSendTask.c</FilePath>
+            </File>
+            <File>
+              <FileName>NetJsonDataRecTask.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>applications\NetJsonDataRecTask.c</FilePath>
             </File>
             <File>
               <FileName>NetJsonDataUpTask.c</FileName>
@@ -429,14 +444,14 @@
               <FilePath>applications\NetJsonDataUpTask.c</FilePath>
             </File>
             <File>
+              <FileName>W5500Task.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>applications\W5500Task.c</FilePath>
+            </File>
+            <File>
               <FileName>main.c</FileName>
               <FileType>1</FileType>
               <FilePath>applications\main.c</FilePath>
-            </File>
-            <File>
-              <FileName>NetJsonDataRecTask.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>applications\NetJsonDataRecTask.c</FilePath>
             </File>
           </Files>
         </Group>
@@ -569,7 +584,7 @@
               <FilePath>..\..\..\components\drivers\ipc\workqueue.c</FilePath>
             </File>
             <File>
-              <FileName>adc.c</FileName>
+              <FileName>misc_adc.c</FileName>
               <FileType>1</FileType>
               <FilePath>..\..\..\components\drivers\misc\adc.c</FilePath>
             </File>
@@ -761,6 +776,16 @@
           </Files>
         </Group>
         <Group>
+          <GroupName>LCD7inch</GroupName>
+          <Files>
+            <File>
+              <FileName>7inchRegist.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>LCD7inch\7inchRegist.c</FilePath>
+            </File>
+          </Files>
+        </Group>
+        <Group>
           <GroupName>Libraries</GroupName>
           <Files>
             <File>
@@ -899,6 +924,26 @@
           <GroupName>Modbus</GroupName>
           <Files>
             <File>
+              <FileName>rs485H2S.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>modbus\rs485H2S.c</FilePath>
+            </File>
+            <File>
+              <FileName>uartReconf.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>modbus\uartReconf.c</FilePath>
+            </File>
+            <File>
+              <FileName>rs485O2.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>modbus\rs485O2.c</FilePath>
+            </File>
+            <File>
+              <FileName>modbus.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>modbus\modbus.c</FilePath>
+            </File>
+            <File>
               <FileName>rs485ThreeAxis.c</FileName>
               <FileType>1</FileType>
               <FilePath>modbus\rs485ThreeAxis.c</FilePath>
@@ -909,9 +954,24 @@
               <FilePath>modbus\rs485Circula.c</FilePath>
             </File>
             <File>
+              <FileName>stm32Flash.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>modbus\stm32Flash.c</FilePath>
+            </File>
+            <File>
               <FileName>rs485PartDischag.c</FileName>
               <FileType>1</FileType>
               <FilePath>modbus\rs485PartDischag.c</FilePath>
+            </File>
+            <File>
+              <FileName>rs485CO.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>modbus\rs485CO.c</FilePath>
+            </File>
+            <File>
+              <FileName>rs485TempHum.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>modbus\rs485TempHum.c</FilePath>
             </File>
             <File>
               <FileName>rs485PressSettl.c</FileName>
@@ -919,49 +979,14 @@
               <FilePath>modbus\rs485PressSettl.c</FilePath>
             </File>
             <File>
-              <FileName>rs485CH4.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>.\modbus\rs485CH4.c</FilePath>
-            </File>
-            <File>
-              <FileName>rs485CO.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>.\modbus\rs485CO.c</FilePath>
-            </File>
-            <File>
-              <FileName>rs485H2S.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>.\modbus\rs485H2S.c</FilePath>
-            </File>
-            <File>
-              <FileName>rs485O2.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>.\modbus\rs485O2.c</FilePath>
-            </File>
-            <File>
               <FileName>rs485WaterLev.c</FileName>
               <FileType>1</FileType>
-              <FilePath>.\modbus\rs485WaterLev.c</FilePath>
+              <FilePath>modbus\rs485WaterLev.c</FilePath>
             </File>
             <File>
-              <FileName>rs485TempHum.c</FileName>
+              <FileName>digConv.c</FileName>
               <FileType>1</FileType>
-              <FilePath>.\modbus\rs485TempHum.c</FilePath>
-            </File>
-            <File>
-              <FileName>modbus.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>modbus\modbus.c</FilePath>
-            </File>
-            <File>
-              <FileName>stm32Flash.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>modbus\stm32Flash.c</FilePath>
-            </File>
-            <File>
-              <FileName>uartReconf.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>modbus\uartReconf.c</FilePath>
+              <FilePath>modbus\digConv.c</FilePath>
             </File>
             <File>
               <FileName>crc.c</FileName>
@@ -969,9 +994,9 @@
               <FilePath>modbus\crc.c</FilePath>
             </File>
             <File>
-              <FileName>digConv.c</FileName>
+              <FileName>rs485CH4.c</FileName>
               <FileType>1</FileType>
-              <FilePath>.\modbus\digConv.c</FilePath>
+              <FilePath>modbus\rs485CH4.c</FilePath>
             </File>
           </Files>
         </Group>
@@ -979,19 +1004,9 @@
           <GroupName>W5500</GroupName>
           <Files>
             <File>
-              <FileName>w5500.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>w5500\w5500.c</FilePath>
-            </File>
-            <File>
               <FileName>loopback.c</FileName>
               <FileType>1</FileType>
               <FilePath>w5500\loopback.c</FilePath>
-            </File>
-            <File>
-              <FileName>dhcp.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>w5500\dhcp.c</FilePath>
             </File>
             <File>
               <FileName>utility.c</FileName>
@@ -999,34 +1014,29 @@
               <FilePath>w5500\utility.c</FilePath>
             </File>
             <File>
-              <FileName>w5500_conf.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>w5500\w5500_conf.c</FilePath>
-            </File>
-            <File>
               <FileName>tcp_demo.c</FileName>
               <FileType>1</FileType>
               <FilePath>w5500\tcp_demo.c</FilePath>
+            </File>
+            <File>
+              <FileName>w5500.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>w5500\w5500.c</FilePath>
             </File>
             <File>
               <FileName>socket.c</FileName>
               <FileType>1</FileType>
               <FilePath>w5500\socket.c</FilePath>
             </File>
-          </Files>
-        </Group>
-        <Group>
-          <GroupName>Analog</GroupName>
-          <Files>
             <File>
-              <FileName>analogTempHum.c</FileName>
+              <FileName>dhcp.c</FileName>
               <FileType>1</FileType>
-              <FilePath>.\analog\analogTempHum.c</FilePath>
+              <FilePath>w5500\dhcp.c</FilePath>
             </File>
             <File>
-              <FileName>adc.c</FileName>
+              <FileName>w5500_conf.c</FileName>
               <FileType>1</FileType>
-              <FilePath>.\analog\adc.c</FilePath>
+              <FilePath>w5500\w5500_conf.c</FilePath>
             </File>
           </Files>
         </Group>

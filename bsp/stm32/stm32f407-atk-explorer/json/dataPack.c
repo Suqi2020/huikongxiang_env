@@ -405,6 +405,11 @@ uint16_t devRegJsonPack()
 			for(int i=0;i<rt_strlen(out);i++)
 					rt_kprintf("%c",out[i]);
 			rt_kprintf("\n");
+		
+		
+//					for(int i=0;i<rt_strlen(out);i++)
+//					rt_kprintf("%02X",out[i]);
+//			rt_kprintf("\n");
 			rt_free(out);
 			out=NULL;
 	}

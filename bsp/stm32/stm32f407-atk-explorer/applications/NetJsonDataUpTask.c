@@ -195,7 +195,8 @@ void startTimeList()
 		}
 }
 
-
+char nihao[]="你好局放防沉降防外破";
+//
 
 //上行数据的维护以及重发
 void   upKeepStateTask(void *para)
@@ -218,6 +219,10 @@ void   upKeepStateTask(void *para)
 	  clearUartData();
 	  
 	  readMultiCirCulaPoint();//对于环流来讲 运行前需要提取扩大方式
+//	  for(int i=0;i<strlen(nihao);i++){
+//				printf("%02X ",nihao[i]);
+//		}
+//		printf("%s \n",nihao);
 		while(1){
 				timeOutRunFun();
 				timeInc();

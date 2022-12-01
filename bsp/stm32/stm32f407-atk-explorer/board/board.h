@@ -34,6 +34,7 @@
 #include "utility.h"
 #include "uartReconf.h"
 #include "stmflash.h"
+#include "7inchRegist.h"
 //#include "rs485ThreeAxis.h"
 //#include "rs485Circula.h"
 //#include "rs485PartDischag.h"
