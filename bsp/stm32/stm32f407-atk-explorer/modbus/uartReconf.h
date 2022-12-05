@@ -8,8 +8,10 @@
 
 
 #define   UART_NUM        4//一共4路串口
-
-
+#define   ACUID_LEN       20
+#define 	DEVID_LEN       20
+#define   MODEL_LEN       8
+#define   NAME_LEN        20
 
 
  
@@ -36,9 +38,9 @@ typedef struct{
 #define  ANALOG_NUM   8//8路模拟量
 
 typedef struct{
-		char  devID[20];
-	  char  model[8];
-		char  name[20];
+		char  devID[DEVID_LEN];
+	  char  model[MODEL_LEN];
+		char  name[NAME_LEN];
 	
     uint8_t port; //1-8
 	  uint8_t rev;//
@@ -52,7 +54,7 @@ typedef struct{
 		netIpFlashStru netIpFlash;
 	  analogDevStru  analog[ANALOG_NUM];
 	  uint32_t    uartBps[UART_NUM];
-	  char     acuId[20];
+	  char     acuId[ACUID_LEN];
 }packIpUartStru;
 extern packIpUartStru packFLash;
 

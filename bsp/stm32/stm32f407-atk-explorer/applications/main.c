@@ -95,15 +95,16 @@
 //V0.43    加入传感器响应状态上传  1-传感器响应  0-传感器不响应  20221111
 //V0.44    修复log显示问题 以及显示波特率      20221117
 //V0.45    增加7寸触屏显示组件地址定义         20221201
-
-#define APP_VER       ((0<<8)+45)//0x0105 表示1.5版本
-const char date[]="20221201";
+//V0.46    增加7寸触屏部分接口函数 增加串口5调试 增加lcdtask 队列       20221205
+#define APP_VER       ((0<<8)+46)//0x0105 表示1.5版本
+const char date[]="20221205";
 
 //static    rt_thread_t tid 	= RT_NULL;
-static    rt_thread_t tidW5500 	= RT_NULL;
+static    rt_thread_t tidW5500 	  = RT_NULL;
 static    rt_thread_t tidNetRec 	= RT_NULL;
 static    rt_thread_t tidNetSend 	= RT_NULL;
 static    rt_thread_t tidUpkeep 	= RT_NULL;
+static    rt_thread_t tidLCD      = RT_NULL;
 //信号量的定义
 extern  rt_sem_t  w5500Iqr_semp ;//w5500有数据时候中断来临
 
@@ -114,13 +115,17 @@ extern struct  rt_mailbox mbNetSendData;
 static char	 	 mbRecPool[20];//接收缓存20条
 static char 	 mbSendPool[20];//发送缓存20条
 
+
+//队列的定义
+struct  rt_messagequeue LCDmque;//= {RT_NULL} ;//创建LCD队列
+uint8_t LCDQuePool[LCD_BUF_LEN];  //创建lcd队列池
 //任务的定义
 extern  void   netDataRecTask(void *para);//网络数据接收
 extern  void   netDataSendTask(void *para);//网络数据发送
 extern  void   upKeepStateTask(void *para);//定时打包数据 后期可能加入定时读取modbus
 extern  void   w5500Task(void *parameter);//w5500网络状态的维护
 extern  void   hardWareDriverTest(void);
-
+extern  void   LCDTask(void *parameter);
 
 const static char sign[]="[main]";
 //const char errStr[]="[ERR]";
@@ -191,7 +196,13 @@ int main(void)
 		if (timer1 != RT_NULL)
         rt_timer_start(timer1);
 		//创建285设备用到的互斥 队列
-
+		
+		int ret = rt_mq_init(&LCDmque,"LCDrecBuf",&LCDQuePool[0],1,LCD_BUF_LEN,RT_IPC_FLAG_FIFO);       
+		if (ret != RT_EOK)
+		{
+				rt_kprintf("%sinit LCD msgque failed.\n",sign);
+				return -1;
+		}
 		extern void 	uartMutexQueueCreate();
 		uartMutexQueueCreate();
 ////////////////////////////////////邮箱//////////////////////////////////
@@ -234,8 +245,11 @@ int main(void)
 				rt_thread_startup(tidUpkeep);													 
 				rt_kprintf("%sRTcreat upKeepStateTask \r\n",sign);
 		}
-		
-
+		tidLCD    =  rt_thread_create("LCD",LCDTask,RT_NULL,512*3,2, 10 );
+		if(tidLCD!=NULL){
+				rt_thread_startup(tidLCD);													 
+				rt_kprintf("%sRTcreat LCDStateTask \r\n",sign);
+		}
 		//队列初始化之后再开启串口中断接收
 //////////////////////////////结束//////////////////////////////////////
     while (0)//task用于测试 以及闪灯操作

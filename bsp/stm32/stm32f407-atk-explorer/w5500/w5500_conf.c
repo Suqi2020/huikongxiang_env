@@ -308,7 +308,7 @@ static void net(int argc, char *argv[])
 		if(argc==1){
 				goto ERR;
 		}
-		int i,j;
+		int i;
 		if(0==rt_strcmp((char *)"macaddr", argv[1])){
 				if(argc!=3){
 					goto ERR;

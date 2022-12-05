@@ -50,6 +50,13 @@
 #define		MODBUS_CFG_READ_ADDR  0x130C
 
 
+
+#define   LCD_HEAD       0X5AA5
+#define   LCD_FILL_TAIL  0XFFFF
+#define   LCD_WRITE      0X82
+#define   LCD_READ       0X83
+
+#define  LCD_BUF_LEN    50
 //#define		MODBUS_READ_NAME_ADDR
 //#define		MODBUS_READ_ID_ADDR
 //#define		MODBUS_READ_SORT_ADDR
