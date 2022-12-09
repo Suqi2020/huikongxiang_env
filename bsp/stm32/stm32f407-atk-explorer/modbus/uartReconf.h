@@ -54,7 +54,8 @@ typedef struct{
 		netIpFlashStru netIpFlash;
 	  analogDevStru  analog[ANALOG_NUM];
 	  uint32_t    uartBps[UART_NUM];
-	  char     acuId[ACUID_LEN];
+	  char     acuId[ACUID_LEN+1];
+	  char rev;
 }packIpUartStru;
 extern packIpUartStru packFLash;
 

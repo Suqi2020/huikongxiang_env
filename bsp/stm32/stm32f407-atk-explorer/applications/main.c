@@ -96,8 +96,10 @@
 //V0.44    修复log显示问题 以及显示波特率      20221117
 //V0.45    增加7寸触屏显示组件地址定义         20221201
 //V0.46    增加7寸触屏部分接口函数 增加串口5调试 增加lcdtask 队列       20221205
-#define APP_VER       ((0<<8)+46)//0x0105 表示1.5版本
-const char date[]="20221205";
+//V0.47    增加显示网络、串口、mcuid 、传感器类型选择功能         20221208
+//V0.48    增加传感器显示 删除界面 增加重启 界面         20221209
+#define APP_VER       ((0<<8)+48)//0x0105 表示1.5版本
+const char date[]="20221209";
 
 //static    rt_thread_t tid 	= RT_NULL;
 static    rt_thread_t tidW5500 	  = RT_NULL;
