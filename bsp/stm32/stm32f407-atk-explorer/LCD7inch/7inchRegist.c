@@ -166,8 +166,89 @@ void LCDDispMCUID()
 		LCDWtite(MCUID_ADDR,buf,ACUID_LEN);
 }
 
+//串口显示掉线次数
+int offLineIndex=1;
+void  LCDDispNetOffline()
+{
+	
+//	  int i=1;
+//	  for( i=1;i<offLine.times;i++){ //下标从1开始
+//				rt_kprintf("[offLine]c the %d time,relayTimer %d 秒\r\n",i,offLine.relayTimer[i]);
+//		}
+//		if(offLine.times==0){
+//				rt_kprintf("[offLine]On line OK\r\n");
+//		}
+//		else{
+//				if(i==(offLine.times)){
+//						extern rt_bool_t gbNetState;
+//						if(gbNetState==RT_FALSE){
+//								rt_kprintf("[offLine]a the %d Time,relayTimer %d 秒\r\n",i,(rt_tick_get()/1000-offLine.relayTimer[i]));
+//						}
+//						else{
+//								rt_kprintf("[offLine]b the %d Times,relayTimer %d 秒\r\n",i,offLine.relayTimer[i]);
+//						}
+//				}
+//		}
+
+	  uint8_t buf[10]={0};
+		//显示总共掉线次数
+		buf[0]=(uint8_t)(offLine.times>>24);
+		buf[1]=(uint8_t)(offLine.times>>16);
+		buf[2]=(uint8_t)(offLine.times>>8);
+		buf[3]=(uint8_t)(offLine.times>>0);
+		LCDWtite(NET_OFFLINE_TOTALTIMES_ADDR,buf,2*2);
+		if(offLine.times==0){
+				//显示第几次掉线
+				buf[0]=0;
+				buf[1]=0;
+				buf[2]=0;
+				buf[3]=0;
+				LCDWtite(NET_OFFLINE_TIMES_ADDR,buf,2*2);
+				
+						//显示总共掉线次数
+				buf[0]=0;
+				buf[1]=0;
+				buf[2]=0;
+				buf[3]=0;
+				LCDWtite(NET_OFFLINE_RELAYTIME_ADDR,buf,2*2);
+		}
+		else{
+			 // if(offLineIndex==offLine.times){
+					  extern rt_bool_t gbNetState;
+						buf[0]=(uint8_t)(offLineIndex>>24);
+						buf[1]=(uint8_t)(offLineIndex>>16);
+						buf[2]=(uint8_t)(offLineIndex>>8);
+						buf[3]=(uint8_t)(offLineIndex>>0);
+						LCDWtite(NET_OFFLINE_TIMES_ADDR,buf,2*2);
+						if(gbNetState==RT_FALSE){
+								//rt_kprintf("[offLine]the %d Time,relayTimer %d 秒\r\n",i,(rt_tick_get()/1000-offLine.relayTimer[i]));
+							  int offTime=(rt_tick_get()/1000-offLine.relayTimer[offLineIndex]);
+						}
+						else{
+								//rt_kprintf("[offLine]the %d Times,relayTimer %d 秒\r\n",i,offLine.relayTimer[i]);
+							  int offTime=offLine.relayTimer[offLineIndex];
+						}
+						buf[0]=(uint8_t)(offLine.relayTimer[offLineIndex]>>24);
+						buf[1]=(uint8_t)(offLine.relayTimer[offLineIndex]>>16);
+						buf[2]=(uint8_t)(offLine.relayTimer[offLineIndex]>>8);
+						buf[3]=(uint8_t)(offLine.relayTimer[offLineIndex]>>0);
+						LCDWtite(NET_OFFLINE_RELAYTIME_ADDR,buf,2*2);
+			//	}
+		}
+}
 
 
+
+
+
+
+									
+typedef struct{
+	  uint8_t X;//modbus设备的种类
+	  uint8_t Y;//每种modbus的个数
+	  uint8_t flag;//存在标记为1
+}modbusPositStru;
+modbusPositStru  modPosit[TOTOLA_485_NUM]={0}; 
 //100是 #define THREEAXIS_485_NUM     40
 //#define PRESSSETTL_485_NUM    40
 //#define CIRCULA_485_NUM   	  5
@@ -180,17 +261,6 @@ void LCDDispMCUID()
 //#define TEMPHUM_485_NUM   	  2
 //之和
 
-
-
-
-
-									
-typedef struct{
-	  uint8_t X;//modbus设备的种类
-	  uint8_t Y;//每种modbus的个数
-	  uint8_t flag;//存在标记为1
-}modbusPositStru;
-modbusPositStru  modPosit[100]={0}; 
 uint8_t  modbTotalIndex=0;
 uint8_t  modbDevReadIndex=0;
 //char  modCurrtID[20];
@@ -575,7 +645,7 @@ void LCDDispModbusGet()
 		}
 }
 static int chinaNameIndex=0;//当前用到的名字标记
-//显示传感器中文名
+//显示传感器中文名 lcd配置传感器界面的中文名称的选择
 static void dispCinaName(uint8_t *buf)
 {
 		rt_kprintf("index %d\n",chinaNameIndex);
@@ -592,6 +662,7 @@ static void dispCinaName(uint8_t *buf)
 		LCDWtite(MODBUS_CFG_NAME_ADDR,buf,sizeof(modbusName[chinaNameIndex])); 
 }
 //modbusName[MODBUS_NUM][20]
+//按键触摸返回函数
 void  keyReturn(uint16_t keyAddr)
 {
 	  uint8_t *buf=NULL;
@@ -668,9 +739,27 @@ void  keyReturn(uint16_t keyAddr)
 			  LCDDispModInfoCpy();
 			  LDCDispMosbus();
 				break;
-
+			case  KEY_NETERROR_ADDR:
+				rt_kprintf("%s按键按下\n",sign);
+				LCDDispNetOffline();
+				break;
+			case	NET_OFFLINE_LAST_ADDR:
+				offLineIndex--;
+			  if(offLineIndex==0){
+						offLineIndex = offLine.times;
+				}
+				LCDDispNetOffline();
+				break;
+			case  NET_OFFLINE_NEXT_ADDR:
+				offLineIndex++;
+			  if(offLineIndex>offLine.times){
+						offLineIndex = 1;
+				}
+				LCDDispNetOffline();
+				break;
 		}
 		
+
 
 		rt_free(buf);
 		buf=RT_NULL;

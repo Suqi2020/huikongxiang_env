@@ -8,7 +8,7 @@
 
 
 #define   UART_NUM        4//一共4路串口
-#define   ACUID_LEN       20
+#define   ACUID_LEN       18
 #define 	DEVID_LEN       20
 #define   MODEL_LEN       8
 #define   NAME_LEN        20

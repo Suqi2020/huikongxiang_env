@@ -58,7 +58,17 @@ typedef struct{
 #define O2_485_NUM   				  2
 #define WATERDEPTH_485_NUM   	2
 #define TEMPHUM_485_NUM   	  2
-
+#define TOTOLA_485_NUM     (THREEAXIS_485_NUM+\
+														PRESSSETTL_485_NUM+\
+														CIRCULA_485_NUM+\
+														PARTDISCHAG_485_NUM+\
+														CH4_485_NUM+\
+														CO_485_NUM+\
+														H2S_485_NUM+\
+														O2_485_NUM+\
+														WATERDEPTH_485_NUM+\
+														TEMPHUM_485_NUM)
+														
 #define ANALOG_NUM   	        8
 typedef struct{
 			modbusStru  threeAxiss[THREEAXIS_485_NUM];

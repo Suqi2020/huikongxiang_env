@@ -69,8 +69,15 @@
 #define   KEY_MODBUSDISP_NEXT_ADDR  0X140E
 #define   KEY_MODBUSDISP_DEL_ADDR   0X1410
 
+//netoffline 显示界面地址
+#define		NET_OFFLINE_TOTALTIMES_ADDR  0X1600
+#define		NET_OFFLINE_TIMES_ADDR       0X1602
+#define   NET_OFFLINE_RELAYTIME_ADDR   0X1604
+#define		NET_OFFLINE_LAST_ADDR        0X1606
+#define   NET_OFFLINE_NEXT_ADDR        0X1608
 
 
+#define   KEY_NETERROR_ADDR        0X1A00
 #define   KEY_SAVE_ADDR             0X1700
 #define   KEY_RESET_ADDR            0X1702
 #define   LCD_HEAD       0X5AA5

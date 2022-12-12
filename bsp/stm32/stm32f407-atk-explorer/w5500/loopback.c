@@ -242,7 +242,7 @@ void loopback_tcpc(SOCKET s, uint16 port)
 				  offLineTimesGet =RT_TRUE;
 					gbNetState = RT_FALSE;
 					offLine.times++;
-					offLine.relayTimer[offLine.times]=rt_tick_get();
+					offLine.relayTimer[offLine.times]=rt_tick_get()/1000;
 			}
 			rt_kprintf("%sw5500 discon\r\n",sign);
 			break;

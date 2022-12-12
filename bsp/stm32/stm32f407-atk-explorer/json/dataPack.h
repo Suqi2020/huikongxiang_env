@@ -2,7 +2,7 @@
 #define   __DATAPACK_H__
 
 #include   "board.h"
-#define   ACUID_LEN  18
+//#define   ACUID_LEN  18
 #define   HEAD_LEN   2
 #define   LENTH_LEN  2
 #define   CRC_LEN    2

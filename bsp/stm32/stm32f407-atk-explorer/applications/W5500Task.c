@@ -143,7 +143,7 @@ void netSend(uint8_t *data,int len)
 		if(send(SOCK_TCPC,	data,len)==0){//启动个定时器来实现重发  2s内收不到回复
 				gbNetState=RT_FALSE;//发送身边 重新联网
 				offLine.times++;
-				offLine.relayTimer[offLine.times]=rt_tick_get();
+				offLine.relayTimer[offLine.times]=rt_tick_get()/1000;
 				rt_kprintf("%snet send fail\n",task);
 		}
 		else{

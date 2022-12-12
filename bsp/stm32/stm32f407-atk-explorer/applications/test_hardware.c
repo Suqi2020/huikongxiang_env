@@ -364,7 +364,7 @@ int offline()
 {
 	  int i=1;
 	  for( i=1;i<offLine.times;i++){ //下标从1开始
-				rt_kprintf("[offLine]the %d time,relayTimer %d 秒\r\n",i,offLine.relayTimer[i]);
+				rt_kprintf("[offLine]c the %d time,relayTimer %d 秒\r\n",i,offLine.relayTimer[i]);
 		}
 
 		if(offLine.times==0){
@@ -374,10 +374,10 @@ int offline()
 				if(i==(offLine.times)){
 						extern rt_bool_t gbNetState;
 						if(gbNetState==RT_FALSE){
-								rt_kprintf("[offLine]the %d Time,relayTimer %d 秒\r\n",i,(rt_tick_get()-offLine.relayTimer[i])/1000);
+								rt_kprintf("[offLine]a the %d Time,relayTimer %d 秒\r\n",i,(rt_tick_get()/1000-offLine.relayTimer[i]));
 						}
 						else{
-								rt_kprintf("[offLine]the %d Times,relayTimer %d 秒\r\n",i,offLine.relayTimer[i]);
+								rt_kprintf("[offLine]b the %d Times,relayTimer %d 秒\r\n",i,offLine.relayTimer[i]);
 						}
 				}
 		}
