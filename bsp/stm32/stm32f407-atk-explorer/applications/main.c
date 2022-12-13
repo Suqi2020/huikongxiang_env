@@ -99,9 +99,9 @@
 //V0.47    增加显示网络、串口、mcuid 、传感器类型选择功能         20221208
 //V0.48    增加传感器显示 删除界面 增加重启 界面         20221209
 //V0.49    增加网络掉线次数显示 显示的是上线过再掉线的时长  一开始上电没有接网线情况下不会显示此次掉线时长  20221212
-
-#define APP_VER       ((0<<8)+49)//0x0105 表示1.5版本
-const char date[]="20221212";
+//v0.50    增加传感器配置界面  暂时不稳定   20221213
+#define APP_VER       ((0<<8)+50)//0x0105 表示1.5版本
+const char date[]="20221213";
 
 //static    rt_thread_t tid 	= RT_NULL;
 static    rt_thread_t tidW5500 	  = RT_NULL;
@@ -161,6 +161,7 @@ static void timeout1(void *parameter)
 			  if(alarmTick>=100){
 						alarmTick=100;// 1 2 3 最终10秒提醒一次
 				}
+
 //				modbusWorkErrCheck();//modbus 错误工作状态打印
 //				errConfigCheck();//	modbusWorkErrCheck();//errConfigCheck();
 				//modbusPrintRead();

@@ -77,9 +77,19 @@
 #define   NET_OFFLINE_NEXT_ADDR        0X1608
 
 
-#define   KEY_NETERROR_ADDR        0X1A00
+
+
+
+
+
 #define   KEY_SAVE_ADDR             0X1700
 #define   KEY_RESET_ADDR            0X1702
+//Ö÷½çÃæ
+#define   KEY_NETERROR_ADDR         0X1A00
+#define   NET_ERR_DISPLAY_ADDR      0X1A0C
+#define   MODBUS_ERR_DISPLAY_ADDR   0X1A0E
+
+//kenal lcd command
 #define   LCD_HEAD       0X5AA5
 #define   LCD_FILL_TAIL  0XFFFF
 #define   LCD_WRITE      0X82

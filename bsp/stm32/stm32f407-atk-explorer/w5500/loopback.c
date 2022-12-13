@@ -210,8 +210,12 @@ void loopback_tcpc(SOCKET s, uint16 port)
 		  rt_kprintf("%sw5500 connected\r\n",sign);
 		  extern rt_bool_t  gbNetState;
 			gbNetState =RT_TRUE;	
+			extern void  LCDDispNetOffline();
+		  LCDDispNetOffline();
 		  offLineTimesGet =RT_FALSE;
-			offLine.relayTimer[offLine.times]=(rt_tick_get()-offLine.relayTimer[offLine.times])/1000;
+			offLine.relayTimer[offLine.times]=(rt_tick_get()/1000-offLine.relayTimer[offLine.times]);
+		
+						  rt_kprintf("%sw5500 con %d%d\r\n",offLine.times,offLine.relayTimer[offLine.times]);
 		  extern uint16_t heartUpJsonPack();
 			heartUpJsonPack();
 		  extern struct rt_mailbox mbNetSendData;
@@ -235,7 +239,7 @@ void loopback_tcpc(SOCKET s, uint16 port)
 //				rt_free(data_buf);
 			}
 			SOCK_DISCON(s);
-			rt_kprintf("w5500 discon\r\n");
+			//rt_kprintf("w5500 discon\r\n");
 			extern rt_bool_t gbNetState;
 			
 			if(offLineTimesGet==RT_FALSE){//只获取一次
@@ -243,6 +247,9 @@ void loopback_tcpc(SOCKET s, uint16 port)
 					gbNetState = RT_FALSE;
 					offLine.times++;
 					offLine.relayTimer[offLine.times]=rt_tick_get()/1000;
+//				  rt_kprintf("w5500 discon %d  %d\r\n",offLine.times,offLine.relayTimer[offLine.times]);
+					extern void  LCDDispNetOffline();
+					LCDDispNetOffline();
 			}
 			rt_kprintf("%sw5500 discon\r\n",sign);
 			break;

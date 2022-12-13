@@ -151,6 +151,37 @@ void LCDDispUart()
 		LCDWtite(PORT4_ADDR,buf,2*2);
 }
 
+
+//lcd屏幕配置串口波特率
+//void LCDConfUart()111
+//{
+//	  uint8_t buf[10]={0};
+//		//显示端口1波特率
+//		buf[0]=(uint8_t)(packFLash.uartBps[0]>>24);
+//		buf[1]=(uint8_t)(packFLash.uartBps[0]>>16);
+//		buf[2]=(uint8_t)(packFLash.uartBps[0]>>8);
+//		buf[3]=(uint8_t)(packFLash.uartBps[0]>>0);
+//		LCDWtite(PORT1_ADDR,buf,2*2);
+//		
+//		//显示端口2波特率
+//		buf[0]=(uint8_t)(packFLash.uartBps[1]>>24);
+//		buf[1]=(uint8_t)(packFLash.uartBps[1]>>16);
+//		buf[2]=(uint8_t)(packFLash.uartBps[1]>>8);
+//		buf[3]=(uint8_t)(packFLash.uartBps[1]>>0);
+//		LCDWtite(PORT2_ADDR,buf,2*2);
+//		//显示端口3波特率
+//		buf[0]=(uint8_t)(packFLash.uartBps[2]>>24);
+//		buf[1]=(uint8_t)(packFLash.uartBps[2]>>16);
+//		buf[2]=(uint8_t)(packFLash.uartBps[2]>>8);
+//		buf[3]=(uint8_t)(packFLash.uartBps[2]>>0);
+//		LCDWtite(PORT3_ADDR,buf,2*2);
+//		//显示端口4波特率
+//		buf[0]=(uint8_t)(packFLash.uartBps[3]>>24);
+//		buf[1]=(uint8_t)(packFLash.uartBps[3]>>16);
+//		buf[2]=(uint8_t)(packFLash.uartBps[3]>>8);
+//		buf[3]=(uint8_t)(packFLash.uartBps[3]>>0);
+//		LCDWtite(PORT4_ADDR,buf,2*2);
+//}
 //串口配置显示
 void LCDDispMCUID()
 {
@@ -166,31 +197,27 @@ void LCDDispMCUID()
 		LCDWtite(MCUID_ADDR,buf,ACUID_LEN);
 }
 
+
+//5A A5 05 82 1A0C 0001 停止
+//5A A5 05 82 1A0C 0000  开始
+//更新lcd网络状态 上下线或者触摸按键时候调用
+void LCDDispNetErrState()
+{
+	  extern rt_bool_t gbNetState;
+//	  static rt_bool_t state =RT_FALSE;//屏幕上电后默认显示也是掉线的
+//	  if(state!=gbNetState){//状态变更时候再去更新
+				uint8_t buf[10]={0};
+				buf[0]=0;
+				buf[1]=gbNetState;
+				LCDWtite(NET_ERR_DISPLAY_ADDR,buf,1*2);
+
+}
 //串口显示掉线次数
 int offLineIndex=1;
 void  LCDDispNetOffline()
 {
-	
-//	  int i=1;
-//	  for( i=1;i<offLine.times;i++){ //下标从1开始
-//				rt_kprintf("[offLine]c the %d time,relayTimer %d 秒\r\n",i,offLine.relayTimer[i]);
-//		}
-//		if(offLine.times==0){
-//				rt_kprintf("[offLine]On line OK\r\n");
-//		}
-//		else{
-//				if(i==(offLine.times)){
-//						extern rt_bool_t gbNetState;
-//						if(gbNetState==RT_FALSE){
-//								rt_kprintf("[offLine]a the %d Time,relayTimer %d 秒\r\n",i,(rt_tick_get()/1000-offLine.relayTimer[i]));
-//						}
-//						else{
-//								rt_kprintf("[offLine]b the %d Times,relayTimer %d 秒\r\n",i,offLine.relayTimer[i]);
-//						}
-//				}
-//		}
-
 	  uint8_t buf[10]={0};
+		extern rt_bool_t gbNetState;
 		//显示总共掉线次数
 		buf[0]=(uint8_t)(offLine.times>>24);
 		buf[1]=(uint8_t)(offLine.times>>16);
@@ -205,36 +232,43 @@ void  LCDDispNetOffline()
 				buf[3]=0;
 				LCDWtite(NET_OFFLINE_TIMES_ADDR,buf,2*2);
 				
-						//显示总共掉线次数
-				buf[0]=0;
-				buf[1]=0;
-				buf[2]=0;
-				buf[3]=0;
+						//显示总共掉线的时长
+				if(gbNetState==RT_FALSE){
+					  int tick = rt_tick_get()/1000;
+			
+						buf[0]=(uint8_t)(tick>>24);
+						buf[1]=(uint8_t)(tick>>16);
+						buf[2]=(uint8_t)(tick>>8);
+						buf[3]=(uint8_t)(tick>>0);
+				}
+
 				LCDWtite(NET_OFFLINE_RELAYTIME_ADDR,buf,2*2);
 		}
-		else{
-			 // if(offLineIndex==offLine.times){
-					  extern rt_bool_t gbNetState;
-						buf[0]=(uint8_t)(offLineIndex>>24);
-						buf[1]=(uint8_t)(offLineIndex>>16);
-						buf[2]=(uint8_t)(offLineIndex>>8);
-						buf[3]=(uint8_t)(offLineIndex>>0);
-						LCDWtite(NET_OFFLINE_TIMES_ADDR,buf,2*2);
-						if(gbNetState==RT_FALSE){
-								//rt_kprintf("[offLine]the %d Time,relayTimer %d 秒\r\n",i,(rt_tick_get()/1000-offLine.relayTimer[i]));
-							  int offTime=(rt_tick_get()/1000-offLine.relayTimer[offLineIndex]);
-						}
-						else{
-								//rt_kprintf("[offLine]the %d Times,relayTimer %d 秒\r\n",i,offLine.relayTimer[i]);
-							  int offTime=offLine.relayTimer[offLineIndex];
-						}
-						buf[0]=(uint8_t)(offLine.relayTimer[offLineIndex]>>24);
-						buf[1]=(uint8_t)(offLine.relayTimer[offLineIndex]>>16);
-						buf[2]=(uint8_t)(offLine.relayTimer[offLineIndex]>>8);
-						buf[3]=(uint8_t)(offLine.relayTimer[offLineIndex]>>0);
-						LCDWtite(NET_OFFLINE_RELAYTIME_ADDR,buf,2*2);
-			//	}
+		else{ 
+				buf[0]=(uint8_t)(offLineIndex>>24);
+				buf[1]=(uint8_t)(offLineIndex>>16);
+				buf[2]=(uint8_t)(offLineIndex>>8);
+				buf[3]=(uint8_t)(offLineIndex>>0);
+				LCDWtite(NET_OFFLINE_TIMES_ADDR,buf,2*2);
+			  int offTime;
+				if(gbNetState==RT_FALSE){
+						//rt_kprintf("[offLine]a the %d Time,relayTimer %d %d秒\r\n",offLineIndex,rt_tick_get()/1000,offLine.relayTimer[offLineIndex]);
+						if(offLineIndex==offLine.times)
+								offTime=(rt_tick_get()/1000-offLine.relayTimer[offLineIndex]);//掉线了此次计数一直++
+						else
+								offTime=offLine.relayTimer[offLineIndex];
+				}
+				else{
+						//rt_kprintf("[offLine]b the %d Times,relayTimer %d 秒\r\n",offLineIndex,offLine.relayTimer[offLineIndex]);
+						offTime=offLine.relayTimer[offLineIndex];
+				}
+				buf[0]=(uint8_t)(offTime>>24);
+				buf[1]=(uint8_t)(offTime>>16);
+				buf[2]=(uint8_t)(offTime>>8);
+				buf[3]=(uint8_t)(offTime>>0);
+				LCDWtite(NET_OFFLINE_RELAYTIME_ADDR,buf,2*2);
 		}
+		LCDDispNetErrState();
 }
 
 
@@ -314,7 +348,7 @@ void delModbusDevbyID(char *ID)
 
 char name[25]={0};
 char  ID[20]={0};
-char  model[10]={0};
+char  model[8]={0};
 uint8_t   port=0;
 uint8_t   addr=0;
 uint32_t  colTime=0;
@@ -530,6 +564,8 @@ void LCDDispModInfoCpy()
 	  
 }
 
+
+
 //LCD显示modbus列表的坐标获取  删除或者第一次上电后需要调用此函数
 void LCDDispModbusGet()
 {
@@ -644,7 +680,124 @@ void LCDDispModbusGet()
 			}
 		}
 }
+extern  const  uartEnum UartNum[UART_NUM];
+modbusStru LCDInput;
+uint32_t   LCDInputTime=0;
+uint32_t   *singlConcalTime=RT_NULL;//
+modbusStru *singlConfDev=RT_NULL;//
+
+
+uint8_t numTable[]={ THREEAXIS_485_NUM,PRESSSETTL_485_NUM, CIRCULA_485_NUM,PARTDISCHAG_485_NUM ,\
+										CH4_485_NUM,CO_485_NUM,H2S_485_NUM,O2_485_NUM ,WATERDEPTH_485_NUM,TEMPHUM_485_NUM };
+//单个modbus设备分别配置  思路 做好映射关系表
+static int singlModbConf(int num)
+{
+	int i=0;
+	int ret=0;
+	singlConfDev=sheet.cirCula;//指针指向
+  for(int z=0;z<num;z++){
+			singlConfDev+=sizeof(modbusStru)*numTable[z];//指针++
+	}
+	singlConcalTime=&sheet.cirCulaColTime+num*4;//指针指向
+	
+	*singlConcalTime=LCDInputTime;
+	for( i=0;i<numTable[num];i++){//核对有没有配置过
+			if(rt_strcmp(singlConfDev[i].ID,LCDInput.ID)==0){//配置过
+
+					singlConfDev[i].workFlag=RT_TRUE;//打开
+
+					singlConfDev[i].slaveAddr=LCDInput.slaveAddr;	
+					singlConfDev[i].useUartNum=UartNum[LCDInput.useUartNum];
+					rt_strcpy(singlConfDev[i].model,LCDInput.model);
+					rt_kprintf("%s %s reconfig %d\n",sign,modbusName[num],i);
+					ret =1;
+					break;
+			}
+	}
+	if(i==numTable[num]){//没有配置过
+			for(int j=0;j<numTable[num];j++){
+					if(singlConfDev[j].workFlag!=RT_TRUE){
+							singlConfDev[j].workFlag=RT_TRUE;//打开
+							singlConfDev[j].slaveAddr=LCDInput.slaveAddr;	
+							singlConfDev[j].useUartNum=UartNum[LCDInput.useUartNum];
+							rt_strcpy(singlConfDev[j].model,LCDInput.model);
+							rt_strcpy(singlConfDev[j].ID,LCDInput.ID);
+							rt_kprintf("%s %s config %d\n",sign,modbusName[num],j);
+							ret =1;
+							break;
+					}
+			}
+	}
+	return ret;
+}
+//static int circulaConf()
+//{
+//	int i=0;
+//	int ret=0;
+//	sheet.cirCulaColTime=calTime;
+//	for( i=0;i<CIRCULA_485_NUM;i++){//核对有没有配置过
+//			if(rt_strcmp(sheet.cirCula[i].ID,LCDInput.ID)==0){//配置过
+
+//					sheet.cirCula[i].workFlag=RT_TRUE;//打开
+
+//					sheet.cirCula[i].slaveAddr=LCDInput.slaveAddr;	
+//					sheet.cirCula[i].useUartNum=UartNum[LCDInput.useUartNum];
+//					rt_strcpy(sheet.cirCula[i].model,LCDInput.model);
+//					rt_kprintf("%s circula reconfig %d\n",sign,i);
+//					ret =1;
+//					break;
+//			}
+//	}
+//	if(i==CIRCULA_485_NUM){//没有配置过
+//			for(int j=0;j<CIRCULA_485_NUM;j++){
+//					if(sheet.cirCula[j].workFlag!=RT_TRUE){
+//							sheet.cirCula[j].workFlag=RT_TRUE;//打开
+//							sheet.cirCula[j].slaveAddr=LCDInput.slaveAddr;	
+//							sheet.cirCula[j].useUartNum=UartNum[LCDInput.useUartNum];
+//							rt_strcpy(sheet.cirCula[j].model,LCDInput.model);
+//							rt_strcpy(sheet.cirCula[j].ID,LCDInput.ID);
+//							rt_kprintf("%s circula config %d\n",sign,j);
+//							ret =1;
+//							break;
+//					}
+//			}
+//	}
+//	return ret;
+//}
+
 static int chinaNameIndex=0;//当前用到的名字标记
+
+//通过屏幕来配置modbus的信息 
+void LCDConfModbus()
+{
+		singlModbConf(chinaNameIndex);
+//		switch(chinaNameIndex)
+//		{
+//			case CIRCULA:
+//					break;
+//			case PARTDISCHAG:
+//					break;
+//			case PRESSSETTL:
+//				  break;
+//			case THREEAXIS:
+//					break;
+//			case CH4:
+//					break;
+//			case O2:
+//					break;
+//			case H2S:
+//					break;
+//			case CO:
+//					break;
+//			case TEMPHUM:
+//					break;
+//			case WATERDEPTH:
+//				  break;
+//		}
+}
+
+
+
 //显示传感器中文名 lcd配置传感器界面的中文名称的选择
 static void dispCinaName(uint8_t *buf)
 {
@@ -676,20 +829,21 @@ void  keyReturn(uint16_t keyAddr)
 				break;
 			case	KEY_MODBUS_LASTNAME_ADDR:
 				if(chinaNameIndex==0)
-					chinaNameIndex=MODBUS_NUM-1;
+						chinaNameIndex=MODBUS_NUM-1;
 				else
-					chinaNameIndex--;
+						chinaNameIndex--;
 				dispCinaName(buf);
 				break;
 			case	KEY_MODBUS_NEXTNAME_ADDR:
 				if(chinaNameIndex==(MODBUS_NUM-1))
-					chinaNameIndex=0;
+						chinaNameIndex=0;
 				else
-					chinaNameIndex++;
+						chinaNameIndex++;
 				dispCinaName(buf);
 				break;
 			case	KEY_MODBUS_SURENAME_ADDR:// 显示到1360
-			  dispCinaName(buf);
+//			  dispCinaName(buf);   singlModbConf(chinaNameIndex);
+//			  rt_strcpy(LCDInput.);
 //				LCDWtite(MODBUS_CFG_NAME_ADDR,buf,sizeof(modbusName[chinaNameNum]));
 				break;	
 			case  KEY_IP_READ_ADDR:
@@ -704,15 +858,19 @@ void  keyReturn(uint16_t keyAddr)
 			case KEY_SAVE_ADDR://保存
 				
 				rt_kprintf("%sflash save OK\n",sign);
-//				stm32_flash_erase(FLASH_IP_SAVE_ADDR, sizeof(packFLash));//每次擦除128k字节数据 存储时候需要一起存储
-//				stm32_flash_write(FLASH_IP_SAVE_ADDR,(uint8_t*)&packFLash,sizeof(packFLash));
-//				stm32_flash_write(FLASH_MODBUS_SAVE_ADDR,(uint8_t*)&sheet,sizeof(sheet));
+				stm32_flash_erase(FLASH_IP_SAVE_ADDR, sizeof(packFLash));//每次擦除128k字节数据 存储时候需要一起存储
+				stm32_flash_write(FLASH_IP_SAVE_ADDR,(uint8_t*)&packFLash,sizeof(packFLash));
+				stm32_flash_write(FLASH_MODBUS_SAVE_ADDR,(uint8_t*)&sheet,sizeof(sheet));
 				break;
 			case KEY_RESET_ADDR://复位
 				rt_hw_cpu_reset();
 				break;
 			case KEY_MODBUS_CFG_WATCH_ADDR:
+				LCDDispModInfoCpy();
 				LDCDispMosbus();
+				break;
+			case KEY_MODBUS_CFG_SURE_ADDR:
+				singlModbConf(chinaNameIndex);
 				break;
 			case  KEY_MODBUSDISP_LAST_ADDR:
 			  if(modbDevReadIndex==0)
@@ -740,7 +898,7 @@ void  keyReturn(uint16_t keyAddr)
 			  LDCDispMosbus();
 				break;
 			case  KEY_NETERROR_ADDR:
-				rt_kprintf("%s按键按下\n",sign);
+				//rt_kprintf("%s按键按下\n",sign);
 				LCDDispNetOffline();
 				break;
 			case	NET_OFFLINE_LAST_ADDR:
@@ -787,54 +945,93 @@ void LCDDispConfig(uint8_t *recBuf,int len)
 		
 		switch(CMD_ADDR){
 			case  LOCAL_IP1_ADDR:
+				packFLash.netIpFlash.localIp[0]=recBuf[8];
 			break;
 			case LOCAL_IP2_ADDR:
+				packFLash.netIpFlash.localIp[1]=recBuf[8];
 			break;       
 			case LOCAL_IP3_ADDR:
+				packFLash.netIpFlash.localIp[2]=recBuf[8];
 			break;        
 			case LOCAL_IP4_ADDR:
+				packFLash.netIpFlash.localIp[3]=recBuf[8];
 			break;        
 			case PHY_PORT_ADDR:
+				packFLash.netIpFlash.macaddr=recBuf[8];
 			break;        
 			case REMOTE_IP1_ADDR:
+				packFLash.netIpFlash.remoteIp[0]=recBuf[8];
 			break;       
 			case REMOTE_IP2_ADDR:
+				packFLash.netIpFlash.remoteIp[1]=recBuf[8];
 			break;        
 			case REMOTE_IP3_ADDR:
+				packFLash.netIpFlash.remoteIp[2]=recBuf[8];
 			break;        
 			case REMOTE_IP4_ADDR:
+				packFLash.netIpFlash.remoteIp[3]=recBuf[8];
 			break;    		 
 			case REMOTE_PORT_ADDR:
+				packFLash.netIpFlash.remotePort=(uint16_t)(recBuf[9]<<8)+recBuf[10];
 			break;   		 
 
-			//波特率
 			case PORT1_ADDR:
+				packFLash.uartBps[0]=(uint32_t)(recBuf[7]<<24)+(uint32_t)(recBuf[8]<<16)+(uint32_t)(recBuf[9]<<8)+recBuf[10];
 			break;     		 			
 			case PORT2_ADDR:
+				packFLash.uartBps[1]=(uint32_t)(recBuf[7]<<24)+(uint32_t)(recBuf[8]<<16)+(uint32_t)(recBuf[9]<<8)+recBuf[10];
 			break;     		 			
 			case PORT3_ADDR:
+				packFLash.uartBps[2]=(uint32_t)(recBuf[7]<<24)+(uint32_t)(recBuf[8]<<16)+(uint32_t)(recBuf[9]<<8)+recBuf[10];
 			break;     		 			
 			case PORT4_ADDR:
+				packFLash.uartBps[3]=(uint32_t)(recBuf[7]<<24)+(uint32_t)(recBuf[8]<<16)+(uint32_t)(recBuf[9]<<8)+recBuf[10];
 			break;     		 			
 
 			//MCUID
 			case MCUID_ADDR:
+				for(int i=0;i<ACUID_LEN+1;i++){
+					packFLash.acuId[i]=recBuf[7+i];
+					if((recBuf[7+i]==0xff)||(recBuf[7+i]==0)){
+							packFLash.acuId[i]=0;
+							break;
+					}
+				}
 			break;         			
 
 			//MODBUS
 			case MODBUS_CFG_NAME_ADDR:
 			break; 		
 			case MODBUS_CFG_ID_ADDR:
+				for(int i=0;i<20;i++){
+					LCDInput.ID[i]=recBuf[7+i];
+					if((recBuf[7+i]==0xff)||(recBuf[7+i]==0)){
+							LCDInput.ID[i]=0;
+							break;
+					}
+				}
+
 			break;    		
 			case MODBUS_CFG_SORT_ADDR:
+				//LCDInput.
 			break; 		
 			case MODBUS_CFG_TYPE_ADDR:
+				for(int i=0;i<8;i++){
+					LCDInput.model[i]=recBuf[7+i];
+					if((recBuf[7+i]==0xff)||(recBuf[7+i]==0)){
+							LCDInput.model[i]=0;
+							break;
+					}
+				}
 			break;  		
 			case MODBUS_CFG_PORT_ADDR:
+				LCDInput.useUartNum=recBuf[8];
 			break;  		
 			case MODBUS_CFG_ADDR_ADDR:
+				LCDInput.slaveAddr=recBuf[8];
 			break;  		
 			case MODBUS_CFG_TIME_ADDR:
+				LCDInputTime=(uint32_t)(recBuf[7]<<24)+(uint32_t)(recBuf[8]<<16)+(uint32_t)(recBuf[9]<<8)+recBuf[10];
 			break; 		
 			case MODBUS_CFG_NAME2_ADDR:
 			break;	

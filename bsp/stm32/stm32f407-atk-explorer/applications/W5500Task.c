@@ -145,6 +145,8 @@ void netSend(uint8_t *data,int len)
 				offLine.times++;
 				offLine.relayTimer[offLine.times]=rt_tick_get()/1000;
 				rt_kprintf("%snet send fail\n",task);
+				extern void  LCDDispNetOffline();
+				LCDDispNetOffline();
 		}
 		else{
 				rt_kprintf("%snet send succ\n",task);

@@ -18,7 +18,7 @@ const static char sign[]="[flash]";/////////////////////////////////////////////
 packIpUartStru packFLash   __attribute__ ((aligned (4)));
 deviceFlashStru sheet      __attribute__ ((aligned (4)));
 const static char     UartName[UART_NUM][6] ={"port1", "port2",  "port3",  "port4"};//重映射一个名称
-const static uartEnum UartNum[UART_NUM]     ={USE_UART2,USE_UART3,USE_UART6,USE_UART4};//重映射一个名称
+const  uartEnum UartNum[UART_NUM]     ={USE_UART2,USE_UART3,USE_UART6,USE_UART4};//重映射一个名称
 
 extern void uartSingConf(int num,int bps);
 

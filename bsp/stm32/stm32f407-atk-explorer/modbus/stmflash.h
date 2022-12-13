@@ -34,13 +34,13 @@ typedef struct{
 		uartEnum  	useUartNum;
 		uint16_t  	slaveAddr; //0-255
 		char  ID[20];
-		char  model[10];
+		char  model[8];
 //		char  name[20];
 
 }modbusStru;
 typedef struct{
 		char  ID[20];
-		char  model[10];
+		char  model[8];
 	  char  name[20];
 	  char  funName[16];
 	  uint8_t   	port;
