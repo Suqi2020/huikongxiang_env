@@ -99,16 +99,6 @@
 
 
 #define  KEY_ADDR  			0X0000
-//#define		MODBUS_READ_NAME_ADDR
-//#define		MODBUS_READ_ID_ADDR
-//#define		MODBUS_READ_SORT_ADDR
-//#define		MODBUS_READ_TYPE_ADDR
-//#define		MODBUS_READ_PORT_ADDR
-//#define		MODBUS_READ_ADDR_ADDR
-//#define		MODBUS_READ_TIME_ADDR
-
-
-
 
 
 

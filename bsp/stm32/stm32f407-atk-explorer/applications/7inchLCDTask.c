@@ -8,27 +8,37 @@ extern void LCDDispModbusGet();
 extern void LDCDispMosbus();
 extern void LCDDispModInfoCpy();
 extern void LCDDispConfig(uint8_t *recBuf,int len);
+extern void firstNameDispInit();
 extern uint8_t  recLCDBuf[LCD_BUF_LEN];
-//uint8_t id[]={0x5A,0xA5 ,0x14 ,0x82 ,0x12 ,0x10 ,0x31 ,0x32 ,0x33 ,0x34 ,0x35 ,0x35 ,0x36 ,0x6A ,0x75 ,0x68 ,0x75 ,0x6A ,0x6A ,0x31 ,0x31 ,0xFF ,0xFF};
-//uint8_t name[]={0x5A ,0xA5 ,0x11,0x82 ,0x13,0x60 ,0xC9,0xCF ,0xBA,0xA3 ,0xB9,0xC8 ,0xD4,0xAA ,0xBF,0xC6 ,0xBC,0xBC ,0xFF,0xFF};
 
+
+
+//char te1[5]={0xff,0xff,0xff,0xff,0xff};
+//char te2[5]={0xff,0xff,0xff,0xff,0};
+//char te3[5]={0xff,0xff,0xff,0xff,0};
+//char te4[5]={0xff,0xff,0xff,0xff,0};
+//char test[20];
+//int testfun(void)
+//{
+
+//    strcpy(test,te1);
+//	rt_kprintf("testfun:");
+//		for(int i=0;i<20;i++){
+
+//		rt_kprintf("%02x ",test[i]);
+//	}
+//		rt_kprintf("\n ");
+//}
 void  LCDTask(void *parameter)
 {
 	  rt_thread_mdelay(1000);//必须加入延时等待串口屏启动
-//	 for( int i=0;i<sizeof(id);i++){
-//		 HAL_UART_Transmit(&huart5,id+i,1,1000); 
-//	 }
-//	 
-//	  
-//	 for( int i=0;i<sizeof(name);i++){
-//		 HAL_UART_Transmit(&huart5,name+i,1,1000); 
-//	 }	
-	
-	  LCDDispIP();
+	//testfun();
+	LCDDispIP();
 	  LCDDispUart();
-	  LCDDispMCUID();
+	  LCDDispMCUID();//LCD send:5a a5 15 82 12 10 ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff 
 	  LCDDispModbusGet();
 	  LCDDispModInfoCpy();
+	  //firstNameDispInit();
   	LDCDispMosbus();
 	  int revLen=0;
 		while(1){

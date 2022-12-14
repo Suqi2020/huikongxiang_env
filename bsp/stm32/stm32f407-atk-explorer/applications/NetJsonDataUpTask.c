@@ -71,7 +71,7 @@ static int timeOut()
 	  for(int i=0;i<TIM_NUM;i++){
 				if(tim[i].count!=0xFFFF){
 						if(tim[i].count>=tim[i].threshoVal){
-							timeStart(i);
+							timeStart((upDataTimEnum)i);
 							//rt_kprintf("tim out %d %d\n",i,tim[i].threshoVal);
 							return i;
 						}
@@ -93,14 +93,14 @@ void h2sRead2Send(rt_bool_t netStat);
 void ch4Read2Send(rt_bool_t netStat);	
 void coRead2Send(rt_bool_t netStat);	
 void analogTempHumJsonPack(uint8_t chanl);
-uint16_t devRegJsonPack();
-uint16_t heartUpJsonPack();
+uint16_t devRegJsonPack(void);
+uint16_t heartUpJsonPack(void);
 extern uint8_t analogTemChanl;
 //定时时间到  执行相应事件
 static void  timeOutRunFun()
 {
 
-	  rt_bool_t workFlag=RT_FALSE;
+//	  rt_bool_t workFlag=RT_FALSE;
 		switch(timeOut()){
 			case HEART_TIME://心跳
 				heartUpJsonPack();
@@ -168,7 +168,7 @@ modbusFunStru modbusFun[MODBUS_NUM];
 void startTimeList()
 {
     for(int k=0;k<TIM_NUM;k++){
-			timeStop(k);
+			timeStop((upDataTimEnum)k);
 		}
 		timeInit(HEART_TIME,      120,2);//心跳定时  定时30秒 第一次28秒就来
 		timeInit(REG_TIME,        5,0);//注册 注册成功后定时器就关闭
@@ -209,7 +209,7 @@ void   upKeepStateTask(void *para)
 	  extern void readMultiCirCulaPoint();
 	  extern void prinfAnalogList();
 	  uartMutexQueueCfg();//根据flash存储重新配置串口
-		//modbusPrintRead();//modbus配置从flash中读取
+//		modbusPrintRead();//modbus配置从flash中读取
 	  uartReconfig();//串口重新配置
 		uartIrqEnaAfterQueue();//串口中断中用到了队列  开启中断需要放到后边
     startTimeList();//开启计时器列表

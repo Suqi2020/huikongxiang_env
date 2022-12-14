@@ -183,18 +183,25 @@ void LCDDispUart()
 //		LCDWtite(PORT4_ADDR,buf,2*2);
 //}
 //串口配置显示
+int k=0;
 void LCDDispMCUID()
 {
 	  uint8_t buf[ACUID_LEN]={0};
-		for(int i=0;i<strlen(packFLash.acuId);i++){//ACUID_LEN
-				buf[i]=packFLash.acuId[i];
+		k=sizeof(packFLash.acuId);
+		for(int i=0;i<sizeof(packFLash.acuId);i++){//ACUID_LEN
+			  if((uint8_t)packFLash.acuId[i]==0xff){
+					 packFLash.acuId[i]=0;
+				}
+			 	buf[i]=packFLash.acuId[i];
 		}
 		int j=0;
+		k=strlen(packFLash.acuId);
 		while((strlen(packFLash.acuId)+j)<ACUID_LEN){
 				buf[strlen(packFLash.acuId)+j]=0xff;
 				j++;
 		}
 		LCDWtite(MCUID_ADDR,buf,ACUID_LEN);
+		//j=100;
 }
 
 
@@ -352,6 +359,8 @@ char  model[8]={0};
 uint8_t   port=0;
 uint8_t   addr=0;
 uint32_t  colTime=0;
+//上电后控件第一次显示的中文名称拷贝 
+
 //传感器读取界面显示所有信息
 void LDCDispMosbus()
 {
@@ -375,22 +384,24 @@ void LDCDispMosbus()
 				buf[i]=ID[i];
 		}
 		 j=0;
-		while((Len+j)<18){
+		while((Len+j)<MODBID_LEN-2){
 				buf[Len+j]=0xff;
 				j++;
+			  if(j>=2)
+					break;
 		}
-	  LCDWtite(MODBUSDISP_ID_ADDR,buf,18);
+	  LCDWtite(MODBUSDISP_ID_ADDR,buf,MODBID_LEN-2);//7寸屏显示18
 		//显示model
 		Len=strlen(model);
 		for(int i=0;i<Len;i++){
 				buf[i]=model[i];
 		}
 		 j=0;
-		while((Len+j)<18){
+		while((Len+j)<MODL_LEN-2){
 				buf[Len+j]=0xff;
 				j++;
 		}
-	  LCDWtite(MODBUSDISP_TYPE_ADDR,buf,6);
+	  LCDWtite(MODBUSDISP_TYPE_ADDR,buf,MODL_LEN-2);
 		//显示PORT
 		buf[0]=0;
 		buf[1]=port+1;
@@ -412,7 +423,10 @@ void LDCDispMosbus()
 		rt_kprintf("%s total %d\n",sign,modbTotalIndex);
 		//显示当前页
 		buf[0]=0;
-		buf[1]=modbDevReadIndex+1;
+		if(modbTotalIndex==0)
+				buf[1]=0;
+		else
+				buf[1]=modbDevReadIndex+1;
 		LCDWtite(MODBUSDISP_NOWNUM_ADDR,buf,2);
 		
 		
@@ -428,12 +442,15 @@ void LCDDispModInfoCpy()
 				case CIRCULA:	
 					for(int j=0;j<CIRCULA_485_NUM;j++){//核对有没有配置过
 							if(modPosit[modbDevReadIndex].Y==j){
-								 rt_strcpy(name,modbusName[modPosit[modbDevReadIndex].X]);
-								 rt_strcpy(ID,  sheet.cirCula[modPosit[modbDevReadIndex].Y].ID);
-                 rt_strcpy(model,sheet.cirCula[modPosit[modbDevReadIndex].Y].model);
-                 port = sheet.cirCula[modPosit[modbDevReadIndex].Y].useUartNum;
-								 addr = sheet.cirCula[modPosit[modbDevReadIndex].Y].slaveAddr;
-								 colTime = sheet.cirCulaColTime;
+									if(modPosit[modbDevReadIndex].flag==1)
+										{
+											 rt_strcpy(name,modbusName[modPosit[modbDevReadIndex].X]);
+											 rt_strcpy(ID,  sheet.cirCula[modPosit[modbDevReadIndex].Y].ID);//ID第一次上电存储的可能是0xff  拷贝会导致内存泄漏
+											 rt_strcpy(model,sheet.cirCula[modPosit[modbDevReadIndex].Y].model);
+											 port = sheet.cirCula[modPosit[modbDevReadIndex].Y].useUartNum;
+											 addr = sheet.cirCula[modPosit[modbDevReadIndex].Y].slaveAddr;
+											 colTime = sheet.cirCulaColTime;
+									}
 								 break;
 							}
 					}
@@ -441,12 +458,14 @@ void LCDDispModInfoCpy()
 				case PARTDISCHAG:
 					for(int j=0;j<PARTDISCHAG_485_NUM;j++){//核对有没有配置过
 							if(modPosit[modbDevReadIndex].Y==j){
-								 rt_strcpy(name,modbusName[modPosit[modbDevReadIndex].X]);
-								 rt_strcpy(ID,  sheet.partDischag[modPosit[modbDevReadIndex].Y].ID);
-                 rt_strcpy(model,sheet.partDischag[modPosit[modbDevReadIndex].Y].model);
-                 port = sheet.partDischag[modPosit[modbDevReadIndex].Y].useUartNum;
-								 addr = sheet.partDischag[modPosit[modbDevReadIndex].Y].slaveAddr;
-								 colTime = sheet.partDischagColTime;
+								if(modPosit[modbDevReadIndex].flag==1){
+									 rt_strcpy(name,modbusName[modPosit[modbDevReadIndex].X]);
+									 rt_strcpy(ID,  sheet.partDischag[modPosit[modbDevReadIndex].Y].ID);
+									 rt_strcpy(model,sheet.partDischag[modPosit[modbDevReadIndex].Y].model);
+									 port = sheet.partDischag[modPosit[modbDevReadIndex].Y].useUartNum;
+									 addr = sheet.partDischag[modPosit[modbDevReadIndex].Y].slaveAddr;
+									 colTime = sheet.partDischagColTime;
+								}
 								 break;
 							}
 					}
@@ -454,12 +473,14 @@ void LCDDispModInfoCpy()
 				case PRESSSETTL:
 					for(int j=0;j<PRESSSETTL_485_NUM;j++){//核对有没有配置过
 							if(modPosit[modbDevReadIndex].Y==j){
-								 rt_strcpy(name,modbusName[modPosit[modbDevReadIndex].X]);
-								 rt_strcpy(ID,  sheet.pressSetl[modPosit[modbDevReadIndex].Y].ID);
-                 rt_strcpy(model,sheet.pressSetl[modPosit[modbDevReadIndex].Y].model);
-                 port = sheet.pressSetl[modPosit[modbDevReadIndex].Y].useUartNum;
-								 addr = sheet.pressSetl[modPosit[modbDevReadIndex].Y].slaveAddr;
-								 colTime = sheet.pressSetlColTime;
+								if(modPosit[modbDevReadIndex].flag==1){
+									 rt_strcpy(name,modbusName[modPosit[modbDevReadIndex].X]);
+									 rt_strcpy(ID,  sheet.pressSetl[modPosit[modbDevReadIndex].Y].ID);
+									 rt_strcpy(model,sheet.pressSetl[modPosit[modbDevReadIndex].Y].model);
+									 port = sheet.pressSetl[modPosit[modbDevReadIndex].Y].useUartNum;
+									 addr = sheet.pressSetl[modPosit[modbDevReadIndex].Y].slaveAddr;
+									 colTime = sheet.pressSetlColTime;
+								}
 								 break;
 							}
 					}
@@ -467,12 +488,14 @@ void LCDDispModInfoCpy()
 				case THREEAXIS:
 					for(int j=0;j<THREEAXIS_485_NUM;j++){//核对有没有配置过
 							if(modPosit[modbDevReadIndex].Y==j){
-								 rt_strcpy(name,modbusName[modPosit[modbDevReadIndex].X]);
-								 rt_strcpy(ID,  sheet.threeAxiss[modPosit[modbDevReadIndex].Y].ID);
-                 rt_strcpy(model,sheet.threeAxiss[modPosit[modbDevReadIndex].Y].model);
-                 port = sheet.threeAxiss[modPosit[modbDevReadIndex].Y].useUartNum;
-								 addr = sheet.threeAxiss[modPosit[modbDevReadIndex].Y].slaveAddr;
-								 colTime = sheet.threeAxissColTime;
+								 if(modPosit[modbDevReadIndex].flag==1){
+									 rt_strcpy(name,modbusName[modPosit[modbDevReadIndex].X]);
+									 rt_strcpy(ID,  sheet.threeAxiss[modPosit[modbDevReadIndex].Y].ID);
+									 rt_strcpy(model,sheet.threeAxiss[modPosit[modbDevReadIndex].Y].model);
+									 port = sheet.threeAxiss[modPosit[modbDevReadIndex].Y].useUartNum;
+									 addr = sheet.threeAxiss[modPosit[modbDevReadIndex].Y].slaveAddr;
+									 colTime = sheet.threeAxissColTime;
+								 }
 								 break;
 							}
 					}
@@ -480,12 +503,14 @@ void LCDDispModInfoCpy()
 				case CH4:
 					for(int j=0;j<CH4_485_NUM;j++){//核对有没有配置过
 							if(modPosit[modbDevReadIndex].Y==j){
-								 rt_strcpy(name,modbusName[modPosit[modbDevReadIndex].X]);
-								 rt_strcpy(ID,  sheet.ch4[modPosit[modbDevReadIndex].Y].ID);
-                 rt_strcpy(model,sheet.ch4[modPosit[modbDevReadIndex].Y].model);
-                 port = sheet.ch4[modPosit[modbDevReadIndex].Y].useUartNum;
-								 addr = sheet.ch4[modPosit[modbDevReadIndex].Y].slaveAddr;
-								 colTime = sheet.ch4ColTime;
+								 if(modPosit[modbDevReadIndex].flag==1){
+									 rt_strcpy(name,modbusName[modPosit[modbDevReadIndex].X]);
+									 rt_strcpy(ID,  sheet.ch4[modPosit[modbDevReadIndex].Y].ID);
+									 rt_strcpy(model,sheet.ch4[modPosit[modbDevReadIndex].Y].model);
+									 port = sheet.ch4[modPosit[modbDevReadIndex].Y].useUartNum;
+									 addr = sheet.ch4[modPosit[modbDevReadIndex].Y].slaveAddr;
+									 colTime = sheet.ch4ColTime;
+								 }
 								 break;
 							}
 					}
@@ -493,12 +518,14 @@ void LCDDispModInfoCpy()
 				case O2:
 					for(int j=0;j<O2_485_NUM;j++){//核对有没有配置过
 							if(modPosit[modbDevReadIndex].Y==j){
-								 rt_strcpy(name,modbusName[modPosit[modbDevReadIndex].X]);
-								 rt_strcpy(ID,  sheet.o2[modPosit[modbDevReadIndex].Y].ID);
-                 rt_strcpy(model,sheet.o2[modPosit[modbDevReadIndex].Y].model);
-                 port = sheet.o2[modPosit[modbDevReadIndex].Y].useUartNum;
-								 addr = sheet.o2[modPosit[modbDevReadIndex].Y].slaveAddr;
-								 colTime = sheet.o2ColTime;
+								if(modPosit[modbDevReadIndex].flag==1){
+									 rt_strcpy(name,modbusName[modPosit[modbDevReadIndex].X]);
+									 rt_strcpy(ID,  sheet.o2[modPosit[modbDevReadIndex].Y].ID);
+									 rt_strcpy(model,sheet.o2[modPosit[modbDevReadIndex].Y].model);
+									 port = sheet.o2[modPosit[modbDevReadIndex].Y].useUartNum;
+									 addr = sheet.o2[modPosit[modbDevReadIndex].Y].slaveAddr;
+									 colTime = sheet.o2ColTime;
+								 }
 								 break;
 							}
 					}
@@ -506,12 +533,14 @@ void LCDDispModInfoCpy()
 				case H2S:
 					for(int j=0;j<H2S_485_NUM;j++){//核对有没有配置过
 							if(modPosit[modbDevReadIndex].Y==j){
-								 rt_strcpy(name,modbusName[modPosit[modbDevReadIndex].X]);
-								 rt_strcpy(ID,  sheet.h2s[modPosit[modbDevReadIndex].Y].ID);
-                 rt_strcpy(model,sheet.h2s[modPosit[modbDevReadIndex].Y].model);
-                 port = sheet.h2s[modPosit[modbDevReadIndex].Y].useUartNum;
-								 addr = sheet.h2s[modPosit[modbDevReadIndex].Y].slaveAddr;
-								 colTime = sheet.h2sColTime;
+								 if(modPosit[modbDevReadIndex].flag==1){
+									 rt_strcpy(name,modbusName[modPosit[modbDevReadIndex].X]);
+									 rt_strcpy(ID,  sheet.h2s[modPosit[modbDevReadIndex].Y].ID);
+									 rt_strcpy(model,sheet.h2s[modPosit[modbDevReadIndex].Y].model);
+									 port = sheet.h2s[modPosit[modbDevReadIndex].Y].useUartNum;
+									 addr = sheet.h2s[modPosit[modbDevReadIndex].Y].slaveAddr;
+									 colTime = sheet.h2sColTime;
+								 }
 								 break;
 							}
 					}
@@ -519,12 +548,14 @@ void LCDDispModInfoCpy()
 				case CO:
 					for(int j=0;j<CO_485_NUM;j++){//核对有没有配置过
 							if(modPosit[modbDevReadIndex].Y==j){
-								 rt_strcpy(name,modbusName[modPosit[modbDevReadIndex].X]);
-								 rt_strcpy(ID,  sheet.co[modPosit[modbDevReadIndex].Y].ID);
-                 rt_strcpy(model,sheet.co[modPosit[modbDevReadIndex].Y].model);
-                 port = sheet.co[modPosit[modbDevReadIndex].Y].useUartNum;
-								 addr = sheet.co[modPosit[modbDevReadIndex].Y].slaveAddr;
-								 colTime = sheet.coColTime;
+								 if(modPosit[modbDevReadIndex].flag==1){
+										 rt_strcpy(name,modbusName[modPosit[modbDevReadIndex].X]);
+										 rt_strcpy(ID,  sheet.co[modPosit[modbDevReadIndex].Y].ID);
+										 rt_strcpy(model,sheet.co[modPosit[modbDevReadIndex].Y].model);
+										 port = sheet.co[modPosit[modbDevReadIndex].Y].useUartNum;
+										 addr = sheet.co[modPosit[modbDevReadIndex].Y].slaveAddr;
+										 colTime = sheet.coColTime;
+								 }
 								 break;
 							}
 					}
@@ -532,12 +563,14 @@ void LCDDispModInfoCpy()
 				case TEMPHUM:
 					for(int j=0;j<TEMPHUM_485_NUM;j++){//核对有没有配置过
 							if(modPosit[modbDevReadIndex].Y==j){
-								 rt_strcpy(name,modbusName[modPosit[modbDevReadIndex].X]);
-								 rt_strcpy(ID,  sheet.tempHum[modPosit[modbDevReadIndex].Y].ID);
-                 rt_strcpy(model,sheet.tempHum[modPosit[modbDevReadIndex].Y].model);
-                 port = sheet.tempHum[modPosit[modbDevReadIndex].Y].useUartNum;
-								 addr = sheet.tempHum[modPosit[modbDevReadIndex].Y].slaveAddr;
-								 colTime = sheet.tempHumColTime;
+								 if(modPosit[modbDevReadIndex].flag==1){
+									 rt_strcpy(name,modbusName[modPosit[modbDevReadIndex].X]);
+									 rt_strcpy(ID,  sheet.tempHum[modPosit[modbDevReadIndex].Y].ID);
+									 rt_strcpy(model,sheet.tempHum[modPosit[modbDevReadIndex].Y].model);
+									 port = sheet.tempHum[modPosit[modbDevReadIndex].Y].useUartNum;
+									 addr = sheet.tempHum[modPosit[modbDevReadIndex].Y].slaveAddr;
+									 colTime = sheet.tempHumColTime;
+								 }
 								 break;
 							}
 					}
@@ -545,12 +578,14 @@ void LCDDispModInfoCpy()
 				case WATERDEPTH:
 					for(int j=0;j<WATERDEPTH_485_NUM;j++){//核对有没有配置过
 							if(modPosit[modbDevReadIndex].Y==j){
-								 rt_strcpy(name,modbusName[modPosit[modbDevReadIndex].X]);
-								 rt_strcpy(ID,  sheet.waterDepth[modPosit[modbDevReadIndex].Y].ID);
-                 rt_strcpy(model,sheet.waterDepth[modPosit[modbDevReadIndex].Y].model);
-                 port = sheet.waterDepth[modPosit[modbDevReadIndex].Y].useUartNum;
-								 addr = sheet.waterDepth[modPosit[modbDevReadIndex].Y].slaveAddr;
-								 colTime = sheet.waterDepthColTime;
+								 if(modPosit[modbDevReadIndex].flag==1){
+									 rt_strcpy(name,modbusName[modPosit[modbDevReadIndex].X]);
+									 rt_strcpy(ID,  sheet.waterDepth[modPosit[modbDevReadIndex].Y].ID);
+									 rt_strcpy(model,sheet.waterDepth[modPosit[modbDevReadIndex].Y].model);
+									 port = sheet.waterDepth[modPosit[modbDevReadIndex].Y].useUartNum;
+									 addr = sheet.waterDepth[modPosit[modbDevReadIndex].Y].slaveAddr;
+									 colTime = sheet.waterDepthColTime;
+								 }
 								 break;
 							}
 					}
@@ -558,10 +593,7 @@ void LCDDispModInfoCpy()
 				default:
 					rt_kprintf("%serror delModbusDevbyID\n",sign);
 					break;
-//					rt_strcpy(modCurrtID,ID);	
-				
 			}
-	  
 }
 
 
@@ -687,30 +719,82 @@ uint32_t   *singlConcalTime=RT_NULL;//
 modbusStru *singlConfDev=RT_NULL;//
 
 
-uint8_t numTable[]={ THREEAXIS_485_NUM,PRESSSETTL_485_NUM, CIRCULA_485_NUM,PARTDISCHAG_485_NUM ,\
+uint8_t numTable[]={  CIRCULA_485_NUM,PARTDISCHAG_485_NUM ,PRESSSETTL_485_NUM,THREEAXIS_485_NUM,\
 										CH4_485_NUM,CO_485_NUM,H2S_485_NUM,O2_485_NUM ,WATERDEPTH_485_NUM,TEMPHUM_485_NUM };
 //单个modbus设备分别配置  思路 做好映射关系表
+static void printfDevAddr()
+{
+	rt_kprintf("cirCula     %08x \n",sheet.cirCula);
+	rt_kprintf("partDischag %08x \n",sheet.partDischag);
+	rt_kprintf("pressSetl   %08x \n",sheet.pressSetl);
+	rt_kprintf("threeAxiss  %08x \n",sheet.threeAxiss);
+	rt_kprintf("ch4         %08x \n",sheet.ch4);
+	rt_kprintf("o2          %08x \n",sheet.o2);
+	rt_kprintf("h2s         %08x \n",sheet.h2s);
+	rt_kprintf("co          %08x \n",sheet.co);
+	rt_kprintf("tempHum     %08x \n",sheet.tempHum);
+	rt_kprintf("waterDepth  %08x \n",sheet.waterDepth);
+
+	rt_kprintf("cirCulaT     %08x\n",&sheet.cirCulaColTime);
+	rt_kprintf("partDischagT %08x\n",&sheet.partDischagColTime);
+	rt_kprintf("pressSetlT 	 %08x\n",&sheet.pressSetlColTime);
+	rt_kprintf("threeAxissT  %08x\n",&sheet.threeAxissColTime);
+	rt_kprintf("ch4T         %08x\n",&sheet.ch4ColTime);
+	rt_kprintf("o2T          %08x\n",&sheet.o2ColTime);
+	rt_kprintf("h2sT         %08x\n",&sheet.h2sColTime);
+	rt_kprintf("coT          %08x\n",&sheet.coColTime);
+	rt_kprintf("tempHumT     %08x\n",&sheet.tempHumColTime);
+	rt_kprintf("waterDepthT  %08x\n",&sheet.waterDepthColTime);		
+	rt_kprintf("DEVb  %08X %08X\n",sheet.cirCula,sheet.cirCula+40);//200056F0
+
+}
+//cirCula     2000509c 
+//partDischag 20005150 
+//pressSetl   20005204 
+//threeAxiss  200057a4 
+//ch4         20005d44 
+//o2          20005d8c 
+//h2s         20005dd4 
+//co          20005e1c 
+//tempHum     20005e64 
+//waterDepth  20005eac 
+//cirCulaT 20005ef4
+//partDischagT  20005ef8
+//pressSetlT 	  20005efc
+//threeAxissT 	20005f00
+//ch4T 20005f04
+//o2T  20005f08
+//h2sT  20005f0c
+//coT 20005f10
+//tempHumT 20005f14
+//waterDepthT 20005f18
+
 static int singlModbConf(int num)
 {
 	int i=0;
 	int ret=0;
-	singlConfDev=sheet.cirCula;//指针指向
-  for(int z=0;z<num;z++){
-			singlConfDev+=sizeof(modbusStru)*numTable[z];//指针++
-	}
-	singlConcalTime=&sheet.cirCulaColTime+num*4;//指针指向
+	//printfDevAddr();//打印设备的地址
 	
+	singlConfDev=sheet.cirCula;//指针指向
+//	rt_kprintf("DEVa  %08X\n",singlConfDev);//2000509C
+//	rt_kprintf("num  %d\n",num);//1
+  for(int z=0;z<num;z++){
+		 // int k=numTable[z];
+			singlConfDev=singlConfDev+numTable[z];//指针++
+		  //rt_kprintf("DEVb  %08X %d %d %d\n",singlConfDev,sizeof(modbusStru),numTable[z],k);//200056F0
+	}
+	
+	singlConcalTime=&sheet.cirCulaColTime+num*1;//指针指向 
 	*singlConcalTime=LCDInputTime;
 	for( i=0;i<numTable[num];i++){//核对有没有配置过
 			if(rt_strcmp(singlConfDev[i].ID,LCDInput.ID)==0){//配置过
-
 					singlConfDev[i].workFlag=RT_TRUE;//打开
-
 					singlConfDev[i].slaveAddr=LCDInput.slaveAddr;	
 					singlConfDev[i].useUartNum=UartNum[LCDInput.useUartNum];
 					rt_strcpy(singlConfDev[i].model,LCDInput.model);
-					rt_kprintf("%s %s reconfig %d\n",sign,modbusName[num],i);
+					rt_kprintf("%s %s reconfig %d\n",sign,modbusName[num],i+1);
 					ret =1;
+				  LCDDispModbusGet();
 					break;
 			}
 	}
@@ -724,6 +808,7 @@ static int singlModbConf(int num)
 							rt_strcpy(singlConfDev[j].ID,LCDInput.ID);
 							rt_kprintf("%s %s config %d\n",sign,modbusName[num],j);
 							ret =1;
+							LCDDispModbusGet();
 							break;
 					}
 			}
@@ -765,12 +850,12 @@ static int singlModbConf(int num)
 //	return ret;
 //}
 
-static int chinaNameIndex=0;//当前用到的名字标记
+static int chinaNameIndex=0;//当前用到的名字标记  根据modbNumEnum对应起来
 
 //通过屏幕来配置modbus的信息 
-void LCDConfModbus()
-{
-		singlModbConf(chinaNameIndex);
+//void LCDConfModbus()
+//{
+//		singlModbConf(chinaNameIndex);
 //		switch(chinaNameIndex)
 //		{
 //			case CIRCULA:
@@ -794,7 +879,7 @@ void LCDConfModbus()
 //			case WATERDEPTH:
 //				  break;
 //		}
-}
+//}
 
 
 

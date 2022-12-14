@@ -100,8 +100,9 @@
 //V0.48    增加传感器显示 删除界面 增加重启 界面         20221209
 //V0.49    增加网络掉线次数显示 显示的是上线过再掉线的时长  一开始上电没有接网线情况下不会显示此次掉线时长  20221212
 //v0.50    增加传感器配置界面  暂时不稳定   20221213
-#define APP_VER       ((0<<8)+50)//0x0105 表示1.5版本
-const char date[]="20221213";
+//V0.51    增加传感器配置界面 测试OK    20221214
+#define APP_VER       ((0<<8)+51)//0x0105 表示1.5版本
+const char date[]="20221214";
 
 //static    rt_thread_t tid 	= RT_NULL;
 static    rt_thread_t tidW5500 	  = RT_NULL;
@@ -200,7 +201,7 @@ int main(void)
                              RT_TIMER_FLAG_PERIODIC);
 		if (timer1 != RT_NULL)
         rt_timer_start(timer1);
-		//创建285设备用到的互斥 队列
+		//创建485设备用到的互斥 队列
 		
 		int ret = rt_mq_init(&LCDmque,"LCDrecBuf",&LCDQuePool[0],1,LCD_BUF_LEN,RT_IPC_FLAG_FIFO);       
 		if (ret != RT_EOK)
@@ -228,7 +229,7 @@ int main(void)
 		
 
 ////////////////////////////////任务////////////////////////////////////
-    tidW5500 =  rt_thread_create("w5500",w5500Task,RT_NULL,1024,2, 10 );
+    tidW5500 =  rt_thread_create("w5500",w5500Task,RT_NULL,1024,3, 10 );
 		if(tidW5500!=NULL){
 				rt_thread_startup(tidW5500);													 
 				rt_kprintf("%sRTcreat w5500Task task\r\n",sign);
@@ -245,12 +246,12 @@ int main(void)
 		}
 
 		
-		tidUpkeep =  rt_thread_create("upKeep",upKeepStateTask,RT_NULL,512*3,2, 10 );
+		tidUpkeep =  rt_thread_create("upKeep",upKeepStateTask,RT_NULL,512*3,4, 10 );
 		if(tidUpkeep!=NULL){
 				rt_thread_startup(tidUpkeep);													 
 				rt_kprintf("%sRTcreat upKeepStateTask \r\n",sign);
 		}
-		tidLCD    =  rt_thread_create("LCD",LCDTask,RT_NULL,512*3,2, 10 );
+		tidLCD    =  rt_thread_create("LCD",LCDTask,RT_NULL,512*4,4, 10 );
 		if(tidLCD!=NULL){
 				rt_thread_startup(tidLCD);													 
 				rt_kprintf("%sRTcreat LCDStateTask \r\n",sign);

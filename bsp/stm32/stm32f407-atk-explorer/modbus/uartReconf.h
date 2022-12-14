@@ -58,12 +58,57 @@ typedef struct{
 	  char rev;
 }packIpUartStru;
 extern packIpUartStru packFLash;
-
+#define  MODBID_LEN   20
+#define  MODL_LEN     8
 /////////////////////////////////////////////////////////////////////////////////////////////////////
 ////////////////////////////////////////串口设置需要修改此处/////////////////////////////////////////
 
+typedef enum{
+		USE_UART2=0,
+	  USE_UART3,
+	  USE_UART6,
+	  USE_UART4,
+	  USE_DIS_UART=0XFF
+}uartEnum;
+typedef struct{
+		bool 	workFlag;
+		uartEnum  	useUartNum;
+		uint16_t  	slaveAddr; //0-255
+		char  ID[MODBID_LEN];
+		char  model[MODL_LEN];
 
-
+}modbusStru;
+typedef struct{
+		char  ID[MODBID_LEN];
+		char  model[8];
+	  char  name[20];
+	  char  funName[16];
+	  uint8_t   	port;
+	  rt_bool_t 	workFlag;
+	  uint32_t   	colTime;
+}analogStru;
+#define THREEAXIS_485_NUM     40
+#define PRESSSETTL_485_NUM    40
+#define CIRCULA_485_NUM   	  5
+#define PARTDISCHAG_485_NUM   5
+#define CH4_485_NUM   			  2
+#define CO_485_NUM   				  2
+#define H2S_485_NUM   			  2
+#define O2_485_NUM   				  2
+#define WATERDEPTH_485_NUM   	2
+#define TEMPHUM_485_NUM   	  2
+#define TOTOLA_485_NUM     (THREEAXIS_485_NUM+\
+														PRESSSETTL_485_NUM+\
+														CIRCULA_485_NUM+\
+														PARTDISCHAG_485_NUM+\
+														CH4_485_NUM+\
+														CO_485_NUM+\
+														H2S_485_NUM+\
+														O2_485_NUM+\
+														WATERDEPTH_485_NUM+\
+														TEMPHUM_485_NUM)
+														
+#define ANALOG_NUM   	        8
 /////////////////////////////////////////////////////////////////////////////////////////////////////
 typedef struct{
 	 // uint32_t bps;
@@ -92,13 +137,46 @@ typedef enum{
 const static char  modbusName[MODBUS_NUM][20] ={"接地环流","局放","防沉降","防外破","甲烷","氧气","硫化氢","一氧化碳","温湿度","水位"};
 const static int   modbusBps[MODBUS_NUM]      ={115200,   115200  ,9600,   9600,   9600,   9600,   9600,   9600,   9600,   9600};
 //const static int   modbusType[MODBUS_NUM]     ={1,        1,       2,      2, 		 3,  			3,  		3,  		3,  		3,  		3};//想同类型的modbus设备名称相同
-/////////////////////////////////////////////////////////////////////////////////////////////////////
 
+typedef struct{
+			
+			modbusStru  cirCula[CIRCULA_485_NUM];
+			modbusStru  partDischag[PARTDISCHAG_485_NUM];
+			modbusStru  pressSetl[PRESSSETTL_485_NUM];
+	    modbusStru  threeAxiss[THREEAXIS_485_NUM];
+			modbusStru  ch4[CH4_485_NUM];
+	    modbusStru  o2[O2_485_NUM];
+			
+			modbusStru  h2s[H2S_485_NUM];
+			modbusStru  co[CO_485_NUM];
+			
+			modbusStru  tempHum[TEMPHUM_485_NUM];
+			modbusStru  waterDepth[WATERDEPTH_485_NUM];
+			
+			uint32_t  cirCulaColTime;
+			uint32_t  partDischagColTime;
+			uint32_t  pressSetlColTime;
+	    uint32_t  threeAxissColTime;
+			uint32_t  ch4ColTime;
+	    uint32_t  o2ColTime;
+			
+			uint32_t  h2sColTime;
+			uint32_t  coColTime;
+			uint32_t  tempHumColTime;
+			uint32_t  waterDepthColTime;
+			
+			
+			analogStru analog[ANALOG_NUM];
+			//uint32_t   analogColTime;
+	
+}deviceFlashStru;
+/////////////////////////////////////////////////////////////////////////////////////////////////////
+extern deviceFlashStru sheet;
 extern uartConfStru  uartDev[];
 extern void rs485UartSend(uint8_t chanl,uint8_t *buf,int len);
 extern void uartMutexQueueCfg(void);
 
-
+extern rt_err_t uartDataRec(uartEnum uartNum,uint8_t dat);
 rt_bool_t errConfigCheck(void);
 
 
