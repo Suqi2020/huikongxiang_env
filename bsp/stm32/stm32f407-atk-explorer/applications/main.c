@@ -13,7 +13,7 @@
 #include <rtdevice.h>
 #include <board.h>
 #include <string.h>
-
+//https://github.com/Suqi2020/huikongxiang_env.git
 //0V1   20220919
 //初始化  没有加入版本管理 
 //0V3   20220920
@@ -101,8 +101,9 @@
 //V0.49    增加网络掉线次数显示 显示的是上线过再掉线的时长  一开始上电没有接网线情况下不会显示此次掉线时长  20221212
 //v0.50    增加传感器配置界面  暂时不稳定   20221213
 //V0.51    增加传感器配置界面 测试OK    20221214
-#define APP_VER       ((0<<8)+51)//0x0105 表示1.5版本
-const char date[]="20221214";
+//V0.52    增加故障传感器显示界面    20221215
+#define APP_VER       ((0<<8)+52)//0x0105 表示1.5版本
+const char date[]="20221215";
 
 //static    rt_thread_t tid 	= RT_NULL;
 static    rt_thread_t tidW5500 	  = RT_NULL;

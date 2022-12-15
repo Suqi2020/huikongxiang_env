@@ -23,6 +23,11 @@ typedef struct{
 const static char sign[]="[防外破]";
 static threeAxisStru threeAxisp[THREEAXIS_485_NUM];
 
+
+int threeAxisState(int i)
+{
+		return threeAxisp[i].respStat;
+}
 //#define   SLAVE_ADDR     0X02 
 #define   LENTH          50  //工作环流用到的最大接收buf长度
 

@@ -52,7 +52,10 @@ static rt_bool_t writeAcqInterv(uint16_t value);
 static rt_bool_t writeThresholdVal(uint32_t value);
 static rt_bool_t writePoint(uint16_t value);
 
-
+int cirCurrtState(int i)
+{
+		return cirCurStru_p[i].respStat;
+}
 //打包串口发送 
 void cirCurrUartSend(int num,uint8_t *buf,int len)
 {

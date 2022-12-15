@@ -32,6 +32,11 @@ typedef struct{
 const static char sign[]="[局放]";
 static partDischargeStru partDiscStru_p[PARTDISCHAG_485_NUM];
 
+
+int partDisState(int i)
+{
+		return partDiscStru_p[i].respStat;
+}
 //#define   SLAVE_ADDR     0X01
 #define   LENTH          1024  //工作环流用到的最大接收buf长度
 

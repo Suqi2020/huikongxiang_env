@@ -19,7 +19,10 @@ typedef struct{
 }pressSettlStru;
 static pressSettlStru pressSettle[PRESSSETTL_485_NUM];
 
-
+int pressSettleState(int i)
+{
+		return pressSettle[i].respStat;
+}
 //打包串口发送 
 static void pressSettlUartSend(int num,uint8_t *buf,int len)
 {

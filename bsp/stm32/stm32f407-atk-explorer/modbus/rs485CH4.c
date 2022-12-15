@@ -20,6 +20,10 @@ static void ch4UartSend(int num,uint8_t *buf,int len)
 		rs485UartSend(sheet.ch4[num].useUartNum,buf, len);
 }
 
+int ch4State(int i)
+{
+		return respStat[i];
+}
 
 
 //·¢ 1A 04 00 01 00 02 23 E0

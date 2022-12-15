@@ -21,7 +21,10 @@ static void coUartSend(int num,uint8_t *buf,int len)
 		rs485UartSend(sheet.co[num].useUartNum,buf, len);
 }
 
-
+int coState(int i)
+{
+		return respStat[i];
+}
 
 //·¢ 1A 04 00 01 00 02 23 E0
 //ÊÕ 1A 04 04 0B 1B 00 1C 23 6F

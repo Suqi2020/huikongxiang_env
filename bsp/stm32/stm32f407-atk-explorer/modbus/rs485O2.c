@@ -13,6 +13,11 @@ const static char sign[]="[氧气]";
 static float o2[O2_485_NUM];
 static uint8_t respStat[O2_485_NUM];
 
+
+int o2State(int i)
+{
+		return respStat[i];
+}
 //打包串口发送 
 static void o2UartSend(int num,uint8_t *buf,int len)
 {
