@@ -99,6 +99,7 @@
 #define   KEY_RESET_ADDR            0X1702
 //Ö÷½çÃæ
 #define   KEY_NETERROR_ADDR         0X1A00
+#define   KEY_MODBUSERR_ADDR        0X1A02
 #define   NET_ERR_DISPLAY_ADDR      0X1A0C
 #define   MODBUS_ERR_DISPLAY_ADDR   0X1A0E
 

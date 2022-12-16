@@ -102,8 +102,9 @@
 //v0.50    增加传感器配置界面  暂时不稳定   20221213
 //V0.51    增加传感器配置界面 测试OK    20221214
 //V0.52    增加故障传感器显示界面    20221215
-#define APP_VER       ((0<<8)+52)//0x0105 表示1.5版本
-const char date[]="20221215";
+//V0.53    加入故障传感器界面显示 翻页正常    20221216
+#define APP_VER       ((0<<8)+53)//0x0105 表示1.5版本
+const char date[]="20221216";
 
 //static    rt_thread_t tid 	= RT_NULL;
 static    rt_thread_t tidW5500 	  = RT_NULL;
