@@ -20,12 +20,12 @@ uint8_t  recLCDBuf[LCD_BUF_LEN];
 //往LCD屏幕发送数据 调用底层串口发送函数
 static void LCDDataSend(uint8_t *buf,int lenth)
 {
-	 rt_kprintf("%s LCD send:",sign);
+	 //rt_kprintf("%s LCD send:",sign);
 	 for(int i=0;i<lenth;i++){
 		 HAL_UART_Transmit(&huart5,buf+i,1,1000); 
-		 rt_kprintf("%02x ",buf[i]);
+		 //rt_kprintf("%02x ",buf[i]);
 	 }
-	 rt_kprintf("\n");
+	 //rt_kprintf("\n");
 	
 }
 //结果 return 0-回应错误  1-回复正确
@@ -1112,7 +1112,7 @@ uint8_t numTable[]={CIRCULA_485_NUM,PARTDISCHAG_485_NUM ,PRESSSETTL_485_NUM,THRE
 //不同种类modbus设备配置 输入为modbus种类
 static int singlModbConf(int num)
 {
-		int i=0;
+//		int i=0;
 		int ret=0;
 		singlConfDev=sheet.cirCula;//指针指向
 		for(int z=0;z<num;z++){

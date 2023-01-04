@@ -79,7 +79,7 @@ rt_bool_t heartRespFun(cJSON  *Json)
 	
 		cJSON  *mid =cJSON_GetObjectItem(Json,"mid");
     if(mcu.upHeartMessID != mid->valueint){
-				rt_kprintf("%sheart resp messID err %d\r\n",sign,mid->valueint);
+				rt_kprintf("%sheart resp messID err %d %d\r\n",sign,mcu.upHeartMessID,mid->valueint);
 			  return RT_FALSE;
 			
 		}
@@ -89,9 +89,9 @@ rt_bool_t heartRespFun(cJSON  *Json)
 				return RT_FALSE;
 		}
 
-		cJSON  *devid =cJSON_GetObjectItem(Json,"id");
+		cJSON  *devid =cJSON_GetObjectItem(Json,"acuId");
 		if(strcmp(packFLash.acuId,devid->valuestring)!=0){
-				rt_kprintf("%sheart resp devID err %s\r\n",sign,devid->valuestring);
+				rt_kprintf("%sheart resp acuId err %s\r\n",sign,devid->valuestring);
 			  return RT_FALSE;
 		}
 
@@ -165,15 +165,15 @@ void AllDownPhrase(char *data,int lenth)
 						}
 						break;
 					case devRegResp:
-						if(RT_TRUE==comRespFun(Json,mcu.devRegMessID)){//收到心跳回应 怎么通知发送层
+						if(RT_TRUE==comRespFun(Json,mcu.devRegMessID)){//收到注册回应 怎么通知发送层
 								rt_kprintf("%sreg dev succ\r\n",sign);
 							  extern rt_bool_t gbRegFlag;
 							  gbRegFlag = RT_TRUE;
 						}
 						break;
 					case repDataResp:
-						if(RT_TRUE==comRespFun(Json,mcu.repDataMessID)){//收到心跳回应 怎么通知发送层
-								rt_kprintf("%srep data succ\r\n",sign);
+						if(RT_TRUE==comRespFun(Json,mcu.repDataMessID)){//收到数据包回应 怎么通知发送层
+								rt_kprintf("%sreport data succ\r\n",sign);
 						}
 						break;
 					case CMDRepData:

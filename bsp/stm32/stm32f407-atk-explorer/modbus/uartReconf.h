@@ -137,7 +137,8 @@ typedef enum{
 const static char  modbusName[MODBUS_NUM][20] ={"接地环流","局放","防沉降","防外破","甲烷","氧气","硫化氢","一氧化碳","温湿度","水位"};
 const static int   modbusBps[MODBUS_NUM]      ={115200,   115200  ,9600,   9600,   9600,   9600,   9600,   9600,   9600,   9600};
 //const static int   modbusType[MODBUS_NUM]     ={1,        1,       2,      2, 		 3,  			3,  		3,  		3,  		3,  		3};//想同类型的modbus设备名称相同
-
+//extern char modbusName_UTF8[MODBUS_NUM][30];
+extern const  char  modbusName_utf8[MODBUS_NUM][30];
 typedef struct{
 			
 			modbusStru  cirCula[CIRCULA_485_NUM];

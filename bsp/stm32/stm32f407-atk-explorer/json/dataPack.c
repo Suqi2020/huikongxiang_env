@@ -25,7 +25,10 @@ uint64_t subTimeStampGet()
 //存储服务器的时间戳差值  
  void  subTimeStampSet(uint64_t time)
 {
-	  subTimeStamp=time-rt_tick_get();//服务器rtc值-当前tick值
+	  if(time>=rt_tick_get())
+				subTimeStamp=time-rt_tick_get();//服务器rtc值-当前tick值
+		else
+				subTimeStamp = 0;
 
 }
 uint32_t  utcTime()
@@ -50,15 +53,15 @@ uint16_t heartUpJsonPack()
 		// 加入节点（键值对）
 		cJSON_AddNumberToObject(root, "mid",mcu.upMessID);
 		cJSON_AddStringToObject(root, "packetType","CMD_HEARTBEAT");
-
+	  cJSON_AddStringToObject(root, "acuId",(char *)packFLash.acuId);
 		char *sprinBuf=RT_NULL;
 		sprinBuf=rt_malloc(20);//20个字符串长度 够用了
 		
-		sprintf(sprinBuf,"%d",utcTime());
+		sprintf(sprinBuf,"%u",utcTime());
 		cJSON_AddStringToObject(root,"timestamp",sprinBuf);
 		nodeobj = cJSON_CreateObject();
 	  cJSON_AddStringToObject(nodeobj, "identifier","area_control_unit");
-	  cJSON_AddStringToObject(nodeobj, "acuId",(char *)packFLash.acuId);
+
 		//cJSON_AddItemToObject(nodeobj,"acuId",cJSON_CreateString((char *)"100000000000001"));
 		cJSON_AddItemToObject(root, "params", nodeobj);
 
@@ -99,8 +102,8 @@ uint16_t heartUpJsonPack()
 		packBuf[len]=(uint8_t)(TAIL>>8); len++;
 		packBuf[len]=(uint8_t)(TAIL);    len++;
 		packBuf[len]=0;//len++;//结尾 补0
-		
-		mcu.devRegMessID =mcu.upMessID;
+		mcu.upHeartMessID =mcu.upMessID;
+		//mcu.devRegMessID =mcu.upMessID;
 		upMessIdAdd();
 		rt_kprintf("%s len:%d\r\n",sign,len);
 		rt_kprintf("\r\n%slen：%d str0:%x str1:%x str[2]:%d  str[3]:%d\r\n",sign,len,packBuf[0],packBuf[1],packBuf[2],packBuf[3]);
@@ -268,7 +271,7 @@ uint16_t devRegJsonPack()
 									nodeobj = cJSON_CreateObject();
 									cJSON_AddItemToArray(Array, nodeobj);
 									cJSON_AddItemToObject(nodeobj,"model",cJSON_CreateString(sheet.cirCula[j].model));
-									cJSON_AddItemToObject(nodeobj,"name",cJSON_CreateString(modbusName[i]));
+									cJSON_AddItemToObject(nodeobj,"name",cJSON_CreateString(modbusName_utf8[i]));
 									cJSON_AddItemToObject(nodeobj,"deviceId",cJSON_CreateString(sheet.cirCula[j].ID));
 							}
 					}
@@ -279,7 +282,7 @@ uint16_t devRegJsonPack()
 									nodeobj = cJSON_CreateObject();
 									cJSON_AddItemToArray(Array, nodeobj);
 									cJSON_AddItemToObject(nodeobj,"model",cJSON_CreateString(sheet.partDischag[j].model));
-									cJSON_AddItemToObject(nodeobj,"name",cJSON_CreateString(modbusName[i]));
+									cJSON_AddItemToObject(nodeobj,"name",cJSON_CreateString(modbusName_utf8[i]));
 									cJSON_AddItemToObject(nodeobj,"deviceId",cJSON_CreateString(sheet.partDischag[j].ID));
 							}
 					}
@@ -290,7 +293,7 @@ uint16_t devRegJsonPack()
 									nodeobj = cJSON_CreateObject();
 									cJSON_AddItemToArray(Array, nodeobj);
 									cJSON_AddItemToObject(nodeobj,"model",cJSON_CreateString(sheet.pressSetl[j].model));
-									cJSON_AddItemToObject(nodeobj,"name",cJSON_CreateString(modbusName[i]));
+									cJSON_AddItemToObject(nodeobj,"name",cJSON_CreateString(modbusName_utf8[i]));
 									cJSON_AddItemToObject(nodeobj,"deviceId",cJSON_CreateString(sheet.pressSetl[j].ID));
 							}
 					}
@@ -301,7 +304,7 @@ uint16_t devRegJsonPack()
 									nodeobj = cJSON_CreateObject();
 									cJSON_AddItemToArray(Array, nodeobj);
 									cJSON_AddItemToObject(nodeobj,"model",cJSON_CreateString(sheet.threeAxiss[j].model));
-									cJSON_AddItemToObject(nodeobj,"name",cJSON_CreateString(modbusName[i]));
+									cJSON_AddItemToObject(nodeobj,"name",cJSON_CreateString(modbusName_utf8[i]));
 									cJSON_AddItemToObject(nodeobj,"deviceId",cJSON_CreateString(sheet.threeAxiss[j].ID));
 							}
 					}
@@ -312,7 +315,7 @@ uint16_t devRegJsonPack()
 									nodeobj = cJSON_CreateObject();
 									cJSON_AddItemToArray(Array, nodeobj);
 									cJSON_AddItemToObject(nodeobj,"model",cJSON_CreateString(sheet.ch4[j].model));
-									cJSON_AddItemToObject(nodeobj,"name",cJSON_CreateString(modbusName[i]));
+									cJSON_AddItemToObject(nodeobj,"name",cJSON_CreateString(modbusName_utf8[i]));
 									cJSON_AddItemToObject(nodeobj,"deviceId",cJSON_CreateString(sheet.ch4[j].ID));
 							}
 					}
@@ -323,7 +326,7 @@ uint16_t devRegJsonPack()
 									nodeobj = cJSON_CreateObject();
 									cJSON_AddItemToArray(Array, nodeobj);
 									cJSON_AddItemToObject(nodeobj,"model",cJSON_CreateString(sheet.o2[j].model));
-									cJSON_AddItemToObject(nodeobj,"name",cJSON_CreateString(modbusName[i]));
+									cJSON_AddItemToObject(nodeobj,"name",cJSON_CreateString(modbusName_utf8[i]));
 									cJSON_AddItemToObject(nodeobj,"deviceId",cJSON_CreateString(sheet.o2[j].ID));
 							}
 					}
@@ -334,7 +337,7 @@ uint16_t devRegJsonPack()
 									nodeobj = cJSON_CreateObject();
 									cJSON_AddItemToArray(Array, nodeobj);
 									cJSON_AddItemToObject(nodeobj,"model",cJSON_CreateString(sheet.h2s[j].model));
-									cJSON_AddItemToObject(nodeobj,"name",cJSON_CreateString(modbusName[i]));
+									cJSON_AddItemToObject(nodeobj,"name",cJSON_CreateString(modbusName_utf8[i]));
 									cJSON_AddItemToObject(nodeobj,"deviceId",cJSON_CreateString(sheet.h2s[j].ID));
 							}
 					}
@@ -345,7 +348,7 @@ uint16_t devRegJsonPack()
 									nodeobj = cJSON_CreateObject();
 									cJSON_AddItemToArray(Array, nodeobj);
 									cJSON_AddItemToObject(nodeobj,"model",cJSON_CreateString(sheet.co[j].model));
-									cJSON_AddItemToObject(nodeobj,"name",cJSON_CreateString(modbusName[i]));
+									cJSON_AddItemToObject(nodeobj,"name",cJSON_CreateString(modbusName_utf8[i]));
 									cJSON_AddItemToObject(nodeobj,"deviceId",cJSON_CreateString(sheet.co[j].ID));
 							}
 					}
@@ -356,7 +359,7 @@ uint16_t devRegJsonPack()
 									nodeobj = cJSON_CreateObject();
 									cJSON_AddItemToArray(Array, nodeobj);
 									cJSON_AddItemToObject(nodeobj,"model",cJSON_CreateString(sheet.tempHum[j].model));
-									cJSON_AddItemToObject(nodeobj,"name",cJSON_CreateString(modbusName[i]));
+									cJSON_AddItemToObject(nodeobj,"name",cJSON_CreateString(modbusName_utf8[i]));
 									cJSON_AddItemToObject(nodeobj,"deviceId",cJSON_CreateString(sheet.tempHum[j].ID));
 							}
 					}
@@ -367,7 +370,7 @@ uint16_t devRegJsonPack()
 									nodeobj = cJSON_CreateObject();
 									cJSON_AddItemToArray(Array, nodeobj);
 									cJSON_AddItemToObject(nodeobj,"model",cJSON_CreateString(sheet.waterDepth[j].model));
-									cJSON_AddItemToObject(nodeobj,"name",cJSON_CreateString(modbusName[i]));
+									cJSON_AddItemToObject(nodeobj,"name",cJSON_CreateString(modbusName_utf8[i]));
 									cJSON_AddItemToObject(nodeobj,"deviceId",cJSON_CreateString(sheet.waterDepth[j].ID));
 							}
 					}
@@ -386,7 +389,7 @@ uint16_t devRegJsonPack()
 			}
 		}
 	}
-	sprintf(sprinBuf,"%d",utcTime());
+	sprintf(sprinBuf,"%u",utcTime());
 	cJSON_AddStringToObject(root,"timestamp",sprinBuf);
 	rt_free(sprinBuf);
 	sprinBuf=RT_NULL;

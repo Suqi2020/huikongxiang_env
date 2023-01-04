@@ -336,7 +336,7 @@
             <v6WtE>0</v6WtE>
             <v6Rtti>0</v6Rtti>
             <VariousControls>
-              <MiscControls></MiscControls>
+              <MiscControls>--no-multibyte-chars</MiscControls>
               <Define>RT_USING_LIBC, USE_HAL_DRIVER, STM32F407xx, __CLK_TCK=RT_TICK_PER_SECOND, __STDC_LIMIT_MACROS, __RTTHREAD__, RT_USING_ARM_LIBC</Define>
               <Undefine></Undefine>
               <IncludePath>..\libraries\HAL_Drivers;..\libraries\STM32F4xx_HAL\CMSIS\Device\ST\STM32F4xx\Include;..\..\..\components\drivers\include;applications;..\..\..\components\libc\compilers\common\include;..\libraries\HAL_Drivers\config;LCD7inch;..\..\..\components\libc\compilers\common\extension;..\..\..\components\libc\posix\io\poll;..\..\..\libcpu\arm\cortex-m4;..\..\..\components\drivers\include;..\..\..\components\libc\posix\io\stdio;analog;..\libraries\HAL_Drivers\CMSIS\Include;..\..\..\components\drivers\spi;..\..\..\components\libc\posix\ipc;..\..\..\libcpu\arm\common;..\..\..\components\drivers\include;..\..\..\components\libc\compilers\common\extension\fcntl\octal;board\CubeMX_Config\Inc;..\..\..\include;..\..\..\components\drivers\include;..\..\..\components\drivers\include;.;board;json;..\libraries\STM32F4xx_HAL\STM32F4xx_HAL_Driver\Inc;..\..\..\components\finsh;..\libraries\HAL_Drivers\drv_flash;board\ports;modbus;w5500</IncludePath>
@@ -682,6 +682,11 @@
               <FileName>dataPack.c</FileName>
               <FileType>1</FileType>
               <FilePath>json\dataPack.c</FilePath>
+            </File>
+            <File>
+              <FileName>utf_8.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>.\json\utf_8.c</FilePath>
             </File>
           </Files>
         </Group>

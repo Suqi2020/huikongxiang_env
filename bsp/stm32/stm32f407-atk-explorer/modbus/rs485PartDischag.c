@@ -254,13 +254,13 @@ uint16_t partDischagJsonPack()
 				cJSON_AddItemToObject(nodeobj_p,"prpsDataC",cJSON_CreateString(""));
 				
 				
-				sprintf(sprinBuf,"%d",utcTime());
+				sprintf(sprinBuf,"%u",utcTime());
 				cJSON_AddItemToObject(nodeobj_p,"monitoringTime",cJSON_CreateString(sprinBuf));
 			}
 		}
 		}
 	
-		sprintf(sprinBuf,"%d",utcTime());
+		sprintf(sprinBuf,"%u",utcTime());
 		cJSON_AddStringToObject(root,"timestamp",sprinBuf);
 		// 打印JSON数据包  
 		//打包
@@ -300,8 +300,8 @@ uint16_t partDischagJsonPack()
 		packBuf[len]=(uint8_t)(TAIL>>8); len++;
 		packBuf[len]=(uint8_t)(TAIL);    len++;
 		packBuf[len]=0;//len++;//结尾 补0
-		
-		mcu.devRegMessID =mcu.upMessID;
+		mcu.repDataMessID =mcu.upMessID;
+		//mcu.devRegMessID =mcu.upMessID;
 		upMessIdAdd();
 		rt_kprintf("%s len:%d\r\n",sign,len);
 		rt_kprintf("\r\n%slen：%d str0:%x str1:%x str[2]:%d  str[3]:%d\r\n",sign,len,packBuf[0],packBuf[1],packBuf[2],packBuf[3]);

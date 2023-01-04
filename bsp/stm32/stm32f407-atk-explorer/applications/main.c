@@ -64,7 +64,7 @@
 //V0.24 	 增加支持modbus设备选择串口 UART2(1) UART3(2) UART6(3) UART1(debug) UART4(4)  未测试  20221020
 //V0.25    增加4路485和网络故障log打印输出                                     20221021
 //V0.26    增加ip_from==IP_FROM_DHCP 或者自定义来实现网络ip配置 （交换机自动获取ip失败） 20221025
-//V0.27    1、加入utf8格式打包json格式  nodepad++设置为utf8 以及 c++中设置 --no-multibyte-chars
+//V0.27    1、加入utf8格式打包json格式  nodepad++设置为utf8 以及 c++中设置 misc controls --no-multibyte-chars
 //            增加json格式中文字符要在dataPack.c中增加 已经把文件用nodepad++更改为utf8格式
 //         2、修复接收数后死机问题 接收完json数据没有释放掉                      20221026
 //         3、增加json格式打包devRegJsonPack  用json自带代替sprintf 增加数据包 465Byte增加到586Byte 谨慎使用
@@ -103,8 +103,10 @@
 //V0.51    增加传感器配置界面 测试OK    20221214
 //V0.52    增加故障传感器显示界面    20221215
 //V0.53    加入故障传感器界面显示 翻页正常    20221216
-#define APP_VER       ((0<<8)+53)//0x0105 表示1.5版本
-const char date[]="20221216";
+//V0.54    修复格式化RTC为负值的情况 %d改为u%  20221230
+//V0.55    增加utf8格式的传感器名称显示  2023-1-4
+#define APP_VER       ((0<<8)+54)//0x0105 表示1.5版本
+const char date[]="20230104";
 
 //static    rt_thread_t tid 	= RT_NULL;
 static    rt_thread_t tidW5500 	  = RT_NULL;
@@ -184,6 +186,7 @@ int main(void)
 		RELAY4_ON;//上电后外部485全部供
 
     rt_kprintf("\n%s%s  ver=%02d.%02d\n",sign,date,(uint8_t)(APP_VER>>8),(uint8_t)APP_VER);
+	  //rt_kprintf("name %s  %s\n",modbusName[0],modbusName_utf8[0]);
 	  rt_err_t result;
 		stm32_flash_read(FLASH_IP_SAVE_ADDR,    (uint8_t*)&packFLash,sizeof(packFLash));
 		stm32_flash_read(FLASH_MODBUS_SAVE_ADDR,(uint8_t*)&sheet,    sizeof(sheet));
@@ -259,6 +262,10 @@ int main(void)
 				rt_kprintf("%sRTcreat LCDStateTask \r\n",sign);
 		}
 		//队列初始化之后再开启串口中断接收
+//		char test[50]={0};
+//			uint32_t a=4294967290;
+//			sprintf(test,"long:%u", a);//"monitoringTime":"1655172531937"
+//			rt_kprintf("%s %s \r\n",sign,test);
 //////////////////////////////结束//////////////////////////////////////
     while (0)//task用于测试 以及闪灯操作
     {

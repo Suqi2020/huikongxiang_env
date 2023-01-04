@@ -206,7 +206,7 @@ void printModbusDevList()
 
 static int circulaConf(int uartnum,char *argv[])
 {
-	int i=0;
+//	int i=0;
 	int ret=0;
 	int slaveAddr=atoi32(argv[5],10);
 	sheet.cirCulaColTime=atoi32(argv[6],10);
@@ -247,7 +247,7 @@ static int circulaConf(int uartnum,char *argv[])
 
 static int partDischagConf(int uartnum,char *argv[])
 {
-	int i=0;
+//	int i=0;
 	int ret=0;
 	int slaveAddr=atoi32(argv[5],10);
 	//sheet.cirCulaColTime=atoi32(argv[6],10);
@@ -289,7 +289,7 @@ static int partDischagConf(int uartnum,char *argv[])
 
 static int pressSettlConf(int uartnum,char *argv[])
 {
-	int i=0;
+//	int i=0;
 	int ret=0;
 	int slaveAddr=atoi32(argv[5],10);
 	//sheet.cirCulaColTime=atoi32(argv[6],10);
@@ -332,7 +332,7 @@ static int pressSettlConf(int uartnum,char *argv[])
 
 static int threeAxisConf(int uartnum,char *argv[])
 {
-	int i=0;
+//	int i=0;
 	int ret=0;
 	int slaveAddr=atoi32(argv[5],10);
 	//sheet.cirCulaColTime=atoi32(argv[6],10);
@@ -373,7 +373,7 @@ static int threeAxisConf(int uartnum,char *argv[])
 }
 static int ch4Conf(int uartnum,char *argv[])
 {
-	int i=0;
+//	int i=0;
 	int ret=0;
 	int slaveAddr=atoi32(argv[5],10);
 	//sheet.cirCulaColTime=atoi32(argv[6],10);
@@ -414,7 +414,7 @@ static int ch4Conf(int uartnum,char *argv[])
 }
 static int coConf(int uartnum,char *argv[])
 {
-	int i=0;
+//	int i=0;
 	int ret=0;
 	int slaveAddr=atoi32(argv[5],10);
 	//sheet.cirCulaColTime=atoi32(argv[6],10);
@@ -455,7 +455,7 @@ static int coConf(int uartnum,char *argv[])
 }
 static int h2sConf(int uartnum,char *argv[])
 {
-	int i=0;
+//	int i=0;
 	int ret=0;
 	int slaveAddr=atoi32(argv[5],10);
 	//sheet.cirCulaColTime=atoi32(argv[6],10);
@@ -496,7 +496,7 @@ static int h2sConf(int uartnum,char *argv[])
 }
 static int o2Conf(int uartnum,char *argv[])
 {
-	int i=0;
+//	int i=0;
 	int ret=0;
 	int slaveAddr=atoi32(argv[5],10);
 	//sheet.cirCulaColTime=atoi32(argv[6],10);
@@ -537,7 +537,7 @@ static int o2Conf(int uartnum,char *argv[])
 }
 static int waterDepthConf(int uartnum,char *argv[])
 {
-	int i=0;
+//	int i=0;
 	int ret=0;
 	int slaveAddr=atoi32(argv[5],10);
 	//sheet.cirCulaColTime=atoi32(argv[6],10);
@@ -578,7 +578,7 @@ static int waterDepthConf(int uartnum,char *argv[])
 }
 static int tempHumConf(int uartnum,char *argv[])
 {
-	int i=0;
+//	int i=0;
 	int ret=0;
 	int slaveAddr=atoi32(argv[5],10);
 	//sheet.cirCulaColTime=atoi32(argv[6],10);

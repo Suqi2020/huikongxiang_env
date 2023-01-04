@@ -12,7 +12,10 @@
 //  24+红色，24-黑色，A+蓝色，B-绿色
 // 发 01 04 00 01 00 04 A0 09 
 // 收 01 04 08 0B CA FE 8D 00 03 03 80 C7 23 
-
+// 发                   01 04 00 01 00 04 A0 09 
+//[防外破]threeAxis send:9  4  0  1  0  4 a1 41 
+// 收         01 04 08 0B CA FE 8D 00 03 03 80 C7 23 
+//[防外破]rec: 9  4  6  b 73  0 9a  0 17 fc 32 69 b4
 typedef struct{
 		float temp;
 	  uint16_t acclrationX;
@@ -268,13 +271,13 @@ static uint16_t threeAxisJsonPack()
 				sprintf(sprinBuf,"%d",threeAxisp[i].acclrationZ);
 				cJSON_AddItemToObject(nodeobj_p,"accelerationZ",cJSON_CreateString(sprinBuf));
 
-				sprintf(sprinBuf,"%d",utcTime());
+				sprintf(sprinBuf,"%u",utcTime());
 				cJSON_AddItemToObject(nodeobj_p,"monitoringTime",cJSON_CreateString(sprinBuf));
 			}
 		}
 		}
 	
-		sprintf(sprinBuf,"%d",utcTime());
+		sprintf(sprinBuf,"%u",utcTime());
 		cJSON_AddStringToObject(root,"timestamp",sprinBuf);
 		// 打印JSON数据包  
 //		out = cJSON_Print(root);
@@ -327,8 +330,8 @@ static uint16_t threeAxisJsonPack()
 		packBuf[len]=(uint8_t)(TAIL>>8); len++;
 		packBuf[len]=(uint8_t)(TAIL);    len++;
 		packBuf[len]=0;//len++;//结尾 补0
-		
-		mcu.devRegMessID =mcu.upMessID;
+		mcu.repDataMessID =mcu.upMessID;
+		//mcu.devRegMessID =mcu.upMessID;
 		upMessIdAdd();
 		rt_kprintf("%sthreeAxis len:%d\r\n",sign,len);
 		rt_kprintf("\r\n%slen：%d str0:%x str1:%x str[2]:%d  str[3]:%d\r\n",sign,len,packBuf[0],packBuf[1],packBuf[2],packBuf[3]);
