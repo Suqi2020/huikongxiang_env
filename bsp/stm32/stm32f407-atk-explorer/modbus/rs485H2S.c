@@ -9,7 +9,7 @@ const static char sign[]="[硫化氢]";
 //#define   SLAVE_ADDR     0X01 
 #define   LENTH          50  //工作环流用到的最大接收buf长度
 
-static float h2s[H2S_485_NUM];
+ float h2s[H2S_485_NUM];
 static uint8_t respStat[H2S_485_NUM];
 //打包串口发送 
 static void h2sUartSend(int num,uint8_t *buf,int len)
@@ -166,19 +166,19 @@ static uint16_t h2sJsonPack()
 
 		return len;
 }
-void h2sRead2Send(rt_bool_t netStat)
+void h2sRead2Send()
 {
-	 int workFlag=RT_FALSE;
+	 //int workFlag=RT_FALSE;
 	 for(int i=0;i<H2S_485_NUM;i++){
 			if(sheet.h2s[i].workFlag==RT_TRUE){
 						readH2S(i);
-						workFlag=RT_TRUE;
+						//workFlag=RT_TRUE;
 				}
 		}
-		if(workFlag==RT_TRUE){
-				rt_kprintf("%s打包采集的h2s数据\r\n",sign);
-				h2sJsonPack();
-				if(netStat==RT_TRUE)
-						rt_mb_send_wait(&mbNetSendData, (rt_ubase_t)&packBuf,RT_WAITING_FOREVER);
-		}
+//		if(workFlag==RT_TRUE){
+//				rt_kprintf("%s打包采集的h2s数据\r\n",sign);
+//				h2sJsonPack();
+//				if(netStat==RT_TRUE)
+//						rt_mb_send_wait(&mbNetSendData, (rt_ubase_t)&packBuf,RT_WAITING_FOREVER);
+//		}
 }

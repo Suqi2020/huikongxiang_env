@@ -12,7 +12,7 @@ const static char sign[]="[甲烷]";
 //concentrationStru gas;
 //#define CH4_485_NUM   				10
 
-static float ch4[CH4_485_NUM];
+ float ch4[CH4_485_NUM];
 static uint8_t respStat[CH4_485_NUM];
 //打包串口发送 
 static void ch4UartSend(int num,uint8_t *buf,int len)
@@ -173,19 +173,19 @@ static uint16_t ch4JsonPack()
 		return len;
 }
 
-void ch4Read2Send(rt_bool_t netStat)
+void ch4Read2Send()
 {
-	 int workFlag=RT_FALSE;
+	 //int workFlag=RT_FALSE;
 	 for(int i=0;i<CH4_485_NUM;i++){
 			if(sheet.ch4[i].workFlag==RT_TRUE){
 						readCH4(i);
-						workFlag=RT_TRUE;
+					//	workFlag=RT_TRUE;
 				}
 		}
-		if(workFlag==RT_TRUE){
-				rt_kprintf("%s打包采集的ch4数据\r\n",sign);
-			  ch4JsonPack();
-				if(netStat==RT_TRUE)
-						rt_mb_send_wait(&mbNetSendData, (rt_ubase_t)&packBuf,RT_WAITING_FOREVER);
-		}
+//		if(workFlag==RT_TRUE){
+//				rt_kprintf("%s打包采集的ch4数据\r\n",sign);
+//			  ch4JsonPack();
+//				if(netStat==RT_TRUE)
+//						rt_mb_send_wait(&mbNetSendData, (rt_ubase_t)&packBuf,RT_WAITING_FOREVER);
+//		}
 }

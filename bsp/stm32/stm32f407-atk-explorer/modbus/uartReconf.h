@@ -158,11 +158,11 @@ typedef struct{
 			uint32_t  partDischagColTime;
 			uint32_t  pressSetlColTime;
 	    uint32_t  threeAxissColTime;
-			uint32_t  ch4ColTime;
-	    uint32_t  o2ColTime;
-			
-			uint32_t  h2sColTime;
-			uint32_t  coColTime;
+//			uint32_t  ch4ColTime;
+//	    uint32_t  o2ColTime;
+//			
+//			uint32_t  h2sColTime;
+			uint32_t  coColTime;//用co的定时器来采集信息  去掉其他三个气体定时器  合并打包上传
 			uint32_t  tempHumColTime;
 			uint32_t  waterDepthColTime;
 			

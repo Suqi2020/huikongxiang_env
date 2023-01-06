@@ -734,7 +734,7 @@ void LCDDispModInfoCpy(modbusPositStru *posit,uint8_t readIndex,LCDDispModInfoSt
 									 rt_strcpy(lcdRead->model,sheet.ch4[posit_p.Y].model);
 									 lcdRead->port = sheet.ch4[posit_p.Y].useUartNum;
 									 lcdRead->addr = sheet.ch4[posit_p.Y].slaveAddr;
-									 lcdRead->colTime = sheet.ch4ColTime;
+									 lcdRead->colTime =sheet.coColTime;// //sheet.ch4ColTime;
 								 }
 								 break;
 							}
@@ -749,7 +749,7 @@ void LCDDispModInfoCpy(modbusPositStru *posit,uint8_t readIndex,LCDDispModInfoSt
 									 rt_strcpy(lcdRead->model,sheet.o2[posit_p.Y].model);
 									 lcdRead->port = sheet.o2[posit_p.Y].useUartNum;
 									 lcdRead->addr = sheet.o2[posit_p.Y].slaveAddr;
-									 lcdRead->colTime = sheet.o2ColTime;
+									 lcdRead->colTime = sheet.coColTime;//sheet.o2ColTime;
 								 }
 								 break;
 							}
@@ -764,7 +764,7 @@ void LCDDispModInfoCpy(modbusPositStru *posit,uint8_t readIndex,LCDDispModInfoSt
 									 rt_strcpy(lcdRead->model,sheet.h2s[posit_p.Y].model);
 									 lcdRead->port = sheet.h2s[posit_p.Y].useUartNum;
 									 lcdRead->addr = sheet.h2s[posit_p.Y].slaveAddr;
-									 lcdRead->colTime = sheet.h2sColTime;
+									 lcdRead->colTime = sheet.coColTime;//sheet.h2sColTime;
 								 }
 								 break;
 							}

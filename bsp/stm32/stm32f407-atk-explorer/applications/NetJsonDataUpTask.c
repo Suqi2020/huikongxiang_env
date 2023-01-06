@@ -135,17 +135,20 @@ static void  timeOutRunFun()
 				threeAxisRead2Send(gbNetState);
 				rt_kprintf("%sTHREEAXIS_TIMEout\r\n",task);
 				break;
-			case  CH4_TIME:
-				ch4Read2Send(gbNetState);
-				break;
-			case  O2_TIME:
-				o2Read2Send(gbNetState);
-				break;
-			case  H2S_TIME:
-				h2sRead2Send(gbNetState);
-				break;
+//			case  CH4_TIME:
+//				ch4Read2Send(gbNetState);
+//				break;
+//			case  O2_TIME:
+//				o2Read2Send(gbNetState);
+//				break;
+//			case  H2S_TIME:
+//				h2sRead2Send(gbNetState);
+//				break;
 			case  CO_TIME://4种气体在一起读取 所以前三个不使用 只在此处读取并打包发送  关闭时候只需要关闭CO就可以把所有气体全部关闭
-				coRead2Send(gbNetState);
+				ch4Read2Send(gbNetState);
+				o2Read2Send(gbNetState);
+				h2sRead2Send(gbNetState);
+			  coRead2Send(gbNetState);
 				break;
 			case  TEMPHUM_TIME:
 				tempHumRead2Send(gbNetState);
@@ -176,9 +179,9 @@ void startTimeList()
 		timeInit(PARTDISCHAG_TIME,sheet.partDischagColTime,10);
 		timeInit(PRESSSETTL_TIME, sheet.pressSetlColTime,15);
 		timeInit(THREEAXIS_TIME,  sheet.threeAxissColTime,20);
-	  timeInit(H2S_TIME, 				sheet.h2sColTime,24);
-		timeInit(CH4_TIME, 				sheet.ch4ColTime,28);
-		timeInit(O2_TIME, 				sheet.o2ColTime,30);
+//	  timeInit(H2S_TIME, 				sheet.h2sColTime,24);
+//		timeInit(CH4_TIME, 				sheet.ch4ColTime,28);
+//		timeInit(O2_TIME, 				sheet.o2ColTime,30);
 		timeInit(CO_TIME, 				sheet.coColTime,35);
 		timeInit(TEMPHUM_TIME, 		sheet.tempHumColTime,40);
 		timeInit(WATERDEPTH_TIME, sheet.waterDepthColTime,45);

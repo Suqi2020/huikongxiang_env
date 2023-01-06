@@ -10,7 +10,7 @@ const static char sign[]="[氧气]";
 #define   LENTH          50  //工作环流用到的最大接收buf长度
 
 
-static float o2[O2_485_NUM];
+ float o2[O2_485_NUM];
 static uint8_t respStat[O2_485_NUM];
 
 
@@ -178,19 +178,19 @@ static uint16_t o2JsonPack()
 }
 
 
-void o2Read2Send(rt_bool_t netStat)
+void o2Read2Send()
 {
-	 int workFlag=RT_FALSE;
+	 //int workFlag=RT_FALSE;
 	 for(int i=0;i<O2_485_NUM;i++){
 			if(sheet.o2[i].workFlag==RT_TRUE){
 						readO2(i);
-						workFlag=RT_TRUE;
+						//workFlag=RT_TRUE;
 				}
 		}
-		if(workFlag==RT_TRUE){
-				rt_kprintf("%s打包采集的O2数据\r\n",sign);
-				o2JsonPack();
-				if(netStat==RT_TRUE)
-						rt_mb_send_wait(&mbNetSendData, (rt_ubase_t)&packBuf,RT_WAITING_FOREVER);
-		}
+//		if(workFlag==RT_TRUE){
+//				rt_kprintf("%s打包采集的O2数据\r\n",sign);
+//				o2JsonPack();
+//				if(netStat==RT_TRUE)
+//						rt_mb_send_wait(&mbNetSendData, (rt_ubase_t)&packBuf,RT_WAITING_FOREVER);
+//		}
 }

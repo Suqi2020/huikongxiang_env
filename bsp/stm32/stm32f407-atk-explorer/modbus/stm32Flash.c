@@ -123,7 +123,7 @@ void printModbusDevList()
 									rt_kprintf("%s ",sheet.ch4[j].model);
 									rt_kprintf("%s ",UartName[sheet.ch4[j].useUartNum]);
 									rt_kprintf("%d ",sheet.ch4[j].slaveAddr);
-									rt_kprintf("%d \n",sheet.ch4ColTime);
+									rt_kprintf("%d \n",sheet.coColTime);//sheet.ch4ColTime);
 							}
 					}
 				break;
@@ -137,7 +137,7 @@ void printModbusDevList()
 									rt_kprintf("%s ",sheet.o2[j].model);
 									rt_kprintf("%s ",UartName[sheet.o2[j].useUartNum]);
 									rt_kprintf("%d ",sheet.o2[j].slaveAddr);
-									rt_kprintf("%d \n",sheet.o2ColTime);
+									rt_kprintf("%d \n",sheet.coColTime);//sheet.o2ColTime);
 							}
 					}
 				break;
@@ -151,7 +151,7 @@ void printModbusDevList()
 									rt_kprintf("%s ",sheet.h2s[j].model);
 									rt_kprintf("%s ",UartName[sheet.h2s[j].useUartNum]);
 									rt_kprintf("%d ",sheet.h2s[j].slaveAddr);
-									rt_kprintf("%d \n",sheet.h2sColTime);
+									rt_kprintf("%d \n",sheet.coColTime);//sheet.h2sColTime);
 							}
 					}
 				break;
@@ -377,7 +377,7 @@ static int ch4Conf(int uartnum,char *argv[])
 	int ret=0;
 	int slaveAddr=atoi32(argv[5],10);
 	//sheet.cirCulaColTime=atoi32(argv[6],10);
-	sheet.ch4ColTime=atoi32(argv[6],10);
+	sheet.coColTime=atoi32(argv[6],10);
 //	for( i=0;i<CH4_485_NUM;i++){//核对有没有配置过
 //			if(rt_strcmp(sheet.ch4[i].ID,argv[2])==0){//配置过
 //					if((slaveAddr==0)||(slaveAddr==255)){//关闭
@@ -459,7 +459,7 @@ static int h2sConf(int uartnum,char *argv[])
 	int ret=0;
 	int slaveAddr=atoi32(argv[5],10);
 	//sheet.cirCulaColTime=atoi32(argv[6],10);
-	sheet.h2sColTime=atoi32(argv[6],10);
+	sheet.coColTime=atoi32(argv[6],10);
 //	for( i=0;i<H2S_485_NUM;i++){//核对有没有配置过
 //			if(rt_strcmp(sheet.h2s[i].ID,argv[2])==0){//配置过
 //					if((slaveAddr==0)||(slaveAddr==255)){//关闭
@@ -500,7 +500,7 @@ static int o2Conf(int uartnum,char *argv[])
 	int ret=0;
 	int slaveAddr=atoi32(argv[5],10);
 	//sheet.cirCulaColTime=atoi32(argv[6],10);
-	sheet.o2ColTime=atoi32(argv[6],10);
+	sheet.coColTime=atoi32(argv[6],10);
 //	for( i=0;i<O2_485_NUM;i++){//核对有没有配置过
 //			if(rt_strcmp(sheet.o2[i].ID,argv[2])==0){//配置过
 //					if((slaveAddr==0)||(slaveAddr==255)){//关闭
@@ -710,48 +710,48 @@ int modbusConfIDCheck(char *inputID)
 					}
 				break;
 				case CH4:
-					for(int j=0;j<CH4_485_NUM;j++){//核对有没有配置过
-							if(sheet.ch4[j].workFlag==RT_TRUE){
-									if(rt_strcmp(sheet.ch4[j].ID,inputID)==0){
-											rt_kprintf("del ch4 same ID\n");
-											sheet.ch4[j].workFlag=RT_FALSE;
-										  return 1;
-									}
-								}
-					}
+//					for(int j=0;j<CH4_485_NUM;j++){//核对有没有配置过
+//							if(sheet.ch4[j].workFlag==RT_TRUE){
+//									if(rt_strcmp(sheet.ch4[j].ID,inputID)==0){
+//											rt_kprintf("del ch4 same ID\n");
+//											sheet.ch4[j].workFlag=RT_FALSE;
+//										  return 1;
+//									}
+//								}
+//					}
 				break;
 				case O2:
-					for(int j=0;j<O2_485_NUM;j++){//核对有没有配置过
-							if(sheet.o2[j].workFlag==RT_TRUE){
-									if(rt_strcmp(sheet.o2[j].ID,inputID)==0){
-											rt_kprintf("del o2 same ID\n");
-											sheet.o2[j].workFlag=RT_FALSE;
-										  return 1;
-									}
-							}
-					}
+//					for(int j=0;j<O2_485_NUM;j++){//核对有没有配置过
+//							if(sheet.o2[j].workFlag==RT_TRUE){
+//									if(rt_strcmp(sheet.o2[j].ID,inputID)==0){
+//											rt_kprintf("del o2 same ID\n");
+//											sheet.o2[j].workFlag=RT_FALSE;
+//										  return 1;
+//									}
+//							}
+//					}
 				break;
 				case H2S:
-					for(int j=0;j<H2S_485_NUM;j++){//核对有没有配置过
-							if(sheet.h2s[j].workFlag==RT_TRUE){
-									if(rt_strcmp(sheet.h2s[j].ID,inputID)==0){
-											rt_kprintf("del h2s same ID\n");
-											sheet.h2s[j].workFlag=RT_FALSE;
-										  return 1;
-									}
-							}
-					}
+//					for(int j=0;j<H2S_485_NUM;j++){//核对有没有配置过
+//							if(sheet.h2s[j].workFlag==RT_TRUE){
+//									if(rt_strcmp(sheet.h2s[j].ID,inputID)==0){
+//											rt_kprintf("del h2s same ID\n");
+//											sheet.h2s[j].workFlag=RT_FALSE;
+//										  return 1;
+//									}
+//							}
+//					}
 				break;
 				case CO:
-					for(int j=0;j<CO_485_NUM;j++){//核对有没有配置过
-							if(sheet.co[j].workFlag==RT_TRUE){
-									if(rt_strcmp(sheet.co[j].ID,inputID)==0){
-											rt_kprintf("del co same ID\n");
-											sheet.co[j].workFlag=RT_FALSE;
-										  return 1;
-									}
-							}
-					}
+//					for(int j=0;j<CO_485_NUM;j++){//核对有没有配置过
+//							if(sheet.co[j].workFlag==RT_TRUE){
+//									if(rt_strcmp(sheet.co[j].ID,inputID)==0){
+//											rt_kprintf("del co same ID\n");
+//											sheet.co[j].workFlag=RT_FALSE;
+//										  return 1;
+//									}
+//							}
+//					}
 				break;
 				case TEMPHUM:
 					for(int j=0;j<TEMPHUM_485_NUM;j++){//核对有没有配置过

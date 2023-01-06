@@ -106,8 +106,12 @@
 //V0.54    修复格式化RTC为负值的情况 %d改为u%  20221230
 //V0.55    增加utf8格式的传感器名称显示  2023-1-4
 //V0.56    修改json打包格式 identify 2023-1-5
-#define APP_VER       ((0<<8)+56)//0x0105 表示1.5版本
-const char date[]="20230105";
+//V0.57    modbus传感器4种气体 氧气硫化氢一氧化碳甲烷使用同一个ID
+//         1、去掉串口和LCD配置传感器时候4种气体的的deviceID查重
+//         2、统一4种气体定时器为co定时器
+//         3、更改4种气体打包逻辑
+#define APP_VER       ((0<<8)+57)//0x0105 表示1.5版本
+const char date[]="20230106";
 
 //static    rt_thread_t tid 	= RT_NULL;
 static    rt_thread_t tidW5500 	  = RT_NULL;
