@@ -96,7 +96,7 @@ static uint16_t coJsonPack()
 		// 加入节点（键值对）
 		cJSON_AddNumberToObject(root, "mid",mcu.upMessID);
 		cJSON_AddStringToObject(root, "packetType","CMD_REPORTDATA");
-		cJSON_AddStringToObject(root, "identifier","carbon_monoxide");
+		cJSON_AddStringToObject(root, "identifier","environment_monitor");
 		cJSON_AddStringToObject(root, "acuId",(char *)packFLash.acuId);
 		
 		

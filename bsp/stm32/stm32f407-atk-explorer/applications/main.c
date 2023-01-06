@@ -105,8 +105,9 @@
 //V0.53    加入故障传感器界面显示 翻页正常    20221216
 //V0.54    修复格式化RTC为负值的情况 %d改为u%  20221230
 //V0.55    增加utf8格式的传感器名称显示  2023-1-4
-#define APP_VER       ((0<<8)+54)//0x0105 表示1.5版本
-const char date[]="20230104";
+//V0.56    修改json打包格式 identify 2023-1-5
+#define APP_VER       ((0<<8)+56)//0x0105 表示1.5版本
+const char date[]="20230105";
 
 //static    rt_thread_t tid 	= RT_NULL;
 static    rt_thread_t tidW5500 	  = RT_NULL;

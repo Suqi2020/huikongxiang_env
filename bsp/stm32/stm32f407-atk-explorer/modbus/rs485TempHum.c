@@ -107,7 +107,7 @@ static uint16_t tempHumJsonPack()
 		// 加入节点（键值对）
 		cJSON_AddNumberToObject(root, "mid",mcu.upMessID);
 		cJSON_AddStringToObject(root, "packetType","CMD_REPORTDATA");
-		cJSON_AddStringToObject(root, "identifier","temperature_humidity");
+		cJSON_AddStringToObject(root, "identifier","environment_monitor");
 		cJSON_AddStringToObject(root, "acuId",(char *)packFLash.acuId);
 		char *sprinBuf=RT_NULL;
 		sprinBuf=rt_malloc(20);//20个字符串长度 够用了

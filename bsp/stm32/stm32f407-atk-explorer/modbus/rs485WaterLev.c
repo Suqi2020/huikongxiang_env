@@ -93,7 +93,7 @@ static uint16_t waterDepthJsonPack()
 		// 加入节点（键值对）
 		cJSON_AddNumberToObject(root, "mid",mcu.upMessID);
 		cJSON_AddStringToObject(root, "packetType","CMD_REPORTDATA");
-		cJSON_AddStringToObject(root, "identifier","water_depth");
+		cJSON_AddStringToObject(root, "identifier","environment_monitor");
 		cJSON_AddStringToObject(root, "acuId",(char *)packFLash.acuId);
 //	  cJSON_AddItemToObject(root,"acuId",cJSON_CreateString(packFLash.acuId));
 		char *sprinBuf=RT_NULL;

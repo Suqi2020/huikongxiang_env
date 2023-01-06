@@ -131,7 +131,7 @@ static uint16_t pressSettlJsonPack()
 		// 加入节点（键值对）
 		cJSON_AddNumberToObject(root, "mid",mcu.upMessID);
 		cJSON_AddStringToObject(root, "packetType","CMD_REPORTDATA");
-		cJSON_AddStringToObject(root, "identifier","anti_sedimentation");
+		cJSON_AddStringToObject(root, "identifier","settlement_monitor");
 		cJSON_AddStringToObject(root, "acuId",(char *)packFLash.acuId);
 		
 		
