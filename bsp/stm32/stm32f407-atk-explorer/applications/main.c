@@ -306,3 +306,4 @@ void  tasklog(int argc, char *argv[])
 		rt_kprintf("%s[tasklog delete]",sign);
 }
 MSH_CMD_EXPORT(tasklog,tasklog del);//FINSH_FUNCTION_EXPORT_CMD
+

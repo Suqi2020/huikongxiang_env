@@ -5,7 +5,7 @@
 //04 03 04 00 00 00 00 AF 33 
 //每次利用co读取定时器来读取4种气体并实现上传 
 //4种气体在一起读取 所以前三个不使用 只在CO定时器地方读取并打包发送  关闭时候只需要关闭CO就可以把所有气体全部关闭
-
+#ifdef USE_4GAS
 const static char sign[]="[一氧化碳]";
 
 //#define   SLAVE_ADDR     0X01 
@@ -213,7 +213,7 @@ char* out = NULL;
 		// 加入节点（键值对）
 		cJSON_AddNumberToObject(root, "mid",mcu.upMessID);
 		cJSON_AddStringToObject(root, "packetType","CMD_REPORTDATA");
-		cJSON_AddStringToObject(root, "identifier","environment_monitor");
+		cJSON_AddStringToObject(root, "identifier","gas_monitor");
 		cJSON_AddStringToObject(root, "acuId",(char *)packFLash.acuId);
 		
 		
@@ -319,3 +319,6 @@ void  gasJsonPack(rt_bool_t netStat)
 
 
 }
+
+#endif
+

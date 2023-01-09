@@ -45,12 +45,12 @@ const static char sign[]="[»·Á÷]";
 extern uint8_t packBuf[TX_RX_MAX_BUF_SIZE];
 
 static CIRCURStru  cirCurStru_p[CIRCULA_485_NUM];
-static uint16_t readAcqInterv(int num);
-static uint16_t readPoint(int num);
-static uint32_t readThresholdVal(int num);
-static rt_bool_t writeAcqInterv(uint16_t value);
-static rt_bool_t writeThresholdVal(uint32_t value);
-static rt_bool_t writePoint(uint16_t value);
+//static uint16_t readAcqInterv(int num);
+//static uint16_t readPoint(int num);
+//static uint32_t readThresholdVal(int num);
+//static rt_bool_t writeAcqInterv(uint16_t value);
+//static rt_bool_t writeThresholdVal(uint32_t value);
+//static rt_bool_t writePoint(uint16_t value);
 
 int cirCurrtState(int i)
 {
@@ -779,3 +779,4 @@ void circulaRead2Send(rt_bool_t netStat)
 						rt_mb_send_wait(&mbNetSendData, (rt_ubase_t)&packBuf,RT_WAITING_FOREVER);
 		}
 }
+

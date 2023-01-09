@@ -2,14 +2,14 @@
 #include   "board.h"
 
 extern struct  rt_messagequeue LCDmque;
-extern void LCDDispIP();
-extern void LCDDispUart();
-extern void LCDDispMCUID();
-extern void LCDDispModbusGet();
-extern void LDCDispMosbusInfo();
-extern void LCDDispModInfoCpy();
+extern void LCDDispIP(void);
+extern void LCDDispUart(void);
+extern void LCDDispMCUID(void);
+extern void LCDDispModbusGet(void);
+extern void LDCDispMosbusInfo(void);
+extern void LCDDispModInfoCpy(void);
 extern void LCDDispConfig(uint8_t *recBuf,int len);
-extern void firstNameDispInit();
+extern void firstNameDispInit(void);
 extern uint8_t  recLCDBuf[LCD_BUF_LEN];
 
 
@@ -56,3 +56,4 @@ void  LCDTask(void *parameter)
 			}
 		}
 }
+

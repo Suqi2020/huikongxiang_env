@@ -113,6 +113,7 @@ void printModbusDevList()
 							}
 					}
 				break;
+	#ifdef USE_4GAS 
 				case CH4:
 					for(int j=0;j<CH4_485_NUM;j++){//核对有没有配置过
 							if(sheet.ch4[j].workFlag==RT_TRUE){
@@ -123,7 +124,7 @@ void printModbusDevList()
 									rt_kprintf("%s ",sheet.ch4[j].model);
 									rt_kprintf("%s ",UartName[sheet.ch4[j].useUartNum]);
 									rt_kprintf("%d ",sheet.ch4[j].slaveAddr);
-									rt_kprintf("%d \n",sheet.coColTime);//sheet.ch4ColTime);
+									rt_kprintf("%d \n",sheet.gasColTime);//sheet.ch4ColTime);
 							}
 					}
 				break;
@@ -137,7 +138,7 @@ void printModbusDevList()
 									rt_kprintf("%s ",sheet.o2[j].model);
 									rt_kprintf("%s ",UartName[sheet.o2[j].useUartNum]);
 									rt_kprintf("%d ",sheet.o2[j].slaveAddr);
-									rt_kprintf("%d \n",sheet.coColTime);//sheet.o2ColTime);
+									rt_kprintf("%d \n",sheet.gasColTime);//sheet.o2ColTime);
 							}
 					}
 				break;
@@ -151,7 +152,7 @@ void printModbusDevList()
 									rt_kprintf("%s ",sheet.h2s[j].model);
 									rt_kprintf("%s ",UartName[sheet.h2s[j].useUartNum]);
 									rt_kprintf("%d ",sheet.h2s[j].slaveAddr);
-									rt_kprintf("%d \n",sheet.coColTime);//sheet.h2sColTime);
+									rt_kprintf("%d \n",sheet.gasColTime);//sheet.h2sColTime);
 							}
 					}
 				break;
@@ -165,10 +166,11 @@ void printModbusDevList()
 									rt_kprintf("%s ",sheet.co[j].model);
 									rt_kprintf("%s ",UartName[sheet.co[j].useUartNum]);
 									rt_kprintf("%d ",sheet.co[j].slaveAddr);
-									rt_kprintf("%d \n",sheet.coColTime);
+									rt_kprintf("%d \n",sheet.gasColTime);
 							}
 					}
 				break;
+	#endif
 				case TEMPHUM:
 					for(int j=0;j<TEMPHUM_485_NUM;j++){//核对有没有配置过
 							if(sheet.tempHum[j].workFlag==RT_TRUE){
@@ -371,13 +373,14 @@ static int threeAxisConf(int uartnum,char *argv[])
 //	}
 	return ret;
 }
+#ifdef USE_4GAS
 static int ch4Conf(int uartnum,char *argv[])
 {
 //	int i=0;
 	int ret=0;
 	int slaveAddr=atoi32(argv[5],10);
 	//sheet.cirCulaColTime=atoi32(argv[6],10);
-	sheet.coColTime=atoi32(argv[6],10);
+	sheet.gasColTime=atoi32(argv[6],10);
 //	for( i=0;i<CH4_485_NUM;i++){//核对有没有配置过
 //			if(rt_strcmp(sheet.ch4[i].ID,argv[2])==0){//配置过
 //					if((slaveAddr==0)||(slaveAddr==255)){//关闭
@@ -418,7 +421,7 @@ static int coConf(int uartnum,char *argv[])
 	int ret=0;
 	int slaveAddr=atoi32(argv[5],10);
 	//sheet.cirCulaColTime=atoi32(argv[6],10);
-	sheet.coColTime=atoi32(argv[6],10);
+	sheet.gasColTime=atoi32(argv[6],10);
 //	for( i=0;i<CO_485_NUM;i++){//核对有没有配置过
 //			if(rt_strcmp(sheet.co[i].ID,argv[2])==0){//配置过
 //					if((slaveAddr==0)||(slaveAddr==255)){//关闭
@@ -459,7 +462,7 @@ static int h2sConf(int uartnum,char *argv[])
 	int ret=0;
 	int slaveAddr=atoi32(argv[5],10);
 	//sheet.cirCulaColTime=atoi32(argv[6],10);
-	sheet.coColTime=atoi32(argv[6],10);
+	sheet.gasColTime=atoi32(argv[6],10);
 //	for( i=0;i<H2S_485_NUM;i++){//核对有没有配置过
 //			if(rt_strcmp(sheet.h2s[i].ID,argv[2])==0){//配置过
 //					if((slaveAddr==0)||(slaveAddr==255)){//关闭
@@ -500,7 +503,7 @@ static int o2Conf(int uartnum,char *argv[])
 	int ret=0;
 	int slaveAddr=atoi32(argv[5],10);
 	//sheet.cirCulaColTime=atoi32(argv[6],10);
-	sheet.coColTime=atoi32(argv[6],10);
+	sheet.gasColTime=atoi32(argv[6],10);
 //	for( i=0;i<O2_485_NUM;i++){//核对有没有配置过
 //			if(rt_strcmp(sheet.o2[i].ID,argv[2])==0){//配置过
 //					if((slaveAddr==0)||(slaveAddr==255)){//关闭
@@ -535,6 +538,7 @@ static int o2Conf(int uartnum,char *argv[])
 //	}
 	return ret;
 }
+#endif
 static int waterDepthConf(int uartnum,char *argv[])
 {
 //	int i=0;
@@ -636,6 +640,7 @@ static int modbusConf(int modbusnum,int uartnum,char *argv[])
 			case THREEAXIS:
 				ret=threeAxisConf(uartnum,argv);
 			break;
+#ifdef USE_4GAS
 			case CH4:
 				ret=ch4Conf(uartnum,argv);
 			break;
@@ -648,6 +653,7 @@ static int modbusConf(int modbusnum,int uartnum,char *argv[])
       case CO:
 				ret=coConf(uartnum,argv);
       break;
+#endif
       case TEMPHUM:
 				ret=tempHumConf(uartnum,argv);
       break;
@@ -709,6 +715,7 @@ int modbusConfIDCheck(char *inputID)
 							}
 					}
 				break;
+	#ifdef 	 USE_4GAS 	
 				case CH4:
 //					for(int j=0;j<CH4_485_NUM;j++){//核对有没有配置过
 //							if(sheet.ch4[j].workFlag==RT_TRUE){
@@ -753,6 +760,7 @@ int modbusConfIDCheck(char *inputID)
 //							}
 //					}
 				break;
+	#endif
 				case TEMPHUM:
 					for(int j=0;j<TEMPHUM_485_NUM;j++){//核对有没有配置过
 							if(sheet.tempHum[j].workFlag==RT_TRUE){

@@ -96,6 +96,7 @@ void analogTempHumJsonPack(uint8_t chanl);
 uint16_t devRegJsonPack(void);
 uint16_t heartUpJsonPack(void);
 extern uint8_t analogTemChanl;
+extern void gasJsonPack(rt_bool_t netStat);
 //定时时间到  执行相应事件
 static void  timeOutRunFun()
 {
@@ -113,7 +114,7 @@ static void  timeOutRunFun()
 					  devRegJsonPack();//devRegJsonPack();
 					  if(gbNetState==RT_TRUE)
 								rt_mb_send_wait(&mbNetSendData, (rt_ubase_t)&packBuf,RT_WAITING_FOREVER); 
-					 // timeStop(REG_TIME);//正式使用时候需要去掉
+					  timeStop(REG_TIME);//正式使用时候需要去掉
 				}
 				else
 						timeStop(REG_TIME);
@@ -144,11 +145,14 @@ static void  timeOutRunFun()
 //			case  H2S_TIME:
 //				h2sRead2Send(gbNetState);
 //				break;
-			case  CO_TIME://4种气体在一起读取 所以前三个不使用 只在此处读取并打包发送  关闭时候只需要关闭CO就可以把所有气体全部关闭
-				ch4Read2Send(gbNetState);
+			case  GAS_TIME://4种气体在一起读取 所以前三个不使用 只在此处读取并打包发送  关闭时候只需要关闭CO就可以把所有气体全部关闭
+		#ifdef USE_4GAS 	
+   			ch4Read2Send(gbNetState);
 				o2Read2Send(gbNetState);
 				h2sRead2Send(gbNetState);
 			  coRead2Send(gbNetState);
+			  gasJsonPack(gbNetState);
+		#endif
 				break;
 			case  TEMPHUM_TIME:
 				tempHumRead2Send(gbNetState);
@@ -182,7 +186,9 @@ void startTimeList()
 //	  timeInit(H2S_TIME, 				sheet.h2sColTime,24);
 //		timeInit(CH4_TIME, 				sheet.ch4ColTime,28);
 //		timeInit(O2_TIME, 				sheet.o2ColTime,30);
-		timeInit(CO_TIME, 				sheet.coColTime,35);
+
+		timeInit(GAS_TIME, 				sheet.gasColTime,35);
+
 		timeInit(TEMPHUM_TIME, 		sheet.tempHumColTime,40);
 		timeInit(WATERDEPTH_TIME, sheet.waterDepthColTime,45);
 	  //启动温湿度

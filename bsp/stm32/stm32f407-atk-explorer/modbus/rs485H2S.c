@@ -3,7 +3,7 @@
 //硫化氢默认地址03  波特率9600
 //03 03 00 02 00 02 64 29
 //04 03 04 00 00 00 00 AF 33 
-
+#ifdef USE_4GAS
 const static char sign[]="[硫化氢]";
 
 //#define   SLAVE_ADDR     0X01 
@@ -182,3 +182,4 @@ void h2sRead2Send()
 //						rt_mb_send_wait(&mbNetSendData, (rt_ubase_t)&packBuf,RT_WAITING_FOREVER);
 //		}
 }
+#endif

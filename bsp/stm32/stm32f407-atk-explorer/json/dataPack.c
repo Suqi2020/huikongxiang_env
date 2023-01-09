@@ -43,11 +43,11 @@ uint16_t heartUpJsonPack()
 {
 		char* out = NULL;
 		//创建数组
-		cJSON* Array = NULL;
+//		cJSON* Array = NULL;
 		// 创建JSON Object  
 		cJSON* root = NULL;
 		cJSON* nodeobj = NULL;
-		cJSON* nodeobj_p = NULL;
+//		cJSON* nodeobj_p = NULL;
 		root = cJSON_CreateObject();
 		if (root == NULL) return 0;
 		// 加入节点（键值对）
@@ -249,7 +249,7 @@ uint16_t devRegJsonPack()
 	// 创建JSON Object  
 	cJSON* root = NULL;
 	cJSON* nodeobj = NULL;
-	cJSON* nodeobj_p = NULL;
+//	cJSON* nodeobj_p = NULL;
 	root = cJSON_CreateObject();
 	if (root == NULL) return 0;
 	// 加入节点（键值对）
@@ -309,6 +309,7 @@ uint16_t devRegJsonPack()
 							}
 					}
 				break;
+#ifdef USE_4GAS
 				case CH4:
 					for(int j=0;j<CH4_485_NUM;j++){//核对有没有配置过
 							if(sheet.ch4[j].workFlag==RT_TRUE){
@@ -353,6 +354,7 @@ uint16_t devRegJsonPack()
 							}
 					}
 				break;
+#endif
 				case TEMPHUM:
 					for(int j=0;j<TEMPHUM_485_NUM;j++){//核对有没有配置过
 							if(sheet.tempHum[j].workFlag==RT_TRUE){

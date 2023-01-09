@@ -3,6 +3,7 @@
 //一氧化碳默认地址04 波特率9600
 //04 03 00 02 00 02 65 9E
 //04 03 04 00 00 00 00 AF 33 
+#ifdef USE_4GAS
 const static char sign[]="[甲烷]";
 
 //#define   SLAVE_ADDR     0X01 
@@ -189,3 +190,4 @@ void ch4Read2Send()
 //						rt_mb_send_wait(&mbNetSendData, (rt_ubase_t)&packBuf,RT_WAITING_FOREVER);
 //		}
 }
+#endif

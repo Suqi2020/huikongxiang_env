@@ -3,7 +3,7 @@
 //氧气默认地址02  波特率9600
 //02 03 00 02 00 02 65 F8
 //02 03 04 00 00 52 1C F5 9A 00 
-
+#ifdef USE_4GAS
 const static char sign[]="[氧气]";
 
 //#define   SLAVE_ADDR     0X01 
@@ -194,3 +194,4 @@ void o2Read2Send()
 //						rt_mb_send_wait(&mbNetSendData, (rt_ubase_t)&packBuf,RT_WAITING_FOREVER);
 //		}
 }
+#endif

@@ -306,6 +306,7 @@ void delModbusDevbyID(char *ID)
 					case THREEAXIS:
 						sheet.threeAxiss[modPosit[modbDevReadIndex].Y].workFlag=RT_FALSE;
 						break;
+		#ifdef USE_4GAS 	
 					case CH4:
 						sheet.ch4[modPosit[modbDevReadIndex].Y].workFlag=RT_FALSE;
 						break;
@@ -318,6 +319,7 @@ void delModbusDevbyID(char *ID)
 					case CO:
 						sheet.co[modPosit[modbDevReadIndex].Y].workFlag=RT_FALSE;
 						break;
+		#endif
 					case TEMPHUM:
 						sheet.tempHum[modPosit[modbDevReadIndex].Y].workFlag=RT_FALSE;
 						break;
@@ -495,6 +497,7 @@ void LCDDispErrModbusGet()
 							}
 					}
 				break;
+#ifdef	USE_4GAS
 				case CH4:
 					for(int j=0;j<CH4_485_NUM;j++){//核对有没有配置过
 							if(sheet.ch4[j].workFlag==RT_TRUE){
@@ -543,6 +546,7 @@ void LCDDispErrModbusGet()
 							}
 					}
 				break;
+#endif
 				case TEMPHUM:
 					for(int j=0;j<TEMPHUM_485_NUM;j++){//核对有没有配置过
 							if(sheet.tempHum[j].workFlag==RT_TRUE){
@@ -725,6 +729,7 @@ void LCDDispModInfoCpy(modbusPositStru *posit,uint8_t readIndex,LCDDispModInfoSt
 							}
 					}
 					break;
+	#ifdef USE_4GAS
 				case CH4:
 					for(int j=0;j<CH4_485_NUM;j++){//核对有没有配置过
 							if(posit_p.Y==j){
@@ -734,7 +739,7 @@ void LCDDispModInfoCpy(modbusPositStru *posit,uint8_t readIndex,LCDDispModInfoSt
 									 rt_strcpy(lcdRead->model,sheet.ch4[posit_p.Y].model);
 									 lcdRead->port = sheet.ch4[posit_p.Y].useUartNum;
 									 lcdRead->addr = sheet.ch4[posit_p.Y].slaveAddr;
-									 lcdRead->colTime =sheet.coColTime;// //sheet.ch4ColTime;
+									 lcdRead->colTime =sheet.gasColTime;// //sheet.ch4ColTime;
 								 }
 								 break;
 							}
@@ -749,7 +754,7 @@ void LCDDispModInfoCpy(modbusPositStru *posit,uint8_t readIndex,LCDDispModInfoSt
 									 rt_strcpy(lcdRead->model,sheet.o2[posit_p.Y].model);
 									 lcdRead->port = sheet.o2[posit_p.Y].useUartNum;
 									 lcdRead->addr = sheet.o2[posit_p.Y].slaveAddr;
-									 lcdRead->colTime = sheet.coColTime;//sheet.o2ColTime;
+									 lcdRead->colTime = sheet.gasColTime;//sheet.o2ColTime;
 								 }
 								 break;
 							}
@@ -764,7 +769,7 @@ void LCDDispModInfoCpy(modbusPositStru *posit,uint8_t readIndex,LCDDispModInfoSt
 									 rt_strcpy(lcdRead->model,sheet.h2s[posit_p.Y].model);
 									 lcdRead->port = sheet.h2s[posit_p.Y].useUartNum;
 									 lcdRead->addr = sheet.h2s[posit_p.Y].slaveAddr;
-									 lcdRead->colTime = sheet.coColTime;//sheet.h2sColTime;
+									 lcdRead->colTime = sheet.gasColTime;//sheet.h2sColTime;
 								 }
 								 break;
 							}
@@ -779,12 +784,13 @@ void LCDDispModInfoCpy(modbusPositStru *posit,uint8_t readIndex,LCDDispModInfoSt
 										 rt_strcpy(lcdRead->model,sheet.co[posit_p.Y].model);
 										 lcdRead->port = sheet.co[posit_p.Y].useUartNum;
 										 lcdRead->addr = sheet.co[posit_p.Y].slaveAddr;
-										 lcdRead->colTime = sheet.coColTime;
+										 lcdRead->colTime = sheet.gasColTime;
 								 }
 								 break;
 							}
 					}
 					break;
+	#endif
 				case TEMPHUM:
 					for(int j=0;j<TEMPHUM_485_NUM;j++){//核对有没有配置过
 							if(posit_p.Y==j){
@@ -939,7 +945,7 @@ void LCDDispModInfoCpy(modbusPositStru *posit,uint8_t readIndex,LCDDispModInfoSt
 //										 rt_strcpy(modbusLCDRead.model,sheet.co[modPosit[modbDevReadIndex].Y].model);
 //										 modbusLCDRead.port = sheet.co[modPosit[modbDevReadIndex].Y].useUartNum;
 //										 modbusLCDRead.addr = sheet.co[modPosit[modbDevReadIndex].Y].slaveAddr;
-//										 modbusLCDRead.colTime = sheet.coColTime;
+//										 modbusLCDRead.colTime = sheet.gasColTime;
 //								 }
 //								 break;
 //							}
@@ -1031,6 +1037,7 @@ void LCDDispModbusGet()
 							}
 					}
 				break;
+	#ifdef USE_4GAS 
 				case CH4:
 					for(int j=0;j<CH4_485_NUM;j++){//核对有没有配置过
 							if(sheet.ch4[j].workFlag==RT_TRUE){
@@ -1071,6 +1078,7 @@ void LCDDispModbusGet()
 							}
 					}
 				break;
+	#endif
 				case TEMPHUM:
 					for(int j=0;j<TEMPHUM_485_NUM;j++){//核对有没有配置过
 							if(sheet.tempHum[j].workFlag==RT_TRUE){
@@ -1104,8 +1112,13 @@ uint32_t   *singlConcalTime=RT_NULL;//
 modbusStru *singlConfDev=RT_NULL;//
 
 //modbus设备数量的映射表 需要跟modbNumEnum的列表一一对应
+#ifdef	USE_4GAS
 uint8_t numTable[]={CIRCULA_485_NUM,PARTDISCHAG_485_NUM ,PRESSSETTL_485_NUM,THREEAXIS_485_NUM,\
 										CH4_485_NUM,CO_485_NUM,H2S_485_NUM,O2_485_NUM ,WATERDEPTH_485_NUM,TEMPHUM_485_NUM };
+#else
+uint8_t numTable[]={CIRCULA_485_NUM,PARTDISCHAG_485_NUM ,PRESSSETTL_485_NUM,THREEAXIS_485_NUM,\
+										WATERDEPTH_485_NUM,TEMPHUM_485_NUM };
+#endif
 
 //单种modbus设备分别配置  思路 做好映射关系表
 
