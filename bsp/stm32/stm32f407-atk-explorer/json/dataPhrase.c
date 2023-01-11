@@ -73,9 +73,11 @@ rt_bool_t heartRespFun(cJSON  *Json)
 		rt_kprintf("%stime:[%lu]s \r\n",sign, (uint32_t)((u64getTick_p)/1000));
 
 		rt_kprintf("%stime:[%lu]ms\r\n",sign, (uint32_t)(u64getTick_p)%1000);
-	
-    extern void  subTimeStampSet(uint64_t time);
-		subTimeStampSet(u64getTick_p);
+	  extern void  subTimeStampSet(uint64_t time);
+	  if(utcTime()-u64getTick_p>=3000){
+        subTimeStampSet(u64getTick_p);
+			  rt_kprintf("%stime:RTC 误差大于3秒 校时\r\n",sign);
+		}
 	
 		cJSON  *mid =cJSON_GetObjectItem(Json,"mid");
     if(mcu.upHeartMessID != mid->valueint){
