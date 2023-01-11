@@ -110,8 +110,12 @@
 //         1、去掉串口和LCD配置传感器时候4种气体的的deviceID查重
 //         2、统一4种气体定时器为co定时器
 //         3、更改4种气体打包逻辑
-#define APP_VER       ((0<<8)+57)//0x0105 表示1.5版本
-const char date[]="20230106";
+//V0.58    utcTime()打包json格式错误
+//         sprintf(sprinBuf,"%u",utcTime()); 
+//         更改为		sprintf(sprinBuf,"%llu",utcTime());
+//         更改uint32_t utcTime() 为 uint64_t utcTime()
+#define APP_VER       ((0<<8)+58)//0x0105 表示1.5版本
+const char date[]="20230111";
 
 //static    rt_thread_t tid 	= RT_NULL;
 static    rt_thread_t tidW5500 	  = RT_NULL;

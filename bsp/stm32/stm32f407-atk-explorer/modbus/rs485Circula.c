@@ -671,13 +671,13 @@ uint16_t circulaJsonPack()
 					cJSON_AddItemToObject(nodeobj_p,"earthCurC",cJSON_CreateString(sprinBuf));
 					cJSON_AddItemToObject(nodeobj_p,"runCurC",cJSON_CreateString(""));
 					cJSON_AddItemToObject(nodeobj_p,"loadRatioC",cJSON_CreateString(""));
-					sprintf(sprinBuf,"%u",utcTime());
+					sprintf(sprinBuf,"%llu",utcTime());
 					cJSON_AddItemToObject(nodeobj_p,"monitoringTime",cJSON_CreateString(sprinBuf));
 				}
 			}
 		}
 	
-		sprintf(sprinBuf,"%u",utcTime());
+		sprintf(sprinBuf,"%llu",utcTime());
 		cJSON_AddStringToObject(root,"timestamp",sprinBuf);
 		// 打印JSON数据包  
 //		out = cJSON_Print(root);

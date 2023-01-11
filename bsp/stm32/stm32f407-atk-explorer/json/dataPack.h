@@ -38,7 +38,7 @@ extern mcuParazStru mcu;
 
 extern uint8_t packBuf[TX_RX_MAX_BUF_SIZE];
 //extern  rs485ParaStru devi[];
-extern  uint32_t  utcTime(void);
+extern  uint64_t  utcTime(void);
 extern  uint32_t upMessIdAdd(void);
 /**************************/
 //心跳上行定义

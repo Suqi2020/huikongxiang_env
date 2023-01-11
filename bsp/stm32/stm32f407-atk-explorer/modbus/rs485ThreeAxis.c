@@ -271,13 +271,13 @@ static uint16_t threeAxisJsonPack()
 				sprintf(sprinBuf,"%d",threeAxisp[i].acclrationZ);
 				cJSON_AddItemToObject(nodeobj_p,"accelerationZ",cJSON_CreateString(sprinBuf));
 
-				sprintf(sprinBuf,"%u",utcTime());
+				sprintf(sprinBuf,"%llu",utcTime());
 				cJSON_AddItemToObject(nodeobj_p,"monitoringTime",cJSON_CreateString(sprinBuf));
 			}
 		}
 		}
 	
-		sprintf(sprinBuf,"%u",utcTime());
+		sprintf(sprinBuf,"%llu",utcTime());
 		cJSON_AddStringToObject(root,"timestamp",sprinBuf);
 		// 打印JSON数据包  
 //		out = cJSON_Print(root);

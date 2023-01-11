@@ -31,10 +31,13 @@ uint64_t subTimeStampGet()
 				subTimeStamp = 0;
 
 }
-uint32_t  utcTime()
+
+uint64_t  utcTime()
 {
-	return rt_tick_get()+subTimeStampGet();
+	return (uint64_t)rt_tick_get()+(uint64_t)subTimeStampGet();
 }
+
+
 //上行数据打包
 
 
@@ -57,7 +60,7 @@ uint16_t heartUpJsonPack()
 		char *sprinBuf=RT_NULL;
 		sprinBuf=rt_malloc(20);//20个字符串长度 够用了
 		
-		sprintf(sprinBuf,"%u",utcTime());
+		sprintf(sprinBuf,"%llu",utcTime());
 		cJSON_AddStringToObject(root,"timestamp",sprinBuf);
 		nodeobj = cJSON_CreateObject();
 	  cJSON_AddStringToObject(nodeobj, "identifier","area_control_unit");
@@ -391,7 +394,7 @@ uint16_t devRegJsonPack()
 			}
 		}
 	}
-	sprintf(sprinBuf,"%u",utcTime());
+	sprintf(sprinBuf,"%llu",utcTime());
 	cJSON_AddStringToObject(root,"timestamp",sprinBuf);
 	rt_free(sprinBuf);
 	sprinBuf=RT_NULL;

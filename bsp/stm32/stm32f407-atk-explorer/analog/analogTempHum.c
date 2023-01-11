@@ -52,11 +52,11 @@ uint16_t analogTempHumJsonPack(uint8_t chanl)
 						 }
 					}
 				}
-				sprintf(sprinBuf,"%u",utcTime());
+				sprintf(sprinBuf,"%llu",utcTime());
 				cJSON_AddItemToObject(nodeobj_p,"monitoringTime",cJSON_CreateString(sprinBuf));
 		}
 	
-		sprintf(sprinBuf,"%u",utcTime());
+		sprintf(sprinBuf,"%llu",utcTime());
 		cJSON_AddStringToObject(root,"timestamp",sprinBuf);
 
 		//´ò°ü

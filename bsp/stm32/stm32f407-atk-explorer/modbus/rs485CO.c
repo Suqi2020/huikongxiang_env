@@ -117,13 +117,13 @@ static uint16_t coJsonPack()
 				cJSON_AddItemToObject(nodeobj, "data", nodeobj_p);
 				sprintf(sprinBuf,"%02f",co[i]);
 				cJSON_AddItemToObject(nodeobj_p,"deepness",cJSON_CreateString(sprinBuf));
-				sprintf(sprinBuf,"%u",utcTime());
+				sprintf(sprinBuf,"%llu",utcTime());
 				cJSON_AddItemToObject(nodeobj_p,"monitoringTime",cJSON_CreateString(sprinBuf));
 			}
 		}
 		}
 	
-		sprintf(sprinBuf,"%u",utcTime());
+		sprintf(sprinBuf,"%llu",utcTime());
 		cJSON_AddStringToObject(root,"timestamp",sprinBuf);
 		// 打印JSON数据包  
 		//打包
@@ -186,9 +186,9 @@ void coRead2Send()
 }
 rt_bool_t gasWork(int num)
 {
-		if((sheet.co[num].workFlag==RT_TRUE)||\
-			(sheet.co[num].workFlag==RT_TRUE)||\
-		  (sheet.co[num].workFlag==RT_TRUE)||\
+		if((sheet.o2[num].workFlag==RT_TRUE)||\
+			(sheet.h2s[num].workFlag==RT_TRUE)||\
+		  (sheet.ch4[num].workFlag==RT_TRUE)||\
 		(sheet.co[num].workFlag==RT_TRUE)){
 				return   RT_TRUE;
 		}
@@ -248,13 +248,13 @@ char* out = NULL;
 					sprintf(sprinBuf,"%02f",ch4[num]);
 					cJSON_AddItemToObject(nodeobj_p,"methane",cJSON_CreateString(sprinBuf));
 				}
-				sprintf(sprinBuf,"%u",utcTime());
+				sprintf(sprinBuf,"%llu",utcTime());
 				cJSON_AddItemToObject(nodeobj_p,"monitoringTime",cJSON_CreateString(sprinBuf));
 			}
 		//}
 		}
 	
-		sprintf(sprinBuf,"%u",utcTime());
+		sprintf(sprinBuf,"%llu",utcTime());
 		cJSON_AddStringToObject(root,"timestamp",sprinBuf);
 		// 打印JSON数据包  
 		//打包
@@ -310,11 +310,12 @@ void  gasJsonPack(rt_bool_t netStat)
 	
 	
 	      for(int i=0;i<CO_485_NUM;i++){
-					  if(gasWork(i)==RT_TRUE)
-							gasPack(i);
-						if(netStat==RT_TRUE)
-							rt_mb_send_wait(&mbNetSendData, (rt_ubase_t)&packBuf,RT_WAITING_FOREVER);
-						rt_thread_mdelay(2000);//延时发送
+					  if(gasWork(i)==RT_TRUE){
+								gasPack(i);
+							if(netStat==RT_TRUE)
+								rt_mb_send_wait(&mbNetSendData, (rt_ubase_t)&packBuf,RT_WAITING_FOREVER);
+							rt_thread_mdelay(2000);//延时发送
+						}
 				}
 
 

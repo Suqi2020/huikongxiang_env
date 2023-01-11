@@ -254,13 +254,13 @@ uint16_t partDischagJsonPack()
 				cJSON_AddItemToObject(nodeobj_p,"prpsDataC",cJSON_CreateString(""));
 				
 				
-				sprintf(sprinBuf,"%u",utcTime());
+				sprintf(sprinBuf,"%llu",utcTime());
 				cJSON_AddItemToObject(nodeobj_p,"monitoringTime",cJSON_CreateString(sprinBuf));
 			}
 		}
 		}
 	
-		sprintf(sprinBuf,"%u",utcTime());
+		sprintf(sprinBuf,"%llu",utcTime());
 		cJSON_AddStringToObject(root,"timestamp",sprinBuf);
 		// 打印JSON数据包  
 		//打包

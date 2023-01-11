@@ -111,13 +111,13 @@ static uint16_t h2sJsonPack()
 				cJSON_AddItemToObject(nodeobj, "data", nodeobj_p);
 				sprintf(sprinBuf,"%02f",h2s[i]);
 				cJSON_AddItemToObject(nodeobj_p,"deepness",cJSON_CreateString(sprinBuf));
-				sprintf(sprinBuf,"%u",utcTime());
+				sprintf(sprinBuf,"%llu",utcTime());
 				cJSON_AddItemToObject(nodeobj_p,"monitoringTime",cJSON_CreateString(sprinBuf));
 			}
 		}
 		}
 	
-		sprintf(sprinBuf,"%u",utcTime());
+		sprintf(sprinBuf,"%llu",utcTime());
 		cJSON_AddStringToObject(root,"timestamp",sprinBuf);
 		// 打印JSON数据包  
 		//打包

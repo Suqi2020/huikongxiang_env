@@ -136,32 +136,32 @@ static uint16_t pressSettlJsonPack()
 		
 		
 		{
-		Array = cJSON_CreateArray();
-		if (Array == NULL) return 0;
-		cJSON_AddItemToObject(root, "params", Array);
-		for (int i = 0; i < PRESSSETTL_485_NUM; i++)
-		{		
-			if(sheet.pressSetl[i].workFlag==RT_TRUE){
-				nodeobj = cJSON_CreateObject();
-				cJSON_AddItemToArray(Array, nodeobj);
-			  cJSON_AddItemToObject(nodeobj,"deviceId",cJSON_CreateString(sheet.pressSetl[i].ID));
-				sprintf(sprinBuf,"%d",pressSettle[i].respStat);
-				cJSON_AddItemToObject(nodeobj,"responseStatus",cJSON_CreateString(sprinBuf));
-				
-				nodeobj_p= cJSON_CreateObject();
-				cJSON_AddItemToObject(nodeobj, "data", nodeobj_p);
-				sprintf(sprinBuf,"%02f",pressSettle[i].temp);
-				cJSON_AddItemToObject(nodeobj_p,"temperature",cJSON_CreateString(sprinBuf));
+			Array = cJSON_CreateArray();
+			if (Array == NULL) return 0;
+			cJSON_AddItemToObject(root, "params", Array);
+			for (int i = 0; i < PRESSSETTL_485_NUM; i++)
+			{		
+				if(sheet.pressSetl[i].workFlag==RT_TRUE){
+					nodeobj = cJSON_CreateObject();
+					cJSON_AddItemToArray(Array, nodeobj);
+					cJSON_AddItemToObject(nodeobj,"deviceId",cJSON_CreateString(sheet.pressSetl[i].ID));
+					sprintf(sprinBuf,"%d",pressSettle[i].respStat);
+					cJSON_AddItemToObject(nodeobj,"responseStatus",cJSON_CreateString(sprinBuf));
+					
+					nodeobj_p= cJSON_CreateObject();
+					cJSON_AddItemToObject(nodeobj, "data", nodeobj_p);
+					sprintf(sprinBuf,"%02f",pressSettle[i].temp);
+					cJSON_AddItemToObject(nodeobj_p,"temperature",cJSON_CreateString(sprinBuf));
 
-				sprintf(sprinBuf,"%02f",pressSettle[i].height.flotVal );
-				cJSON_AddItemToObject(nodeobj_p,"height",cJSON_CreateString(sprinBuf));
-				sprintf(sprinBuf,"%u",utcTime());
-				cJSON_AddItemToObject(nodeobj_p,"monitoringTime",cJSON_CreateString(sprinBuf));
+					sprintf(sprinBuf,"%02f",pressSettle[i].height.flotVal );
+					cJSON_AddItemToObject(nodeobj_p,"height",cJSON_CreateString(sprinBuf));
+					sprintf(sprinBuf,"%llu",utcTime());
+					cJSON_AddItemToObject(nodeobj_p,"monitoringTime",cJSON_CreateString(sprinBuf));
+				}
 			}
 		}
-		}
 	
-		sprintf(sprinBuf,"%u",utcTime());
+		sprintf(sprinBuf,"%llu",utcTime());
 		cJSON_AddStringToObject(root,"timestamp",sprinBuf);
 		// 打印JSON数据包  
 

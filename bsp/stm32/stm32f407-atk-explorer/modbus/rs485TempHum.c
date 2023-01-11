@@ -131,13 +131,13 @@ static uint16_t tempHumJsonPack()
 
 				sprintf(sprinBuf,"%02f",thum[i].hum );
 				cJSON_AddItemToObject(nodeobj_p,"humidity",cJSON_CreateString(sprinBuf));
-				sprintf(sprinBuf,"%u",utcTime());
+				sprintf(sprinBuf,"%llu",utcTime());
 				cJSON_AddItemToObject(nodeobj_p,"monitoringTime",cJSON_CreateString(sprinBuf));
 			}
 		}
 		}
 	
-		sprintf(sprinBuf,"%u",utcTime());
+		sprintf(sprinBuf,"%llu",utcTime());
 		cJSON_AddStringToObject(root,"timestamp",sprinBuf);
 		// 打印JSON数据包  
 
