@@ -114,8 +114,9 @@
 //         sprintf(sprinBuf,"%u",utcTime()); 
 //         更改为		sprintf(sprinBuf,"%llu",utcTime());
 //         更改uint32_t utcTime() 为 uint64_t utcTime()
-#define APP_VER       ((0<<8)+58)//0x0105 表示1.5版本
-const char date[]="20230111";
+//V0.59    修改串口配置modbus传感器情况下不能删除传感器
+#define APP_VER       ((0<<8)+59)//0x0105 表示1.5版本
+const char date[]="20230112";
 
 //static    rt_thread_t tid 	= RT_NULL;
 static    rt_thread_t tidW5500 	  = RT_NULL;
