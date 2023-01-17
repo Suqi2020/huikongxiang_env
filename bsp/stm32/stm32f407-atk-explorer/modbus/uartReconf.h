@@ -4,7 +4,9 @@
 #include "board.h"
 
 #include "dataPack.h"
-
+//存储分为3个部分  1/modbus传感器存储
+//								 2/ip 串口 acuid 模拟传感器 输入 输出设备
+//								 3/数字,模拟传感器阈值存储
 
 
 #define   UART_NUM        4//一共4路串口
@@ -12,7 +14,8 @@
 #define 	DEVID_LEN       20
 #define   MODEL_LEN       8
 #define   NAME_LEN        20
-
+#define   DI_NUM          8
+#define   DO_NUM          8
 #define   USE_4GAS
  
 
@@ -49,13 +52,25 @@ typedef struct{
 
 }analogDevStru;
 
+
+typedef struct{
+	
+		char  devID[DEVID_LEN];
+	  char  model[MODEL_LEN];
+		char  name[NAME_LEN];
+    uint8_t port; //1-8
+	  uint8_t workFlag;//RT_TRUE-
+	  uint8_t rev[2];
+}digitStru;//数字输入输出
 typedef struct{
 //		uartSaveStru   port[UART_NUM];
-		netIpFlashStru netIpFlash;
-	  analogDevStru  analog[ANALOG_NUM];
-	  uint32_t    uartBps[UART_NUM];
-	  char     acuId[ACUID_LEN+1];
+		netIpFlashStru netIpFlash;        //存储IP数据
+	  analogDevStru  analog[ANALOG_NUM];//存储模拟数据
+	  uint32_t       uartBps[UART_NUM];    //存储串口配置
+	  char     acuId[ACUID_LEN+1];      //存储acuID
 	  char rev;
+		digitStru input[DI_NUM];   //数字输入
+	  digitStru output[DO_NUM];   //数字输出
 }packIpUartStru;
 extern packIpUartStru packFLash;
 #define  MODBID_LEN   20
@@ -69,7 +84,7 @@ typedef enum{
 	  USE_UART6,
 	  USE_UART4,
 	  USE_DIS_UART=0XFF
-}uartEnum;
+}uartEnum;////
 typedef struct{
 		bool 	workFlag;
 		uartEnum  	useUartNum;
@@ -78,6 +93,8 @@ typedef struct{
 		char  model[MODL_LEN];
 
 }modbusStru;
+
+	
 typedef struct{
 		char  ID[MODBID_LEN];
 		char  model[8];
@@ -187,7 +204,7 @@ const static int   modbusBps[MODBUS_NUM]      ={115200,   115200  ,9600,   9600,
 //extern char modbusName_UTF8[MODBUS_NUM][30];
 extern const  char  modbusName_utf8[MODBUS_NUM][30];
 typedef struct{
-			
+///////////////////////////////////////////////////
 			modbusStru  cirCula[CIRCULA_485_NUM];
 			modbusStru  partDischag[PARTDISCHAG_485_NUM];
 			modbusStru  pressSetl[PRESSSETTL_485_NUM];
@@ -201,23 +218,23 @@ typedef struct{
 #endif
 			modbusStru  tempHum[TEMPHUM_485_NUM];
 			modbusStru  waterDepth[WATERDEPTH_485_NUM];
-			
+///////////////////////////////////////////////////
 			uint32_t  cirCulaColTime;
 			uint32_t  partDischagColTime;
 			uint32_t  pressSetlColTime;
 	    uint32_t  threeAxissColTime;
 //			uint32_t  ch4ColTime;
 //	    uint32_t  o2ColTime;
-//			
 //			uint32_t  h2sColTime;
 			uint32_t  gasColTime;//用co的定时器来采集信息  去掉其他三个气体定时器  合并打包上传
 			uint32_t  tempHumColTime;
 			uint32_t  waterDepthColTime;
-			
-			
+///////////////////////////////////////////////////
 			analogStru analog[ANALOG_NUM];
-			//uint32_t   analogColTime;
-	
+///////////////////////////////////////////////////
+			
+
+
 }deviceFlashStru;
 /////////////////////////////////////////////////////////////////////////////////////////////////////
 extern deviceFlashStru sheet;

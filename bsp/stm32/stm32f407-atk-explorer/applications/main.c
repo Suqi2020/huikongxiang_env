@@ -115,8 +115,10 @@
 //         更改为		sprintf(sprinBuf,"%llu",utcTime());
 //         更改uint32_t utcTime() 为 uint64_t utcTime()
 //V0.59    修改串口配置modbus传感器情况下不能删除传感器
-#define APP_VER       ((0<<8)+59)//0x0105 表示1.5版本
-const char date[]="20230112";
+//V0.60		 增加串口digitalinput配置以及存储
+//V0.61    增加串口digital output 配置以及存储 参考文档《汇控箱modbus串口配置V0.3》
+#define APP_VER       ((0<<8)+61)//0x0105 表示1.5版本
+const char date[]="20230117";
 
 //static    rt_thread_t tid 	= RT_NULL;
 static    rt_thread_t tidW5500 	  = RT_NULL;

@@ -884,6 +884,7 @@ MSH_CMD_EXPORT(modbus,port slaveaddr config);//FINSH_FUNCTION_EXPORT_CMD
 //}
 //MSH_CMD_EXPORT(uart,uart config);//FINSH_FUNCTION_EXPORT_CMD
 static const uint8_t portStr[UART_NUM][6]={"port1","port2","port3","port4"};
+////////////////////串口配置/////////////////////////////
 static void uart(int argc, char *argv[])
 {
 	  
@@ -907,7 +908,7 @@ static void uart(int argc, char *argv[])
 }
 MSH_CMD_EXPORT(uart,uart config);//FINSH_FUNCTION_EXPORT_CMD
 
-
+////////////////////////ACUID配置///////////////////////////////////
 static void acuid(int argc, char *argv[])
 {
 		if(argc!=2){
@@ -1019,4 +1020,144 @@ static void analog(int argc, char *argv[])
 
 }
 MSH_CMD_EXPORT(analog,analog config);//FINSH_FUNCTION_EXPORT_CMD
+
+
+
+
+
+
+void printfDIList()
+{
+		for(int j=0;j<DI_NUM;j++){//查一遍 找到 GYNJLXSD000000499  如果
+				if(packFLash.input[j].workFlag==RT_TRUE){//打开
+						rt_kprintf("%s digInput ",sign);
+
+						rt_kprintf("%s ",packFLash.input[j].name);
+						rt_kprintf("%s ",packFLash.input[j].devID);
+						
+						rt_kprintf("%s ",packFLash.input[j].model);
+						rt_kprintf("%d \n",packFLash.input[j].port);
+
+
+
+				}
+		}
+}
+void printfDOList()
+{
+		for(int j=0;j<DO_NUM;j++){//查一遍 找到 GYNJLXSD000000499  如果
+				if(packFLash.output[j].workFlag==RT_TRUE){//打开
+						rt_kprintf("%s digOutput ",sign);
+						rt_kprintf("%s ",packFLash.output[j].name);
+						rt_kprintf("%s ",packFLash.output[j].devID);
+						rt_kprintf("%s ",packFLash.output[j].model);
+						rt_kprintf("%d \n",packFLash.output[j].port);
+				}
+		}
+}
+//digInput 水泵 GYNJLXSD000000162 GY281 1
+static void digInput(int argc, char *argv[])
+{
+	 if(0==rt_strcmp((char *)"list", argv[1])){
+				printfDIList();
+				return;
+		}
+		if(argc!=5){
+				goto ERR;
+		}
+	 int port = atoi16(argv[4],10);
+
+	 if((port<8)&&(port>0)){//添加
+		 	 for(int j=0;j<DI_NUM;j++){//查一遍 找到 GYNJLXSD000000499  如果
+					if(rt_strcmp(packFLash.input[j].devID,argv[2])==0){
+							packFLash.input[j].workFlag=RT_TRUE;
+							rt_strcpy(packFLash.input[j].name, argv[1]);
+							rt_strcpy(packFLash.input[j].model,argv[3]);
+              packFLash.input[j].port=port;
+							rt_kprintf("%s readd diginput channel %d\n",sign,j+1);
+						  return;
+					}
+			 }
+			 for(int j=0;j<DI_NUM;j++){//查一遍 找到 GYNJLXSD000000499  如果
+					if(packFLash.input[j].workFlag!=RT_TRUE){//没启用
+							packFLash.input[j].workFlag=RT_TRUE;
+							rt_strcpy(packFLash.input[j].name, argv[1]);
+						  rt_strcpy(packFLash.input[j].devID,argv[2]);
+							rt_strcpy(packFLash.input[j].model,argv[3]);
+				      packFLash.input[j].port=port;
+							rt_kprintf("%s add diginput chanl %d\n",sign,j+1);
+							return;
+					}
+			 }
+	 }
+	 else{//删除
+			 for(int j=0;j<DI_NUM;j++){//查一遍 找到 GYNJLXSD000000499  如果
+					if(rt_strcmp(packFLash.input[j].devID,argv[2])==0){
+							packFLash.input[j].workFlag=RT_FALSE;
+							rt_kprintf("%s delete diginput channel %d\n",sign,j+1);
+					}
+			 }
+	 }
+		return;
+		ERR:
+		rt_kprintf("%sfor example\n",sign);
+		rt_kprintf("%s[digInput 水泵 GYNJLXSD000000162 GY281 1]\n",sign);
+		rt_kprintf("%s[port1-8 之外清除对应ID的所有参数]\n",sign);
+
+}
+MSH_CMD_EXPORT(digInput,digInput config);//FINSH_FUNCTION_EXPORT_CMD
+
+
+
+
+static void digOutput(int argc, char *argv[])
+{
+	 
+	  if(0==rt_strcmp((char *)"list", argv[1])){
+				printfDOList();
+				return;
+		}
+		if(argc!=5){
+				goto ERR;
+		}
+    int port = atoi16(argv[4],10);
+	 if((port<8)&&(port>0)){//添加
+		 	 for(int j=0;j<DI_NUM;j++){//查一遍 找到 GYNJLXSD000000499  如果
+					if(rt_strcmp(packFLash.output[j].devID,argv[2])==0){
+							packFLash.output[j].workFlag=RT_TRUE;
+							rt_strcpy(packFLash.output[j].name, argv[1]);
+							rt_strcpy(packFLash.output[j].model,argv[3]);
+              packFLash.output[j].port=port;
+							rt_kprintf("%s readd digOutput channel %d\n",sign,j+1);
+						  return;
+					}
+			 }
+			 for(int j=0;j<DI_NUM;j++){//查一遍 找到 GYNJLXSD000000499  如果
+					if(packFLash.output[j].workFlag!=RT_TRUE){//没启用
+							packFLash.output[j].workFlag=RT_TRUE;
+							rt_strcpy(packFLash.output[j].name, argv[1]);
+						  rt_strcpy(packFLash.output[j].devID,argv[2]);
+							rt_strcpy(packFLash.output[j].model,argv[3]);
+				      packFLash.output[j].port=port;
+							rt_kprintf("%s add digOutput chanl %d\n",sign,j+1);
+							return;
+					}
+			 }
+	 }
+	 else{//删除
+			 for(int j=0;j<DI_NUM;j++){//查一遍 找到 GYNJLXSD000000499  如果
+					if(rt_strcmp(packFLash.output[j].devID,argv[2])==0){
+							packFLash.output[j].workFlag=RT_FALSE;
+							rt_kprintf("%s delete digOutput channel %d\n",sign,j+1);
+					}
+			 }
+	 }
+		return;
+		ERR:
+		rt_kprintf("%sfor example\n",sign);
+		rt_kprintf("%s[digOutput 水泵 GYNJLXSD000000162 GY281 1]\n",sign);
+		rt_kprintf("%s[port1-8 之外清除对应ID的所有参数]\n",sign);
+
+}
+MSH_CMD_EXPORT(digOutput,digOutput config);//FINSH_FUNCTION_EXPORT_CMD
 
