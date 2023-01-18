@@ -117,8 +117,9 @@
 //V0.59    修改串口配置modbus传感器情况下不能删除传感器
 //V0.60		 增加串口digitalinput配置以及存储
 //V0.61    增加串口digital output 配置以及存储 参考文档《汇控箱modbus串口配置V0.3》
-#define APP_VER       ((0<<8)+61)//0x0105 表示1.5版本
-const char date[]="20230117";
+//V0.62    增加digital output input 配置超过8个情况下错误提示功能
+#define APP_VER       ((0<<8)+62)//0x0105 表示1.5版本
+const char date[]="20230118";
 
 //static    rt_thread_t tid 	= RT_NULL;
 static    rt_thread_t tidW5500 	  = RT_NULL;
@@ -307,10 +308,12 @@ void  tasklog(int argc, char *argv[])
 			  rt_thread_delete(tidNetRec);
 			  rt_thread_delete(tidNetSend);
 			  rt_thread_delete(tidUpkeep);
-			  rt_kprintf("%s[tasklog delete OK]",sign);
+			  rt_kprintf("%s[tasklog delete OK]\n",sign);
+			  return;
 		}
 		ERR:
-		rt_kprintf("%s[tasklog delete]",sign);
+		rt_kprintf("%serr for example:\n",sign);
+		rt_kprintf("%s[tasklog delete]\n",sign);
 }
 MSH_CMD_EXPORT(tasklog,tasklog del);//FINSH_FUNCTION_EXPORT_CMD
 

@@ -1078,7 +1078,8 @@ static void digInput(int argc, char *argv[])
 						  return;
 					}
 			 }
-			 for(int j=0;j<DI_NUM;j++){//查一遍 找到 GYNJLXSD000000499  如果
+			 int j=0;
+			 for(j=0;j<DI_NUM;j++){//查一遍 找到 GYNJLXSD000000499  如果
 					if(packFLash.input[j].workFlag!=RT_TRUE){//没启用
 							packFLash.input[j].workFlag=RT_TRUE;
 							rt_strcpy(packFLash.input[j].name, argv[1]);
@@ -1088,6 +1089,9 @@ static void digInput(int argc, char *argv[])
 							rt_kprintf("%s add diginput chanl %d\n",sign,j+1);
 							return;
 					}
+			 }
+			 if(j==DI_NUM){
+					rt_kprintf("%s digInput number >8 delete first\n",sign);
 			 }
 	 }
 	 else{//删除
@@ -1132,7 +1136,8 @@ static void digOutput(int argc, char *argv[])
 						  return;
 					}
 			 }
-			 for(int j=0;j<DI_NUM;j++){//查一遍 找到 GYNJLXSD000000499  如果
+			 int j=0;
+			 for(j=0;j<DI_NUM;j++){//查一遍 找到 GYNJLXSD000000499  如果
 					if(packFLash.output[j].workFlag!=RT_TRUE){//没启用
 							packFLash.output[j].workFlag=RT_TRUE;
 							rt_strcpy(packFLash.output[j].name, argv[1]);
@@ -1142,6 +1147,9 @@ static void digOutput(int argc, char *argv[])
 							rt_kprintf("%s add digOutput chanl %d\n",sign,j+1);
 							return;
 					}
+			 }
+			 if(j==DI_NUM){
+					rt_kprintf("%s digOutput number >8 delete first\n",sign);
 			 }
 	 }
 	 else{//删除
