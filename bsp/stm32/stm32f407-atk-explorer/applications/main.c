@@ -109,17 +109,18 @@
 //V0.57    modbus传感器4种气体 氧气硫化氢一氧化碳甲烷使用同一个ID
 //         1、去掉串口和LCD配置传感器时候4种气体的的deviceID查重
 //         2、统一4种气体定时器为co定时器
-//         3、更改4种气体打包逻辑
+//         3、更改4种气体打包逻辑  2023-1-7
 //V0.58    utcTime()打包json格式错误
 //         sprintf(sprinBuf,"%u",utcTime()); 
 //         更改为		sprintf(sprinBuf,"%llu",utcTime());
-//         更改uint32_t utcTime() 为 uint64_t utcTime()
-//V0.59    修改串口配置modbus传感器情况下不能删除传感器
-//V0.60		 增加串口digitalinput配置以及存储
-//V0.61    增加串口digital output 配置以及存储 参考文档《汇控箱modbus串口配置V0.3》
-//V0.62    增加digital output input 配置超过8个情况下错误提示功能
-#define APP_VER       ((0<<8)+62)//0x0105 表示1.5版本
-const char date[]="20230118";
+//         更改uint32_t utcTime() 为 uint64_t utcTime()  2023-1-10
+//V0.59    修改串口配置modbus传感器情况下不能删除传感器  2023-1-11
+//V0.60		 增加串口digitalinput配置以及存储              2023-1-12
+//V0.61    增加串口digital output 配置以及存储 参考文档《汇控箱modbus串口配置V0.3》 2023-1-17
+//V0.62    增加digital output input 配置超过8个情况下错误提示功能  2023-1-18
+//V0.63    增加analog传感器配置，
+#define APP_VER       ((0<<8)+63)//0x0105 表示1.5版本
+const char date[]="20230202";
 
 //static    rt_thread_t tid 	= RT_NULL;
 static    rt_thread_t tidW5500 	  = RT_NULL;

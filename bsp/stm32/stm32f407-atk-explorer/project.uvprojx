@@ -914,14 +914,14 @@
               <FilePath>modbus\modbus.c</FilePath>
             </File>
             <File>
-              <FileName>rs485TempHum.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>modbus\rs485TempHum.c</FilePath>
-            </File>
-            <File>
               <FileName>uartReconf.c</FileName>
               <FileType>1</FileType>
               <FilePath>modbus\uartReconf.c</FilePath>
+            </File>
+            <File>
+              <FileName>rs485TempHum.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>modbus\rs485TempHum.c</FilePath>
             </File>
             <File>
               <FileName>rs485CO.c</FileName>
@@ -982,6 +982,16 @@
               <FileName>rs485PartDischag.c</FileName>
               <FileType>1</FileType>
               <FilePath>modbus\rs485PartDischag.c</FilePath>
+            </File>
+            <File>
+              <FileName>modbusConfig.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>.\modbus\modbusConfig.c</FilePath>
+            </File>
+            <File>
+              <FileName>analogConfig.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>.\modbus\analogConfig.c</FilePath>
             </File>
           </Files>
         </Group>

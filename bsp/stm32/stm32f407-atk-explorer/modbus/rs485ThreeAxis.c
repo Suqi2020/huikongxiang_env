@@ -26,7 +26,6 @@ typedef struct{
 const static char sign[]="[∑¿Õ‚∆∆]";
 static threeAxisStru threeAxisp[THREEAXIS_485_NUM];
 
-
 int threeAxisState(int i)
 {
 		return threeAxisp[i].respStat;

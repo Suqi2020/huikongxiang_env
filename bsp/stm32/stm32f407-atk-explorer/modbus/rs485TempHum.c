@@ -13,6 +13,7 @@ typedef struct{
 	uint8_t respStat;
 }thStru;
 static thStru thum[TEMPHUM_485_NUM];
+
 //float temp[TEMPHUM_485_NUM];
 //float hum[TEMPHUM_485_NUM]; 
 //打包串口发送 

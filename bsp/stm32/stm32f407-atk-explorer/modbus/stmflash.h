@@ -26,8 +26,7 @@
 
 
 
-const static char  analogName[20]="ÎÂÊª¶È";
-const static char  analogName1Val[2][20]={"temperature","humidity"};
+
 
 
 //uint32_t STMFLASH_ReadWord(uint32_t faddr);		  	//¶Á³ö×Ö  

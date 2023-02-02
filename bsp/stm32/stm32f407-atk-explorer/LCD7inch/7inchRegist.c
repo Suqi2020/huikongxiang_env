@@ -327,7 +327,7 @@ void delModbusDevbyID(char *ID)
 						sheet.waterDepth[modPosit[modbDevReadIndex].Y].workFlag=RT_FALSE;
 						break;
 					default:
-						rt_kprintf("%serror delModbusDevbyID\n",sign);
+						rt_kprintf("%serror delModbusDevbyID\n %d",sign,modPosit[modbDevReadIndex].X);
 						break;
 				}
 				rt_kprintf("%sfind ID\n",sign);
@@ -572,7 +572,7 @@ void LCDDispErrModbusGet()
 					}
 				break;
 				default:
-					rt_kprintf("%serror LCDDispModbusGet\n",sign);
+					rt_kprintf("%serror LCDDispErrModbusGet %d\n",sign,i);
 				break;
 			}
 		}
@@ -822,7 +822,7 @@ void LCDDispModInfoCpy(modbusPositStru *posit,uint8_t readIndex,LCDDispModInfoSt
 					}
 					break;
 				default:
-					rt_kprintf("%serror delModbusDevbyID\n",sign);
+					rt_kprintf("%serror LCDDispModInfoCpy %d\n",sign,posit_p.X);
 					break;
 			}
 }
@@ -1100,7 +1100,7 @@ void LCDDispModbusGet()
 					}
 				break;
 				default:
-					rt_kprintf("%serror LCDDispModbusGet\n",sign);
+					rt_kprintf("%serror LCDDispModbusGet %d\n",sign,i);
 				break;
 			}
 		}

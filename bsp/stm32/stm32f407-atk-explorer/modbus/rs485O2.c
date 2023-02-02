@@ -10,7 +10,7 @@ const static char sign[]="[氧气]";
 #define   LENTH          50  //工作环流用到的最大接收buf长度
 
 
- float o2[O2_485_NUM];
+float  o2[O2_485_NUM];
 static uint8_t respStat[O2_485_NUM];
 
 

@@ -194,7 +194,7 @@ void startTimeList()
 	  //Æô¶¯ÎÂÊª¶È
 	  
 	  for(int i=0;i<ANALOG_NUM;i++){
-				if(rt_strcmp(sheet.analog[i].name,analogName)==0){
+				if(rt_strcmp(sheet.analog[i].name,analogName[0])==0){
 					  if(sheet.analog[i].workFlag==RT_TRUE){
 								timeInit(ANA_TEMPHUM_TIME,sheet.analog[i].colTime,30);
 								analogTemChanl=i;

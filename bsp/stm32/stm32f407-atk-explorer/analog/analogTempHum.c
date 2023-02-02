@@ -40,16 +40,16 @@ uint16_t analogTempHumJsonPack(uint8_t chanl)
 				for (int i = 0; i < ANALOG_NUM; i++){		
 					if(sheet.analog[i].workFlag==RT_TRUE){
 						
-						 if(0==strcmp(sheet.analog[i].funName,analogName1Val[0])){//temperature
-								float temp=1.23;
-								sprintf(sprinBuf,"%02f",temp);
-								cJSON_AddItemToObject(nodeobj_p,analogName1Val[0],cJSON_CreateString(sprinBuf));
-						 }
-						 else if(0==strcmp(sheet.analog[i].funName,analogName1Val[1])){//humidity
-								float hum=1.23;
-								sprintf(sprinBuf,"%02f",hum );
-								cJSON_AddItemToObject(nodeobj_p,analogName1Val[1],cJSON_CreateString(sprinBuf));
-						 }
+//						 if(0==strcmp(sheet.analog[i].funName,analogName1Val[0])){//temperature
+//								float temp=1.23;
+//								sprintf(sprinBuf,"%02f",temp);
+//								cJSON_AddItemToObject(nodeobj_p,analogName1Val[0],cJSON_CreateString(sprinBuf));
+//						 }
+//						 else if(0==strcmp(sheet.analog[i].funName,analogName1Val[1])){//humidity
+//								float hum=1.23;
+//								sprintf(sprinBuf,"%02f",hum );
+//								cJSON_AddItemToObject(nodeobj_p,analogName1Val[1],cJSON_CreateString(sprinBuf));
+//						 }
 					}
 				}
 				sprintf(sprinBuf,"%llu",utcTime());
