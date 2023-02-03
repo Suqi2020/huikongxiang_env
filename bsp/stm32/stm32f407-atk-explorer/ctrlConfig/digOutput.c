@@ -29,22 +29,23 @@ static void digOutput(int argc, char *argv[])
 				goto ERR;
 		}
     int port = atoi16(argv[4],10);
-	 if((port<=DO_NUM)&&(port>0)){//添加
+		if((port<=DO_NUM)&&(port>0)){//添加
 				packFLash.output[port-1].workFlag=RT_TRUE;
 				rt_strcpy(packFLash.output[port-1].name, argv[1]);
 				rt_strcpy(packFLash.output[port-1].devID,argv[2]);
 				rt_strcpy(packFLash.output[port-1].model,argv[3]);
 				packFLash.output[port-1].port=port;
 				rt_kprintf("%s add digOutput chanl %d\n",sign,port);
-	 }
-	 else{//删除
+			  rt_kprintf("%s digOutput OK\n",sign);
+		}
+		else{//删除
 			 for(int j=0;j<DO_NUM;j++){//查一遍 找到 GYNJLXSD000000499  如果
 					if(rt_strcmp(packFLash.output[j].devID,argv[2])==0){
 							packFLash.output[j].workFlag=RT_FALSE;
 							rt_kprintf("%s delete digOutput channel %d\n",sign,j+1);
 					}
 			 }
-	 }
+		}
 		return;
 		ERR:
 		rt_kprintf("%sfor example\n",sign);

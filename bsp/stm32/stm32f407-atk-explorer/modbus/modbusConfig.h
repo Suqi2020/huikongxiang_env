@@ -229,19 +229,23 @@ typedef struct{
 ///////////////////////////////////////////////////
 			analogStru analog[ANALOG_NUM];
 ///////////////////////////////////////////////////
-	//放入各种传感器上限下限值
+//放入各种传感器上限下限值 start
 
-			circuStru_p      modbusCircul;
-			partDisChgStru_p modbusPartDisChg;
-			pressSettlStru_p modbusPreSettl;
-			threeAxisStru_p  modbusThreAxis;
-			ch4Stru_p        modbusCh4;
-			o2Stru_p         modbusO2;
-			h2sStru_p        modbusH2s;
-			coStru_p         modbusCo;
-			tempHumStru_p	   modbusTempHum;
-			depthStru_p			 modbusWaterDepth;
-
+			circuStru_p      modbusCircul[CIRCULA_485_NUM];
+			partDisChgStru_p modbusPartDisChg[PARTDISCHAG_485_NUM];
+			pressSettlStru_p modbusPreSettl[PRESSSETTL_485_NUM];
+			threeAxisStru_p  modbusThreAxis[THREEAXIS_485_NUM];
+#ifdef  USE_4GAS
+			ch4Stru_p        modbusCh4[CH4_485_NUM];
+			o2Stru_p         modbusO2[O2_485_NUM];
+			h2sStru_p        modbusH2s[H2S_485_NUM];
+			coStru_p         modbusCo[CO_485_NUM];
+#endif
+			tempHumStru_p	   modbusTempHum[TEMPHUM_485_NUM];
+			depthStru_p			 modbusWaterDepth[WATERDEPTH_485_NUM];
+			
+			tempHumStru_p    analogTempHum;//不支持多路模拟温度传感器
+//放入各种传感器上限下限值 end
 }deviceFlashStru;
 
 

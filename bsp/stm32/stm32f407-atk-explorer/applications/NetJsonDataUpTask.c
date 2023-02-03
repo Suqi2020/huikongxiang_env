@@ -204,7 +204,7 @@ void startTimeList()
 		}
 }
 
-char nihao[]="你好局放防沉降防外破";
+//char nihao[]="你好局放防沉降防外破";
 //
 
 //上行数据的维护以及重发
@@ -219,6 +219,7 @@ void   upKeepStateTask(void *para)
 	  extern void prinfAnalogList();
 	  extern void printfDIList();
 	  extern void printfDOList();
+		extern void printfThresholdList();
 	  uartMutexQueueCfg();//根据flash存储重新配置串口
 //		modbusPrintRead();//modbus配置从flash中读取
 	  uartReconfig();//串口重新配置
@@ -229,13 +230,11 @@ void   upKeepStateTask(void *para)
 	  prinfAnalogList();
 	  printfDIList();
 	  printfDOList();
+		printfThresholdList();
 	  clearUartData();
 	  
 	  readMultiCirCulaPoint();//对于环流来讲 运行前需要提取扩大方式
-//	  for(int i=0;i<strlen(nihao);i++){
-//				printf("%02X ",nihao[i]);
-//		}
-//		printf("%s \n",nihao);
+
 		while(1){
 				timeOutRunFun();
 				timeInc();

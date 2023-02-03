@@ -11,13 +11,12 @@ void prinfAnalogList()
 						rt_kprintf("%s analog ",sign);
 
 						rt_kprintf("%s ",sheet.analog[j].name);
-						rt_kprintf("%d ",sheet.analog[j].nameType);
+						rt_kprintf("%d ",sheet.analog[j].subName);
 						
 						rt_kprintf("%s ",sheet.analog[j].ID);
 						rt_kprintf("%s ",sheet.analog[j].model);
 						rt_kprintf("%d ",sheet.analog[j].port);
 						rt_kprintf("%d\n",sheet.analog[j].colTime);
-
 				}
 		}
 }
@@ -63,10 +62,10 @@ static void analog(int argc, char *argv[])
 				 if((port>8)&&(port!=255)){
 						rt_kprintf("%s,ERR:port should be 0-8 or 255\n",sign);
 				 }
-				 int nametype=atoi32(argv[3],10);
+				 int subName=atoi32(argv[3],10);
 				 if(port==0){//关闭 需要判断ID和选项都对的上时候才能关闭
 						for(int j=0;j<ANALOG_NUM;j++){//查一遍 找到 GYNJLXSD000000499  如果
-								if((rt_strcmp(sheet.analog[j].ID,argv[2])==0)&&(nametype==sheet.analog[j].nameType )){
+								if((rt_strcmp(sheet.analog[j].ID,argv[2])==0)&&(subName==sheet.analog[j].subName )){
 										sheet.analog[j].workFlag=RT_FALSE;
 										rt_kprintf("%s close chanl%d\n",sign,j+1);
 										return;
@@ -77,7 +76,7 @@ static void analog(int argc, char *argv[])
 				 }
 				 else if(port==255){//删除此设备 需要判断ID和选项都对的上时候才能删除
 						for(int j=0;j<ANALOG_NUM;j++){//查一遍 找到 GYNJLXSD000000499  如果
-								if((rt_strcmp(sheet.analog[j].ID,argv[2])==0)&&(nametype==sheet.analog[j].nameType )){
+								if((rt_strcmp(sheet.analog[j].ID,argv[2])==0)&&(subName==sheet.analog[j].subName )){
 										sheet.analog[j].workFlag=RT_FALSE;
 										rt_kprintf("%s delete chanl%d\n",sign,j+1);
 										return;
@@ -91,9 +90,10 @@ static void analog(int argc, char *argv[])
 						rt_strcpy(sheet.analog[port-1].model,  argv[4]);
 						rt_strcpy(sheet.analog[port-1].ID,     argv[2]);
 						sheet.analog[port-1].port=port;
-						sheet.analog[port-1].nameType= nametype;           
+						sheet.analog[port-1].subName= subName;           
 						sheet.analog[port-1].colTime = atoi16(argv[6],10);
 						rt_kprintf("%s open port%d\n",sign,port);
+					  rt_kprintf("%s analog OK\n",sign);
 						return;
 				}
 		}

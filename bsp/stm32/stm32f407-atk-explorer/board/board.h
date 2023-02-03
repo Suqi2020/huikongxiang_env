@@ -13,6 +13,7 @@
 
 #include <rtthread.h>
 #include "stdbool.h"
+#include "stdlib.h"
 #include <stm32f4xx.h>
 #include "drv_common.h"
 #include "drv_gpio.h"

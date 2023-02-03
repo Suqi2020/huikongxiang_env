@@ -763,52 +763,52 @@ static void modbus(int argc, char *argv[])
 				goto ERR;
 		}
 		if(argc==2){
-					if(0==rt_strcmp((char *)"list", argv[1])){
-							printModbusDevList();
-						  return;
-					}
+				if(0==rt_strcmp((char *)"list", argv[1])){
+						printModbusDevList();
+						return;
+				}
 		}
 		else{
-			uint8_t slaveaddr=atoi16(argv[5],10);
-			int setTime =atoi16(argv[6],10);
-			if(setTime<60){
-					rt_kprintf("%serr:argv[6] 采集时间>60 now is%d\n",sign,setTime);
-					goto ERR;
-			}
-			if(slaveaddr>255){
-					rt_kprintf("%serr:argv[5] between 0 and 255 %d\n",sign,argv[5]);
-					goto ERR;
-			}
-			for(i=0;i<MODBUS_NUM;i++){
-					if(0==rt_strcmp((char *)modbusName[i], argv[1])){
-							for(j=0;j<UART_NUM;j++){
-									if(0==rt_strcmp((char *)UartName[j], argv[4])){//串口 合法
-											break;
-									}
-							}
-							break;
-					}
-			}
-			if(i>=MODBUS_NUM){
-					rt_kprintf("%serr:argv[1]\n",sign);
-					for(int j=0;j<MODBUS_NUM;j++)
-						rt_kprintf("%s ",modbusName[j]);
-					rt_kprintf("\n ");
-					goto ERR;
-			}
-			if(j>=UART_NUM){
-					rt_kprintf("%serr:argv[2]\n",sign);
-					for(int j=0;j<UART_NUM;j++)
-						rt_kprintf("%s ",UartName[j]);
-					rt_kprintf("\n ");
-					goto ERR;
-			}
-			if(1==modbusConf(i,j,argv)){//配置modbus参数到表中
-					return;//正确跳出
-			}
-			else{
-					rt_kprintf("%smodbus exit delete first\n",sign);
-			}
+				uint8_t slaveaddr=atoi16(argv[5],10);
+				int setTime =atoi16(argv[6],10);
+				if(setTime<60){
+						rt_kprintf("%serr:argv[6] 采集时间>60 now is%d\n",sign,setTime);
+						goto ERR;
+				}
+				if(slaveaddr>255){
+						rt_kprintf("%serr:argv[5] between 0 and 255 %d\n",sign,argv[5]);
+						goto ERR;
+				}
+				for(i=0;i<MODBUS_NUM;i++){
+						if(0==rt_strcmp((char *)modbusName[i], argv[1])){
+								for(j=0;j<UART_NUM;j++){
+										if(0==rt_strcmp((char *)UartName[j], argv[4])){//串口 合法
+												break;
+										}
+								}
+								break;
+						}
+				}
+				if(i>=MODBUS_NUM){
+						rt_kprintf("%serr:argv[1]\n",sign);
+						for(int j=0;j<MODBUS_NUM;j++)
+								rt_kprintf("%s ",modbusName[j]);
+						rt_kprintf("\n ");
+						goto ERR;
+				}
+				if(j>=UART_NUM){
+						rt_kprintf("%serr:argv[2]\n",sign);
+						for(int j=0;j<UART_NUM;j++)
+								rt_kprintf("%s ",UartName[j]);
+						rt_kprintf("\n ");
+						goto ERR;
+				}
+				if(1==modbusConf(i,j,argv)){//配置modbus参数到表中
+						return;//正确跳出
+				}
+				else{
+						rt_kprintf("%smodbus exit delete first\n",sign);
+				}
 	
 		}
 		

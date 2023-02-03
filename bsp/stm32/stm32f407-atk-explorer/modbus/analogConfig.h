@@ -2,8 +2,9 @@
 #define   _ANALOGCONFIG_H_
 
 #include  "board.h"
+#define   ANALOGNAME_NUM      1
 ////////////////////////////////////////////////////////////////////////////
-const static char  analogName[1][20]={"温湿度"};
+const static char  analogName[ANALOGNAME_NUM][20]={"温湿度"};
 //const static char  analogName1Val[2][20]={"temperature","humidity"};
 //typedef enum{
 //		enumAnaTemp=1,
@@ -23,7 +24,7 @@ typedef struct{
 	  uint8_t   	port;
 	  rt_bool_t 	workFlag;
 	  uint32_t   	colTime;
-	  uint8_t     nameType;
+	  uint8_t     subName;//子选项  比如温湿度中的 温度 湿度
 	  uint8_t     rev[3];
 }analogStru;
 

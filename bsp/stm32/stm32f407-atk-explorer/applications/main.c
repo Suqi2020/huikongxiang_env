@@ -118,7 +118,8 @@
 //V0.60		 增加串口digitalinput配置以及存储              2023-1-12
 //V0.61    增加串口digital output 配置以及存储 参考文档《汇控箱modbus串口配置V0.3》 2023-1-17
 //V0.62    增加digital output input 配置超过8个情况下错误提示功能  2023-1-18
-//V0.63    增加analog传感器配置，
+//V0.63    增加analog传感器配置    2023-02-02
+//         
 #define APP_VER       ((0<<8)+63)//0x0105 表示1.5版本
 const char date[]="20230202";
 
@@ -189,8 +190,8 @@ static void timeout1(void *parameter)
 //				}
 		}
 }
-
-
+char *strnum="1234.5678";
+//double atof(const char *s);
 int main(void)
 {
 
@@ -200,6 +201,7 @@ int main(void)
 		RELAY4_ON;//上电后外部485全部供
 
     rt_kprintf("\n%s%s  ver=%02d.%02d\n",sign,date,(uint8_t)(APP_VER>>8),(uint8_t)APP_VER);
+	  rt_kprintf("[%s %f]\n",strnum,atof(strnum));
 	  //rt_kprintf("name %s  %s\n",modbusName[0],modbusName_utf8[0]);
 	  rt_err_t result;
 		stm32_flash_read(FLASH_IP_SAVE_ADDR,    (uint8_t*)&packFLash,sizeof(packFLash));

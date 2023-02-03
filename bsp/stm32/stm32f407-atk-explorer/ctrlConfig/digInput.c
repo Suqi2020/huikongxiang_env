@@ -43,7 +43,7 @@ static void digInput(int argc, char *argv[])
 				rt_strcpy(packFLash.input[port-1].model,argv[3]);
 				packFLash.input[port-1].port=port;
 				rt_kprintf("%s add diginput chanl %d\n",sign,port);
-
+        rt_kprintf("%s digInput OK\n",sign);
 	 }
 	 else{//删除
 			 for(int j=0;j<DI_NUM;j++){//查一遍 找到 GYNJLXSD000000499  如果
