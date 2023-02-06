@@ -16,6 +16,9 @@
 #define   NAME_LEN        20
 #define   DI_NUM          8
 #define   DO_NUM          8
+#define   V33O_NUM        2
+#define   V5O_NUM         2
+#define   V12O_NUM        4
 #define   USE_4GAS
  
 
@@ -73,7 +76,10 @@ typedef struct{
 	  char     acuId[ACUID_LEN+1];      //存储acuID
 	  char rev;
 		digitStru input[DI_NUM];   //数字输入
-	  digitStru output[DO_NUM];   //数字输出
+	  digitStru digoutput[DO_NUM];   //数字输出
+		digitStru v33output[V33O_NUM]; //3V3电源输出
+		digitStru v5output[V5O_NUM];   //5V电源输出
+		digitStru v12output[V12O_NUM]; //12V电源输出
 }packIpUartStru;
 extern packIpUartStru packFLash;
 

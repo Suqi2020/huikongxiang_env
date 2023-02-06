@@ -218,7 +218,7 @@ void   upKeepStateTask(void *para)
 	  extern void readMultiCirCulaPoint();
 	  extern void prinfAnalogList();
 	  extern void printfDIList();
-	  extern void printfDOList();
+	  extern void printfOutputList();
 		extern void printfThresholdList();
 	  uartMutexQueueCfg();//根据flash存储重新配置串口
 //		modbusPrintRead();//modbus配置从flash中读取
@@ -229,7 +229,7 @@ void   upKeepStateTask(void *para)
 	  printModbusDevList();
 	  prinfAnalogList();
 	  printfDIList();
-	  printfDOList();
+	  printfOutputList();
 		printfThresholdList();
 	  clearUartData();
 	  

@@ -119,9 +119,10 @@
 //V0.61    增加串口digital output 配置以及存储 参考文档《汇控箱modbus串口配置V0.3》 2023-1-17
 //V0.62    增加digital output input 配置超过8个情况下错误提示功能  2023-1-18
 //V0.63    增加analog传感器配置    2023-02-02
-//         
-#define APP_VER       ((0<<8)+63)//0x0105 表示1.5版本
-const char date[]="20230202";
+//V0.64    增加传感器threshold配置   2023-02-05
+//V0.65    增加3v3 5v 12voutput供电配置 20230206
+#define APP_VER       ((0<<8)+65)//0x0105 表示1.5版本
+const char date[]="20230206";
 
 //static    rt_thread_t tid 	= RT_NULL;
 static    rt_thread_t tidW5500 	  = RT_NULL;
