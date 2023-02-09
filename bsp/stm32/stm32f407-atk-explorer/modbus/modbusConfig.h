@@ -1,5 +1,6 @@
 #ifndef __MODBUSCONFIG_H__
 #define __MODBUSCONFIG_H__
+//#include "uartReconf.h"
 #include  "board.h"
 
 
@@ -28,6 +29,11 @@ typedef struct{
 		float tempLowLimit;
 		float humUpLimit;
 		float humLowLimit;
+	
+	  bool  tempUpFlag;//阈值超限的标记
+	  bool  tempLowFlag;
+	  bool  humUpFlag;
+	  bool  humDownFlag;
 }tempHumStru_p;
 
 //modbus传感器防外破
@@ -40,6 +46,15 @@ typedef struct{
 	  uint16_t accYLowLimit;
 	  uint16_t accZUpLimit;
 	  uint16_t accZLowLimit;
+	
+		bool  tempUpFlag;//阈值超限的标记
+		bool  tempLowFlag;
+		bool  accXUpFlag;
+		bool  accXLowFlag;
+		bool  accYUpFlag;
+		bool  accYLowFlag;
+		bool  accZUpFlag;
+		bool  accZLowFlag;
 }threeAxisStru_p;
 //modbus传感 沉降仪
 typedef struct{
@@ -47,6 +62,11 @@ typedef struct{
 		float tempLowLimit;
 	  float heightUpLimit;
 	  float heightLowLimit;
+	
+		bool  tempUpFlag;//阈值超限的标记
+		bool  tempLowFlag;
+		bool  heightUpFlag;
+		bool  heightLowFlag;
 }pressSettlStru_p;
 typedef struct
 {
@@ -57,32 +77,49 @@ typedef struct
 	  float cirCurBLowLimit;
 		float cirCurCUpLimit;
 	  float cirCurCLowLimit;
+
+		bool  cirCurAUpFlag;//阈值超限的标记
+		bool  cirCurALowFlag;
+		bool  cirCurBUpFlag;
+		bool  cirCurBLowFlag;
+		bool  cirCurCUpFlag;
+		bool  cirCurCLowFlag;
 }circuStru_p;
 
 //modbus传感器co
 typedef struct{
 		float coUpLimit;
 		float coLowLimit;
+		bool  coUpFlag;//阈值超限的标记
+		bool  coLowFlag;
 }coStru_p;
 //modbus传感器O2
 typedef struct{
 		float o2UpLimit;
 		float o2LowLimit;
+	  bool  o2UpFlag;//阈值超限的标记
+		bool  coLowFlag;
 }o2Stru_p;
 //modbus传感器ch4
 typedef struct{
 		float ch4UpLimit;
 		float ch4LowLimit;
+	  bool  ch4UpFlag;//阈值超限的标记
+		bool  ch4LowFlag;
 }ch4Stru_p;
 //modbus传感器h2s
 typedef struct{
 		float h2sUpLimit;
 		float h2sLowLimit;
+	  bool  h2sUpFlag;//阈值超限的标记
+		bool  h2sLowFlag;
 }h2sStru_p;
 //modbus传感器waterLev
 typedef struct{
 		float depthUpLimit;
 		float depthLowLimit;
+	  bool  depthUpFlag;//阈值超限的标记
+		bool  depthLowFlag;
 }depthStru_p;
 
 //modbus传感器partDischarg
@@ -107,6 +144,29 @@ typedef struct{
 		uint32_t freqCLowLimit;
 		uint32_t dischargeCUpLimit;
 		uint32_t dischargeCLowLimit;
+	  bool  amplitudeAUpFlag;//阈值超限的标记
+		bool  amplitudeALowFlag;
+	  bool  amplitudeBUpFlag;
+		bool  amplitudeBLowFlag;
+		bool  amplitudeCUpFlag;
+		bool  amplitudeCLowFlag;
+		
+	  bool  freqAUpFlag;//阈值超限的标记
+		bool  freqALowFlag;
+	  bool  freqBUpFlag;
+		bool  freqBLowFlag;
+		bool  freqCUpFlag;
+		bool  freqCLowFlag;
+
+
+	  bool  dischargeAUpFlag;//阈值超限的标记
+		bool  dischargeALowFlag;
+	  bool  dischargeBUpFlag;
+		bool  dischargeBLowFlag;
+		bool  dischargeCUpFlag;
+		bool  dischargeCLowFlag;
+		
+		
 }partDisChgStru_p;
 #define GAS_NUM               2
 #define THREEAXIS_485_NUM     40
@@ -140,7 +200,7 @@ typedef struct{
 														WATERDEPTH_485_NUM+\
 														TEMPHUM_485_NUM)
 #endif
-#define ANALOG_NUM   	        8
+//
 /////////////////////////////////////////////////////////////////////////////////////////////////////
 
 //modbus+设备名称(波特率)+端口(port1-port4)+设备地址(0-关闭设备)+采集间隔(秒)
@@ -209,7 +269,6 @@ typedef struct{
 #ifdef  USE_4GAS
 			modbusStru  ch4[CH4_485_NUM];
 	    modbusStru  o2[O2_485_NUM];
-			
 			modbusStru  h2s[H2S_485_NUM];
 			modbusStru  co[CO_485_NUM];
 #endif
@@ -230,7 +289,6 @@ typedef struct{
 			analogStru analog[ANALOG_NUM];
 ///////////////////////////////////////////////////
 //放入各种传感器上限下限值 start
-
 			circuStru_p      modbusCircul[CIRCULA_485_NUM];
 			partDisChgStru_p modbusPartDisChg[PARTDISCHAG_485_NUM];
 			pressSettlStru_p modbusPreSettl[PRESSSETTL_485_NUM];
@@ -246,6 +304,9 @@ typedef struct{
 			
 			tempHumStru_p    analogTempHum;//不支持多路模拟温度传感器
 //放入各种传感器上限下限值 end
+  
+			autoCtrl_stru		 autoctrl[CRTL_TOTAL_NUM];
+			//uint32_t         autoCrtl
 }deviceFlashStru;
 
 

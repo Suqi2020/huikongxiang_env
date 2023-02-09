@@ -121,8 +121,9 @@
 //V0.63    增加analog传感器配置    2023-02-02
 //V0.64    增加传感器threshold配置   2023-02-05
 //V0.65    增加3v3 5v 12voutput供电配置 20230206
-#define APP_VER       ((0<<8)+65)//0x0105 表示1.5版本
-const char date[]="20230206";
+//V0.66    增加逻辑控制 扩展结构体 增加保存指针到flash中
+#define APP_VER       ((0<<8)+66)//0x0105 表示1.5版本
+const char date[]="20230209";
 
 //static    rt_thread_t tid 	= RT_NULL;
 static    rt_thread_t tidW5500 	  = RT_NULL;
@@ -193,6 +194,8 @@ static void timeout1(void *parameter)
 }
 char *strnum="1234.5678";
 //double atof(const char *s);
+
+//char testNum[4]={1,2,3,4};
 int main(void)
 {
 
@@ -201,14 +204,40 @@ int main(void)
 		RELAY3_ON;
 		RELAY4_ON;//上电后外部485全部供
 
+		
+		
+	  rt_kprintf("\n%\n",sign,date,(uint8_t)(APP_VER>>8),(uint8_t)APP_VER);
     rt_kprintf("\n%s%s  ver=%02d.%02d\n",sign,date,(uint8_t)(APP_VER>>8),(uint8_t)APP_VER);
 	  rt_kprintf("[%s %f]\n",strnum,atof(strnum));
 	  //rt_kprintf("name %s  %s\n",modbusName[0],modbusName_utf8[0]);
 	  rt_err_t result;
 		stm32_flash_read(FLASH_IP_SAVE_ADDR,    (uint8_t*)&packFLash,sizeof(packFLash));
 		stm32_flash_read(FLASH_MODBUS_SAVE_ADDR,(uint8_t*)&sheet,    sizeof(sheet));
-//	  extern void  flashTest();
-//	  flashTest();
+
+	
+	
+	
+	//		sheet.testFlag[0]=testNum+0;
+//		sheet.testFlag[1]=&testNum[1];
+//		sheet.testFlag[2]=&testNum[2];
+//		sheet.testFlag[3]=&testNum[3];
+//	  for(int i=0;i<4;i++){
+//				//rt_kprintf("%d ",testNum[i]);
+//			  rt_kprintf("%d ",*sheet.testFlag[i]);
+//		}
+//		rt_kprintf("\n");
+//		for(int i=0;i<4;i++){
+//				testNum[i]=i+10;
+//		}
+//		
+//		for(int i=0;i<4;i++){
+//				rt_kprintf("%d ",*sheet.testFlag[i]);
+//		}
+//		rt_kprintf("\n");
+//		stm32_flash_erase(FLASH_IP_SAVE_ADDR, sizeof(packFLash));//每次擦除128k字节数据 存储时候需要一起存储
+//		stm32_flash_write(FLASH_IP_SAVE_ADDR,(uint8_t*)&packFLash,sizeof(packFLash));
+//		stm32_flash_write(FLASH_MODBUS_SAVE_ADDR,(uint8_t*)&sheet,sizeof(sheet));
+		
 //////////////////////////////////////信号量//////////////////////////////
 	  w5500Iqr_semp = rt_sem_create("w5500Iqr_semp",0, RT_IPC_FLAG_FIFO);
 		if (w5500Iqr_semp == RT_NULL)

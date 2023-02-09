@@ -17,7 +17,7 @@ const static char sign[]="[flash]";
 //All rights reserved									  
 ////////////////////////////////////////////////////////////////////////////////// 	
 packIpUartStru packFLash   __attribute__ ((aligned (4)));
-deviceFlashStru sheet      __attribute__ ((aligned (4)));
+deviceFlashStru sheet    __attribute__ ((aligned (4)))={0};
 
 extern void uartSingConf(int num,int bps);
 

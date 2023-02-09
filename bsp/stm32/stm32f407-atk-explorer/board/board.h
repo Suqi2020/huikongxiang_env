@@ -11,6 +11,10 @@
 #ifndef __BOARD_H__
 #define __BOARD_H__
 
+
+
+#define ANALOG_NUM   	        8
+
 #include <rtthread.h>
 #include "stdbool.h"
 #include "stdlib.h"

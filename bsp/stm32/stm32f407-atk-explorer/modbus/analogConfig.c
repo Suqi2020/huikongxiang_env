@@ -57,51 +57,54 @@ static void analog(int argc, char *argv[])
 		if(argc!=7){
 				goto ERR;
 		}
-		if(rt_strcmp(argv[1],analogName[0])==0){
-				 int port = atoi32(argv[5],10);
-				 if((port>8)&&(port!=255)){
-						rt_kprintf("%s,ERR:port should be 0-8 or 255\n",sign);
-				 }
-				 int subName=atoi32(argv[3],10);
-				 if(port==0){//关闭 需要判断ID和选项都对的上时候才能关闭
-						for(int j=0;j<ANALOG_NUM;j++){//查一遍 找到 GYNJLXSD000000499  如果
-								if((rt_strcmp(sheet.analog[j].ID,argv[2])==0)&&(subName==sheet.analog[j].subName )){
-										sheet.analog[j].workFlag=RT_FALSE;
-										rt_kprintf("%s close chanl%d\n",sign,j+1);
-										return;
-								}
+		for(int i=0;i<ANALOGNAME_NUM;i++){
+				if(rt_strcmp(argv[1],analogName[i])==0){
+						
+						 int port = atoi32(argv[5],10);
+						 if((port>8)&&(port!=255)){
+								rt_kprintf("%s,ERR:port should be 0-8 or 255\n",sign);
 						 }
-						 rt_kprintf("%s,ERR:not find off analog device\n",sign);
-						 return;
-				 }
-				 else if(port==255){//删除此设备 需要判断ID和选项都对的上时候才能删除
-						for(int j=0;j<ANALOG_NUM;j++){//查一遍 找到 GYNJLXSD000000499  如果
-								if((rt_strcmp(sheet.analog[j].ID,argv[2])==0)&&(subName==sheet.analog[j].subName )){
-										sheet.analog[j].workFlag=RT_FALSE;
-										rt_kprintf("%s delete chanl%d\n",sign,j+1);
-										return;
-								}
+						 int subName=atoi32(argv[3],10);
+						 if(port==0){//关闭 需要判断ID和选项都对的上时候才能关闭
+								for(int j=0;j<ANALOG_NUM;j++){//查一遍 找到 GYNJLXSD000000499  如果
+										if((rt_strcmp(sheet.analog[j].ID,argv[2])==0)&&(subName==sheet.analog[j].subName )){
+												sheet.analog[j].workFlag=RT_FALSE;
+												rt_kprintf("%s close chanl%d\n",sign,j+1);
+												return;
+										}
+								 }
+								 rt_kprintf("%s,ERR:not find off analog device\n",sign);
+								 return;
 						 }
-						 rt_kprintf("%s,ERR:not find delete analog device\n",sign);
-				 }
-				 else{//按照端口来配置
-						sheet.analog[port-1].workFlag=RT_TRUE;
-						rt_strcpy(sheet.analog[port-1].name,   argv[1]);
-						rt_strcpy(sheet.analog[port-1].model,  argv[4]);
-						rt_strcpy(sheet.analog[port-1].ID,     argv[2]);
-						sheet.analog[port-1].port=port;
-						sheet.analog[port-1].subName= subName;           
-						sheet.analog[port-1].colTime = atoi16(argv[6],10);
-						rt_kprintf("%s open port%d\n",sign,port);
-					  rt_kprintf("%s analog OK\n",sign);
-						return;
+						 else if(port==255){//删除此设备 需要判断ID和选项都对的上时候才能删除
+								for(int j=0;j<ANALOG_NUM;j++){//查一遍 找到 GYNJLXSD000000499  如果
+										if((rt_strcmp(sheet.analog[j].ID,argv[2])==0)&&(subName==sheet.analog[j].subName )){
+												sheet.analog[j].workFlag=RT_FALSE;
+												rt_kprintf("%s delete chanl%d\n",sign,j+1);
+												return;
+										}
+								 }
+								 rt_kprintf("%s,ERR:not find delete analog device\n",sign);
+						 }
+						 else{//按照端口来配置
+								sheet.analog[port-1].workFlag=RT_TRUE;
+								rt_strcpy(sheet.analog[port-1].name,   argv[1]);
+								rt_strcpy(sheet.analog[port-1].model,  argv[4]);
+								rt_strcpy(sheet.analog[port-1].ID,     argv[2]);
+								sheet.analog[port-1].port=port;
+								sheet.analog[port-1].subName= subName;           
+								sheet.analog[port-1].colTime = atoi16(argv[6],10);
+								rt_kprintf("%s open port%d\n",sign,port);
+								rt_kprintf("%s analog OK\n",sign);
+								return;
+						}
 				}
 		}
-		else{
-			  rt_kprintf("analog 2\n");
-				rt_kprintf("%sargv[1]!=%s\n",sign,analogName);
-				goto ERR;
-		}
+
+		rt_kprintf("analog 2\n");
+		rt_kprintf("%sargv[1]!=%s\n",sign,analogName);
+		goto ERR;
+
 
 		return;
 		ERR:

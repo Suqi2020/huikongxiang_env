@@ -44,7 +44,7 @@ typedef struct{
 	  uint8_t  rev;
 }netIpFlashStru;
 
-#define  ANALOG_NUM   8//8路模拟量
+//#define  ANALOG_NUM   8//8路模拟量
 
 typedef struct{
 		char  devID[DEVID_LEN];
@@ -71,7 +71,7 @@ typedef struct{
 typedef struct{
 //		uartSaveStru   port[UART_NUM];
 		netIpFlashStru netIpFlash;        //存储IP数据
-	  analogDevStru  analog[ANALOG_NUM];//存储模拟数据
+//	  analogDevStru  analog[ANALOG_NUM];//存储模拟数据
 	  uint32_t       uartBps[UART_NUM];    //存储串口配置
 	  char     acuId[ACUID_LEN+1];      //存储acuID
 	  char rev;
