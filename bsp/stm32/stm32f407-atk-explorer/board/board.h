@@ -13,8 +13,18 @@
 
 
 
-#define ANALOG_NUM   	        8
-
+#define 	ANALOG_NUM   	        8
+#define   UART_NUM        4//一共4路串口
+#define   ACUID_LEN       18
+#define 	DEVID_LEN       20
+#define   MODEL_LEN       8
+#define   NAME_LEN        20
+#define   DI_NUM          8
+#define   DO_NUM          8
+#define   V33O_NUM        2
+#define   V5O_NUM         2
+#define   V12O_NUM        4
+#define   USE_4GAS
 #include <rtthread.h>
 #include "stdbool.h"
 #include "stdlib.h"

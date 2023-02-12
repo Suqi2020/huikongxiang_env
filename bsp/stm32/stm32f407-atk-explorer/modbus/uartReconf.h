@@ -9,17 +9,7 @@
 //								 3/数字,模拟传感器阈值存储
 
 
-#define   UART_NUM        4//一共4路串口
-#define   ACUID_LEN       18
-#define 	DEVID_LEN       20
-#define   MODEL_LEN       8
-#define   NAME_LEN        20
-#define   DI_NUM          8
-#define   DO_NUM          8
-#define   V33O_NUM        2
-#define   V5O_NUM         2
-#define   V12O_NUM        4
-#define   USE_4GAS
+
  
 
 //typedef struct{
@@ -58,7 +48,10 @@ typedef struct{
 
 }analogDevStru;
 
-
+//typedef struct{
+//		bool lowFlag;
+//	  bool upFlag;
+//}digitStru_p;
 typedef struct{
 	
 		char  devID[DEVID_LEN];
@@ -66,7 +59,9 @@ typedef struct{
 		char  name[NAME_LEN];
     uint8_t port; //1-8
 	  uint8_t workFlag;//RT_TRUE-
+//		bool levelFlag;//给个值
 	  uint8_t rev[2];
+	//	bool upFlag;
 }digitStru;//数字输入输出
 typedef struct{
 //		uartSaveStru   port[UART_NUM];
@@ -80,6 +75,13 @@ typedef struct{
 		digitStru v33output[V33O_NUM]; //3V3电源输出
 		digitStru v5output[V5O_NUM];   //5V电源输出
 		digitStru v12output[V12O_NUM]; //12V电源输出
+	
+//			//配置的输入输出高低电平有效需要存储
+//		digitStru_p        digInput[DI_NUM];
+//		digitStru_p        digOutput[DO_NUM];
+//		digitStru_p        digV33Out[V33O_NUM];
+//		digitStru_p        digV5out[V5O_NUM];
+//		digitStru_p        digV12out[V12O_NUM];
 }packIpUartStru;
 extern packIpUartStru packFLash;
 

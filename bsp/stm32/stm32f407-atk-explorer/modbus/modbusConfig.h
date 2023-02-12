@@ -29,13 +29,15 @@ typedef struct{
 		float tempLowLimit;
 		float humUpLimit;
 		float humLowLimit;
-	
+
+}tempHumStru_p;
+typedef struct{
+		
 	  bool  tempUpFlag;//阈值超限的标记
 	  bool  tempLowFlag;
 	  bool  humUpFlag;
-	  bool  humDownFlag;
-}tempHumStru_p;
-
+	  bool  humLowFlag;
+}tempHumFlagStru;
 //modbus传感器防外破
 typedef struct{
 		float tempUpLimit;
@@ -46,7 +48,8 @@ typedef struct{
 	  uint16_t accYLowLimit;
 	  uint16_t accZUpLimit;
 	  uint16_t accZLowLimit;
-	
+}threeAxisStru_p;
+typedef struct{
 		bool  tempUpFlag;//阈值超限的标记
 		bool  tempLowFlag;
 		bool  accXUpFlag;
@@ -55,19 +58,20 @@ typedef struct{
 		bool  accYLowFlag;
 		bool  accZUpFlag;
 		bool  accZLowFlag;
-}threeAxisStru_p;
+}threeAxisFlagStru;
 //modbus传感 沉降仪
 typedef struct{
 	  float tempUpLimit;
 		float tempLowLimit;
 	  float heightUpLimit;
 	  float heightLowLimit;
-	
+}pressSettlStru_p;
+typedef struct{
 		bool  tempUpFlag;//阈值超限的标记
 		bool  tempLowFlag;
 		bool  heightUpFlag;
 		bool  heightLowFlag;
-}pressSettlStru_p;
+}pressSettlFlagStru;
 typedef struct
 {
 	  //环流值 放大了100倍
@@ -77,50 +81,61 @@ typedef struct
 	  float cirCurBLowLimit;
 		float cirCurCUpLimit;
 	  float cirCurCLowLimit;
-
+}circuStru_p;
+typedef struct{
 		bool  cirCurAUpFlag;//阈值超限的标记
 		bool  cirCurALowFlag;
 		bool  cirCurBUpFlag;
 		bool  cirCurBLowFlag;
 		bool  cirCurCUpFlag;
 		bool  cirCurCLowFlag;
-}circuStru_p;
+}circuFlagStru;
 
 //modbus传感器co
 typedef struct{
 		float coUpLimit;
 		float coLowLimit;
+}coStru_p;
+typedef struct{
 		bool  coUpFlag;//阈值超限的标记
 		bool  coLowFlag;
-}coStru_p;
+}coFlagStru;
 //modbus传感器O2
 typedef struct{
 		float o2UpLimit;
 		float o2LowLimit;
-	  bool  o2UpFlag;//阈值超限的标记
-		bool  coLowFlag;
 }o2Stru_p;
+typedef struct{
+	  bool  o2UpFlag;//阈值超限的标记
+		bool  o2LowFlag;
+}o2FlagStru;
 //modbus传感器ch4
 typedef struct{
 		float ch4UpLimit;
 		float ch4LowLimit;
+}ch4Stru_p;
+typedef struct{
 	  bool  ch4UpFlag;//阈值超限的标记
 		bool  ch4LowFlag;
-}ch4Stru_p;
+}ch4FlagStru;
 //modbus传感器h2s
 typedef struct{
 		float h2sUpLimit;
 		float h2sLowLimit;
+}h2sStru_p;
+typedef  struct{
 	  bool  h2sUpFlag;//阈值超限的标记
 		bool  h2sLowFlag;
-}h2sStru_p;
+}h2sFlagStru;
 //modbus传感器waterLev
 typedef struct{
 		float depthUpLimit;
 		float depthLowLimit;
+}depthStru_p;
+typedef struct{
 	  bool  depthUpFlag;//阈值超限的标记
 		bool  depthLowFlag;
-}depthStru_p;
+}depthFlagStru;
 
 //modbus传感器partDischarg
 typedef struct{
@@ -144,6 +159,8 @@ typedef struct{
 		uint32_t freqCLowLimit;
 		uint32_t dischargeCUpLimit;
 		uint32_t dischargeCLowLimit;
+}partDisChgStru_p;
+typedef struct{
 	  bool  amplitudeAUpFlag;//阈值超限的标记
 		bool  amplitudeALowFlag;
 	  bool  amplitudeBUpFlag;
@@ -158,16 +175,16 @@ typedef struct{
 		bool  freqCUpFlag;
 		bool  freqCLowFlag;
 
-
 	  bool  dischargeAUpFlag;//阈值超限的标记
 		bool  dischargeALowFlag;
 	  bool  dischargeBUpFlag;
 		bool  dischargeBLowFlag;
 		bool  dischargeCUpFlag;
 		bool  dischargeCLowFlag;
-		
-		
-}partDisChgStru_p;
+}partDisChgFlagStru;
+
+
+
 #define GAS_NUM               2
 #define THREEAXIS_485_NUM     40
 #define PRESSSETTL_485_NUM    40
@@ -307,12 +324,39 @@ typedef struct{
   
 			autoCtrl_stru		 autoctrl[CRTL_TOTAL_NUM];
 			//uint32_t         autoCrtl
+			
+
 }deviceFlashStru;
 
+typedef struct{
+		bool lowFlag;//低电平
+	  bool upFlag;//高电平
+}digputFlagStru;
 
+
+typedef struct{
+			circuFlagStru      modbusCircul[CIRCULA_485_NUM];
+			partDisChgFlagStru modbusPartDisChg[PARTDISCHAG_485_NUM];
+			pressSettlFlagStru modbusPreSettl[PRESSSETTL_485_NUM];
+			threeAxisFlagStru  modbusThreAxis[THREEAXIS_485_NUM];
+#ifdef  USE_4GAS
+			ch4FlagStru        modbusCh4[CH4_485_NUM];
+			o2FlagStru         modbusO2[O2_485_NUM];
+			h2sFlagStru        modbusH2s[H2S_485_NUM];
+			coFlagStru         modbusCo[CO_485_NUM];
+#endif
+			tempHumFlagStru	   modbusTempHum[TEMPHUM_485_NUM];
+			depthFlagStru			 modbusWaterDepth[WATERDEPTH_485_NUM];
+			tempHumFlagStru    analogTempHum;//不支持多路模拟温度传感器
+		  digputFlagStru     digInput[DI_NUM];
+	    digputFlagStru     v33Output[V33O_NUM];
+	    digputFlagStru     v5Output[V5O_NUM];
+	    digputFlagStru     v12Output[V12O_NUM];
+}inoutDevStru;
+//DI配置高有效
 extern rt_err_t uartDataRec( uartEnum uartNum,uint8_t dat);
 extern deviceFlashStru sheet;
-
+extern inoutDevStru inpoutpFlag;
 
 
 //extern rt_err_t uartDataRec( uartEnum uartNum,uint8_t dat);

@@ -122,8 +122,9 @@
 //V0.64    增加传感器threshold配置   2023-02-05
 //V0.65    增加3v3 5v 12voutput供电配置 20230206
 //V0.66    增加逻辑控制 扩展结构体 增加保存指针到flash中
-#define APP_VER       ((0<<8)+66)//0x0105 表示1.5版本
-const char date[]="20230209";
+//V0.67    输入输出配置增加完成 未测试 20230212
+#define APP_VER       ((0<<8)+67)//0x0105 表示1.5版本
+const char date[]="20230212";
 
 //static    rt_thread_t tid 	= RT_NULL;
 static    rt_thread_t tidW5500 	  = RT_NULL;
