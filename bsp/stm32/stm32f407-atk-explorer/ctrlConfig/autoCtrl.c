@@ -4,8 +4,7 @@
 a║╒╣╠йДхК╤Ю╦ЖиХ╠╦цЭаНй╠╨Рё╛иХ╠╦╪Д╣д╧ьо╣н╙бъ╪╜сКё╗╪╢йДхКлУ╪Чх╚╡©бЗвЦё╘ё╛
 b║╒йДЁЖ╤Ю╦ЖиХ╠╦цЭаНй╠╨Рё╛иХ╠╦╪Д╣д╧ьо╣н╙бъ╪╜сКё╗╪╢йДЁЖ╣диХ╠╦╤╪пХр╙ж╢ппё╘
 c║╒╣╠йДхК╤Ю╦ЖиХ╠╦ё╛╡╒грйДхКиХ╠╦╪Д╣д╧ьо╣йгбъ╪╜╩Р╣дй╠╨Рё╛пХр╙╤Ю╢н╣╔╤юиХжц╪╢©и
-d║╒ртиобъ╪╜еДжцй╠╨РхГпХр╙и╬ЁЩ╣╔╦ЖйДхК╩РуъйДЁЖиХ╠╦ё╛я║оНн╙0╪╢©иё╗бъ╪╜©ьжфап
-╠М╣дж╦уКн╙©уё╘╩РуъжьфТиХ╠╦
+d║╒╡╩ж╖Ёжи╬ЁЩуЩтзеДжцжп╣д╣╔╦ЖиХ╠╦ё╛пХр╙иХжцcancel╪Э╩РуъжьфТиХ╠╦
 e║╒sure cancelх╥╤╗╩Рх║оШ╠╬╢н(a/b/c/d)еДжц
 f║╒listотй╬вН╤Ю10вИеДжциЗп╖╣дбъ╪╜ап╠М
 g║╒delete(1-10)и╬ЁЩеДжц╧Щ╣дбъ╪╜ап╠М
@@ -35,8 +34,8 @@ autoctrl V12O к╝╠ц  GYNJLXSD000000439 1
 
 inoutDevStru inpoutpFlag={0};
 const static char sign[]="[autoCtrl]";
-char *inName[]={"AI","DI","MB",};
-char *outName[]={"DO","V3O","V5O","V12O"};
+char *inName[INOUTNAME_LEN]={"AI","DI","MB",};
+char *outName[INOUTNAME_LEN]={"DO","V3O","V5O","V12O"};
 uint8_t inputIndex=0; //╠╬╢неДжц©ьжфбъ╪╜╣дйДхКвЬ╠ЙеДжц   ╠╩inputFlag ж╦уК╣Всц
 uint8_t outputIndex=0;//╠╬╢неДжц©ьжфбъ╪╜╣дйДЁЖ╣двЬ╠ЙеДжц ╠╩outputFlagж╦уК╣Всц
 
@@ -44,7 +43,7 @@ uint8_t pindex=0;//вэ╧╡еДжц╧ЩуБц╢╤Ю©ьжфлУйЩ ц©еДжц╩Руъи╬ЁЩмЙр╩лУрт╪╟ио╣Гй╠╨Р пХр
 //хГ╧ШйгуЩтзеДжц╫ГцФ ╡╒ц╩спеДжцмЙЁи  ╣Ц╩Ви╬ЁЩ ╢кй╠╡╩дэ╦Эпбpindex
 bool configFlag=false;//вЖ╦Ж╠Й╪гю╢еп╤ойг╡╩йгуЩтзеДжц
 //╪Л╡Ир╩обц╩спиХжц╧Щ╣дIndex 
-uint8_t findCtrlIndex()
+static uint8_t findCtrlIndex()
 {
 		for(int i=0;i<CRTL_TOTAL_NUM;i++){
 				if(sheet.autoctrl[i].workFlag!=1){
@@ -65,16 +64,15 @@ bool firstReadFlag=false;
 //		return 255;
 //}
 //╡Иур╣╠г╟╣дйДЁЖindex
-uint8_t findOutputIndex()
-{
-}
+//uint8_t findOutputIndex()
+//{
+//}
 
-char testa=100;
+//char testa=100;
 
 //ртиобъ╪╜еДжцй╠╨РхГпХр╙и╬ЁЩ╣╔╦ЖйДхК╩РуъйДЁЖиХ╠╦ё╛я║оНн╙0╪╢©иё╛
 //╠ьпК╢с╨СмЫг╟ё╗м╪пн╫ГцФотй╬ё╘р╩╦Жр╩╦Жи╬ЁЩё╗бъ╪╜©ьжфап╠М╣дж╦уКн╙©уё╘╩РуъжьфТиХ╠╦ё╛cancelцЭаНр╡©иртх║оШ╠╬╢нуШлЕеДжц
-//
-void crtlCirculaConf(char **argv)
+static void crtlCirculaConf(char **argv)
 {
 		uint8_t subname = atoi16(argv[4],10);
 		uint8_t limit   = atoi16(argv[5],10);
@@ -87,42 +85,45 @@ void crtlCirculaConf(char **argv)
 				rt_kprintf("%sERR:autoCirculaConf argv[5] limit %s should be 0 1\n",sign);
 				return ;
 		}
-		
-		
+
 		for(i=0;i<CIRCULA_485_NUM;i++){
-					if(rt_strcmp(sheet.cirCula[i].ID,argv[2])==0){//ур╣╫оЮм╛ID╣д
+					if(rt_strcmp(sheet.cirCula[i].ID,argv[3])==0){//ур╣╫оЮм╛ID╣д
+//							rt_strcpy(sheet.autoctrl[pindex].input[inputIndex].typeName,argv[1]);
+//							rt_strcpy(sheet.autoctrl[pindex].input[inputIndex].senseName,argv[2]);
+//							rt_strcpy(sheet.autoctrl[pindex].input[inputIndex].ID,argv[3]);
+//							sheet.autoctrl[pindex].input[inputIndex].subName=subname;
 							if(subname==1){//A
 									if(limit==0){//обоч
-											sheet.autoctrl[pindex].inputFlag[inputIndex]=&inpoutpFlag.modbusCircul[i].cirCurALowFlag;
+											sheet.autoctrl[pindex].input[inputIndex].flag=&inpoutpFlag.modbusCircul[i].cirCurALowFlag;
 											inputIndex++;//
 											return;// true;
 									}
 									else{
-											sheet.autoctrl[pindex].inputFlag[inputIndex]=&inpoutpFlag.modbusCircul[i].cirCurAUpFlag;
+											sheet.autoctrl[pindex].input[inputIndex].flag=&inpoutpFlag.modbusCircul[i].cirCurAUpFlag;
 											inputIndex++;//return true;
 											return;
 									}
 							}
 							else if(subname==2){//A
 									if(limit==0){//обоч
-											sheet.autoctrl[pindex].inputFlag[inputIndex]=&inpoutpFlag.modbusCircul[i].cirCurBLowFlag;
+											sheet.autoctrl[pindex].input[inputIndex].flag=&inpoutpFlag.modbusCircul[i].cirCurBLowFlag;
 											inputIndex++;//return true;
 											return;
 									}
 									else{
-											sheet.autoctrl[pindex].inputFlag[inputIndex]=&inpoutpFlag.modbusCircul[i].cirCurBUpFlag;
+											sheet.autoctrl[pindex].input[inputIndex].flag=&inpoutpFlag.modbusCircul[i].cirCurBUpFlag;
 											inputIndex++;//return true;
 											return;
 									}
 							}
 							else if(subname==3){//A
 									if(limit==0){//обоч
-											sheet.autoctrl[pindex].inputFlag[inputIndex]=&inpoutpFlag.modbusCircul[i].cirCurCLowFlag;
+											sheet.autoctrl[pindex].input[inputIndex].flag=&inpoutpFlag.modbusCircul[i].cirCurCLowFlag;
 											inputIndex++;//return true;
 											return;
 									}
 									else{
-											sheet.autoctrl[pindex].inputFlag[inputIndex]=&inpoutpFlag.modbusCircul[i].cirCurCUpFlag;
+											sheet.autoctrl[pindex].input[inputIndex].flag=&inpoutpFlag.modbusCircul[i].cirCurCUpFlag;
 											inputIndex++;
 											return;
 											//return true;
@@ -133,8 +134,8 @@ void crtlCirculaConf(char **argv)
 }
 
 
-
-void crtlPartDischagConf(char **argv)
+//
+static void crtlPartDischagConf(char **argv)
 {
 			uint8_t subname = atoi16(argv[4],10);
 			uint8_t limit   = atoi16(argv[5],10);
@@ -149,111 +150,116 @@ void crtlPartDischagConf(char **argv)
 			}
 		
 			for(i=0;i<PARTDISCHAG_485_NUM;i++){
-					if(rt_strcmp(sheet.partDischag[i].ID,argv[2])==0){//ур╣╫оЮм╛ID╣д
+					if(rt_strcmp(sheet.partDischag[i].ID,argv[3])==0){//ур╣╫оЮм╛ID╣д
+//						  rt_strcpy(sheet.autoctrl[pindex].input[inputIndex].typeName,argv[1]);
+//						  rt_strcpy(sheet.autoctrl[pindex].input[inputIndex].senseName,argv[2]);
+//						  rt_strcpy(sheet.autoctrl[pindex].input[inputIndex].ID,argv[3]);
+//						  sheet.autoctrl[pindex].input[inputIndex].subName=subname;
+
 							if(subname==1){//A
 									if(limit==0){//обоч
-											sheet.autoctrl[pindex].inputFlag[inputIndex]=&inpoutpFlag.modbusPartDisChg[i].amplitudeALowFlag;
+											sheet.autoctrl[pindex].input[inputIndex].flag=&inpoutpFlag.modbusPartDisChg[i].amplitudeALowFlag;
 											inputIndex++;//
 											return;// true;
 									}
 									else{
-											sheet.autoctrl[pindex].inputFlag[inputIndex]=&inpoutpFlag.modbusPartDisChg[i].amplitudeAUpFlag;
+											sheet.autoctrl[pindex].input[inputIndex].flag=&inpoutpFlag.modbusPartDisChg[i].amplitudeAUpFlag;
 											inputIndex++;//return true;
 											return;
 									}
 							}
 							else if(subname==2){//B
 									if(limit==0){//обоч
-											sheet.autoctrl[pindex].inputFlag[inputIndex]=&inpoutpFlag.modbusPartDisChg[i].amplitudeBLowFlag;
+											sheet.autoctrl[pindex].input[inputIndex].flag=&inpoutpFlag.modbusPartDisChg[i].amplitudeBLowFlag;
 											inputIndex++;//return true;
 											return;
 									}
 									else{
-											sheet.autoctrl[pindex].inputFlag[inputIndex]=&inpoutpFlag.modbusPartDisChg[i].amplitudeBUpFlag;
+											sheet.autoctrl[pindex].input[inputIndex].flag=&inpoutpFlag.modbusPartDisChg[i].amplitudeBUpFlag;
 											inputIndex++;//return true;
 											return;
 									}
 							}
 							else if(subname==3){//C
 									if(limit==0){//обоч
-											sheet.autoctrl[pindex].inputFlag[inputIndex]=&inpoutpFlag.modbusPartDisChg[i].amplitudeCLowFlag;
+											sheet.autoctrl[pindex].input[inputIndex].flag=&inpoutpFlag.modbusPartDisChg[i].amplitudeCLowFlag;
 											inputIndex++;//return true;
 											return;
 									}
 									else{
-											sheet.autoctrl[pindex].inputFlag[inputIndex]=&inpoutpFlag.modbusPartDisChg[i].amplitudeCUpFlag;
+											sheet.autoctrl[pindex].input[inputIndex].flag=&inpoutpFlag.modbusPartDisChg[i].amplitudeCUpFlag;
 											inputIndex++;//return true;
 											return;
 									}
 							}
 							else if(subname==4){//A
 									if(limit==0){//обоч
-											sheet.autoctrl[pindex].inputFlag[inputIndex]=&inpoutpFlag.modbusPartDisChg[i].freqALowFlag;
+											sheet.autoctrl[pindex].input[inputIndex].flag=&inpoutpFlag.modbusPartDisChg[i].freqALowFlag;
 											inputIndex++;//
 											return;// true;
 									}
 									else{
-											sheet.autoctrl[pindex].inputFlag[inputIndex]=&inpoutpFlag.modbusPartDisChg[i].freqAUpFlag;
+											sheet.autoctrl[pindex].input[inputIndex].flag=&inpoutpFlag.modbusPartDisChg[i].freqAUpFlag;
 											inputIndex++;//return true;
 											return;
 									}
 							}
 							else if(subname==5){//B
 									if(limit==0){//обоч
-											sheet.autoctrl[pindex].inputFlag[inputIndex]=&inpoutpFlag.modbusPartDisChg[i].freqBLowFlag;
+											sheet.autoctrl[pindex].input[inputIndex].flag=&inpoutpFlag.modbusPartDisChg[i].freqBLowFlag;
 											inputIndex++;//return true;
 											return;
 									}
 									else{
-											sheet.autoctrl[pindex].inputFlag[inputIndex]=&inpoutpFlag.modbusPartDisChg[i].freqBUpFlag;
+											sheet.autoctrl[pindex].input[inputIndex].flag=&inpoutpFlag.modbusPartDisChg[i].freqBUpFlag;
 											inputIndex++;//return true;
 											return;
 									}
 							}
 							else if(subname==6){//C
 									if(limit==0){//обоч
-											sheet.autoctrl[pindex].inputFlag[inputIndex]=&inpoutpFlag.modbusPartDisChg[i].freqCLowFlag;
+											sheet.autoctrl[pindex].input[inputIndex].flag=&inpoutpFlag.modbusPartDisChg[i].freqCLowFlag;
 											inputIndex++;//return true;
 											return;
 									}
 									else{
-											sheet.autoctrl[pindex].inputFlag[inputIndex]=&inpoutpFlag.modbusPartDisChg[i].freqCUpFlag;
+											sheet.autoctrl[pindex].input[inputIndex].flag=&inpoutpFlag.modbusPartDisChg[i].freqCUpFlag;
 											inputIndex++;//return true;
 											return;
 									}
 							}	
 							else if(subname==7){//A
 									if(limit==0){//обоч
-											sheet.autoctrl[pindex].inputFlag[inputIndex]=&inpoutpFlag.modbusPartDisChg[i].dischargeALowFlag;
+											sheet.autoctrl[pindex].input[inputIndex].flag=&inpoutpFlag.modbusPartDisChg[i].dischargeALowFlag;
 											inputIndex++;//
 											return;// true;
 									}
 									else{
-											sheet.autoctrl[pindex].inputFlag[inputIndex]=&inpoutpFlag.modbusPartDisChg[i].dischargeAUpFlag;
+											sheet.autoctrl[pindex].input[inputIndex].flag=&inpoutpFlag.modbusPartDisChg[i].dischargeAUpFlag;
 											inputIndex++;//return true;
 											return;
 									}
 							}
 							else if(subname==8){//B
 									if(limit==0){//обоч
-											sheet.autoctrl[pindex].inputFlag[inputIndex]=&inpoutpFlag.modbusPartDisChg[i].dischargeBLowFlag;
+											sheet.autoctrl[pindex].input[inputIndex].flag=&inpoutpFlag.modbusPartDisChg[i].dischargeBLowFlag;
 											inputIndex++;//return true;
 											return;
 									}
 									else{
-											sheet.autoctrl[pindex].inputFlag[inputIndex]=&inpoutpFlag.modbusPartDisChg[i].dischargeBUpFlag;
+											sheet.autoctrl[pindex].input[inputIndex].flag=&inpoutpFlag.modbusPartDisChg[i].dischargeBUpFlag;
 											inputIndex++;//return true;
 											return;
 									}
 							}
 							else if(subname==9){//C
 									if(limit==0){//обоч
-											sheet.autoctrl[pindex].inputFlag[inputIndex]=&inpoutpFlag.modbusPartDisChg[i].dischargeCLowFlag;
+											sheet.autoctrl[pindex].input[inputIndex].flag=&inpoutpFlag.modbusPartDisChg[i].dischargeCLowFlag;
 											inputIndex++;//return true;
 											return;
 									}
 									else{
-											sheet.autoctrl[pindex].inputFlag[inputIndex]=&inpoutpFlag.modbusPartDisChg[i].dischargeCUpFlag;
+											sheet.autoctrl[pindex].input[inputIndex].flag=&inpoutpFlag.modbusPartDisChg[i].dischargeCUpFlag;
 											inputIndex++;//return true;
 											return;
 									}
@@ -262,7 +268,7 @@ void crtlPartDischagConf(char **argv)
 			}
 }
 
-void ctrlPressSettlConf(char **argv)
+static void ctrlPressSettlConf(char **argv)
 {
 			uint8_t subname = atoi16(argv[4],10);
 			uint8_t limit   = atoi16(argv[5],10);
@@ -278,27 +284,31 @@ void ctrlPressSettlConf(char **argv)
 			
 			
 			for(i=0;i<PRESSSETTL_485_NUM;i++){
-						if(rt_strcmp(sheet.pressSetl[i].ID,argv[2])==0){//ур╣╫оЮм╛ID╣д
+						if(rt_strcmp(sheet.pressSetl[i].ID,argv[3])==0){//ур╣╫оЮм╛ID╣д
+//								rt_strcpy(sheet.autoctrl[pindex].input[inputIndex].typeName,argv[1]);
+//								rt_strcpy(sheet.autoctrl[pindex].input[inputIndex].senseName,argv[2]);
+//								rt_strcpy(sheet.autoctrl[pindex].input[inputIndex].ID,argv[3]);
+//								sheet.autoctrl[pindex].input[inputIndex].subName=subname;
 								if(subname==1){//A
 									  if(limit==0){//обоч
-												sheet.autoctrl[pindex].inputFlag[inputIndex]=&inpoutpFlag.modbusPreSettl[i].tempLowFlag;
+												sheet.autoctrl[pindex].input[inputIndex].flag=&inpoutpFlag.modbusPreSettl[i].tempLowFlag;
 											  inputIndex++;//
 											  return;// true;
 										}
 										else{
-											  sheet.autoctrl[pindex].inputFlag[inputIndex]=&inpoutpFlag.modbusPreSettl[i].tempUpFlag;
+											  sheet.autoctrl[pindex].input[inputIndex].flag=&inpoutpFlag.modbusPreSettl[i].tempUpFlag;
 												inputIndex++;//return true;
 											  return;
 										}
 								}
 								else if(subname==2){//A
 									  if(limit==0){//обоч
-												sheet.autoctrl[pindex].inputFlag[inputIndex]=&inpoutpFlag.modbusPreSettl[i].heightLowFlag;
+												sheet.autoctrl[pindex].input[inputIndex].flag=&inpoutpFlag.modbusPreSettl[i].heightLowFlag;
 											  inputIndex++;//return true;
 											  return;
 										}
 										else{
-											  sheet.autoctrl[pindex].inputFlag[inputIndex]=&inpoutpFlag.modbusPreSettl[i].heightUpFlag;
+											  sheet.autoctrl[pindex].input[inputIndex].flag=&inpoutpFlag.modbusPreSettl[i].heightUpFlag;
 												inputIndex++;//return true;
 											  return;
 										}
@@ -309,7 +319,7 @@ void ctrlPressSettlConf(char **argv)
 
 
 
-void ctrlThreeAxisConf(char **argv)
+static void ctrlThreeAxisConf(char **argv)
 {
 			uint8_t subname = atoi16(argv[4],10);
 			uint8_t limit   = atoi16(argv[5],10);
@@ -323,51 +333,55 @@ void ctrlThreeAxisConf(char **argv)
 				  return ;
 			}
 			for(i=0;i<THREEAXIS_485_NUM;i++){
-						if(rt_strcmp(sheet.threeAxiss[i].ID,argv[2])==0){//ур╣╫оЮм╛ID╣д
+						if(rt_strcmp(sheet.threeAxiss[i].ID,argv[3])==0){//ур╣╫оЮм╛ID╣д
+//								rt_strcpy(sheet.autoctrl[pindex].input[inputIndex].typeName,argv[1]);
+//								rt_strcpy(sheet.autoctrl[pindex].input[inputIndex].senseName,argv[2]);
+//								rt_strcpy(sheet.autoctrl[pindex].input[inputIndex].ID,argv[3]);
+//								sheet.autoctrl[pindex].input[inputIndex].subName=subname;
 								if(subname==1){//A
 									  if(limit==0){//обоч
-												sheet.autoctrl[pindex].inputFlag[inputIndex]=&inpoutpFlag.modbusThreAxis[i].tempLowFlag;
+												sheet.autoctrl[pindex].input[inputIndex].flag=&inpoutpFlag.modbusThreAxis[i].tempLowFlag;
 											  inputIndex++;//
 											  return;// true;
 										}
 										else{
-											  sheet.autoctrl[pindex].inputFlag[inputIndex]=&inpoutpFlag.modbusThreAxis[i].tempUpFlag;
+											  sheet.autoctrl[pindex].input[inputIndex].flag=&inpoutpFlag.modbusThreAxis[i].tempUpFlag;
 												inputIndex++;//return true;
 											  return;
 										}
 								}
 								else if(subname==2){//A
 									  if(limit==0){//обоч
-												sheet.autoctrl[pindex].inputFlag[inputIndex]=&inpoutpFlag.modbusThreAxis[i].accXLowFlag;
+												sheet.autoctrl[pindex].input[inputIndex].flag=&inpoutpFlag.modbusThreAxis[i].accXLowFlag;
 											  inputIndex++;//return true;
 											  return;
 										}
 										else{
-											  sheet.autoctrl[pindex].inputFlag[inputIndex]=&inpoutpFlag.modbusThreAxis[i].accXUpFlag;
+											  sheet.autoctrl[pindex].input[inputIndex].flag=&inpoutpFlag.modbusThreAxis[i].accXUpFlag;
 												inputIndex++;//return true;
 											  return;
 										}
 								}
 								else if(subname==3){//B
 									  if(limit==0){//обоч
-												sheet.autoctrl[pindex].inputFlag[inputIndex]=&inpoutpFlag.modbusThreAxis[i].accYLowFlag;
+												sheet.autoctrl[pindex].input[inputIndex].flag=&inpoutpFlag.modbusThreAxis[i].accYLowFlag;
 											  inputIndex++;//return true;
 											  return;
 										}
 										else{
-											  sheet.autoctrl[pindex].inputFlag[inputIndex]=&inpoutpFlag.modbusThreAxis[i].accYUpFlag;
+											  sheet.autoctrl[pindex].input[inputIndex].flag=&inpoutpFlag.modbusThreAxis[i].accYUpFlag;
 												inputIndex++;//return true;
 											  return;
 										}
 								}							
 								else if(subname==4){//C
 									  if(limit==0){//обоч
-												sheet.autoctrl[pindex].inputFlag[inputIndex]=&inpoutpFlag.modbusThreAxis[i].accZLowFlag;
+												sheet.autoctrl[pindex].input[inputIndex].flag=&inpoutpFlag.modbusThreAxis[i].accZLowFlag;
 											  inputIndex++;//return true;
 											  return;
 										}
 										else{
-											  sheet.autoctrl[pindex].inputFlag[inputIndex]=&inpoutpFlag.modbusThreAxis[i].accZUpFlag;
+											  sheet.autoctrl[pindex].input[inputIndex].flag=&inpoutpFlag.modbusThreAxis[i].accZUpFlag;
 												inputIndex++;//return true;
 											  return;
 										}
@@ -379,7 +393,7 @@ void ctrlThreeAxisConf(char **argv)
 						
 #ifdef USE_4GAS
 
-void ctrlCh4Conf(char **argv)
+static void ctrlCh4Conf(char **argv)
 {
 
 			uint8_t subname = atoi16(argv[4],10);
@@ -396,15 +410,19 @@ void ctrlCh4Conf(char **argv)
 			
 			
 			for(i=0;i<CH4_485_NUM;i++){
-						if(rt_strcmp(sheet.ch4[i].ID,argv[2])==0){//ур╣╫оЮм╛ID╣д
+						if(rt_strcmp(sheet.ch4[i].ID,argv[3])==0){//ур╣╫оЮм╛ID╣д
+//								rt_strcpy(sheet.autoctrl[pindex].input[inputIndex].typeName,argv[1]);
+//								rt_strcpy(sheet.autoctrl[pindex].input[inputIndex].senseName,argv[2]);
+//								rt_strcpy(sheet.autoctrl[pindex].input[inputIndex].ID,argv[3]);
+//								sheet.autoctrl[pindex].input[inputIndex].subName=subname;
 								if(subname==1){//A
 									  if(limit==0){//обоч
-												sheet.autoctrl[pindex].inputFlag[inputIndex]=&inpoutpFlag.modbusCh4[i].ch4LowFlag;
+												sheet.autoctrl[pindex].input[inputIndex].flag=&inpoutpFlag.modbusCh4[i].ch4LowFlag;
 											  inputIndex++;//
 											  return;// true;
 										}
 										else{
-											  sheet.autoctrl[pindex].inputFlag[inputIndex]=&inpoutpFlag.modbusCh4[i].ch4UpFlag;
+											  sheet.autoctrl[pindex].input[inputIndex].flag=&inpoutpFlag.modbusCh4[i].ch4UpFlag;
 												inputIndex++;//return true;
 											  return;
 										}
@@ -412,7 +430,7 @@ void ctrlCh4Conf(char **argv)
 						}
 			}
 }
-void ctrlO2Conf(char **argv)
+static void ctrlO2Conf(char **argv)
 {
 
 			uint8_t subname = atoi16(argv[4],10);
@@ -427,15 +445,15 @@ void ctrlO2Conf(char **argv)
 				  return ;
 			}
 			for(i=0;i<O2_485_NUM;i++){
-						if(rt_strcmp(sheet.o2[i].ID,argv[2])==0){//ур╣╫оЮм╛ID╣д
+						if(rt_strcmp(sheet.o2[i].ID,argv[3])==0){//ур╣╫оЮм╛ID╣д
 								if(subname==1){//A
 									  if(limit==0){//обоч
-												sheet.autoctrl[pindex].inputFlag[inputIndex]=&inpoutpFlag.modbusO2[i].o2LowFlag;
+												sheet.autoctrl[pindex].input[inputIndex].flag=&inpoutpFlag.modbusO2[i].o2LowFlag;
 											  inputIndex++;//
 											  return;// true;
 										}
 										else{
-											  sheet.autoctrl[pindex].inputFlag[inputIndex]=&inpoutpFlag.modbusO2[i].o2UpFlag;
+											  sheet.autoctrl[pindex].input[inputIndex].flag=&inpoutpFlag.modbusO2[i].o2UpFlag;
 												inputIndex++;//return true;
 											  return;
 										}
@@ -443,7 +461,7 @@ void ctrlO2Conf(char **argv)
 						}
 			}
 }
-void ctrlH2sConf(char **argv)
+static void ctrlH2sConf(char **argv)
 {
 
 			uint8_t subname = atoi16(argv[4],10);
@@ -460,15 +478,15 @@ void ctrlH2sConf(char **argv)
 			
 			
 			for(i=0;i<H2S_485_NUM;i++){
-						if(rt_strcmp(sheet.h2s[i].ID,argv[2])==0){//ур╣╫оЮм╛ID╣д
+						if(rt_strcmp(sheet.h2s[i].ID,argv[3])==0){//ур╣╫оЮм╛ID╣д
 								if(subname==1){//A
 									  if(limit==0){//обоч
-												sheet.autoctrl[pindex].inputFlag[inputIndex]=&inpoutpFlag.modbusH2s[i].h2sLowFlag;
+												sheet.autoctrl[pindex].input[inputIndex].flag=&inpoutpFlag.modbusH2s[i].h2sLowFlag;
 											  inputIndex++;//
 											  return;// true;
 										}
 										else{
-											  sheet.autoctrl[pindex].inputFlag[inputIndex]=&inpoutpFlag.modbusH2s[i].h2sUpFlag;
+											  sheet.autoctrl[pindex].input[inputIndex].flag=&inpoutpFlag.modbusH2s[i].h2sUpFlag;
 												inputIndex++;//return true;
 											  return;
 										}
@@ -476,7 +494,7 @@ void ctrlH2sConf(char **argv)
 						}
 			}
 }
-void ctrlCoConf(char **argv)
+static void ctrlCoConf(char **argv)
 {
 			uint8_t subname = atoi16(argv[4],10);
 			uint8_t limit   = atoi16(argv[5],10);
@@ -490,15 +508,20 @@ void ctrlCoConf(char **argv)
 				  return ;
 			}
 			for(i=0;i<CO_485_NUM;i++){
-					if(rt_strcmp(sheet.co[i].ID,argv[2])==0){//ур╣╫оЮм╛ID╣д
+					if(rt_strcmp(sheet.co[i].ID,argv[3])==0){//ур╣╫оЮм╛ID╣д
+//								rt_strcpy(sheet.autoctrl[pindex].input[inputIndex].typeName,argv[1]);
+//								rt_strcpy(sheet.autoctrl[pindex].input[inputIndex].senseName,argv[2]);
+//								rt_strcpy(sheet.autoctrl[pindex].input[inputIndex].ID,argv[3]);
+//								sheet.autoctrl[pindex].input[inputIndex].subName=subname;
+
 							if(subname==1){//A
 									if(limit==0){//обоч
-											sheet.autoctrl[pindex].inputFlag[inputIndex]=&inpoutpFlag.modbusCo[i].coLowFlag;
+											sheet.autoctrl[pindex].input[inputIndex].flag=&inpoutpFlag.modbusCo[i].coLowFlag;
 											inputIndex++;//
 											return;// true;
 									}
 									else{
-											sheet.autoctrl[pindex].inputFlag[inputIndex]=&inpoutpFlag.modbusCo[i].coUpFlag;
+											sheet.autoctrl[pindex].input[inputIndex].flag=&inpoutpFlag.modbusCo[i].coUpFlag;
 											inputIndex++;//return true;
 											return;
 									}
@@ -510,7 +533,7 @@ void ctrlCoConf(char **argv)
 #endif
 
 
-void ctrlTemphumConf(char **argv)
+static void ctrlTemphumConf(char **argv)
 {
 			uint8_t subname = atoi16(argv[4],10);
 			uint8_t limit   = atoi16(argv[5],10);
@@ -524,27 +547,27 @@ void ctrlTemphumConf(char **argv)
 				  return ;
 			}
 			for(i=0;i<TEMPHUM_485_NUM;i++){
-					if(rt_strcmp(sheet.tempHum[i].ID,argv[2])==0){//ур╣╫оЮм╛ID╣д
+					if(rt_strcmp(sheet.tempHum[i].ID,argv[3])==0){//ур╣╫оЮм╛ID╣д
 							if(subname==1){//A
 									if(limit==0){//обоч
-											sheet.autoctrl[pindex].inputFlag[inputIndex]=&inpoutpFlag.modbusTempHum[i].tempLowFlag;
+											sheet.autoctrl[pindex].input[inputIndex].flag=&inpoutpFlag.modbusTempHum[i].tempLowFlag;
 											inputIndex++;//
 											return;// true;
 									}
 									else{
-											sheet.autoctrl[pindex].inputFlag[inputIndex]=&inpoutpFlag.modbusTempHum[i].tempUpFlag;
+											sheet.autoctrl[pindex].input[inputIndex].flag=&inpoutpFlag.modbusTempHum[i].tempUpFlag;
 											inputIndex++;//return true;
 											return;
 									}
 							}
 							else if(subname==2){//A
 									if(limit==0){//обоч
-											sheet.autoctrl[pindex].inputFlag[inputIndex]=&inpoutpFlag.modbusTempHum[i].humLowFlag;
+											sheet.autoctrl[pindex].input[inputIndex].flag=&inpoutpFlag.modbusTempHum[i].humLowFlag;
 											inputIndex++;//
 											return;// true;
 									}
 									else{
-											sheet.autoctrl[pindex].inputFlag[inputIndex]=&inpoutpFlag.modbusTempHum[i].humUpFlag;
+											sheet.autoctrl[pindex].input[inputIndex].flag=&inpoutpFlag.modbusTempHum[i].humUpFlag;
 											inputIndex++;//return true;
 											return;
 									}
@@ -552,7 +575,7 @@ void ctrlTemphumConf(char **argv)
 					}
 			}
 }					
-void ctrlWaterConf(char **argv)
+static void ctrlWaterConf(char **argv)
 {
 			uint8_t subname = atoi16(argv[4],10);
 			uint8_t limit   = atoi16(argv[5],10);
@@ -566,15 +589,20 @@ void ctrlWaterConf(char **argv)
 				  return ;
 			}
 			for(i=0;i<WATERDEPTH_485_NUM;i++){
-					if(rt_strcmp(sheet.waterDepth[i].ID,argv[2])==0){//ур╣╫оЮм╛ID╣д
+					if(rt_strcmp(sheet.waterDepth[i].ID,argv[3])==0){//ур╣╫оЮм╛ID╣д
+//							rt_strcpy(sheet.autoctrl[pindex].input[inputIndex].typeName,argv[1]);
+//							rt_strcpy(sheet.autoctrl[pindex].input[inputIndex].senseName,argv[2]);
+//							rt_strcpy(sheet.autoctrl[pindex].input[inputIndex].ID,argv[3]);
+//							sheet.autoctrl[pindex].input[inputIndex].subName=subname;
+//              sheet.autoctrl[pindex].input[inputIndex].limit=limit;
 							if(subname==1){//A
 									if(limit==0){//обоч
-											sheet.autoctrl[pindex].inputFlag[inputIndex]=&inpoutpFlag.modbusWaterDepth[i].depthLowFlag;
+											sheet.autoctrl[pindex].input[inputIndex].flag=&inpoutpFlag.modbusWaterDepth[i].depthLowFlag;
 											inputIndex++;//
 											return;// true;
 									}
 									else{
-											sheet.autoctrl[pindex].inputFlag[inputIndex]=&inpoutpFlag.modbusWaterDepth[i].depthUpFlag;
+											sheet.autoctrl[pindex].input[inputIndex].flag=&inpoutpFlag.modbusWaterDepth[i].depthUpFlag;
 											inputIndex++;//return true;
 											return;
 									}
@@ -587,9 +615,10 @@ void ctrlWaterConf(char **argv)
 static void autoctrlInputcfg(char*argv[])
 {
 	  int i,j;
-	  uint8_t limit ;
+	  uint8_t limit ,subName;
 		for(i=0;i<sizeof(inName)/sizeof(inName[0]);i++){
 				if(rt_strcmp(inName[i],argv[1])==0){//find input
+
 						switch(i){
 							case 0://AI
 								for(j=0;j<ANALOG_NUM;j++){
@@ -597,6 +626,12 @@ static void autoctrlInputcfg(char*argv[])
 												if(rt_strcmp(argv[3],sheet.analog[j].ID)==0){//find ID
 													  uint8_t subname = atoi16(argv[4],10);
 													  uint8_t limit   = atoi16(argv[5],10);
+
+														rt_strcpy(sheet.autoctrl[pindex].input[inputIndex].typeName,argv[1]);
+														rt_strcpy(sheet.autoctrl[pindex].input[inputIndex].senseName,argv[2]);
+														rt_strcpy(sheet.autoctrl[pindex].input[inputIndex].ID,argv[3]);
+														sheet.autoctrl[pindex].input[inputIndex].subName=subname;
+														sheet.autoctrl[pindex].input[inputIndex].limit=limit;
 													  if(!((subname==0)||(subname==1)||(subname==2))){
 																rt_kprintf("%sERR:argv[4] subname %s should be 0 1 2\n",sign,inName[i]);
 														}
@@ -606,30 +641,22 @@ static void autoctrlInputcfg(char*argv[])
 														if(sheet.analog[j].subName==subname){//find subname
 															  if(subname==1){//нб╤х
 																		if(limit==0){//обоч
-																				sheet.autoctrl[pindex].inputFlag[inputIndex]=&inpoutpFlag.analogTempHum.tempLowFlag;
+																				sheet.autoctrl[pindex].input[inputIndex].flag=&inpoutpFlag.analogTempHum.tempLowFlag;
 																		}
 																		else{//иооч
-																			  sheet.autoctrl[pindex].inputFlag[inputIndex]=&inpoutpFlag.analogTempHum.tempUpFlag;
+																			  sheet.autoctrl[pindex].input[inputIndex].flag=&inpoutpFlag.analogTempHum.tempUpFlag;
 																		}
 																		inputIndex++;
 																}
 																else if(subname==2){//й╙╤х
 																		if(limit==0){//обоч
-																				sheet.autoctrl[pindex].inputFlag[inputIndex]=&inpoutpFlag.analogTempHum.humLowFlag;
+																				sheet.autoctrl[pindex].input[inputIndex].flag=&inpoutpFlag.analogTempHum.humLowFlag;
 																		}
 																		else{//иооч
-																			  sheet.autoctrl[pindex].inputFlag[inputIndex]=&inpoutpFlag.analogTempHum.humUpFlag;
+																			  sheet.autoctrl[pindex].input[inputIndex].flag=&inpoutpFlag.analogTempHum.humUpFlag;
 																		}
 																		inputIndex++;
 																}
-//																else if(subname==0){//и╬ЁЩио╠ъиХжц╣днб╤хй╙╤хж╣  ╟╢уум╪пнотй╬╠ьпКеДжц╧Щ╡едэотй╬х║оШ╣д╟╢е╔  м╪пн╫ГцФпХр╙╤Чж╣отй╬
-//																	  if(inputIndex==0){
-//																			  rt_kprintf("%sERR:inpudIndex is 0\n",sign);
-//																				return;
-//																		}
-//																		inputIndex--;
-//																		sheet.autoctrl[pindex].inputFlag[inputIndex]=NULL;
-//																}
 																configFlag=true;
 														}
 												}
@@ -638,6 +665,11 @@ static void autoctrlInputcfg(char*argv[])
 								break;
 							case 1://DI
 								limit   = atoi16(argv[5],10);
+								rt_strcpy(sheet.autoctrl[pindex].input[inputIndex].typeName,argv[1]);
+								rt_strcpy(sheet.autoctrl[pindex].input[inputIndex].senseName,argv[2]);
+								rt_strcpy(sheet.autoctrl[pindex].input[inputIndex].ID,argv[3]);
+								sheet.autoctrl[pindex].input[inputIndex].subName=0;
+								sheet.autoctrl[pindex].input[inputIndex].limit=limit;
 								if(!((limit==0)||(limit==1))){
 										rt_kprintf("%sERR:di conf argv[5] limit %s should be 0 1\n",sign);
 										return ;
@@ -646,15 +678,22 @@ static void autoctrlInputcfg(char*argv[])
 										if(0==rt_strcmp((char *)packFLash.input[i].devID,argv[2])){
 												//packFLash.input[i].levelFlag=limit;//м╗╧ЩlevelFlagю╢жцн╩ lowFlag upFlag
 											  if(limit==0)
-														sheet.autoctrl[pindex].inputFlag[inputIndex]=&inpoutpFlag.digInput[i].lowFlag;
+														sheet.autoctrl[pindex].input[inputIndex].flag=&inpoutpFlag.digInput[i].lowFlag;
 												else
-														sheet.autoctrl[pindex].inputFlag[inputIndex]=&inpoutpFlag.digInput[i].upFlag;
+														sheet.autoctrl[pindex].input[inputIndex].flag=&inpoutpFlag.digInput[i].upFlag;
 										}
 								}
 								break;
 							case 2://MB
 								for(i=0;i<MODBUS_NUM;i++){
 										if(0==rt_strcmp((char *)modbusName[i], argv[2])){
+												limit   = atoi16(argv[5],10);
+												subName = atoi16(argv[4],10);
+												rt_strcpy(sheet.autoctrl[pindex].input[inputIndex].typeName,argv[1]);
+												rt_strcpy(sheet.autoctrl[pindex].input[inputIndex].senseName,argv[2]);
+												rt_strcpy(sheet.autoctrl[pindex].input[inputIndex].ID,argv[3]);
+												sheet.autoctrl[pindex].input[inputIndex].subName=subName;
+												sheet.autoctrl[pindex].input[inputIndex].limit=limit;
 												switch(i){
 													case CIRCULA:
 															// if(true==autoCirculaConf(argv))
@@ -717,6 +756,11 @@ static void autoctrlOutputcfg(char*argv[])
 		}
 		for(i=0;i<sizeof(outName)/sizeof(outName[0]);i++){
 				if(rt_strcmp(outName[i],argv[i])==0){//find output
+						rt_strcpy(sheet.autoctrl[pindex].output[outputIndex].typeName,argv[1]);
+						rt_strcpy(sheet.autoctrl[pindex].output[outputIndex].senseName,argv[2]);
+						rt_strcpy(sheet.autoctrl[pindex].output[outputIndex].ID,argv[3]);
+						sheet.autoctrl[pindex].output[outputIndex].subName=0;
+					  sheet.autoctrl[pindex].output[outputIndex].limit=limit;
 						switch(i)
 						{
 							case 0:
@@ -724,9 +768,9 @@ static void autoctrlOutputcfg(char*argv[])
 										if(0==rt_strcmp((char *)packFLash.digoutput[i].devID,argv[2])){
 												//packFLash.digoutput[i].levelFlag=limit;//м╗╧ЩlevelFlagю╢жцн╩ lowFlag upFlag
 											  if(limit==0)
-														sheet.autoctrl[pindex].outputFlag[outputIndex]=&inpoutpFlag.digInput[i].lowFlag;
+														sheet.autoctrl[pindex].output[outputIndex].flag=&inpoutpFlag.digOutput[i].lowFlag;
 												else
-														sheet.autoctrl[pindex].outputFlag[outputIndex]=&inpoutpFlag.digInput[i].upFlag;
+														sheet.autoctrl[pindex].output[outputIndex].flag=&inpoutpFlag.digOutput[i].upFlag;
 										}
 								}
 								break;
@@ -735,20 +779,20 @@ static void autoctrlOutputcfg(char*argv[])
 										if(0==rt_strcmp((char *)packFLash.v33output[i].devID,argv[2])){
 												//packFLash.digoutput[i].levelFlag=limit;//м╗╧ЩlevelFlagю╢жцн╩ lowFlag upFlag
 											  if(limit==0)
-														sheet.autoctrl[pindex].outputFlag[outputIndex]=&inpoutpFlag.v33Output[i].lowFlag;
+														sheet.autoctrl[pindex].output[outputIndex].flag=&inpoutpFlag.v33Output[i].lowFlag;
 												else
-														sheet.autoctrl[pindex].outputFlag[outputIndex]=&inpoutpFlag.v33Output[i].upFlag;
+														sheet.autoctrl[pindex].output[outputIndex].flag=&inpoutpFlag.v33Output[i].upFlag;
 										}
 								}
 								break;
 							case 2:
 								for(i=0;i<V5O_NUM;i++){
 										if(0==rt_strcmp((char *)packFLash.v5output[i].devID,argv[2])){
-												//packFLash.digoutput[i].levelFlag=limit;//м╗╧ЩlevelFlagю╢жцн╩ lowFlag upFlag
+												
 											  if(limit==0)
-														sheet.autoctrl[pindex].outputFlag[outputIndex]=&inpoutpFlag.v5Output[i].lowFlag;
+														sheet.autoctrl[pindex].output[outputIndex].flag=&inpoutpFlag.v5Output[i].lowFlag;
 												else
-														sheet.autoctrl[pindex].outputFlag[outputIndex]=&inpoutpFlag.v5Output[i].upFlag;
+														sheet.autoctrl[pindex].output[outputIndex].flag=&inpoutpFlag.v5Output[i].upFlag;
 										}
 								}
 								break;
@@ -757,9 +801,9 @@ static void autoctrlOutputcfg(char*argv[])
 										if(0==rt_strcmp((char *)packFLash.v12output[i].devID,argv[2])){
 												//packFLash.digoutput[i].levelFlag=limit;//м╗╧ЩlevelFlagю╢жцн╩ lowFlag upFlag
 											  if(limit==0)
-														sheet.autoctrl[pindex].outputFlag[outputIndex]=&inpoutpFlag.v12Output[i].lowFlag;
+														sheet.autoctrl[pindex].output[outputIndex].flag=&inpoutpFlag.v12Output[i].lowFlag;
 												else
-														sheet.autoctrl[pindex].outputFlag[outputIndex]=&inpoutpFlag.v12Output[i].upFlag;
+														sheet.autoctrl[pindex].output[outputIndex].flag=&inpoutpFlag.v12Output[i].upFlag;
 										}
 								}
 								break;
@@ -769,6 +813,36 @@ static void autoctrlOutputcfg(char*argv[])
 		}
 	
 }
+//╢Рс║вт╤╞©ьжф╣деДжцап╠М
+static void ctrlPrintf()
+{
+		rt_kprintf("%s,auto ctrl list",sign);
+		for(int i=0;i<CRTL_TOTAL_NUM;i++){
+				//rt_kprintf("%s,autoctrl list",sign);
+			  if(sheet.autoctrl[i].workFlag==true)
+						for(int k=0;k<CRTL_IN_NUM;k++){
+								if(sheet.autoctrl[i].input[k].flag!=NULL){
+										rt_kprintf("In:autoctrl ");
+										rt_kprintf("%s ",sheet.autoctrl[i].input[k].typeName);
+										rt_kprintf("%s ",sheet.autoctrl[i].input[k].senseName);
+										rt_kprintf("%s ",sheet.autoctrl[i].input[k].ID);
+										rt_kprintf("%d ",sheet.autoctrl[i].input[k].subName);
+										rt_kprintf("%d \n",sheet.autoctrl[i].input[k].limit);
+								}
+						}
+						for(int j=0;j<CRTL_OUT_NUM;j++){
+								if(sheet.autoctrl[i].output[j].flag!=NULL){
+										rt_kprintf("Out:autoctrl ");
+										rt_kprintf("%s ",sheet.autoctrl[i].output[j].typeName);
+										rt_kprintf("%s ",sheet.autoctrl[i].output[j].senseName);
+										rt_kprintf("%s ",sheet.autoctrl[i].output[j].ID);
+										rt_kprintf("%d ",sheet.autoctrl[i].output[j].subName);
+										rt_kprintf("%d \n",sheet.autoctrl[i].output[j].limit);
+								}
+						}	
+		}
+}
+//вт╤╞©ьжфйДхК╨╞йЩ  ╢╝©зйДЁЖцЭаНйвох╣Всц╢к╨╞йЩ╫БнЖ
 static void autoctrl(char argc,char*argv[])
 {
 	  if(firstReadFlag==false){
@@ -780,7 +854,7 @@ static void autoctrl(char argc,char*argv[])
 			  return;
 		}
 		if(rt_strcmp("list",argv[1])==0){
-			
+				ctrlPrintf();
 				return;
 		}//╢Рс║
 		if(rt_strcmp("sure",argv[1])==0){//х╥╤╗╠╬╢неДжц╟╢е╔  х╥╤╗мЙакж╩дэи╬ЁЩ ╡╩дэх║оШ
@@ -791,13 +865,13 @@ static void autoctrl(char argc,char*argv[])
 				outputIndex=0;
 				return;
 		}
-		int i,j,k;
+		int k;
 		if(rt_strcmp("cancel",argv[1])==0){//х║оШ╠╬╢неДжц╟╢е╔
 			  for( k=0;k<CRTL_IN_NUM;k++){
-						sheet.autoctrl[pindex].inputFlag[inputIndex]=NULL;
+						sheet.autoctrl[pindex].input[inputIndex].flag=NULL;
 				}
 				for( k=0;k<CRTL_OUT_NUM;k++){
-						sheet.autoctrl[pindex].outputFlag[outputIndex]=NULL;
+						sheet.autoctrl[pindex].output[outputIndex].flag=NULL;
 				}
 				pindex =findCtrlIndex();//х╥╤╗╨Ск╒пбвЬ╠Й
 			  configFlag=false;
@@ -815,65 +889,7 @@ static void autoctrl(char argc,char*argv[])
 				rt_kprintf("%saotuCtrl num<=8 ,delete it first\n",sign);
 			  return;
 		}
-		autoctrlInputcfg(argv);
-//		for(i=0;i<sizeof(inName)/sizeof(inName[0]);i++){
-//				if(rt_strcmp(inName[i],argv[1])==0){//find input
-//						switch(i){
-//							case 0://AI
-//								for(j=0;j<ANALOG_NUM;j++){
-//										if(rt_strcmp(argv[2],sheet.analog[j].name)==0){//find  name
-//												if(rt_strcmp(argv[3],sheet.analog[j].ID)==0){//find ID
-//													  uint8_t subname = atoi16(argv[4],10);
-//													  uint8_t limit   = atoi16(argv[5],10);
-//													  if(!((subname==0)||(subname==1)||(subname==2))){
-//																rt_kprintf("%sERR:argv[4] subname %s should be 0 1 2\n",sign,inName[i]);
-//														}
-//														if(!((limit==0)||(limit==1))){
-//																rt_kprintf("%sERR:argv[5] limit %s should be 0 1\n",sign,inName[i]);
-//														}
-//														if(sheet.analog[j].subName==subname){//find subname
-//															  if(subname==1){//нб╤х
-//																		if(limit==0){//обоч
-//																				sheet.autoctrl[pindex].inputFlag[inputIndex]=&sheet.analogTempHum.tempLowFlag;
-//																		}
-//																		else{//иооч
-//																			  sheet.autoctrl[pindex].inputFlag[inputIndex]=&sheet.analogTempHum.tempUpFlag;
-//																		}
-//																		inputIndex++;
-//																}
-//																else if(subname==2){//й╙╤х
-//																		if(limit==0){//обоч
-//																				sheet.autoctrl[pindex].inputFlag[inputIndex]=&sheet.analogTempHum.humDownFlag;
-//																		}
-//																		else{//иооч
-//																			  sheet.autoctrl[pindex].inputFlag[inputIndex]=&sheet.analogTempHum.humUpFlag;
-//																		}
-//																		inputIndex++;
-//																}
-//																else if(subname==0){//и╬ЁЩио╠ъиХжц╣днб╤хй╙╤хж╣  ╟╢уум╪пнотй╬╠ьпКеДжц╧Щ╡едэотй╬х║оШ╣д╟╢е╔  м╪пн╫ГцФпХр╙╤Чж╣отй╬
-//																	  if(inputIndex==0){
-//																			  rt_kprintf("%sERR:inpudIndex is 0\n",sign);
-//																				return;
-//																		}
-//																		inputIndex--;
-//																		sheet.autoctrl[pindex].inputFlag[inputIndex]=NULL;
-//																}
-//																configFlag=true;
-//																
-//														}
-//												}
-//										}
-//								}
-//								break;
-//							case 1://DI
-//								break;
-//							case 2://MB
-//								break;
-//						}
-//						for(j=0;j<ANALOG_NUM;j++)
-//						return;
-//				}
-//		}
-
+		autoctrlInputcfg(argv); //╪Л╡Ийг╡╩йгйДхКеДжц
+		autoctrlOutputcfg(argv);//╪Л╡Ийг╡╩йгйДЁЖеДжц
 }
 MSH_CMD_EXPORT(autoctrl,autoctrl config);

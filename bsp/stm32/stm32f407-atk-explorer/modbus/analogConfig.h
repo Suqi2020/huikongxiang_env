@@ -12,7 +12,7 @@ const static char  analogName[ANALOGNAME_NUM][20]={"ÎÂÊª¶È"};
 //}anaTempHumEnum;
 
 ///////////////////////////////////////////////////////////////////////////
-#define  MODBID_LEN   20
+
 
 
 

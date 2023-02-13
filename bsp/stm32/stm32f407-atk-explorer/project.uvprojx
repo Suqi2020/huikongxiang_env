@@ -433,6 +433,11 @@
               <FileType>1</FileType>
               <FilePath>applications\NetJsonDataUpTask.c</FilePath>
             </File>
+            <File>
+              <FileName>autoCtrlTask.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>.\applications\autoCtrlTask.c</FilePath>
+            </File>
           </Files>
         </Group>
         <Group>

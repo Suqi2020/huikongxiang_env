@@ -24,6 +24,7 @@
 #define   V33O_NUM        2
 #define   V5O_NUM         2
 #define   V12O_NUM        4
+#define  MODBID_LEN  		 20
 #define   USE_4GAS
 #include <rtthread.h>
 #include "stdbool.h"

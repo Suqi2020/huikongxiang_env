@@ -123,8 +123,9 @@
 //V0.65    增加3v3 5v 12voutput供电配置 20230206
 //V0.66    增加逻辑控制 扩展结构体 增加保存指针到flash中
 //V0.67    输入输出配置增加完成 未测试 20230212
-#define APP_VER       ((0<<8)+67)//0x0105 表示1.5版本
-const char date[]="20230212";
+//V0.68    增加autoctrltask 增加 autoCtrlRun和ctrlOutSetIO函数
+#define APP_VER       ((0<<8)+68)//0x0105 表示1.5版本
+const char date[]="20230213";
 
 //static    rt_thread_t tid 	= RT_NULL;
 static    rt_thread_t tidW5500 	  = RT_NULL;
@@ -132,6 +133,7 @@ static    rt_thread_t tidNetRec 	= RT_NULL;
 static    rt_thread_t tidNetSend 	= RT_NULL;
 static    rt_thread_t tidUpkeep 	= RT_NULL;
 static    rt_thread_t tidLCD      = RT_NULL;
+static    rt_thread_t tidAutoCtrl = RT_NULL;
 //信号量的定义
 extern  rt_sem_t  w5500Iqr_semp ;//w5500有数据时候中断来临
 
@@ -153,7 +155,7 @@ extern  void   upKeepStateTask(void *para);//定时打包数据 后期可能加入定时读取mo
 extern  void   w5500Task(void *parameter);//w5500网络状态的维护
 extern  void   hardWareDriverTest(void);
 extern  void   LCDTask(void *parameter);
-
+extern  void   autoCtrlTask(void *para);
 const static char sign[]="[main]";
 //const char errStr[]="[ERR]";
 
@@ -197,18 +199,20 @@ char *strnum="1234.5678";
 //double atof(const char *s);
 
 //char testNum[4]={1,2,3,4};
+void  outIOInit();
 int main(void)
 {
 
-		RELAY1_ON;
-		RELAY2_ON;
-		RELAY3_ON;
-		RELAY4_ON;//上电后外部485全部供
+//		RELAY1_ON;
+//		RELAY2_ON;
+//		RELAY3_ON;
+//		RELAY4_ON;//上电后外部485全部供
 
 		
 		
 	  rt_kprintf("\n%\n",sign,date,(uint8_t)(APP_VER>>8),(uint8_t)APP_VER);
     rt_kprintf("\n%s%s  ver=%02d.%02d\n",sign,date,(uint8_t)(APP_VER>>8),(uint8_t)APP_VER);
+	  outIOInit();
 	  rt_kprintf("[%s %f]\n",strnum,atof(strnum));
 	  //rt_kprintf("name %s  %s\n",modbusName[0],modbusName_utf8[0]);
 	  rt_err_t result;
@@ -298,15 +302,15 @@ int main(void)
 		}
 
 		
-		tidUpkeep =  rt_thread_create("upKeep",upKeepStateTask,RT_NULL,512*3,4, 10 );
+		tidUpkeep 	=  rt_thread_create("upKeep",upKeepStateTask,RT_NULL,512*3,4, 10 );
 		if(tidUpkeep!=NULL){
 				rt_thread_startup(tidUpkeep);													 
 				rt_kprintf("%sRTcreat upKeepStateTask \r\n",sign);
 		}
-		tidLCD    =  rt_thread_create("LCD",LCDTask,RT_NULL,512*4,4, 10 );
+		tidAutoCtrl =  rt_thread_create("autoCtrl",autoCtrlTask,RT_NULL,1024,5, 10 );
 		if(tidLCD!=NULL){
-				rt_thread_startup(tidLCD);													 
-				rt_kprintf("%sRTcreat LCDStateTask \r\n",sign);
+				rt_thread_startup(tidAutoCtrl);													 
+				rt_kprintf("%sRTcreat autoCtrlTask\r\n",sign);
 		}
 		//队列初始化之后再开启串口中断接收
 //		char test[50]={0};
@@ -342,6 +346,7 @@ void  tasklog(int argc, char *argv[])
 			  rt_thread_delete(tidNetRec);
 			  rt_thread_delete(tidNetSend);
 			  rt_thread_delete(tidUpkeep);
+			  rt_thread_delete(tidAutoCtrl);
 			  rt_kprintf("%s[tasklog delete OK]\n",sign);
 			  return;
 		}
