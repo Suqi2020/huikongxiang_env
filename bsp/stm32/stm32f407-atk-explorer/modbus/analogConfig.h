@@ -30,8 +30,8 @@ typedef struct{
 
 
 
-
-
+extern uint32_t chanl[8];
+extern uint16_t Get_Adc_Average(uint16_t ch,uint16_t times);
 
 
 

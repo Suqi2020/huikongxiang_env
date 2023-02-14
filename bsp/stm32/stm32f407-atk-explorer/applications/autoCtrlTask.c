@@ -2,17 +2,31 @@
 #include   "board.h"
 
 const static char sign[]="[autoCtrlTask]";
-//char *sign={[]};
+
+
+//ai传感器判断阈值超标后  置位相应的flag
+void aiThresholdOutSetFlag()
+{
+//在各个analog传感器读取数据时候判断完成
+}
+//modbus传感器判断阈值超标后  置位相应的flag
+//void modbusThresholdOutSetFlag()
+//{
+//}
+//digit input检测到符合逻辑的电平 置位相应的flag
+//void diIOOutSetFlag()
+//{
+//}
 //自动控制逻辑的处理
 //1/阈值的判断 以及置位标记  仅仅对于输入设备
-void  thresholdOutSetInputFlag()
-{
-}
+//void  thresholdOutSetInputFlag()
+//{
+//}
 //2/根据标记来执行的输出控制标记
 void  autoCtrlRun()
 {
 		int i,j,k;
-		for(int i=0;i<CRTL_TOTAL_NUM;i++){
+		for(i=0;i<CRTL_TOTAL_NUM;i++){
 				if(sheet.autoctrl[i].workFlag==true){
 						for(int j=0;j<CRTL_IN_NUM;j++){
 								if(sheet.autoctrl[i].input[j].flag!=NULL){//指针全部不为空
@@ -224,11 +238,13 @@ void  ctrlOutSetIO()
 					}
 			}
 }
+
+extern void diIOOutSetFlag(void);
 void  autoCtrlTask(void *para)
 {
 	
 		while(1){	
-			
+			  diIOOutSetFlag();
 			  autoCtrlRun();
 			  ctrlOutSetIO();
 				rt_thread_mdelay(1000);

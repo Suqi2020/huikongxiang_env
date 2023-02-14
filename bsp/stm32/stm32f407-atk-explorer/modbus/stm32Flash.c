@@ -16,7 +16,7 @@ const static char sign[]="[flash]";
 //Copyright(C) 广州市星翼电子科技有限公司 2014-2024
 //All rights reserved									  
 ////////////////////////////////////////////////////////////////////////////////// 	
-packIpUartStru packFLash   __attribute__ ((aligned (4)));
+packIpUartStru packFlash   __attribute__ ((aligned (4)));
 deviceFlashStru sheet    __attribute__ ((aligned (4)))={0};
 
 extern void uartSingConf(int num,int bps);
@@ -29,8 +29,8 @@ static void flash(int argc, char *argv[])
 		if(argc==2){
 			if(0==rt_strcmp((char *)"save", argv[1])){
 				rt_kprintf("%sflash save OK\n",sign);
-				stm32_flash_erase(FLASH_IP_SAVE_ADDR, sizeof(packFLash));//每次擦除128k字节数据 存储时候需要一起存储
-				stm32_flash_write(FLASH_IP_SAVE_ADDR,(uint8_t*)&packFLash,sizeof(packFLash));
+				stm32_flash_erase(FLASH_IP_SAVE_ADDR, sizeof(packFlash));//每次擦除128k字节数据 存储时候需要一起存储
+				stm32_flash_write(FLASH_IP_SAVE_ADDR,(uint8_t*)&packFlash,sizeof(packFlash));
 				stm32_flash_write(FLASH_MODBUS_SAVE_ADDR,(uint8_t*)&sheet,sizeof(sheet));
 		  }
 			else
@@ -58,7 +58,7 @@ MSH_CMD_EXPORT(flash,flash save);//FINSH_FUNCTION_EXPORT_CMD
 //		if(argc!=3){
 //				goto ERR;
 //		}
-//		rt_strcpy((char *)packFLash.acuId,argv[1]);
+//		rt_strcpy((char *)packFlash.acuId,argv[1]);
 //		ERR:
 //		rt_kprintf("%s[uart 端口(1-4) 波特率]\n",sign);
 //		rt_kprintf("%sfor example\n",sign);
@@ -77,8 +77,8 @@ static void uart(int argc, char *argv[])
 
 		for(int i=0;i<UART_NUM;i++){
 				if(0==rt_strcmp((char *)portStr[i], argv[1])){
-						packFLash.uartBps[i]    =atoi32(argv[2],10);
-						uartSingConf(i,packFLash.uartBps[i]);
+						packFlash.uartBps[i]    =atoi32(argv[2],10);
+						uartSingConf(i,packFlash.uartBps[i]);
 						rt_kprintf("%sport%d config OK\n",sign,i+1);
 				}
 		}
@@ -97,7 +97,7 @@ static void acuid(int argc, char *argv[])
 		if(argc!=2){
 				goto ERR;
 		}
-		rt_strcpy(packFLash.acuId,argv[1]);
+		rt_strcpy(packFlash.acuId,argv[1]);
 		rt_kprintf("%sacuid OK\n",sign);
 		return;
 		ERR:

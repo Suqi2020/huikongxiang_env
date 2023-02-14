@@ -52,19 +52,19 @@ rt_err_t uartDataRec(uartEnum uartNum,uint8_t dat)
 void uartReconfig()
 {
 		for(int i=0;i<UART_NUM;i++){
-				if(packFLash.uartBps[i]==0){//没用到的串口 给个默认波特率 
+				if(packFlash.uartBps[i]==0){//没用到的串口 给个默认波特率 
 					 // rt_kprintf("%sport[%d] no use\n",sign,i+1);
-					  packFLash.uartBps[i]=4800;
+					  packFlash.uartBps[i]=4800;
 				}
 		}
 		for(int i=0;i<UART_NUM;i++){
-				rt_kprintf("%sport%d bps[%d]\n",sign,i+1,packFLash.uartBps[i]);
+				rt_kprintf("%sport%d bps[%d]\n",sign,i+1,packFlash.uartBps[i]);
 		}
 	
-		MX_USART2_UART_Init(packFLash.uartBps[0]);
-		MX_USART3_UART_Init(packFLash.uartBps[1]);
-		MX_USART6_UART_Init(packFLash.uartBps[2]);
-		MX_UART4_Init(packFLash.uartBps[3]);
+		MX_USART2_UART_Init(packFlash.uartBps[0]);
+		MX_USART3_UART_Init(packFlash.uartBps[1]);
+		MX_USART6_UART_Init(packFlash.uartBps[2]);
+		MX_UART4_Init(packFlash.uartBps[3]);
 	  rt_kprintf("%sUART re config\n",sign);
 
 }
@@ -75,20 +75,20 @@ void uartSingConf(int num,int bps)
 	switch(num){
 		case USE_UART2:
 			MX_USART2_UART_Init(bps	);
-		  rt_kprintf("%sUART conf uart2 bps=%d\n",sign,packFLash.uartBps[0]);
+		  rt_kprintf("%sUART conf uart2 bps=%d\n",sign,packFlash.uartBps[0]);
 			break;
 		case USE_UART3:
 			MX_USART3_UART_Init(bps	);
-		  rt_kprintf("%sUART conf uart3 bps=%d\n",sign,packFLash.uartBps[1]);
+		  rt_kprintf("%sUART conf uart3 bps=%d\n",sign,packFlash.uartBps[1]);
 			break;
 
 		case USE_UART6:
 			MX_USART6_UART_Init(bps	);
-		  rt_kprintf("%sUART conf uart6 bps=%d\n",sign,packFLash.uartBps[2]);
+		  rt_kprintf("%sUART conf uart6 bps=%d\n",sign,packFlash.uartBps[2]);
 			break;
 		case USE_UART4:
 			MX_UART4_Init(bps	);
-		  rt_kprintf("%sUART conf uart4 bps=%d\n",sign,packFLash.uartBps[3]);
+		  rt_kprintf("%sUART conf uart4 bps=%d\n",sign,packFlash.uartBps[3]);
 			break;
 	}
 }

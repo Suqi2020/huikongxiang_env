@@ -33,6 +33,93 @@ const static char sign[]="[局放]";
 static partDischargeStru partDiscStru_p[PARTDISCHAG_485_NUM];
 
 
+
+
+
+static void partDischCheckSetFlag(int num)
+{
+	  //high
+		if(partDiscStru_p[num].amplitudeA>=sheet.modbusPartDisChg[num].amplitudeAUpLimit)
+				inpoutpFlag.modbusPartDisChg[num].amplitudeAUpFlag=true;
+		else
+				inpoutpFlag.modbusPartDisChg[num].amplitudeAUpFlag=false;
+		if(partDiscStru_p[num].amplitudeB>=sheet.modbusPartDisChg[num].amplitudeBUpLimit)
+				inpoutpFlag.modbusPartDisChg[num].amplitudeBUpFlag=true;
+		else
+				inpoutpFlag.modbusPartDisChg[num].amplitudeBUpFlag=false;
+		if(partDiscStru_p[num].amplitudeC>=sheet.modbusPartDisChg[num].amplitudeCUpLimit)
+				inpoutpFlag.modbusPartDisChg[num].amplitudeCUpFlag=true;
+		else
+				inpoutpFlag.modbusPartDisChg[num].amplitudeCUpFlag=false;
+		//low
+		if(partDiscStru_p[num].amplitudeA<=sheet.modbusPartDisChg[num].amplitudeALowLimit)
+				inpoutpFlag.modbusPartDisChg[num].amplitudeALowFlag=true;
+		else
+				inpoutpFlag.modbusPartDisChg[num].amplitudeALowFlag=false;
+		if(partDiscStru_p[num].amplitudeB<=sheet.modbusPartDisChg[num].amplitudeBLowLimit)
+				inpoutpFlag.modbusPartDisChg[num].amplitudeBLowFlag=true;
+		else
+				inpoutpFlag.modbusPartDisChg[num].amplitudeBLowFlag=false;
+		if(partDiscStru_p[num].amplitudeC<=sheet.modbusPartDisChg[num].amplitudeCLowLimit)
+				inpoutpFlag.modbusPartDisChg[num].amplitudeCLowFlag=true;
+		else
+				inpoutpFlag.modbusPartDisChg[num].amplitudeCLowFlag=false;
+		//high
+		if(partDiscStru_p[num].dischargeA>=sheet.modbusPartDisChg[num].dischargeAUpLimit)
+				inpoutpFlag.modbusPartDisChg[num].dischargeAUpFlag=true;
+		else
+				inpoutpFlag.modbusPartDisChg[num].dischargeAUpFlag=false;
+		if(partDiscStru_p[num].dischargeB>=sheet.modbusPartDisChg[num].dischargeBUpLimit)
+				inpoutpFlag.modbusPartDisChg[num].dischargeBUpFlag=true;
+		else
+				inpoutpFlag.modbusPartDisChg[num].dischargeBUpFlag=false;
+		if(partDiscStru_p[num].dischargeC>=sheet.modbusPartDisChg[num].dischargeCUpLimit)
+				inpoutpFlag.modbusPartDisChg[num].dischargeCUpFlag=true;
+		else
+				inpoutpFlag.modbusPartDisChg[num].dischargeCUpFlag=false;
+		//low
+		if(partDiscStru_p[num].dischargeA<=sheet.modbusPartDisChg[num].dischargeALowLimit)
+				inpoutpFlag.modbusPartDisChg[num].dischargeALowFlag=true;
+		else
+				inpoutpFlag.modbusPartDisChg[num].dischargeALowFlag=false;
+		if(partDiscStru_p[num].dischargeB<=sheet.modbusPartDisChg[num].dischargeBLowLimit)
+				inpoutpFlag.modbusPartDisChg[num].dischargeBLowFlag=true;
+		else
+				inpoutpFlag.modbusPartDisChg[num].dischargeBLowFlag=false;
+		if(partDiscStru_p[num].dischargeC<=sheet.modbusPartDisChg[num].dischargeCLowLimit)
+				inpoutpFlag.modbusPartDisChg[num].dischargeCLowFlag=true;
+		else
+				inpoutpFlag.modbusPartDisChg[num].dischargeCLowFlag=false;
+		
+		
+		//high
+		if(partDiscStru_p[num].freqA>=sheet.modbusPartDisChg[num].freqAUpLimit)
+				inpoutpFlag.modbusPartDisChg[num].freqAUpFlag=true;
+		else
+				inpoutpFlag.modbusPartDisChg[num].freqAUpFlag=false;
+		if(partDiscStru_p[num].freqB>=sheet.modbusPartDisChg[num].freqBUpLimit)
+				inpoutpFlag.modbusPartDisChg[num].freqBUpFlag=true;
+		else
+				inpoutpFlag.modbusPartDisChg[num].freqBUpFlag=false;
+		if(partDiscStru_p[num].freqC>=sheet.modbusPartDisChg[num].freqCUpLimit)
+				inpoutpFlag.modbusPartDisChg[num].freqCUpFlag=true;
+		else
+				inpoutpFlag.modbusPartDisChg[num].freqCUpFlag=false;
+		
+				//low
+		if(partDiscStru_p[num].freqA<=sheet.modbusPartDisChg[num].freqALowLimit)
+				inpoutpFlag.modbusPartDisChg[num].freqALowFlag=true;
+		else
+				inpoutpFlag.modbusPartDisChg[num].freqALowFlag=false;
+		if(partDiscStru_p[num].freqB<=sheet.modbusPartDisChg[num].freqBLowLimit)
+				inpoutpFlag.modbusPartDisChg[num].freqBLowFlag=true;
+		else
+				inpoutpFlag.modbusPartDisChg[num].freqBLowFlag=false;
+		if(partDiscStru_p[num].freqC<=sheet.modbusPartDisChg[num].freqCLowLimit)
+				inpoutpFlag.modbusPartDisChg[num].freqCLowFlag=true;
+		else
+				inpoutpFlag.modbusPartDisChg[num].freqCLowFlag=false;
+}
 int partDisState(int i)
 {
 		return partDiscStru_p[i].respStat;
@@ -96,6 +183,7 @@ void readPdFreqDischarge(int num)
 			  partDiscStru_p[num].dischargeC=(buf[offset]<<24)+(buf[offset+1]<<16)+(buf[offset+2]<<8)+buf[offset+3];offset+=4;
 			  rt_kprintf("%sPdFreqDiach read ok\n",sign);
 			  partDiscStru_p[num].respStat=1;
+				partDischCheckSetFlag(num);
 		} 
 		else{//读不到给0
 				if(ret2==2){
@@ -204,7 +292,7 @@ uint16_t partDischagJsonPack()
 		cJSON_AddNumberToObject(root, "mid",mcu.upMessID);
 		cJSON_AddStringToObject(root, "packetType","CMD_REPORTDATA");
 		cJSON_AddStringToObject(root, "identifier","partial_discharge_monitor");
-		cJSON_AddStringToObject(root, "acuId",(char *)packFLash.acuId);
+		cJSON_AddStringToObject(root, "acuId",(char *)packFlash.acuId);
 		char *sprinBuf=RT_NULL;
 		sprinBuf=rt_malloc(20);//20个字符串长度 够用了
 		

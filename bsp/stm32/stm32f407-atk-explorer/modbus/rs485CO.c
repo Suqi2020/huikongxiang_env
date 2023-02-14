@@ -26,6 +26,19 @@ int coState(int i)
 		return respStat[i];
 }
 
+
+static void coCheckSetFlag(int num)
+{
+	
+		if(co[num]>=sheet.modbusCo[num].coUpLimit)
+				inpoutpFlag.modbusCo[num].coUpFlag=true;
+		else
+				inpoutpFlag.modbusCo[num].coUpFlag=false;
+		if(co[num]<=sheet.modbusCo[num].coLowLimit)
+				inpoutpFlag.modbusCo[num].coLowFlag=true;
+		else
+				inpoutpFlag.modbusCo[num].coLowFlag=false;
+}
 //发 1A 04 00 01 00 02 23 E0
 //收 1A 04 04 0B 1B 00 1C 23 6F
 void readCO(int num)
@@ -64,6 +77,9 @@ void readCO(int num)
         co[num]=(float)((float)value	/1000);
 			  respStat[num]=1;
 			  rt_kprintf("%s浓度值:%0.2fmol/Lread ok\n",sign,co[num]);  
+			
+			
+				coCheckSetFlag(num);
 		} 
 		else{//读不到给0
 			  co[num]	=0;
@@ -74,12 +90,18 @@ void readCO(int num)
 		rt_free(buf);
 	  buf=RT_NULL;
 
+		
+		
+		
+
+		
+
 }
 
 
 
 
-
+/*gasJsonPack中整体打包
 static uint16_t coJsonPack()
 {
 		char* out = NULL;
@@ -97,7 +119,7 @@ static uint16_t coJsonPack()
 		cJSON_AddNumberToObject(root, "mid",mcu.upMessID);
 		cJSON_AddStringToObject(root, "packetType","CMD_REPORTDATA");
 		cJSON_AddStringToObject(root, "identifier","environment_monitor");
-		cJSON_AddStringToObject(root, "acuId",(char *)packFLash.acuId);
+		cJSON_AddStringToObject(root, "acuId",(char *)packFlash.acuId);
 		
 		
 		{
@@ -172,7 +194,7 @@ static uint16_t coJsonPack()
 		return len;
 }
 
-
+*/
 void coRead2Send()
 {
 	  //int workFlag=RT_FALSE;
@@ -214,7 +236,7 @@ char* out = NULL;
 		cJSON_AddNumberToObject(root, "mid",mcu.upMessID);
 		cJSON_AddStringToObject(root, "packetType","CMD_REPORTDATA");
 		cJSON_AddStringToObject(root, "identifier","gas_monitor");
-		cJSON_AddStringToObject(root, "acuId",(char *)packFLash.acuId);
+		cJSON_AddStringToObject(root, "acuId",(char *)packFlash.acuId);
 		
 		
 		{

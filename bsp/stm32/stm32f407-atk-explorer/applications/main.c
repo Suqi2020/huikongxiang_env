@@ -88,7 +88,7 @@
 //         故连续读取设备情况下需要延时2秒继续读取                   20221105
 //V0.39    修改存储参数命令统一为 flash save                      
 //         增加模拟配置                                            20221107
-//         存在bug  uart 的MX_USART2_UART_Init(packFLash.port[i].bps); 中
+//         存在bug  uart 的MX_USART2_UART_Init(packFlash.port[i].bps); 中
 //V0.40    修改傻瓜式为指定传感器       20221108
 //V0.41    所用到传感器json格式已经打包完成   20221109
 //V0.42    接入传感器测试 修复bug    增加模拟量配置目前支持温湿度未完成 20221110
@@ -124,8 +124,9 @@
 //V0.66    增加逻辑控制 扩展结构体 增加保存指针到flash中
 //V0.67    输入输出配置增加完成 未测试 20230212
 //V0.68    增加autoctrltask 增加 autoCtrlRun和ctrlOutSetIO函数
-#define APP_VER       ((0<<8)+68)//0x0105 表示1.5版本
-const char date[]="20230213";
+//V0.69    增加modbus ai传感器输入阈值检测置位标记 以及diIOOutSetFlag() di输入检测置位标记
+#define APP_VER       ((0<<8)+69)//0x0105 表示1.5版本
+const char date[]="20230214";
 
 //static    rt_thread_t tid 	= RT_NULL;
 static    rt_thread_t tidW5500 	  = RT_NULL;
@@ -199,7 +200,7 @@ char *strnum="1234.5678";
 //double atof(const char *s);
 
 //char testNum[4]={1,2,3,4};
-void  outIOInit();
+void  outIOInit(void);
 int main(void)
 {
 
@@ -216,7 +217,7 @@ int main(void)
 	  rt_kprintf("[%s %f]\n",strnum,atof(strnum));
 	  //rt_kprintf("name %s  %s\n",modbusName[0],modbusName_utf8[0]);
 	  rt_err_t result;
-		stm32_flash_read(FLASH_IP_SAVE_ADDR,    (uint8_t*)&packFLash,sizeof(packFLash));
+		stm32_flash_read(FLASH_IP_SAVE_ADDR,    (uint8_t*)&packFlash,sizeof(packFlash));
 		stm32_flash_read(FLASH_MODBUS_SAVE_ADDR,(uint8_t*)&sheet,    sizeof(sheet));
 
 	
@@ -239,8 +240,8 @@ int main(void)
 //				rt_kprintf("%d ",*sheet.testFlag[i]);
 //		}
 //		rt_kprintf("\n");
-//		stm32_flash_erase(FLASH_IP_SAVE_ADDR, sizeof(packFLash));//每次擦除128k字节数据 存储时候需要一起存储
-//		stm32_flash_write(FLASH_IP_SAVE_ADDR,(uint8_t*)&packFLash,sizeof(packFLash));
+//		stm32_flash_erase(FLASH_IP_SAVE_ADDR, sizeof(packFlash));//每次擦除128k字节数据 存储时候需要一起存储
+//		stm32_flash_write(FLASH_IP_SAVE_ADDR,(uint8_t*)&packFlash,sizeof(packFlash));
 //		stm32_flash_write(FLASH_MODBUS_SAVE_ADDR,(uint8_t*)&sheet,sizeof(sheet));
 		
 //////////////////////////////////////信号量//////////////////////////////

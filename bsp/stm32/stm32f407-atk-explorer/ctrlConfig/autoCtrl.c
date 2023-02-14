@@ -32,7 +32,7 @@ autoctrl V12O 水泵  GYNJLXSD000000439 1
 */
 
 
-inoutDevStru inpoutpFlag={0};
+inoutDevStru inpoutpFlag={0};//输入输出超值的标记位   
 const static char sign[]="[autoCtrl]";
 char *inName[INOUTNAME_LEN]={"AI","DI","MB",};
 char *outName[INOUTNAME_LEN]={"DO","V3O","V5O","V12O"};
@@ -675,8 +675,8 @@ static void autoctrlInputcfg(char*argv[])
 										return ;
 								}
 								for(i=0;i<DI_NUM;i++){
-										if(0==rt_strcmp((char *)packFLash.input[i].devID,argv[2])){
-												//packFLash.input[i].levelFlag=limit;//通过levelFlag来置位 lowFlag upFlag
+										if(0==rt_strcmp((char *)packFlash.input[i].devID,argv[2])){
+												//packFlash.input[i].levelFlag=limit;//通过levelFlag来置位 lowFlag upFlag
 											  if(limit==0)
 														sheet.autoctrl[pindex].input[inputIndex].flag=&inpoutpFlag.digInput[i].lowFlag;
 												else
@@ -765,8 +765,8 @@ static void autoctrlOutputcfg(char*argv[])
 						{
 							case 0:
 								for(i=0;i<DO_NUM;i++){
-										if(0==rt_strcmp((char *)packFLash.digoutput[i].devID,argv[2])){
-												//packFLash.digoutput[i].levelFlag=limit;//通过levelFlag来置位 lowFlag upFlag
+										if(0==rt_strcmp((char *)packFlash.digoutput[i].devID,argv[2])){
+												//packFlash.digoutput[i].levelFlag=limit;//通过levelFlag来置位 lowFlag upFlag
 											  if(limit==0)
 														sheet.autoctrl[pindex].output[outputIndex].flag=&inpoutpFlag.digOutput[i].lowFlag;
 												else
@@ -776,8 +776,8 @@ static void autoctrlOutputcfg(char*argv[])
 								break;
 							case 1:
 								for(i=0;i<V33O_NUM;i++){
-										if(0==rt_strcmp((char *)packFLash.v33output[i].devID,argv[2])){
-												//packFLash.digoutput[i].levelFlag=limit;//通过levelFlag来置位 lowFlag upFlag
+										if(0==rt_strcmp((char *)packFlash.v33output[i].devID,argv[2])){
+												//packFlash.digoutput[i].levelFlag=limit;//通过levelFlag来置位 lowFlag upFlag
 											  if(limit==0)
 														sheet.autoctrl[pindex].output[outputIndex].flag=&inpoutpFlag.v33Output[i].lowFlag;
 												else
@@ -787,7 +787,7 @@ static void autoctrlOutputcfg(char*argv[])
 								break;
 							case 2:
 								for(i=0;i<V5O_NUM;i++){
-										if(0==rt_strcmp((char *)packFLash.v5output[i].devID,argv[2])){
+										if(0==rt_strcmp((char *)packFlash.v5output[i].devID,argv[2])){
 												
 											  if(limit==0)
 														sheet.autoctrl[pindex].output[outputIndex].flag=&inpoutpFlag.v5Output[i].lowFlag;
@@ -798,8 +798,8 @@ static void autoctrlOutputcfg(char*argv[])
 								break;
 							case 3:
 								for(i=0;i<V12O_NUM;i++){
-										if(0==rt_strcmp((char *)packFLash.v12output[i].devID,argv[2])){
-												//packFLash.digoutput[i].levelFlag=limit;//通过levelFlag来置位 lowFlag upFlag
+										if(0==rt_strcmp((char *)packFlash.v12output[i].devID,argv[2])){
+												//packFlash.digoutput[i].levelFlag=limit;//通过levelFlag来置位 lowFlag upFlag
 											  if(limit==0)
 														sheet.autoctrl[pindex].output[outputIndex].flag=&inpoutpFlag.v12Output[i].lowFlag;
 												else
@@ -893,3 +893,4 @@ static void autoctrl(char argc,char*argv[])
 		autoctrlOutputcfg(argv);//检查是不是输出配置
 }
 MSH_CMD_EXPORT(autoctrl,autoctrl config);
+

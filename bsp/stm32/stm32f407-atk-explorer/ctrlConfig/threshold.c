@@ -13,9 +13,9 @@ void printfThresholdList()
 	  int i;
 		for(int j=0;j<ANALOG_NUM;j++){//查一遍 找到 温湿度的模拟阈值
 			  if(sheet.analog[j].workFlag==RT_TRUE){
-						if(rt_strcmp(sheet.analog[j].name,analogName[0])==0){
+						//if(rt_strcmp(sheet.analog[j].name,analogName[i])==0){
 								rt_kprintf("%s threshold ",sign);
-								rt_kprintf("%s ",analogName[0]);
+								rt_kprintf("%s ",sheet.analog[j].name);
 								rt_kprintf("%s ",sheet.analog[j].ID);
 								rt_kprintf("2 ");
 								rt_kprintf("%d ",sheet.analog[j].subName);
@@ -29,8 +29,6 @@ void printfThresholdList()
 
 								}
 						}
-					rt_kprintf("\n");
-				}
 				
 		}
 		for(i=0;i<CIRCULA_485_NUM;i++){
@@ -552,6 +550,10 @@ threshold：固定头部
 
 static void threshold(int argc,char *argv[])
 {
+		float uplimit ;
+		float lowlimit ;
+		int sensorType;
+		int sensorSubName;
 	  if(0==rt_strcmp((char *)"list", argv[1])){
 				printfThresholdList();
 				return;
@@ -559,8 +561,8 @@ static void threshold(int argc,char *argv[])
 		if(argc!=7){
 				goto ERR;
 		}
-		int sensorType= atoi32(argv[3],10);
-		int sensorSubName=atoi32(argv[4],10);
+		sensorType= atoi32(argv[3],10);
+		sensorSubName=atoi32(argv[4],10);
 		if((sensorType!=1)&&(sensorType!=2)){
 				rt_kprintf("%ssensorType argv[3] should be 1 or 2\n",sign);
 			  goto ERR;
@@ -569,8 +571,8 @@ static void threshold(int argc,char *argv[])
 				rt_kprintf("%ssensorSubName argv[4] should be <100\n",sign);
 			  goto ERR;
 		}
-		float uplimit  = atof(argv[5]);
-		float lowlimit = atof(argv[6]);
+		uplimit  = atof(argv[5]);
+		lowlimit = atof(argv[6]);
 		if(sensorType==1){//modbus传感器
 			  int i=0;
 			  for(i=0;i<MODBUS_NUM;i++){
@@ -607,3 +609,4 @@ static void threshold(int argc,char *argv[])
 
 }
 MSH_CMD_EXPORT(threshold,threshold config);
+

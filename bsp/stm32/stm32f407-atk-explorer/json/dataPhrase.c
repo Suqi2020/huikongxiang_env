@@ -92,7 +92,7 @@ rt_bool_t heartRespFun(cJSON  *Json)
 		}
 
 		cJSON  *devid =cJSON_GetObjectItem(Json,"acuId");
-		if(strcmp(packFLash.acuId,devid->valuestring)!=0){
+		if(strcmp(packFlash.acuId,devid->valuestring)!=0){
 				rt_kprintf("%sheart resp acuId err %s\r\n",sign,devid->valuestring);
 			  return RT_FALSE;
 		}

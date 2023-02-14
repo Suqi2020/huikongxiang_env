@@ -105,8 +105,6 @@ static void analog(int argc, char *argv[])
 		rt_kprintf("%sargv[1]!=%s\n",sign,analogName);
 		goto ERR;
 
-
-		return;
 		ERR:
 		rt_kprintf("%sfor example\n",sign);
 		rt_kprintf("%s[analog  ÎÂÊª¶È temperature    GYNJLXSD000000499 GY280 port1  120]\n",sign);

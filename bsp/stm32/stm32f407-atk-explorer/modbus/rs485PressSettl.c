@@ -48,6 +48,26 @@ uint8_t psReadReg(uint16_t slavAddr,uint16_t regAddr,uint16_t len,uint8_t * out)
 		return i;
 }
 
+static void pressStlCheckSetFlag(int num)
+{
+		if(pressSettle[num].temp>=sheet.modbusPreSettl[num].tempUpLimit)
+				inpoutpFlag.modbusPreSettl[num].tempUpFlag=true;
+		else
+				inpoutpFlag.modbusPreSettl[num].tempUpFlag=false;
+		if(pressSettle[num].temp<=sheet.modbusPreSettl[num].tempLowLimit)
+				inpoutpFlag.modbusPreSettl[num].tempLowFlag=true;
+		else
+				inpoutpFlag.modbusPreSettl[num].tempLowFlag=false;
+		
+		if(pressSettle[num].height.flotVal>=sheet.modbusPreSettl[num].heightUpLimit)
+				inpoutpFlag.modbusPreSettl[num].heightUpFlag=true;
+		else
+				inpoutpFlag.modbusPreSettl[num].heightUpFlag=false;
+		if(pressSettle[num].height.flotVal<=sheet.modbusPreSettl[num].heightLowLimit)
+				inpoutpFlag.modbusPreSettl[num].heightLowFlag=true;
+		else
+				inpoutpFlag.modbusPreSettl[num].heightLowFlag=false;
+}
 
 
 //发 1A 04 00 01 00 02 23 E0
@@ -88,7 +108,7 @@ void readPSTempHeight(int num)
 			
 				pressSettle[num].temp =temp/100;
 				pressSettle[num].respStat=1;
-
+				pressStlCheckSetFlag(num);
 			  rt_kprintf("%stemp:%0.2f*C height:%0.1fmm read ok\n",sign,pressSettle[num].temp,pressSettle[num].height.flotVal);  
 		} 
 		else{//读不到给0
@@ -105,7 +125,6 @@ void readPSTempHeight(int num)
 	  buf=RT_NULL;
 
 }
-
 
 
 /////////////////////////////////////////JSON格式打包//////////////////////////////////////////
@@ -132,7 +151,7 @@ static uint16_t pressSettlJsonPack()
 		cJSON_AddNumberToObject(root, "mid",mcu.upMessID);
 		cJSON_AddStringToObject(root, "packetType","CMD_REPORTDATA");
 		cJSON_AddStringToObject(root, "identifier","settlement_monitor");
-		cJSON_AddStringToObject(root, "acuId",(char *)packFLash.acuId);
+		cJSON_AddStringToObject(root, "acuId",(char *)packFlash.acuId);
 		
 		
 		{

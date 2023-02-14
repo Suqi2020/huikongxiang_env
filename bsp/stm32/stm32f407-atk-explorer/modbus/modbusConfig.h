@@ -326,7 +326,7 @@ typedef struct{
 			//uint32_t         autoCrtl
 			
 
-}deviceFlashStru;
+}deviceFlashStru;//存储到flash中
 
 typedef struct{
 		bool lowFlag;//低电平

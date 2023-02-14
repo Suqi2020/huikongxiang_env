@@ -56,7 +56,7 @@ uint16_t heartUpJsonPack()
 		// 加入节点（键值对）
 		cJSON_AddNumberToObject(root, "mid",mcu.upMessID);
 		cJSON_AddStringToObject(root, "packetType","CMD_HEARTBEAT");
-	  cJSON_AddStringToObject(root, "acuId",(char *)packFLash.acuId);
+	  cJSON_AddStringToObject(root, "acuId",(char *)packFlash.acuId);
 		char *sprinBuf=RT_NULL;
 		sprinBuf=rt_malloc(20);//20个字符串长度 够用了
 		
@@ -258,7 +258,7 @@ uint16_t devRegJsonPack()
 	// 加入节点（键值对）
 	cJSON_AddNumberToObject(root, "mid",mcu.upMessID);
 	cJSON_AddStringToObject(root, "packetType","CMD_DEVICE_REGISTER");
-	cJSON_AddStringToObject(root, "acuId",(char *)packFLash.acuId);
+	cJSON_AddStringToObject(root, "acuId",(char *)packFlash.acuId);
 	char *sprinBuf=RT_NULL;
 	sprinBuf=rt_malloc(20);//20个字符串长度 够用了
 	{

@@ -46,7 +46,45 @@ static void threeAxisUartSend(int num,uint8_t *buf,int len)
 extern uint8_t psReadReg(uint16_t slavAddr,uint16_t regAddr,uint16_t len,uint8_t * out);
 
 
+static void threeAccCheckSetFlag(int num)
+{
+	
+		if(threeAxisp[num].temp>=sheet.modbusThreAxis[num].tempUpLimit)
+				inpoutpFlag.modbusThreAxis[num].tempUpFlag=true;
+		else
+			  inpoutpFlag.modbusThreAxis[num].tempUpFlag=false;
+		if(threeAxisp[num].temp<=sheet.modbusThreAxis[num].tempLowLimit)
+				inpoutpFlag.modbusThreAxis[num].tempLowFlag=true;
+		else
+			  inpoutpFlag.modbusThreAxis[num].tempLowFlag=false;
+		
+		if(threeAxisp[num].acclrationX>=sheet.modbusThreAxis[num].accXUpLimit)
+				inpoutpFlag.modbusThreAxis[num].accXUpFlag=true;
+		else
+			  inpoutpFlag.modbusThreAxis[num].accXUpFlag=false;
+		if(threeAxisp[num].acclrationX<=sheet.modbusThreAxis[num].accXLowLimit)
+				inpoutpFlag.modbusThreAxis[num].accXLowFlag=true;
+		else
+			  inpoutpFlag.modbusThreAxis[num].accXLowFlag=false;
 
+		if(threeAxisp[num].acclrationY>=sheet.modbusThreAxis[num].accYUpLimit)
+				inpoutpFlag.modbusThreAxis[num].accYUpFlag=true;
+		else
+			  inpoutpFlag.modbusThreAxis[num].accYUpFlag=false;
+		if(threeAxisp[num].acclrationY<=sheet.modbusThreAxis[num].accYLowLimit)
+				inpoutpFlag.modbusThreAxis[num].accYLowFlag=true;
+		else
+			  inpoutpFlag.modbusThreAxis[num].accYLowFlag=false;
+
+		if(threeAxisp[num].acclrationZ>=sheet.modbusThreAxis[num].accZUpLimit)
+				inpoutpFlag.modbusThreAxis[num].accZUpFlag=true;
+		else
+			  inpoutpFlag.modbusThreAxis[num].accZUpFlag=false;
+		if(threeAxisp[num].acclrationZ<=sheet.modbusThreAxis[num].accZLowLimit)
+				inpoutpFlag.modbusThreAxis[num].accZLowFlag=true;
+		else
+			  inpoutpFlag.modbusThreAxis[num].accZLowFlag=false;
+}
 //发 1A 04 00 01 00 02 23 E0
 //收 1A 04 04 0B 1B 00 1C 23 6F
 void readThreeTempAcc(int num)
@@ -85,6 +123,7 @@ void readThreeTempAcc(int num)
 				threeAxisp[num].acclrationZ = (buf[offset]<<8)+buf[offset+1];offset+=2;
         threeAxisp[num].temp=(float)temp/100; 
 			  threeAxisp[num].respStat=1;
+				threeAccCheckSetFlag(num);
 			  rt_kprintf("%stemp:%0.2f*C ACC:X%dmg Y%dmg Z%dmg ok\n",sign,threeAxisp[num].temp,threeAxisp[num].acclrationX,threeAxisp[num].acclrationY,threeAxisp[num].acclrationZ);  
 		} 
 		else{//读不到给0
@@ -102,17 +141,11 @@ void readThreeTempAcc(int num)
 		rt_free(buf);
 	  buf=RT_NULL;
 
+		
+		
+
+		
 }
-//void multReadThreeTempAcc()
-//{
-//		for(int i=0;i<THREEAXIS_485_NUM;i++){
-//				if(sheet.threeAxiss[i].slaveAddr!=0){
-//					if(sheet.threeAxiss[i].slaveAddr!=255){
-//						readThreeTempAcc(i);
-//					}
-//				}
-//		}
-//}
 
 /////////////////////////////////////////JSON格式打包//////////////////////////////////////////
 //温度高度值打包
@@ -139,90 +172,6 @@ void readThreeTempAcc(int num)
 }
 */
 
-//void t3AxisTempAccPack()
-//{
-//		memset(packBuf,0,sizeof(packBuf));
-//		int len=0;
-//    //head+lenth
-//	  packBuf[len]= (uint8_t)(HEAD>>8); len++;
-//	  packBuf[len]= (uint8_t)(HEAD);    len++;
-//	  len+=LENTH_LEN;//json长度最后再填写
-//	  //json
-//	  char str[50]={0};//临时使用的数组
-//		sprintf(str,"{\"mid\":%u,",mcu.upMessID);
-//		rt_strcpy((char *)packBuf+len,str);
-//    len+=rt_strlen(str);
-//		
-//		rt_strcpy(str,"\"packetType\":\"CMD_REPORTDATA\",");
-//		rt_strcpy((char *)packBuf+len,str);
-//    len+=rt_strlen(str);
-//		
-//		rt_strcpy(str,"\"param\":{");
-//		rt_strcpy((char *)packBuf+len,str);
-//    len+=rt_strlen(str);
-
-//		rt_strcpy(str,"\"identifier\":\"pressure_settler_monitor\",");
-//		rt_strcpy((char *)packBuf+len,str);
-//		len+=rt_strlen(str);
-
-//		rt_sprintf(str,"\"acuId\":\"%s\",",mcu.devID);
-//		rt_strcpy((char *)packBuf+len,str);
-//		len+=rt_strlen(str);
-//		
-//		rt_sprintf(str,"\"deviceId\":\"%s\",",devi[THREEAXIS].ID);
-//		rt_strcpy((char *)packBuf+len,str);
-//		len+=rt_strlen(str);
-
-//		rt_strcpy(str,"\"data\":{");
-//		rt_strcpy((char *)packBuf+len,str);
-//		len+=rt_strlen(str);
-//		
-//		
-//	 	//sprintf(str,"test:%0.2f",(float)121/100);				 
-//		sprintf(str,"\"temp\":\"%0.2f\",",(float)((float)threeAxis.temp/100));	 
-//		rt_strcpy((char *)packBuf+len,str);
-//		len+=rt_strlen(str);
-//		sprintf(str,"\"accelerationX\":\"%d\",",threeAxis.acclrationX);	 
-//		rt_strcpy((char *)packBuf+len,str);
-//		len+=rt_strlen(str);
-
-//		sprintf(str,"\"accelerationY\":\"%d\",",threeAxis.acclrationY);	 
-//		rt_strcpy((char *)packBuf+len,str);
-//		len+=rt_strlen(str);
-//		sprintf(str,"\"accelerationZ\":\"%d\",",threeAxis.acclrationZ);	 
-//		rt_strcpy((char *)packBuf+len,str);
-//		len+=rt_strlen(str);		
-//		
-//		rt_sprintf(str,"\"monitoringTime\":\"%lu\"}},",utcTime());
-//		rt_strcpy((char *)packBuf+len,str);
-//    len+=rt_strlen(str);
-//		
-//		rt_sprintf(str,"\"timestamp\":\"%lu\"}",utcTime());
-//		rt_strcpy((char *)packBuf+len,str);
-//    len+=rt_strlen(str);
-//		
-//		//lenth
-//	  packBuf[2]=(uint8_t)((len-LENTH_LEN-HEAD_LEN)>>8);//更新json长度
-//	  packBuf[3]=(uint8_t)(len-LENTH_LEN-HEAD_LEN);
-//	  uint16_t jsonBodyCrc=RTU_CRC(packBuf+HEAD_LEN+LENTH_LEN,len-HEAD_LEN-LENTH_LEN);
-//	  //crc
-//	  packBuf[len]=(uint8_t)(jsonBodyCrc>>8); len++;//更新crc
-//	  packBuf[len]=(uint8_t)(jsonBodyCrc);    len++;
-
-//		//tail
-//		packBuf[len]= (uint8_t)(TAIL>>8); len++;
-//		packBuf[len]= (uint8_t)(TAIL);    len++;
-//		packBuf[len] =0;//len++;//结尾 补0
-//		
-//		mcu.repDataMessID =mcu.upMessID;
-//		upMessIdAdd();
-//		rt_kprintf("%sThreeAx len:%d\r\n",sign,len);
-//		
-////		for(int i=0;i<len;i++)
-////				rt_kprintf("%02x",packBuf[i]);
-//		rt_kprintf("\r\n%slen：%d str0:%x str1:%x str[2]:%d  str[3]:%d\r\n",sign,len,packBuf[0],packBuf[1],packBuf[2],packBuf[3]);
-//}
-
 static uint16_t threeAxisJsonPack()
 {
 
@@ -239,7 +188,7 @@ static uint16_t threeAxisJsonPack()
 		cJSON_AddNumberToObject(root, "mid",mcu.upMessID);
 		cJSON_AddStringToObject(root, "packetType","CMD_REPORTDATA");
 		cJSON_AddStringToObject(root, "identifier","vibration_monitor");
-	  cJSON_AddStringToObject(root, "acuId",(char *)packFLash.acuId);
+	  cJSON_AddStringToObject(root, "acuId",(char *)packFlash.acuId);
 		char *sprinBuf=RT_NULL;
 		sprinBuf=rt_malloc(20);//20个字符串长度 够用了
 		

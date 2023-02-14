@@ -26,7 +26,18 @@ int ch4State(int i)
 		return respStat[i];
 }
 
-
+static void ch4CheckSetFlag(int num)
+{
+	
+		if(ch4[num]>=sheet.modbusCh4[num].ch4UpLimit)
+				inpoutpFlag.modbusCh4[num].ch4UpFlag=true;
+		else
+				inpoutpFlag.modbusCh4[num].ch4UpFlag=false;
+		if(ch4[num]<=sheet.modbusCh4[num].ch4LowLimit)
+				inpoutpFlag.modbusCh4[num].ch4LowFlag=true;
+		else
+				inpoutpFlag.modbusCh4[num].ch4LowFlag=false;
+}
 //发 1A 04 00 01 00 02 23 E0
 //收 1A 04 04 0B 1B 00 1C 23 6F
 void readCH4(int num)
@@ -64,6 +75,7 @@ void readCH4(int num)
 
         ch4[num]=(float)((float)val	/1000);
 			  respStat[num]=1;
+			  ch4CheckSetFlag(num);
 			  rt_kprintf("%s浓度值:%0.2fmol/Lread ok\n",sign,ch4[num]);  
 		} 
 		else{//读不到给0
@@ -80,6 +92,7 @@ void readCH4(int num)
 
 }
 
+/*gasJsonPack中整体打包
 static uint16_t ch4JsonPack()
 {
 		char* out = NULL;
@@ -95,7 +108,7 @@ static uint16_t ch4JsonPack()
 		cJSON_AddNumberToObject(root, "mid",mcu.upMessID);
 		cJSON_AddStringToObject(root, "packetType","CMD_REPORTDATA");
 		cJSON_AddStringToObject(root, "identifier","environment_monitor");
-		cJSON_AddStringToObject(root, "acuId",(char *)packFLash.acuId);
+		cJSON_AddStringToObject(root, "acuId",(char *)packFlash.acuId);
 		char *sprinBuf=RT_NULL;
 		sprinBuf=rt_malloc(20);//20个字符串长度 够用了
 		
@@ -173,7 +186,7 @@ static uint16_t ch4JsonPack()
 
 		return len;
 }
-
+*/
 void ch4Read2Send()
 {
 	 //int workFlag=RT_FALSE;

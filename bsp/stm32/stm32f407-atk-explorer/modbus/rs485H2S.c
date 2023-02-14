@@ -21,6 +21,21 @@ int h2sState(int i)
 {
 		return respStat[i];
 }
+
+
+static void h2sCheckSetFlag(int num)
+{
+	
+		if(h2s[num]>=sheet.modbusH2s[num].h2sUpLimit)
+				inpoutpFlag.modbusH2s[num].h2sUpFlag=true;
+		else
+				inpoutpFlag.modbusH2s[num].h2sUpFlag=false;
+		if(h2s[num]<=sheet.modbusH2s[num].h2sLowLimit)
+				inpoutpFlag.modbusH2s[num].h2sLowFlag=true;
+		else
+				inpoutpFlag.modbusH2s[num].h2sLowFlag=false;
+}
+
 //发 1A 04 00 01 00 02 23 E0
 //收 1A 04 04 0B 1B 00 1C 23 6F
 void readH2S(int num)
@@ -57,6 +72,7 @@ void readH2S(int num)
 
         h2s[num]	=(float)((float)val	/1000);
 			  respStat[num]=1;
+				h2sCheckSetFlag(num);
 			  rt_kprintf("%s浓度值:%0.2fmol/Lread ok\n",sign,h2s[num]);  
 		} 
 		else{//读不到给0
@@ -72,7 +88,7 @@ void readH2S(int num)
 	  buf=RT_NULL;
 
 }
-
+/*gasJsonPack中整体打包
 static uint16_t h2sJsonPack()
 {
 //		char *sprinBuf=RT_NULL;
@@ -90,7 +106,7 @@ static uint16_t h2sJsonPack()
 		cJSON_AddNumberToObject(root, "mid",mcu.upMessID);
 		cJSON_AddStringToObject(root, "packetType","CMD_REPORTDATA");
 		cJSON_AddStringToObject(root, "identifier","environment_monitor");
-		cJSON_AddStringToObject(root, "acuId",(char *)packFLash.acuId);
+		cJSON_AddStringToObject(root, "acuId",(char *)packFlash.acuId);
 		char *sprinBuf=RT_NULL;
 		sprinBuf=rt_malloc(20);//20个字符串长度 够用了
 		
@@ -166,6 +182,7 @@ static uint16_t h2sJsonPack()
 
 		return len;
 }
+*/
 void h2sRead2Send()
 {
 	 //int workFlag=RT_FALSE;
@@ -183,3 +200,4 @@ void h2sRead2Send()
 //		}
 }
 #endif
+

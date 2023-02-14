@@ -14,6 +14,22 @@ float  o2[O2_485_NUM];
 static uint8_t respStat[O2_485_NUM];
 
 
+
+static void o2CheckSetFlag(int num)
+{
+	
+		if(o2[num]>=sheet.modbusO2[num].o2UpLimit)
+				inpoutpFlag.modbusO2[num].o2UpFlag=true;
+		else
+				inpoutpFlag.modbusO2[num].o2UpFlag=false;
+		if(o2[num]<=sheet.modbusO2[num].o2LowLimit)
+				inpoutpFlag.modbusO2[num].o2LowFlag=true;
+		else
+				inpoutpFlag.modbusO2[num].o2LowFlag=false;
+}
+
+
+
 int o2State(int i)
 {
 		return respStat[i];
@@ -63,6 +79,7 @@ void readO2(int num)
 
         o2[num]=(float)((float)val	/1000);
 			  respStat[num]=1;
+				o2CheckSetFlag(num);
 			  rt_kprintf("%s浓度值:%0.2fmol/Lread ok\n",sign,o2[num]);  
 		} 
 		else{//读不到给0
@@ -82,7 +99,7 @@ void readO2(int num)
 
 
 
-
+/* gasJsonPack中整体打包
 static uint16_t o2JsonPack()
 {
 		char* out = NULL;
@@ -98,7 +115,7 @@ static uint16_t o2JsonPack()
 		cJSON_AddNumberToObject(root, "mid",mcu.upMessID);
 		cJSON_AddStringToObject(root, "packetType","CMD_REPORTDATA");
 		cJSON_AddStringToObject(root, "identifier","environment_monitor");
-		cJSON_AddStringToObject(root, "acuId",(char *)packFLash.acuId);
+		cJSON_AddStringToObject(root, "acuId",(char *)packFlash.acuId);
 		char *sprinBuf=RT_NULL;
 		sprinBuf=rt_malloc(20);//20个字符串长度 够用了
 		
@@ -177,7 +194,7 @@ static uint16_t o2JsonPack()
 		return len;
 }
 
-
+*/
 void o2Read2Send()
 {
 	 //int workFlag=RT_FALSE;
@@ -195,3 +212,4 @@ void o2Read2Send()
 //		}
 }
 #endif
+

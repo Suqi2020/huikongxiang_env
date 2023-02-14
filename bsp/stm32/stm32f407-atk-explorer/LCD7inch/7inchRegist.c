@@ -87,31 +87,31 @@ void LCDDispIP()
 	  uint8_t buf[10]={0};
 		//显示IP
 		buf[0]=0;
-		buf[1]=packFLash.netIpFlash.localIp[0];
+		buf[1]=packFlash.netIpFlash.localIp[0];
 		LCDWtite(LOCAL_IP1_ADDR,buf,1*2);
-		buf[1]=packFLash.netIpFlash.localIp[1];
+		buf[1]=packFlash.netIpFlash.localIp[1];
 		LCDWtite(LOCAL_IP2_ADDR,buf,1*2);
-		buf[1]=packFLash.netIpFlash.localIp[2];
+		buf[1]=packFlash.netIpFlash.localIp[2];
 		LCDWtite(LOCAL_IP3_ADDR,buf,1*2);
-		buf[1]=packFLash.netIpFlash.localIp[3];
+		buf[1]=packFlash.netIpFlash.localIp[3];
 		LCDWtite(LOCAL_IP4_ADDR,buf,1*2);
 	  //显示端口
-		buf[1]=packFLash.netIpFlash.macaddr;
+		buf[1]=packFlash.netIpFlash.macaddr;
 		LCDWtite(PHY_PORT_ADDR,buf,1*2);
 		//远端IP
-		buf[1]=packFLash.netIpFlash.remoteIp[0];
+		buf[1]=packFlash.netIpFlash.remoteIp[0];
 		LCDWtite(REMOTE_IP1_ADDR,buf,1*2);
-		buf[1]=packFLash.netIpFlash.remoteIp[1];
+		buf[1]=packFlash.netIpFlash.remoteIp[1];
 		LCDWtite(REMOTE_IP2_ADDR,buf,1*2);
-		buf[1]=packFLash.netIpFlash.remoteIp[2];
+		buf[1]=packFlash.netIpFlash.remoteIp[2];
 		LCDWtite(REMOTE_IP3_ADDR,buf,1*2);
-		buf[1]=packFLash.netIpFlash.remoteIp[3];
+		buf[1]=packFlash.netIpFlash.remoteIp[3];
 		LCDWtite(REMOTE_IP4_ADDR,buf,1*2);
 		//远端port
 		buf[0]=0;
 		buf[1]=0;
-		buf[2]=(uint8_t)(packFLash.netIpFlash.remotePort>>8);
-		buf[3]=(uint8_t)(packFLash.netIpFlash.remotePort);
+		buf[2]=(uint8_t)(packFlash.netIpFlash.remotePort>>8);
+		buf[3]=(uint8_t)(packFlash.netIpFlash.remotePort);
 		LCDWtite(REMOTE_PORT_ADDR,buf,2*2);
 }
 //串口配置显示
@@ -119,29 +119,29 @@ void LCDDispUart()
 {
 	  uint8_t buf[10]={0};
 		//显示端口1波特率
-		buf[0]=(uint8_t)(packFLash.uartBps[0]>>24);
-		buf[1]=(uint8_t)(packFLash.uartBps[0]>>16);
-		buf[2]=(uint8_t)(packFLash.uartBps[0]>>8);
-		buf[3]=(uint8_t)(packFLash.uartBps[0]>>0);
+		buf[0]=(uint8_t)(packFlash.uartBps[0]>>24);
+		buf[1]=(uint8_t)(packFlash.uartBps[0]>>16);
+		buf[2]=(uint8_t)(packFlash.uartBps[0]>>8);
+		buf[3]=(uint8_t)(packFlash.uartBps[0]>>0);
 		LCDWtite(PORT1_ADDR,buf,2*2);
 		
 		//显示端口2波特率
-		buf[0]=(uint8_t)(packFLash.uartBps[1]>>24);
-		buf[1]=(uint8_t)(packFLash.uartBps[1]>>16);
-		buf[2]=(uint8_t)(packFLash.uartBps[1]>>8);
-		buf[3]=(uint8_t)(packFLash.uartBps[1]>>0);
+		buf[0]=(uint8_t)(packFlash.uartBps[1]>>24);
+		buf[1]=(uint8_t)(packFlash.uartBps[1]>>16);
+		buf[2]=(uint8_t)(packFlash.uartBps[1]>>8);
+		buf[3]=(uint8_t)(packFlash.uartBps[1]>>0);
 		LCDWtite(PORT2_ADDR,buf,2*2);
 		//显示端口3波特率
-		buf[0]=(uint8_t)(packFLash.uartBps[2]>>24);
-		buf[1]=(uint8_t)(packFLash.uartBps[2]>>16);
-		buf[2]=(uint8_t)(packFLash.uartBps[2]>>8);
-		buf[3]=(uint8_t)(packFLash.uartBps[2]>>0);
+		buf[0]=(uint8_t)(packFlash.uartBps[2]>>24);
+		buf[1]=(uint8_t)(packFlash.uartBps[2]>>16);
+		buf[2]=(uint8_t)(packFlash.uartBps[2]>>8);
+		buf[3]=(uint8_t)(packFlash.uartBps[2]>>0);
 		LCDWtite(PORT3_ADDR,buf,2*2);
 		//显示端口4波特率
-		buf[0]=(uint8_t)(packFLash.uartBps[3]>>24);
-		buf[1]=(uint8_t)(packFLash.uartBps[3]>>16);
-		buf[2]=(uint8_t)(packFLash.uartBps[3]>>8);
-		buf[3]=(uint8_t)(packFLash.uartBps[3]>>0);
+		buf[0]=(uint8_t)(packFlash.uartBps[3]>>24);
+		buf[1]=(uint8_t)(packFlash.uartBps[3]>>16);
+		buf[2]=(uint8_t)(packFlash.uartBps[3]>>8);
+		buf[3]=(uint8_t)(packFlash.uartBps[3]>>0);
 		LCDWtite(PORT4_ADDR,buf,2*2);
 }
 
@@ -151,29 +151,29 @@ void LCDDispUart()
 //{
 //	  uint8_t buf[10]={0};
 //		//显示端口1波特率
-//		buf[0]=(uint8_t)(packFLash.uartBps[0]>>24);
-//		buf[1]=(uint8_t)(packFLash.uartBps[0]>>16);
-//		buf[2]=(uint8_t)(packFLash.uartBps[0]>>8);
-//		buf[3]=(uint8_t)(packFLash.uartBps[0]>>0);
+//		buf[0]=(uint8_t)(packFlash.uartBps[0]>>24);
+//		buf[1]=(uint8_t)(packFlash.uartBps[0]>>16);
+//		buf[2]=(uint8_t)(packFlash.uartBps[0]>>8);
+//		buf[3]=(uint8_t)(packFlash.uartBps[0]>>0);
 //		LCDWtite(PORT1_ADDR,buf,2*2);
 //		
 //		//显示端口2波特率
-//		buf[0]=(uint8_t)(packFLash.uartBps[1]>>24);
-//		buf[1]=(uint8_t)(packFLash.uartBps[1]>>16);
-//		buf[2]=(uint8_t)(packFLash.uartBps[1]>>8);
-//		buf[3]=(uint8_t)(packFLash.uartBps[1]>>0);
+//		buf[0]=(uint8_t)(packFlash.uartBps[1]>>24);
+//		buf[1]=(uint8_t)(packFlash.uartBps[1]>>16);
+//		buf[2]=(uint8_t)(packFlash.uartBps[1]>>8);
+//		buf[3]=(uint8_t)(packFlash.uartBps[1]>>0);
 //		LCDWtite(PORT2_ADDR,buf,2*2);
 //		//显示端口3波特率
-//		buf[0]=(uint8_t)(packFLash.uartBps[2]>>24);
-//		buf[1]=(uint8_t)(packFLash.uartBps[2]>>16);
-//		buf[2]=(uint8_t)(packFLash.uartBps[2]>>8);
-//		buf[3]=(uint8_t)(packFLash.uartBps[2]>>0);
+//		buf[0]=(uint8_t)(packFlash.uartBps[2]>>24);
+//		buf[1]=(uint8_t)(packFlash.uartBps[2]>>16);
+//		buf[2]=(uint8_t)(packFlash.uartBps[2]>>8);
+//		buf[3]=(uint8_t)(packFlash.uartBps[2]>>0);
 //		LCDWtite(PORT3_ADDR,buf,2*2);
 //		//显示端口4波特率
-//		buf[0]=(uint8_t)(packFLash.uartBps[3]>>24);
-//		buf[1]=(uint8_t)(packFLash.uartBps[3]>>16);
-//		buf[2]=(uint8_t)(packFLash.uartBps[3]>>8);
-//		buf[3]=(uint8_t)(packFLash.uartBps[3]>>0);
+//		buf[0]=(uint8_t)(packFlash.uartBps[3]>>24);
+//		buf[1]=(uint8_t)(packFlash.uartBps[3]>>16);
+//		buf[2]=(uint8_t)(packFlash.uartBps[3]>>8);
+//		buf[3]=(uint8_t)(packFlash.uartBps[3]>>0);
 //		LCDWtite(PORT4_ADDR,buf,2*2);
 //}
 //LCD显示MCUID
@@ -181,17 +181,17 @@ int k=0;
 void LCDDispMCUID()
 {
 	  uint8_t buf[ACUID_LEN]={0};
-		k=sizeof(packFLash.acuId);
-		for(int i=0;i<sizeof(packFLash.acuId);i++){//ACUID_LEN
-			  if((uint8_t)packFLash.acuId[i]==0xff){
-					 packFLash.acuId[i]=0;
+		k=sizeof(packFlash.acuId);
+		for(int i=0;i<sizeof(packFlash.acuId);i++){//ACUID_LEN
+			  if((uint8_t)packFlash.acuId[i]==0xff){
+					 packFlash.acuId[i]=0;
 				}
-			 	buf[i]=packFLash.acuId[i];
+			 	buf[i]=packFlash.acuId[i];
 		}
 		int j=0;
-		k=strlen(packFLash.acuId);
-		while((strlen(packFLash.acuId)+j)<ACUID_LEN){
-				buf[strlen(packFLash.acuId)+j]=0xff;
+		k=strlen(packFlash.acuId);
+		while((strlen(packFlash.acuId)+j)<ACUID_LEN){
+				buf[strlen(packFlash.acuId)+j]=0xff;
 				j++;
 		}
 		LCDWtite(MCUID_ADDR,buf,ACUID_LEN);
@@ -1233,8 +1233,8 @@ void  keyReturn(uint16_t keyAddr)
 			case KEY_SAVE_ADDR://保存
 				
 				rt_kprintf("%sflash save OK\n",sign);
-				stm32_flash_erase(FLASH_IP_SAVE_ADDR, sizeof(packFLash));//每次擦除128k字节数据 存储时候需要一起存储
-				stm32_flash_write(FLASH_IP_SAVE_ADDR,(uint8_t*)&packFLash,sizeof(packFLash));
+				stm32_flash_erase(FLASH_IP_SAVE_ADDR, sizeof(packFlash));//每次擦除128k字节数据 存储时候需要一起存储
+				stm32_flash_write(FLASH_IP_SAVE_ADDR,(uint8_t*)&packFlash,sizeof(packFlash));
 				stm32_flash_write(FLASH_MODBUS_SAVE_ADDR,(uint8_t*)&sheet,sizeof(sheet));
 				break;
 			case KEY_RESET_ADDR://复位
@@ -1350,55 +1350,55 @@ void LCDDispConfig(uint8_t *recBuf,int len)
 		uint16_t CMD_ADDR=(uint16_t)(recBuf[4]<<8)+recBuf[5];
 		switch(CMD_ADDR){
 			case  LOCAL_IP1_ADDR:
-				packFLash.netIpFlash.localIp[0]=recBuf[8];
+				packFlash.netIpFlash.localIp[0]=recBuf[8];
 				break;
 			case LOCAL_IP2_ADDR:
-				packFLash.netIpFlash.localIp[1]=recBuf[8];
+				packFlash.netIpFlash.localIp[1]=recBuf[8];
 				break;       
 			case LOCAL_IP3_ADDR:
-				packFLash.netIpFlash.localIp[2]=recBuf[8];
+				packFlash.netIpFlash.localIp[2]=recBuf[8];
 				break;        
 			case LOCAL_IP4_ADDR:
-				packFLash.netIpFlash.localIp[3]=recBuf[8];
+				packFlash.netIpFlash.localIp[3]=recBuf[8];
 				break;        
 			case PHY_PORT_ADDR:
-				packFLash.netIpFlash.macaddr=recBuf[8];
+				packFlash.netIpFlash.macaddr=recBuf[8];
 				break;        
 			case REMOTE_IP1_ADDR:
-				packFLash.netIpFlash.remoteIp[0]=recBuf[8];
+				packFlash.netIpFlash.remoteIp[0]=recBuf[8];
 				break;       
 			case REMOTE_IP2_ADDR:
-				packFLash.netIpFlash.remoteIp[1]=recBuf[8];
+				packFlash.netIpFlash.remoteIp[1]=recBuf[8];
 				break;        
 			case REMOTE_IP3_ADDR:
-				packFLash.netIpFlash.remoteIp[2]=recBuf[8];
+				packFlash.netIpFlash.remoteIp[2]=recBuf[8];
 				break;        
 			case REMOTE_IP4_ADDR:
-				packFLash.netIpFlash.remoteIp[3]=recBuf[8];
+				packFlash.netIpFlash.remoteIp[3]=recBuf[8];
 				break;    		 
 			case REMOTE_PORT_ADDR:
-				packFLash.netIpFlash.remotePort=(uint16_t)(recBuf[9]<<8)+recBuf[10];
+				packFlash.netIpFlash.remotePort=(uint16_t)(recBuf[9]<<8)+recBuf[10];
 				break;   		 
 
 			case PORT1_ADDR:
-				packFLash.uartBps[0]=(uint32_t)(recBuf[7]<<24)+(uint32_t)(recBuf[8]<<16)+(uint32_t)(recBuf[9]<<8)+recBuf[10];
+				packFlash.uartBps[0]=(uint32_t)(recBuf[7]<<24)+(uint32_t)(recBuf[8]<<16)+(uint32_t)(recBuf[9]<<8)+recBuf[10];
 				break;     		 			
 			case PORT2_ADDR:
-				packFLash.uartBps[1]=(uint32_t)(recBuf[7]<<24)+(uint32_t)(recBuf[8]<<16)+(uint32_t)(recBuf[9]<<8)+recBuf[10];
+				packFlash.uartBps[1]=(uint32_t)(recBuf[7]<<24)+(uint32_t)(recBuf[8]<<16)+(uint32_t)(recBuf[9]<<8)+recBuf[10];
 				break;     		 			
 			case PORT3_ADDR:
-				packFLash.uartBps[2]=(uint32_t)(recBuf[7]<<24)+(uint32_t)(recBuf[8]<<16)+(uint32_t)(recBuf[9]<<8)+recBuf[10];
+				packFlash.uartBps[2]=(uint32_t)(recBuf[7]<<24)+(uint32_t)(recBuf[8]<<16)+(uint32_t)(recBuf[9]<<8)+recBuf[10];
 				break;     		 			
 			case PORT4_ADDR:
-				packFLash.uartBps[3]=(uint32_t)(recBuf[7]<<24)+(uint32_t)(recBuf[8]<<16)+(uint32_t)(recBuf[9]<<8)+recBuf[10];
+				packFlash.uartBps[3]=(uint32_t)(recBuf[7]<<24)+(uint32_t)(recBuf[8]<<16)+(uint32_t)(recBuf[9]<<8)+recBuf[10];
 				break;     		 			
 
 			//MCUID
 			case MCUID_ADDR:
 				for(int i=0;i<ACUID_LEN+1;i++){
-					packFLash.acuId[i]=recBuf[7+i];
+					packFlash.acuId[i]=recBuf[7+i];
 					if((recBuf[7+i]==0xff)||(recBuf[7+i]==0)){
-							packFLash.acuId[i]=0;
+							packFlash.acuId[i]=0;
 							break;
 					}
 				}
@@ -1428,7 +1428,7 @@ void LCDDispConfig(uint8_t *recBuf,int len)
 				}
 				break;  		
 			case MODBUS_CFG_PORT_ADDR:
-				LCDInput.useUartNum=recBuf[8];
+				LCDInput.useUartNum=(uartEnum)recBuf[8];
 				break;  		
 			case MODBUS_CFG_ADDR_ADDR:
 				LCDInput.slaveAddr=recBuf[8];

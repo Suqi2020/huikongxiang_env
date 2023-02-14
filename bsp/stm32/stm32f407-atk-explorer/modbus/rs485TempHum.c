@@ -27,6 +27,28 @@ int tempHumState(int i)
 		return thum[i].respStat;
 }
 
+
+
+static void tempHumCheckSetFlag(int num)
+{
+		if(thum[num].temp>=sheet.modbusTempHum[num].tempUpLimit)
+				inpoutpFlag.modbusTempHum[num].tempUpFlag=true;
+		else
+				inpoutpFlag.modbusTempHum[num].tempUpFlag=false;
+		if(thum[num].temp<=sheet.modbusTempHum[num].tempLowLimit)
+				inpoutpFlag.modbusTempHum[num].tempLowFlag=true;
+		else
+				inpoutpFlag.modbusTempHum[num].tempLowFlag=false;
+		
+		if(thum[num].hum>=sheet.modbusTempHum[num].humUpLimit)
+				inpoutpFlag.modbusTempHum[num].humUpFlag=true;
+		else
+				inpoutpFlag.modbusTempHum[num].humUpFlag=false;
+		if(thum[num].temp<=sheet.modbusTempHum[num].humLowLimit)
+				inpoutpFlag.modbusTempHum[num].humLowFlag=true;
+		else
+				inpoutpFlag.modbusTempHum[num].humLowFlag=false;
+}
 //发 1A 04 00 01 00 02 23 E0
 //收 1A 04 04 0B 1B 00 1C 23 6F
 void readTempHum(int num)
@@ -75,6 +97,8 @@ void readTempHum(int num)
 					rt_kprintf("%s温度:-%0.1fC 湿度:%0.1f\n",sign,thum[num].temp,thum[num].hum); 
 				else
 					rt_kprintf("%s温度:%0.1fC 湿度:%0.1f\n",sign,thum[num].temp,thum[num].hum);   
+				tempHumCheckSetFlag(num);
+
 		} 
 		else{//读不到给0
 				if(ret2==2){
@@ -88,8 +112,7 @@ void readTempHum(int num)
 		}
 	  rt_mutex_release(uartDev[sheet.tempHum[num].useUartNum].uartMutex);
 		rt_free(buf);
-	  buf=RT_NULL;
-
+	  buf=RT_NULL;				
 }
 
 
@@ -109,7 +132,7 @@ static uint16_t tempHumJsonPack()
 		cJSON_AddNumberToObject(root, "mid",mcu.upMessID);
 		cJSON_AddStringToObject(root, "packetType","CMD_REPORTDATA");
 		cJSON_AddStringToObject(root, "identifier","temperature_and_humidity_monitor");
-		cJSON_AddStringToObject(root, "acuId",(char *)packFLash.acuId);
+		cJSON_AddStringToObject(root, "acuId",(char *)packFlash.acuId);
 		char *sprinBuf=RT_NULL;
 		sprinBuf=rt_malloc(20);//20个字符串长度 够用了
 		{

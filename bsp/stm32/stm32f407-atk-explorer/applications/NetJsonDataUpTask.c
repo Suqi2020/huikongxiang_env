@@ -92,7 +92,8 @@ void o2Read2Send(rt_bool_t netStat);
 void h2sRead2Send(rt_bool_t netStat);	
 void ch4Read2Send(rt_bool_t netStat);	
 void coRead2Send(rt_bool_t netStat);	
-void analogTempHumJsonPack(uint8_t chanl);
+//void analogTempHumJsonPack(uint8_t chanl);
+void anaTempHumReadPack(void);;
 uint16_t devRegJsonPack(void);
 uint16_t heartUpJsonPack(void);
 extern uint8_t analogTemChanl;
@@ -161,7 +162,8 @@ static void  timeOutRunFun()
 				waterDepthRead2Send(gbNetState);
 				break;
 			case  ANA_TEMPHUM_TIME:
-				analogTempHumJsonPack(analogTemChanl);
+//				analogTempHumJsonPack(analogTemChanl);
+			  anaTempHumReadPack();
 				if(gbNetState==RT_TRUE)
 							rt_mb_send_wait(&mbNetSendData, (rt_ubase_t)&packBuf,RT_WAITING_FOREVER);
 				break;
@@ -194,7 +196,7 @@ void startTimeList()
 	  //启动温湿度
 	  
 	  for(int i=0;i<ANALOG_NUM;i++){
-				if(rt_strcmp(sheet.analog[i].name,analogName[0])==0){
+				if(rt_strcmp(sheet.analog[i].name,analogName[0])==0){//用 analogName[0]  指明是温湿度
 					  if(sheet.analog[i].workFlag==RT_TRUE){
 								timeInit(ANA_TEMPHUM_TIME,sheet.analog[i].colTime,30);
 								analogTemChanl=i;

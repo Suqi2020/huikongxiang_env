@@ -36,7 +36,9 @@ uint16_t Get_Adc_Average(uint16_t ch,uint16_t times)
 		}
 		return temp_val/times;
 } 
-uint32_t chanl[8]={ADC_CHANNEL_8,ADC_CHANNEL_8,ADC_CHANNEL_8,ADC_CHANNEL_8,ADC_CHANNEL_8,ADC_CHANNEL_8,ADC_CHANNEL_8,ADC_CHANNEL_8};
+
+//¶ÔÓ¦¶Ë¿Ú1-8
+uint32_t chanl[8]={ADC_CHANNEL_10,ADC_CHANNEL_11,ADC_CHANNEL_12,ADC_CHANNEL_13,ADC_CHANNEL_14,ADC_CHANNEL_15,ADC_CHANNEL_8,ADC_CHANNEL_9};
 void adcGetTest()
 {
 

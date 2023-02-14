@@ -99,9 +99,9 @@ void  w5500Task(void *parameter)
 						}
 						else{
 							  set_w5500_ip();
-								rt_kprintf("%sW5500 服务器IP:%d.%d.%d.%d\r\n",task,packFLash.netIpFlash.remoteIp[0],\
-							      packFLash.netIpFlash.remoteIp[1],packFLash.netIpFlash.remoteIp[2],packFLash.netIpFlash.remoteIp[3]);
-								rt_kprintf("%sW5500 监听端口:%d \r\n",task,packFLash.netIpFlash.remotePort);
+								rt_kprintf("%sW5500 服务器IP:%d.%d.%d.%d\r\n",task,packFlash.netIpFlash.remoteIp[0],\
+							      packFlash.netIpFlash.remoteIp[1],packFlash.netIpFlash.remoteIp[2],packFlash.netIpFlash.remoteIp[3]);
+								rt_kprintf("%sW5500 监听端口:%d \r\n",task,packFlash.netIpFlash.remotePort);
 								W5500State=W5500NetOKEnum;
 							  rt_sem_release(w5500Iqr_semp);
 								break;
@@ -122,7 +122,7 @@ void  w5500Task(void *parameter)
 			      static int count=0;      
 						if(ret==RT_EOK){
 								W5500ISR();//w5500
-								loopback_tcpc(SOCK_TCPC, packFLash.netIpFlash.remotePort);//W5500内部自动维护网络连接 此处只读寄存器
+								loopback_tcpc(SOCK_TCPC, packFlash.netIpFlash.remotePort);//W5500内部自动维护网络连接 此处只读寄存器
 						}
 
 					  if(gbNetState ==RT_FALSE){//没联网  重新初始化

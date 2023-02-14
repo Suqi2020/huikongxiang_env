@@ -6,7 +6,64 @@
 const char *sign="[analogTempH]";
 //num 定时器启动时候找到的对应的0-7通道
 uint8_t analogTemChanl=0;
-uint16_t analogTempHumJsonPack(uint8_t chanl)
+
+float temp =0.00;
+float humi =0.00;
+
+char copyID[MODBID_LEN];//读取ana温湿度时候 顺便把ID拷贝出来
+void  anaTempHumiReadAndSetFlag()
+{
+				for (int i = 0; i < ANALOG_NUM; i++){		
+					if(sheet.analog[i].workFlag==RT_TRUE){
+						if(rt_strcmp(sheet.analog[i].name,analogName[0])==0){
+								if(sheet.analog[i].subName==1){//温度  参考《汇控箱modbus串口配置V0.4》
+										uint16_t  ADCtemp=Get_Adc_Average(chanl[sheet.analog[i].port-1],5);
+									  float Vtemp=ADCtemp*33/4096/10;
+										temp=(10*Vtemp-6)*(80+40)/(30-6)-40;
+									  rt_strcpy(copyID,sheet.analog[i].ID);
+									  if(temp>=sheet.analogTempHum.tempUpLimit){
+												inpoutpFlag.analogTempHum.tempUpFlag=true;
+										}
+										else
+												inpoutpFlag.analogTempHum.tempUpFlag=false;
+										if(temp<=sheet.analogTempHum.tempLowLimit){
+												inpoutpFlag.analogTempHum.tempLowFlag=true;
+										}
+										else
+												inpoutpFlag.analogTempHum.tempLowFlag=false;
+								}
+								else if(sheet.analog[i].subName==2){//湿度
+										uint16_t  ADChumi=Get_Adc_Average(chanl[sheet.analog[i].port-1],5);
+									  float Vhumi=ADChumi*33/4096/10;
+										humi=(10*Vhumi-6)*(100)/(30-6);
+									  rt_strcpy(copyID,sheet.analog[i].ID);
+										if(humi>=sheet.analogTempHum.humUpLimit){
+												inpoutpFlag.analogTempHum.humUpFlag=true;
+										}
+										else
+												inpoutpFlag.analogTempHum.humUpFlag=false;
+										if(humi<=sheet.analogTempHum.humLowLimit){
+												inpoutpFlag.analogTempHum.humLowFlag=true;
+										}
+										else
+												inpoutpFlag.analogTempHum.humLowFlag=true;
+								}		
+						}
+//						 if(0==strcmp(sheet.analog[i].funName,analogName1Val[0])){//temperature
+//								float temp=1.23;
+//								sprintf(sprinBuf,"%02f",temp);
+//								cJSON_AddItemToObject(nodeobj_p,analogName1Val[0],cJSON_CreateString(sprinBuf));
+//						 }
+//						 else if(0==strcmp(sheet.analog[i].funName,analogName1Val[1])){//humidity
+//								float hum=1.23;
+//								sprintf(sprinBuf,"%02f",hum );
+//								cJSON_AddItemToObject(nodeobj_p,analogName1Val[1],cJSON_CreateString(sprinBuf));
+//						 }
+					}
+				}
+}
+
+uint16_t analogTempHumJsonPack()
 {
 		char* out = NULL;
 		//创建数组
@@ -21,7 +78,7 @@ uint16_t analogTempHumJsonPack(uint8_t chanl)
 		cJSON_AddNumberToObject(root, "mid",mcu.upMessID);
 		cJSON_AddStringToObject(root, "packetType","CMD_REPORTDATA");
 		cJSON_AddStringToObject(root, "identifier","temperature_humidity");
-		cJSON_AddStringToObject(root, "acuId",(char *)packFLash.acuId);
+		cJSON_AddStringToObject(root, "acuId",(char *)packFlash.acuId);
 		char *sprinBuf=RT_NULL;
 		sprinBuf=rt_malloc(20);//20个字符串长度 够用了
 		
@@ -32,26 +89,18 @@ uint16_t analogTempHumJsonPack(uint8_t chanl)
 
 				nodeobj = cJSON_CreateObject();
 				cJSON_AddItemToArray(Array, nodeobj);
-			  cJSON_AddItemToObject(nodeobj,"deviceId",cJSON_CreateString(sheet.tempHum[chanl].ID));
+			  cJSON_AddItemToObject(nodeobj,"deviceId",cJSON_CreateString(copyID));
 				
 				
 				nodeobj_p= cJSON_CreateObject();
 				cJSON_AddItemToObject(nodeobj, "data", nodeobj_p);
-				for (int i = 0; i < ANALOG_NUM; i++){		
-					if(sheet.analog[i].workFlag==RT_TRUE){
-						
-//						 if(0==strcmp(sheet.analog[i].funName,analogName1Val[0])){//temperature
-//								float temp=1.23;
-//								sprintf(sprinBuf,"%02f",temp);
-//								cJSON_AddItemToObject(nodeobj_p,analogName1Val[0],cJSON_CreateString(sprinBuf));
-//						 }
-//						 else if(0==strcmp(sheet.analog[i].funName,analogName1Val[1])){//humidity
-//								float hum=1.23;
-//								sprintf(sprinBuf,"%02f",hum );
-//								cJSON_AddItemToObject(nodeobj_p,analogName1Val[1],cJSON_CreateString(sprinBuf));
-//						 }
-					}
-				}
+			
+			
+				sprintf(sprinBuf,"%02f",temp);
+				cJSON_AddItemToObject(nodeobj_p,"温度",cJSON_CreateString(sprinBuf));
+				sprintf(sprinBuf,"%02f",humi );
+				cJSON_AddItemToObject(nodeobj_p,"湿度",cJSON_CreateString(sprinBuf));
+
 				sprintf(sprinBuf,"%llu",utcTime());
 				cJSON_AddItemToObject(nodeobj_p,"monitoringTime",cJSON_CreateString(sprinBuf));
 		}
@@ -104,4 +153,11 @@ uint16_t analogTempHumJsonPack(uint8_t chanl)
 		sprinBuf=RT_NULL;
 
 		return len;
+}
+
+
+void anaTempHumReadPack()
+{
+		anaTempHumiReadAndSetFlag();
+	  analogTempHumJsonPack();
 }

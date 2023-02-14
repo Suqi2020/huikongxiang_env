@@ -64,7 +64,39 @@ void cirCurrUartSend(int num,uint8_t *buf,int len)
 
 }
 
+static void circulaCheckSetFlag(int num)
+{
+		if(cirCurStru_p[num].circlCurA>=sheet.modbusCircul[num].cirCurAUpLimit)
+				inpoutpFlag.modbusCircul[num].cirCurAUpFlag=true;
+		else
+				inpoutpFlag.modbusCircul[num].cirCurAUpFlag=false;
+		if(cirCurStru_p[num].circlCurA<=sheet.modbusCircul[num].cirCurALowLimit)
+				inpoutpFlag.modbusCircul[num].cirCurALowFlag=true;
+		else
+				inpoutpFlag.modbusCircul[num].cirCurALowFlag=false;
+		
+		if(cirCurStru_p[num].circlCurB>=sheet.modbusCircul[num].cirCurBUpLimit)
+				inpoutpFlag.modbusCircul[num].cirCurBUpFlag=true;
+		else
+				inpoutpFlag.modbusCircul[num].cirCurBUpFlag=false;
+		if(cirCurStru_p[num].circlCurB<=sheet.modbusCircul[num].cirCurBLowLimit)
+				inpoutpFlag.modbusCircul[num].cirCurBLowFlag=true;
+		else
+				inpoutpFlag.modbusCircul[num].cirCurBLowFlag=false;
+		
+		
+		if(cirCurStru_p[num].circlCurC>=sheet.modbusCircul[num].cirCurCUpLimit)
+				inpoutpFlag.modbusCircul[num].cirCurCUpFlag=true;
+		else
+				inpoutpFlag.modbusCircul[num].cirCurCUpFlag=false;
+		
+		if(cirCurStru_p[num].circlCurC<=sheet.modbusCircul[num].cirCurCLowLimit)
+				inpoutpFlag.modbusCircul[num].cirCurCLowFlag=true;
+		else
+				inpoutpFlag.modbusCircul[num].cirCurCLowFlag=false;
+		
 
+}
 ///////////////////////////////////////读写寄存器相关操作////////////////////////////////////////
 //读取环流值和报警信息 寄存器地址 0x0023 长度12
 void readCirCurrAndWaring(int num)
@@ -113,6 +145,7 @@ void readCirCurrAndWaring(int num)
 			  cirCurStru_p[num].warningD	=(buf[offset]<<8)	+buf[offset+1];	offset+=2;
 			  rt_kprintf("%s提取电流、报警值成功\r\n",sign);
 			  cirCurStru_p[num].respStat=1;
+				circulaCheckSetFlag(num);
 		} 
 		else{//读不到给0
 			  if(ret==2){
@@ -135,6 +168,7 @@ void readCirCurrAndWaring(int num)
 		rt_free(buf);
 	//	 rt_kprintf("free\r\n");
 	  buf=RT_NULL;
+		
 }
 //每次上电后需要从flash中读出存储的值与modbus回复的值进行比较
 //void cirCurrConf()
@@ -636,7 +670,7 @@ uint16_t circulaJsonPack()
 		cJSON_AddNumberToObject(root, "mid",mcu.upMessID);
 		cJSON_AddStringToObject(root, "packetType","CMD_REPORTDATA");
 		cJSON_AddStringToObject(root, "identifier","grounding_current_monitor");
-		cJSON_AddStringToObject(root, "acuId",(char *)packFLash.acuId);
+		cJSON_AddStringToObject(root, "acuId",(char *)packFlash.acuId);
 		char *sprinBuf=RT_NULL;
 		sprinBuf=rt_malloc(20);//20个字符串长度 够用了
 		

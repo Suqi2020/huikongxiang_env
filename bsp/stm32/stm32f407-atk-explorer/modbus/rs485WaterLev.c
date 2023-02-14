@@ -20,6 +20,24 @@ int waterDepthState(int i)
 		return respStat[i];
 }
 
+
+
+static void waterLevCheckSetFlag(int num)
+{
+	
+		if(waterDepth[num]>=sheet.modbusWaterDepth[num].depthUpLimit)
+				inpoutpFlag.modbusWaterDepth[num].depthUpFlag=true;
+		else
+				inpoutpFlag.modbusWaterDepth[num].depthUpFlag=false;
+		if(waterDepth[num]<=sheet.modbusWaterDepth[num].depthLowLimit)
+				inpoutpFlag.modbusWaterDepth[num].depthLowFlag=true;
+		else
+				inpoutpFlag.modbusWaterDepth[num].depthLowFlag=false;
+}
+
+
+
+
 //发 1A 04 00 01 00 02 23 E0
 //收 1A 04 04 0B 1B 00 1C 23 6F
 void readWaterDepth(int num)
@@ -59,6 +77,7 @@ void readWaterDepth(int num)
         waterDepth[num]=(float)(waterDepth_p	/9.8);
 			  rt_kprintf("%s水深:%0.4f米\n",sign,waterDepth[num]);  
 			  respStat[num]=1;
+				waterLevCheckSetFlag(num);
 		} 
 		else{//读不到给0
 				if(ret2==2){
@@ -94,8 +113,8 @@ static uint16_t waterDepthJsonPack()
 		cJSON_AddNumberToObject(root, "mid",mcu.upMessID);
 		cJSON_AddStringToObject(root, "packetType","CMD_REPORTDATA");
 		cJSON_AddStringToObject(root, "identifier","water_level_monitor");
-		cJSON_AddStringToObject(root, "acuId",(char *)packFLash.acuId);
-//	  cJSON_AddItemToObject(root,"acuId",cJSON_CreateString(packFLash.acuId));
+		cJSON_AddStringToObject(root, "acuId",(char *)packFlash.acuId);
+//	  cJSON_AddItemToObject(root,"acuId",cJSON_CreateString(packFlash.acuId));
 		char *sprinBuf=RT_NULL;
 		sprinBuf=rt_malloc(20);//20个字符串长度 够用了	
 		

@@ -66,13 +66,13 @@ volatile uint8_t	    ntptimer  = 0;															  	/*NPT秒计数*/
 */
 void set_w5500_ip(void)
 {	
-	mac[5]=packFLash.netIpFlash.macaddr;
+	mac[5]=packFlash.netIpFlash.macaddr;
 		
    /*复制定义的配置信息到配置结构体*/
 	memcpy(ConfigMsg.mac, mac, 6);
-	memcpy(ConfigMsg.lip,packFLash.netIpFlash.localIp,4);
+	memcpy(ConfigMsg.lip,packFlash.netIpFlash.localIp,4);
 	memcpy(ConfigMsg.sub,subnet,4);
-	memcpy(ConfigMsg.gw,packFLash.netIpFlash.gateway,4);
+	memcpy(ConfigMsg.gw,packFlash.netIpFlash.gateway,4);
 	memcpy(ConfigMsg.dns,dns_server,4);
 	if(ip_from==IP_FROM_DEFINE)	
 		printf("%s使用定义的IP信息配置W5500\r\n",sign);
@@ -107,14 +107,14 @@ void set_w5500_ip(void)
 	setGAR(ConfigMsg.gw);
 	setSIPR(ConfigMsg.lip);
 	
-	getSIPR (packFLash.netIpFlash.localIp);			
-	printf("%sW5500 IP地址   : %d.%d.%d.%d\r\n", sign,packFLash.netIpFlash.localIp[0],packFLash.netIpFlash.localIp[1],\
-												packFLash.netIpFlash.localIp[2],packFLash.netIpFlash.localIp[3]);
+	getSIPR (packFlash.netIpFlash.localIp);			
+	printf("%sW5500 IP地址   : %d.%d.%d.%d\r\n", sign,packFlash.netIpFlash.localIp[0],packFlash.netIpFlash.localIp[1],\
+												packFlash.netIpFlash.localIp[2],packFlash.netIpFlash.localIp[3]);
 	getSUBR(subnet);
 	printf("%sW5500 子网掩码 : %d.%d.%d.%d\r\n",sign, subnet[0],subnet[1],subnet[2],subnet[3]);
-	getGAR(packFLash.netIpFlash.gateway);
-	printf("%sW5500 网关     : %d.%d.%d.%d\r\n",sign, packFLash.netIpFlash.gateway[0],packFLash.netIpFlash.gateway[1],\
-													packFLash.netIpFlash.gateway[2],packFLash.netIpFlash.gateway[3]);
+	getGAR(packFlash.netIpFlash.gateway);
+	printf("%sW5500 网关     : %d.%d.%d.%d\r\n",sign, packFlash.netIpFlash.gateway[0],packFlash.netIpFlash.gateway[1],\
+													packFlash.netIpFlash.gateway[2],packFlash.netIpFlash.gateway[3]);
 	printf("%sW5500 物理地址 : %02X %02X %02X %02X %02X %02X\r\n",sign, mac[0],mac[1],mac[2],mac[3],mac[4],mac[5]);
 }
 
@@ -314,7 +314,7 @@ static void net(int argc, char *argv[])
 					goto ERR;
 				}
 				mac[5]=atoi16(argv[2],10);
-				packFLash.netIpFlash.macaddr=mac[5];
+				packFlash.netIpFlash.macaddr=mac[5];
 				rt_kprintf("%smacaddr OK\n",sign);
 
 		}
@@ -322,10 +322,10 @@ static void net(int argc, char *argv[])
 				if(argc!=6){
 					goto ERR;
 				}
-				packFLash.netIpFlash.localIp[0] =atoi16(argv[2],10);
-				packFLash.netIpFlash.localIp[1] =atoi16(argv[3],10);
-				packFLash.netIpFlash.localIp[2] =atoi16(argv[4],10);
-				packFLash.netIpFlash.localIp[3] =atoi16(argv[5],10);
+				packFlash.netIpFlash.localIp[0] =atoi16(argv[2],10);
+				packFlash.netIpFlash.localIp[1] =atoi16(argv[3],10);
+				packFlash.netIpFlash.localIp[2] =atoi16(argv[4],10);
+				packFlash.netIpFlash.localIp[3] =atoi16(argv[5],10);
 
 				rt_kprintf("%slocalIp OK\n",sign);
 		}
@@ -333,10 +333,10 @@ static void net(int argc, char *argv[])
 				if(argc!=6){
 					goto ERR;
 				}
-			  packFLash.netIpFlash.gateway[0] =atoi16(argv[2],10);
-				packFLash.netIpFlash.gateway[1] =atoi16(argv[3],10);
-				packFLash.netIpFlash.gateway[2] =atoi16(argv[4],10);
-				packFLash.netIpFlash.gateway[3] =atoi16(argv[5],10); 
+			  packFlash.netIpFlash.gateway[0] =atoi16(argv[2],10);
+				packFlash.netIpFlash.gateway[1] =atoi16(argv[3],10);
+				packFlash.netIpFlash.gateway[2] =atoi16(argv[4],10);
+				packFlash.netIpFlash.gateway[3] =atoi16(argv[5],10); 
 	
 				rt_kprintf("%sgateway OK\n",sign);
 
@@ -345,10 +345,10 @@ static void net(int argc, char *argv[])
 				if(argc!=6){
 					goto ERR;
 				}
-			  packFLash.netIpFlash.remoteIp[0] =atoi16(argv[2],10);
-				packFLash.netIpFlash.remoteIp[1] =atoi16(argv[3],10);
-				packFLash.netIpFlash.remoteIp[2] =atoi16(argv[4],10);
-				packFLash.netIpFlash.remoteIp[3] =atoi16(argv[5],10);
+			  packFlash.netIpFlash.remoteIp[0] =atoi16(argv[2],10);
+				packFlash.netIpFlash.remoteIp[1] =atoi16(argv[3],10);
+				packFlash.netIpFlash.remoteIp[2] =atoi16(argv[4],10);
+				packFlash.netIpFlash.remoteIp[3] =atoi16(argv[5],10);
 		
 				rt_kprintf("%sremoteIp OK\n",sign);
 
@@ -358,7 +358,7 @@ static void net(int argc, char *argv[])
 				if(argc!=3){
 					goto ERR;
 				}
-				packFLash.netIpFlash.remotePort=atoi32(argv[2],10);
+				packFlash.netIpFlash.remotePort=atoi32(argv[2],10);
 
 		
 				rt_kprintf("%sremotePort OK\n",sign);
