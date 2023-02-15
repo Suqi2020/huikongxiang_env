@@ -170,10 +170,10 @@ void printfPower12VList()
 		for(int j=0;j<V12O_NUM;j++){//查一遍 找到 GYNJLXSD000000499  如果
 				if(packFlash.v5output[j].workFlag==RT_TRUE){//打开
 						rt_kprintf("%s power12V ",sign);
-						rt_kprintf("%s ",packFlash.v5output[j].name);
-						rt_kprintf("%s ",packFlash.v5output[j].devID);
-						rt_kprintf("%s ",packFlash.v5output[j].model);
-						rt_kprintf("%d \n",packFlash.v5output[j].port);
+						rt_kprintf("%s ",packFlash.v12output[j].name);
+						rt_kprintf("%s ",packFlash.v12output[j].devID);
+						rt_kprintf("%s ",packFlash.v12output[j].model);
+						rt_kprintf("%d \n",packFlash.v12output[j].port);
 				}
 		}
 }
@@ -192,18 +192,18 @@ static void power12V(int argc, char *argv[])
 		}
     port = atoi16(argv[4],10);
 		if((port<=V12O_NUM)&&(port>0)){//添加
-				packFlash.v5output[port-1].workFlag=RT_TRUE;
-				rt_strcpy(packFlash.v5output[port-1].name, argv[1]);
-				rt_strcpy(packFlash.v5output[port-1].devID,argv[2]);
-				rt_strcpy(packFlash.v5output[port-1].model,argv[3]);
-				packFlash.v5output[port-1].port=port;
+				packFlash.v12output[port-1].workFlag=RT_TRUE;
+				rt_strcpy(packFlash.v12output[port-1].name, argv[1]);
+				rt_strcpy(packFlash.v12output[port-1].devID,argv[2]);
+				rt_strcpy(packFlash.v12output[port-1].model,argv[3]);
+				packFlash.v12output[port-1].port=port;
 				rt_kprintf("%s add 12VOutput chanl %d\n",sign,port);
 			  rt_kprintf("%s 12VOutput OK\n",sign);
 		}
 		else{//删除
 			 for(int j=0;j<V12O_NUM;j++){//查一遍 找到 GYNJLXSD000000499  如果
-					if(rt_strcmp(packFlash.v5output[j].devID,argv[2])==0){
-							packFlash.v5output[j].workFlag=RT_FALSE;
+					if(rt_strcmp(packFlash.v12output[j].devID,argv[2])==0){
+							packFlash.v12output[j].workFlag=RT_FALSE;
 							rt_kprintf("%s delete 12VOutput channel %d\n",sign,j+1);
 					}
 			 }

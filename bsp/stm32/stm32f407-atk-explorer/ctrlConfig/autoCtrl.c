@@ -47,6 +47,7 @@ static uint8_t findCtrlIndex()
 {
 		for(int i=0;i<CRTL_TOTAL_NUM;i++){
 				if(sheet.autoctrl[i].workFlag!=1){
+					  
 						return i;//找到没有用过的 
 				}
 		}
@@ -72,18 +73,18 @@ bool firstReadFlag=false;
 
 //以上逻辑配置时候如需要删除单个输入或者输出设备，选项为0即可，
 //必须从后往前（图形界面显示）一个一个删除（逻辑控制列表的指针为空）或者重启设备，cancel命令也可以取消本次整体配置
-static void crtlCirculaConf(char **argv)
+static bool crtlCirculaConf(char **argv)
 {
 		uint8_t subname = atoi16(argv[4],10);
 		uint8_t limit   = atoi16(argv[5],10);
 		int i;
 		if((subname==0)||(subname>3)){
 				rt_kprintf("%sERR:autoCirculaConf argv[4] subname %s should be <4 and not 0\n",sign);
-				return ;
+				return false;
 		}
 		if(!((limit==0)||(limit==1))){
 				rt_kprintf("%sERR:autoCirculaConf argv[5] limit %s should be 0 1\n",sign);
-				return ;
+				return false;
 		}
 
 		for(i=0;i<CIRCULA_485_NUM;i++){
@@ -95,58 +96,59 @@ static void crtlCirculaConf(char **argv)
 							if(subname==1){//A
 									if(limit==0){//下限
 											sheet.autoctrl[pindex].input[inputIndex].flag=&inpoutpFlag.modbusCircul[i].cirCurALowFlag;
-											inputIndex++;//
-											return;// true;
+											//inputIndex++;//
+											return true;// true;
 									}
 									else{
 											sheet.autoctrl[pindex].input[inputIndex].flag=&inpoutpFlag.modbusCircul[i].cirCurAUpFlag;
-											inputIndex++;//return true;
-											return;
+											//inputIndex++;//return true;
+											return true;
 									}
 							}
 							else if(subname==2){//A
 									if(limit==0){//下限
 											sheet.autoctrl[pindex].input[inputIndex].flag=&inpoutpFlag.modbusCircul[i].cirCurBLowFlag;
-											inputIndex++;//return true;
-											return;
+											//inputIndex++;//return true;
+											return true;
 									}
 									else{
 											sheet.autoctrl[pindex].input[inputIndex].flag=&inpoutpFlag.modbusCircul[i].cirCurBUpFlag;
-											inputIndex++;//return true;
-											return;
+											//inputIndex++;//return true;
+											return true;
 									}
 							}
 							else if(subname==3){//A
 									if(limit==0){//下限
 											sheet.autoctrl[pindex].input[inputIndex].flag=&inpoutpFlag.modbusCircul[i].cirCurCLowFlag;
-											inputIndex++;//return true;
-											return;
+											//inputIndex++;//return true;
+											return true;
 									}
 									else{
 											sheet.autoctrl[pindex].input[inputIndex].flag=&inpoutpFlag.modbusCircul[i].cirCurCUpFlag;
-											inputIndex++;
-											return;
+											//inputIndex++;
+											return true;
 											//return true;
 									}
 							}
 					}
 			}
+		return false;
 }
 
 
 //
-static void crtlPartDischagConf(char **argv)
+static bool crtlPartDischagConf(char **argv)
 {
 			uint8_t subname = atoi16(argv[4],10);
 			uint8_t limit   = atoi16(argv[5],10);
 	    int i;
 			if((subname==0)||(subname>9)){
 					rt_kprintf("%sERR:partDischagConf argv[4] subname %s should be <10 and not 0\n",sign);
-				  return ;
+				  return false;
 			}
 			if(!((limit==0)||(limit==1))){
 					rt_kprintf("%sERR:partDischagConf argv[5] limit %s should be 0 1\n",sign);
-				  return ;
+				  return false;
 			}
 		
 			for(i=0;i<PARTDISCHAG_485_NUM;i++){
@@ -159,127 +161,128 @@ static void crtlPartDischagConf(char **argv)
 							if(subname==1){//A
 									if(limit==0){//下限
 											sheet.autoctrl[pindex].input[inputIndex].flag=&inpoutpFlag.modbusPartDisChg[i].amplitudeALowFlag;
-											inputIndex++;//
-											return;// true;
+											//inputIndex++;//
+											return true;// true;
 									}
 									else{
 											sheet.autoctrl[pindex].input[inputIndex].flag=&inpoutpFlag.modbusPartDisChg[i].amplitudeAUpFlag;
-											inputIndex++;//return true;
-											return;
+											//inputIndex++;//return true;
+											return true;
 									}
 							}
 							else if(subname==2){//B
 									if(limit==0){//下限
 											sheet.autoctrl[pindex].input[inputIndex].flag=&inpoutpFlag.modbusPartDisChg[i].amplitudeBLowFlag;
-											inputIndex++;//return true;
-											return;
+											//inputIndex++;//return true;
+											return true;
 									}
 									else{
 											sheet.autoctrl[pindex].input[inputIndex].flag=&inpoutpFlag.modbusPartDisChg[i].amplitudeBUpFlag;
-											inputIndex++;//return true;
-											return;
+											//inputIndex++;//return true;
+											return true;
 									}
 							}
 							else if(subname==3){//C
 									if(limit==0){//下限
 											sheet.autoctrl[pindex].input[inputIndex].flag=&inpoutpFlag.modbusPartDisChg[i].amplitudeCLowFlag;
-											inputIndex++;//return true;
-											return;
+											//inputIndex++;//return true;
+											return true;
 									}
 									else{
 											sheet.autoctrl[pindex].input[inputIndex].flag=&inpoutpFlag.modbusPartDisChg[i].amplitudeCUpFlag;
-											inputIndex++;//return true;
-											return;
+											//inputIndex++;//return true;
+											return true;
 									}
 							}
 							else if(subname==4){//A
 									if(limit==0){//下限
 											sheet.autoctrl[pindex].input[inputIndex].flag=&inpoutpFlag.modbusPartDisChg[i].freqALowFlag;
-											inputIndex++;//
-											return;// true;
+											//inputIndex++;//
+											return true;// true;
 									}
 									else{
 											sheet.autoctrl[pindex].input[inputIndex].flag=&inpoutpFlag.modbusPartDisChg[i].freqAUpFlag;
-											inputIndex++;//return true;
-											return;
+											//inputIndex++;//return true;
+											return true;
 									}
 							}
 							else if(subname==5){//B
 									if(limit==0){//下限
 											sheet.autoctrl[pindex].input[inputIndex].flag=&inpoutpFlag.modbusPartDisChg[i].freqBLowFlag;
-											inputIndex++;//return true;
-											return;
+											//inputIndex++;//return true;
+											return true;
 									}
 									else{
 											sheet.autoctrl[pindex].input[inputIndex].flag=&inpoutpFlag.modbusPartDisChg[i].freqBUpFlag;
-											inputIndex++;//return true;
-											return;
+											//inputIndex++;//return true;
+											return true;
 									}
 							}
 							else if(subname==6){//C
 									if(limit==0){//下限
 											sheet.autoctrl[pindex].input[inputIndex].flag=&inpoutpFlag.modbusPartDisChg[i].freqCLowFlag;
-											inputIndex++;//return true;
-											return;
+											//inputIndex++;//return true;
+											return true;
 									}
 									else{
 											sheet.autoctrl[pindex].input[inputIndex].flag=&inpoutpFlag.modbusPartDisChg[i].freqCUpFlag;
-											inputIndex++;//return true;
-											return;
+											//inputIndex++;//return true;
+											return true;
 									}
 							}	
 							else if(subname==7){//A
 									if(limit==0){//下限
 											sheet.autoctrl[pindex].input[inputIndex].flag=&inpoutpFlag.modbusPartDisChg[i].dischargeALowFlag;
-											inputIndex++;//
-											return;// true;
+											//inputIndex++;//
+											return true;// true;
 									}
 									else{
 											sheet.autoctrl[pindex].input[inputIndex].flag=&inpoutpFlag.modbusPartDisChg[i].dischargeAUpFlag;
-											inputIndex++;//return true;
-											return;
+											//inputIndex++;//return true;
+											return true;
 									}
 							}
 							else if(subname==8){//B
 									if(limit==0){//下限
 											sheet.autoctrl[pindex].input[inputIndex].flag=&inpoutpFlag.modbusPartDisChg[i].dischargeBLowFlag;
-											inputIndex++;//return true;
-											return;
+											//inputIndex++;//return true;
+											return true;
 									}
 									else{
 											sheet.autoctrl[pindex].input[inputIndex].flag=&inpoutpFlag.modbusPartDisChg[i].dischargeBUpFlag;
-											inputIndex++;//return true;
-											return;
+											//inputIndex++;//return true;
+											return true;
 									}
 							}
 							else if(subname==9){//C
 									if(limit==0){//下限
 											sheet.autoctrl[pindex].input[inputIndex].flag=&inpoutpFlag.modbusPartDisChg[i].dischargeCLowFlag;
-											inputIndex++;//return true;
-											return;
+											//inputIndex++;//return true;
+											return true;
 									}
 									else{
 											sheet.autoctrl[pindex].input[inputIndex].flag=&inpoutpFlag.modbusPartDisChg[i].dischargeCUpFlag;
-											inputIndex++;//return true;
-											return;
+											//inputIndex++;//return true;
+											return true;
 									}
 							}
 					}
 			}
+			return false;
 }
 
-static void ctrlPressSettlConf(char **argv)
+static bool ctrlPressSettlConf(char **argv)
 {
 			uint8_t subname = atoi16(argv[4],10);
 			uint8_t limit   = atoi16(argv[5],10);
 	    int i;
 			if((subname==0)||(subname>2)){
 					rt_kprintf("%sERR:ctrlPressSettlConf argv[4] subname %s should be <=2 and not 0\n",sign);
-				  return ;
+				  return false;
 			}
 			if(!((limit==0)||(limit==1))){
 					rt_kprintf("%sERR:ctrlPressSettlConf argv[5] limit %s should be 0 1\n",sign);
-				  return ;
+				  return false;
 			}
 			
 			
@@ -292,45 +295,46 @@ static void ctrlPressSettlConf(char **argv)
 								if(subname==1){//A
 									  if(limit==0){//下限
 												sheet.autoctrl[pindex].input[inputIndex].flag=&inpoutpFlag.modbusPreSettl[i].tempLowFlag;
-											  inputIndex++;//
-											  return;// true;
+											  //inputIndex++;//
+											  return true;// true;
 										}
 										else{
 											  sheet.autoctrl[pindex].input[inputIndex].flag=&inpoutpFlag.modbusPreSettl[i].tempUpFlag;
-												inputIndex++;//return true;
-											  return;
+												//inputIndex++;//return true;
+											  return true;
 										}
 								}
 								else if(subname==2){//A
 									  if(limit==0){//下限
 												sheet.autoctrl[pindex].input[inputIndex].flag=&inpoutpFlag.modbusPreSettl[i].heightLowFlag;
-											  inputIndex++;//return true;
-											  return;
+											  //inputIndex++;//return true;
+											  return true;
 										}
 										else{
 											  sheet.autoctrl[pindex].input[inputIndex].flag=&inpoutpFlag.modbusPreSettl[i].heightUpFlag;
-												inputIndex++;//return true;
-											  return;
+												//inputIndex++;//return true;
+											  return true;
 										}
 								}
 						}
 			}
+			return false;
 }
 
 
 
-static void ctrlThreeAxisConf(char **argv)
+static bool ctrlThreeAxisConf(char **argv)
 {
 			uint8_t subname = atoi16(argv[4],10);
 			uint8_t limit   = atoi16(argv[5],10);
 	    int i;
 			if((subname==0)||(subname>4)){
 					rt_kprintf("%sERR:ctrlThreeAxisConf argv[4] subname %s should be <=4 and not 0\n",sign);
-				  return ;
+				  return false;
 			}
 			if(!((limit==0)||(limit==1))){
 					rt_kprintf("%sERR:ctrlThreeAxisConf argv[5] limit %s should be 0 1\n",sign);
-				  return ;
+				  return false;
 			}
 			for(i=0;i<THREEAXIS_485_NUM;i++){
 						if(rt_strcmp(sheet.threeAxiss[i].ID,argv[3])==0){//找到相同ID的
@@ -341,59 +345,60 @@ static void ctrlThreeAxisConf(char **argv)
 								if(subname==1){//A
 									  if(limit==0){//下限
 												sheet.autoctrl[pindex].input[inputIndex].flag=&inpoutpFlag.modbusThreAxis[i].tempLowFlag;
-											  inputIndex++;//
-											  return;// true;
+											  //inputIndex++;//
+											  return true;// true;
 										}
 										else{
 											  sheet.autoctrl[pindex].input[inputIndex].flag=&inpoutpFlag.modbusThreAxis[i].tempUpFlag;
-												inputIndex++;//return true;
-											  return;
+												//inputIndex++;//return true;
+											  return true; 
 										}
 								}
 								else if(subname==2){//A
 									  if(limit==0){//下限
 												sheet.autoctrl[pindex].input[inputIndex].flag=&inpoutpFlag.modbusThreAxis[i].accXLowFlag;
-											  inputIndex++;//return true;
-											  return;
+											  //inputIndex++;//return true;
+											  return true;
 										}
 										else{
 											  sheet.autoctrl[pindex].input[inputIndex].flag=&inpoutpFlag.modbusThreAxis[i].accXUpFlag;
-												inputIndex++;//return true;
-											  return;
+												//inputIndex++;//return true;
+											  return true;
 										}
 								}
 								else if(subname==3){//B
 									  if(limit==0){//下限
 												sheet.autoctrl[pindex].input[inputIndex].flag=&inpoutpFlag.modbusThreAxis[i].accYLowFlag;
-											  inputIndex++;//return true;
-											  return;
+											  //inputIndex++;//return true;
+											  return true;
 										}
 										else{
 											  sheet.autoctrl[pindex].input[inputIndex].flag=&inpoutpFlag.modbusThreAxis[i].accYUpFlag;
-												inputIndex++;//return true;
-											  return;
+												//inputIndex++;//return true;
+											  return true;
 										}
 								}							
 								else if(subname==4){//C
 									  if(limit==0){//下限
 												sheet.autoctrl[pindex].input[inputIndex].flag=&inpoutpFlag.modbusThreAxis[i].accZLowFlag;
-											  inputIndex++;//return true;
-											  return;
+											  //inputIndex++;//return true;
+											  return true;
 										}
 										else{
 											  sheet.autoctrl[pindex].input[inputIndex].flag=&inpoutpFlag.modbusThreAxis[i].accZUpFlag;
-												inputIndex++;//return true;
-											  return;
+												//inputIndex++;//return true;
+											  return true;
 										}
 								}
 						}
 			}
+			return false;
 }
 			
 						
 #ifdef USE_4GAS
 
-static void ctrlCh4Conf(char **argv)
+static bool ctrlCh4Conf(char **argv)
 {
 
 			uint8_t subname = atoi16(argv[4],10);
@@ -401,11 +406,11 @@ static void ctrlCh4Conf(char **argv)
 	    int i;
 			if((subname==0)||(subname>1)){
 					rt_kprintf("%sERR:ctrlCh4Conf argv[4] subname %s should be <=1 and not 0\n",sign);
-				  return ;
+				  return false;
 			}
 			if(!((limit==0)||(limit==1))){
 					rt_kprintf("%sERR:ctrlCh4Conf argv[5] limit %s should be 0 1\n",sign);
-				  return ;
+				  return false;
 			}
 			
 			
@@ -418,19 +423,20 @@ static void ctrlCh4Conf(char **argv)
 								if(subname==1){//A
 									  if(limit==0){//下限
 												sheet.autoctrl[pindex].input[inputIndex].flag=&inpoutpFlag.modbusCh4[i].ch4LowFlag;
-											  inputIndex++;//
-											  return;// true;
+											  //inputIndex++;//
+											  return true;// true;
 										}
 										else{
 											  sheet.autoctrl[pindex].input[inputIndex].flag=&inpoutpFlag.modbusCh4[i].ch4UpFlag;
-												inputIndex++;//return true;
-											  return;
+												//inputIndex++;//return true;
+											  return true;
 										}
 								}
 						}
 			}
+			return false;
 }
-static void ctrlO2Conf(char **argv)
+static bool ctrlO2Conf(char **argv)
 {
 
 			uint8_t subname = atoi16(argv[4],10);
@@ -438,30 +444,31 @@ static void ctrlO2Conf(char **argv)
 	    int i;
 			if((subname==0)||(subname>1)){
 					rt_kprintf("%sERR:ctrlO2Conf argv[4] subname %s should be <=1 and not 0\n",sign);
-				  return ;
+				  return false;
 			}
 			if(!((limit==0)||(limit==1))){
 					rt_kprintf("%sERR:ctrlO2Conf argv[5] limit %s should be 0 1\n",sign);
-				  return ;
+				  return false;
 			}
 			for(i=0;i<O2_485_NUM;i++){
-						if(rt_strcmp(sheet.o2[i].ID,argv[3])==0){//找到相同ID的
-								if(subname==1){//A
-									  if(limit==0){//下限
-												sheet.autoctrl[pindex].input[inputIndex].flag=&inpoutpFlag.modbusO2[i].o2LowFlag;
-											  inputIndex++;//
-											  return;// true;
-										}
-										else{
-											  sheet.autoctrl[pindex].input[inputIndex].flag=&inpoutpFlag.modbusO2[i].o2UpFlag;
-												inputIndex++;//return true;
-											  return;
-										}
-								}
-						}
+					if(rt_strcmp(sheet.o2[i].ID,argv[3])==0){//找到相同ID的
+							if(subname==1){//A
+									if(limit==0){//下限
+											sheet.autoctrl[pindex].input[inputIndex].flag=&inpoutpFlag.modbusO2[i].o2LowFlag;
+											//inputIndex++;//
+											return true;// true;
+									}
+									else{
+											sheet.autoctrl[pindex].input[inputIndex].flag=&inpoutpFlag.modbusO2[i].o2UpFlag;
+											//inputIndex++;//return true;
+											return true;
+									}
+							}
+					}
 			}
+			return false;
 }
-static void ctrlH2sConf(char **argv)
+static bool ctrlH2sConf(char **argv)
 {
 
 			uint8_t subname = atoi16(argv[4],10);
@@ -469,43 +476,44 @@ static void ctrlH2sConf(char **argv)
 	    int i;
 			if((subname==0)||(subname>1)){
 					rt_kprintf("%sERR:ctrlH2sConf argv[4] subname %s should be <=1 and not 0\n",sign);
-				  return ;
+				  return false;
 			}
 			if(!((limit==0)||(limit==1))){
 					rt_kprintf("%sERR:ctrlH2sConf argv[5] limit %s should be 0 1\n",sign);
-				  return ;
+				  return false;
 			}
 			
 			
 			for(i=0;i<H2S_485_NUM;i++){
-						if(rt_strcmp(sheet.h2s[i].ID,argv[3])==0){//找到相同ID的
-								if(subname==1){//A
-									  if(limit==0){//下限
-												sheet.autoctrl[pindex].input[inputIndex].flag=&inpoutpFlag.modbusH2s[i].h2sLowFlag;
-											  inputIndex++;//
-											  return;// true;
-										}
-										else{
-											  sheet.autoctrl[pindex].input[inputIndex].flag=&inpoutpFlag.modbusH2s[i].h2sUpFlag;
-												inputIndex++;//return true;
-											  return;
-										}
-								}
-						}
+					if(rt_strcmp(sheet.h2s[i].ID,argv[3])==0){//找到相同ID的
+							if(subname==1){//A
+									if(limit==0){//下限
+											sheet.autoctrl[pindex].input[inputIndex].flag=&inpoutpFlag.modbusH2s[i].h2sLowFlag;
+											//inputIndex++;//
+											return true;// true;
+									}
+									else{
+											sheet.autoctrl[pindex].input[inputIndex].flag=&inpoutpFlag.modbusH2s[i].h2sUpFlag;
+											//inputIndex++;//return true;
+											return true;
+									}
+							}
+					}
 			}
+			return false;
 }
-static void ctrlCoConf(char **argv)
+static bool ctrlCoConf(char **argv)
 {
 			uint8_t subname = atoi16(argv[4],10);
 			uint8_t limit   = atoi16(argv[5],10);
 	    int i;
 			if((subname==0)||(subname>1)){
 					rt_kprintf("%sERR:ctrlCoConf argv[4] subname %s should be <=1 and not 0\n",sign);
-				  return ;
+				  return false;
 			}
 			if(!((limit==0)||(limit==1))){
 					rt_kprintf("%sERR:ctrlCoConf argv[5] limit %s should be 0 1\n",sign);
-				  return ;
+				  return false;
 			}
 			for(i=0;i<CO_485_NUM;i++){
 					if(rt_strcmp(sheet.co[i].ID,argv[3])==0){//找到相同ID的
@@ -517,76 +525,78 @@ static void ctrlCoConf(char **argv)
 							if(subname==1){//A
 									if(limit==0){//下限
 											sheet.autoctrl[pindex].input[inputIndex].flag=&inpoutpFlag.modbusCo[i].coLowFlag;
-											inputIndex++;//
-											return;// true;
+											//inputIndex++;//
+											return true;// true;
 									}
 									else{
 											sheet.autoctrl[pindex].input[inputIndex].flag=&inpoutpFlag.modbusCo[i].coUpFlag;
-											inputIndex++;//return true;
-											return;
+											//inputIndex++;//return true;
+											return true;
 									}
 							}
 					}
 			}
+			return false;
 }					
 
 #endif
 
 
-static void ctrlTemphumConf(char **argv)
+static bool ctrlTemphumConf(char **argv)
 {
 			uint8_t subname = atoi16(argv[4],10);
 			uint8_t limit   = atoi16(argv[5],10);
 	    int i;
 			if((subname==0)||(subname>2)){
 					rt_kprintf("%sERR:ctrlTempHumConf argv[4] subname %s should be <=2 and not 0\n",sign);
-				  return ;
+				  return false;
 			}
 			if(!((limit==0)||(limit==1))){
 					rt_kprintf("%sERR:ctrlTempHumConf argv[5] limit %s should be 0 1\n",sign);
-				  return ;
+				  return false;
 			}
 			for(i=0;i<TEMPHUM_485_NUM;i++){
 					if(rt_strcmp(sheet.tempHum[i].ID,argv[3])==0){//找到相同ID的
 							if(subname==1){//A
 									if(limit==0){//下限
 											sheet.autoctrl[pindex].input[inputIndex].flag=&inpoutpFlag.modbusTempHum[i].tempLowFlag;
-											inputIndex++;//
-											return;// true;
+											//inputIndex++;//
+											return true;// true;
 									}
 									else{
 											sheet.autoctrl[pindex].input[inputIndex].flag=&inpoutpFlag.modbusTempHum[i].tempUpFlag;
-											inputIndex++;//return true;
-											return;
+											//inputIndex++;//return true;
+											return true;
 									}
 							}
 							else if(subname==2){//A
 									if(limit==0){//下限
 											sheet.autoctrl[pindex].input[inputIndex].flag=&inpoutpFlag.modbusTempHum[i].humLowFlag;
-											inputIndex++;//
-											return;// true;
+											//inputIndex++;//
+											return true;// true;
 									}
 									else{
 											sheet.autoctrl[pindex].input[inputIndex].flag=&inpoutpFlag.modbusTempHum[i].humUpFlag;
-											inputIndex++;//return true;
-											return;
+											//inputIndex++;//return true;
+											return true;
 									}
 							}
 					}
 			}
+			return false;
 }					
-static void ctrlWaterConf(char **argv)
+static bool  ctrlWaterConf(char **argv)
 {
 			uint8_t subname = atoi16(argv[4],10);
 			uint8_t limit   = atoi16(argv[5],10);
 	    int i;
 			if((subname==0)||(subname>1)){
 					rt_kprintf("%sERR:ctrlWaterConf argv[4] subname %s should be <=1 and not 0\n",sign);
-				  return ;
+				  return false;
 			}
 			if(!((limit==0)||(limit==1))){
 					rt_kprintf("%sERR:ctrlWaterConf argv[5] limit %s should be 0 1\n",sign);
-				  return ;
+				  return false;
 			}
 			for(i=0;i<WATERDEPTH_485_NUM;i++){
 					if(rt_strcmp(sheet.waterDepth[i].ID,argv[3])==0){//找到相同ID的
@@ -598,17 +608,18 @@ static void ctrlWaterConf(char **argv)
 							if(subname==1){//A
 									if(limit==0){//下限
 											sheet.autoctrl[pindex].input[inputIndex].flag=&inpoutpFlag.modbusWaterDepth[i].depthLowFlag;
-											inputIndex++;//
-											return;// true;
+											//inputIndex++;//
+											return true;// true;
 									}
 									else{
 											sheet.autoctrl[pindex].input[inputIndex].flag=&inpoutpFlag.modbusWaterDepth[i].depthUpFlag;
-											inputIndex++;//return true;
-											return;
+											//inputIndex++;//return true;
+											return true;
 									}
 							}
 					}
 			}
+			return false;
 }													
 
 //输入的指针配置
@@ -616,6 +627,7 @@ static void autoctrlInputcfg(char*argv[])
 {
 	  int i,j;
 	  uint8_t limit ,subName;
+	  bool ret=false;
 		for(i=0;i<sizeof(inName)/sizeof(inName[0]);i++){
 				if(rt_strcmp(inName[i],argv[1])==0){//find input
 
@@ -658,6 +670,7 @@ static void autoctrlInputcfg(char*argv[])
 																		inputIndex++;
 																}
 																configFlag=true;
+																rt_kprintf("%saotuctrl AI OK\n",sign);
 														}
 												}
 										}
@@ -675,12 +688,15 @@ static void autoctrlInputcfg(char*argv[])
 										return ;
 								}
 								for(i=0;i<DI_NUM;i++){
-										if(0==rt_strcmp((char *)packFlash.input[i].devID,argv[2])){
+										if(0==rt_strcmp((char *)packFlash.input[i].devID,argv[3])){
 												//packFlash.input[i].levelFlag=limit;//通过levelFlag来置位 lowFlag upFlag
 											  if(limit==0)
 														sheet.autoctrl[pindex].input[inputIndex].flag=&inpoutpFlag.digInput[i].lowFlag;
 												else
 														sheet.autoctrl[pindex].input[inputIndex].flag=&inpoutpFlag.digInput[i].upFlag;
+												inputIndex++;
+												configFlag=true;
+												rt_kprintf("%saotuctrl DI OK\n",sign);
 										}
 								}
 								break;
@@ -697,40 +713,46 @@ static void autoctrlInputcfg(char*argv[])
 												switch(i){
 													case CIRCULA:
 															// if(true==autoCirculaConf(argv))
-															crtlCirculaConf(argv);	
+															ret=crtlCirculaConf(argv);	
 													break;
 													case PARTDISCHAG:
-														  crtlPartDischagConf(argv);
+														  ret=crtlPartDischagConf(argv);
 													break;
 													case PRESSSETTL:
-															ctrlPressSettlConf(argv);
+															ret=ctrlPressSettlConf(argv);
 													break;
 													case THREEAXIS:
-															ctrlThreeAxisConf(argv);
+															ret=ctrlThreeAxisConf(argv);
 													break;
 										#ifdef USE_4GAS
 													case CH4:
-														  ctrlCh4Conf(argv);
+														  ret=ctrlCh4Conf(argv);
 													break;
 													case O2:
-														  ctrlO2Conf(argv);
+														  ret=ctrlO2Conf(argv);
 													break;
 													case H2S:
-														  ctrlH2sConf(argv);
+														  ret=ctrlH2sConf(argv);
 													break;
 													case CO:
-															ctrlCoConf(argv);
+															ret=ctrlCoConf(argv);
 													break;
 										#endif
 													case TEMPHUM:
-														ctrlTemphumConf(argv);
+														ret=ctrlTemphumConf(argv);
 													break;
 													case WATERDEPTH:
-														ctrlWaterConf(argv);
+														ret=ctrlWaterConf(argv);
 													break;
 													default:
 														rt_kprintf("%sERR:argv[2]>%d\n",sign,WATERDEPTH);
 													break;
+												}
+												
+												if(ret==true){
+														configFlag=true;
+													  inputIndex++;
+														rt_kprintf("%saotuctrl MB OK\n",sign);
 												}
 												break;
 										}
@@ -755,7 +777,7 @@ static void autoctrlOutputcfg(char*argv[])
 				return ;
 		}
 		for(i=0;i<sizeof(outName)/sizeof(outName[0]);i++){
-				if(rt_strcmp(outName[i],argv[i])==0){//find output
+				if(rt_strcmp(outName[i],argv[1])==0){//find output
 						rt_strcpy(sheet.autoctrl[pindex].output[outputIndex].typeName,argv[1]);
 						rt_strcpy(sheet.autoctrl[pindex].output[outputIndex].senseName,argv[2]);
 						rt_strcpy(sheet.autoctrl[pindex].output[outputIndex].ID,argv[3]);
@@ -765,47 +787,62 @@ static void autoctrlOutputcfg(char*argv[])
 						{
 							case 0:
 								for(i=0;i<DO_NUM;i++){
-										if(0==rt_strcmp((char *)packFlash.digoutput[i].devID,argv[2])){
+										if(0==rt_strcmp((char *)packFlash.digoutput[i].devID,argv[3])){
 												//packFlash.digoutput[i].levelFlag=limit;//通过levelFlag来置位 lowFlag upFlag
 											  if(limit==0)
 														sheet.autoctrl[pindex].output[outputIndex].flag=&inpoutpFlag.digOutput[i].lowFlag;
 												else
 														sheet.autoctrl[pindex].output[outputIndex].flag=&inpoutpFlag.digOutput[i].upFlag;
+												outputIndex++;
+												configFlag=true;
+												rt_kprintf("%saotuctrl DO OK\n",sign);
 										}
 								}
 								break;
-							case 1:
+							case 1:							
 								for(i=0;i<V33O_NUM;i++){
-										if(0==rt_strcmp((char *)packFlash.v33output[i].devID,argv[2])){
+										if(0==rt_strcmp((char *)packFlash.v33output[i].devID,argv[3])){
 												//packFlash.digoutput[i].levelFlag=limit;//通过levelFlag来置位 lowFlag upFlag
 											  if(limit==0)
 														sheet.autoctrl[pindex].output[outputIndex].flag=&inpoutpFlag.v33Output[i].lowFlag;
 												else
 														sheet.autoctrl[pindex].output[outputIndex].flag=&inpoutpFlag.v33Output[i].upFlag;
+												outputIndex++;
+												configFlag=true;
+												rt_kprintf("%saotuctrl V33O OK\n",sign);
 										}
 								}
 								break;
 							case 2:
 								for(i=0;i<V5O_NUM;i++){
-										if(0==rt_strcmp((char *)packFlash.v5output[i].devID,argv[2])){
+										if(0==rt_strcmp((char *)packFlash.v5output[i].devID,argv[3])){
 												
 											  if(limit==0)
 														sheet.autoctrl[pindex].output[outputIndex].flag=&inpoutpFlag.v5Output[i].lowFlag;
 												else
 														sheet.autoctrl[pindex].output[outputIndex].flag=&inpoutpFlag.v5Output[i].upFlag;
+												outputIndex++;
+												configFlag=true;
+												rt_kprintf("%saotuctrl V5O OK\n",sign);
 										}
 								}
 								break;
 							case 3:
 								for(i=0;i<V12O_NUM;i++){
-										if(0==rt_strcmp((char *)packFlash.v12output[i].devID,argv[2])){
+										if(0==rt_strcmp((char *)packFlash.v12output[i].devID,argv[3])){
 												//packFlash.digoutput[i].levelFlag=limit;//通过levelFlag来置位 lowFlag upFlag
 											  if(limit==0)
 														sheet.autoctrl[pindex].output[outputIndex].flag=&inpoutpFlag.v12Output[i].lowFlag;
 												else
 														sheet.autoctrl[pindex].output[outputIndex].flag=&inpoutpFlag.v12Output[i].upFlag;
+												outputIndex++;
+												configFlag=true;
+												rt_kprintf("%saotuctrl V12O OK\n",sign);
 										}
 								}
+								break;
+								default:
+
 								break;
 						}
 						return;
@@ -814,14 +851,15 @@ static void autoctrlOutputcfg(char*argv[])
 	
 }
 //打印自动控制的配置列表
-static void ctrlPrintf()
+void ctrlPrintf()
 {
-		rt_kprintf("%s,auto ctrl list",sign);
+		rt_kprintf("%sauto ctrl list\n",sign);
 		for(int i=0;i<CRTL_TOTAL_NUM;i++){
 				//rt_kprintf("%s,autoctrl list",sign);
-			  if(sheet.autoctrl[i].workFlag==true)
+			  if(sheet.autoctrl[i].workFlag==true){
+					  rt_kprintf("%s,autoctrl the [%d] inctrl\n",sign,i+1);
 						for(int k=0;k<CRTL_IN_NUM;k++){
-								if(sheet.autoctrl[i].input[k].flag!=NULL){
+								if((sheet.autoctrl[i].input[k].flag!=NULL)&&((uint32_t)(uint32_t*)(sheet.autoctrl[i].input[k].flag)!=0xFFFFFFFF)){
 										rt_kprintf("In:autoctrl ");
 										rt_kprintf("%s ",sheet.autoctrl[i].input[k].typeName);
 										rt_kprintf("%s ",sheet.autoctrl[i].input[k].senseName);
@@ -831,7 +869,8 @@ static void ctrlPrintf()
 								}
 						}
 						for(int j=0;j<CRTL_OUT_NUM;j++){
-								if(sheet.autoctrl[i].output[j].flag!=NULL){
+							 							//	if((sheet.autoctrl[i].input[k].flag!=NULL)&&((uint32_t)(uint32_t*)(sheet.autoctrl[i].input[k].flag)!=0xFFFFFFFF)){
+								if((sheet.autoctrl[i].output[j].flag!=NULL)&&((uint32_t)(uint32_t*)sheet.autoctrl[i].output[j].flag!=0xFFFFFFFF)){
 										rt_kprintf("Out:autoctrl ");
 										rt_kprintf("%s ",sheet.autoctrl[i].output[j].typeName);
 										rt_kprintf("%s ",sheet.autoctrl[i].output[j].senseName);
@@ -840,6 +879,8 @@ static void ctrlPrintf()
 										rt_kprintf("%d \n",sheet.autoctrl[i].output[j].limit);
 								}
 						}	
+						rt_kprintf("\n");
+				}
 		}
 }
 //自动控制输入函数  串口输出命令首先调用此函数解析
@@ -850,7 +891,7 @@ static void autoctrl(char argc,char*argv[])
 				pindex=findCtrlIndex();//每次上电后读取一次即可
 		}
 	  if(pindex==255){
-				rt_kprintf("%s,ERR:aotuctrl is full,the total number is %d\n",sign,CRTL_TOTAL_NUM);
+				rt_kprintf("%sERR:aotuctrl is full,the total number is %d\n",sign,CRTL_TOTAL_NUM);
 			  return;
 		}
 		if(rt_strcmp("list",argv[1])==0){
@@ -863,6 +904,7 @@ static void autoctrl(char argc,char*argv[])
 			  configFlag=false;
 				inputIndex=0; 
 				outputIndex=0;
+			  rt_kprintf("%saotuctrl sure OK\n",sign);
 				return;
 		}
 		int k;
@@ -877,12 +919,17 @@ static void autoctrl(char argc,char*argv[])
 			  configFlag=false;
 				inputIndex=0; 
 				outputIndex=0;
+				rt_kprintf("%saotuctrl cancel OK\n",sign);
 				return;
 		}
 		if(rt_strcmp("delete",argv[1])==0){
-			  sheet.autoctrl[pindex].workFlag=false;//本条配置失效
+			  
+			  int i=atoi16(argv[2],10);
+			rt_kprintf("%s %d %d\n",sign,i,pindex);
+			  sheet.autoctrl[pindex-1].workFlag=false;//本条配置失效
 			  if(configFlag==false)
 						pindex =findCtrlIndex();//删除后刷新坐标
+				rt_kprintf("%saotuctrl delete OK\n",sign);
 				return;
 		}//打印删除按钮
 		if(pindex==255){

@@ -219,10 +219,9 @@ int main(void)
 	  rt_err_t result;
 		stm32_flash_read(FLASH_IP_SAVE_ADDR,    (uint8_t*)&packFlash,sizeof(packFlash));
 		stm32_flash_read(FLASH_MODBUS_SAVE_ADDR,(uint8_t*)&sheet,    sizeof(sheet));
-
-	
-	
-	
+		if(packFlash.acuId[0]>=0x7F){
+				rt_strcpy(packFlash.acuId,"000000000000001");//必须加上 执行cJSON_AddStringToObject(root, "acuId",(char *)packFlash.acuId);
+		}                                                //会导致内存泄漏	
 	//		sheet.testFlag[0]=testNum+0;
 //		sheet.testFlag[1]=&testNum[1];
 //		sheet.testFlag[2]=&testNum[2];

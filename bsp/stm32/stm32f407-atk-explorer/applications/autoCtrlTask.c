@@ -243,6 +243,7 @@ extern void diIOOutSetFlag(void);
 void  autoCtrlTask(void *para)
 {
 	
+//	  ctrlPrintf();
 		while(1){	
 			  diIOOutSetFlag();
 			  autoCtrlRun();
