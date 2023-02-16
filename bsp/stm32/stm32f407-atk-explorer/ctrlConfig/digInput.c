@@ -31,17 +31,19 @@ bool  diReadFun(char num)
 		return ret;
 }
 //digit input检测到符合逻辑的电平 置位相应的flag
-void diIOOutSetFlag()
+void diIOSetFlag()
 {
 		for(int i=0;i<DI_NUM;i++){
 				if(packFlash.input[i].workFlag==true){
 						if(diReadFun(i)==true){
 								inpoutpFlag.digInput[i].upFlag =true;
-							  inpoutpFlag.digInput[i].lowFlag =false;
+							  inpoutpFlag.digInput[i].lowFlag =false; 
+							  rt_kprintf("%s diIOSet upFlag %d\n",sign,i);
 						}
 						else {
 							  inpoutpFlag.digInput[i].upFlag =false;
 								inpoutpFlag.digInput[i].lowFlag=true;
+							  rt_kprintf("%s diIOSet lowFlag %d\n",sign,i);
 						}
 				}
 		}

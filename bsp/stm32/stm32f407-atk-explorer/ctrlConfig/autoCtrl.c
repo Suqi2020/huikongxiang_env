@@ -31,8 +31,8 @@ autoctrl V12O 水泵  GYNJLXSD000000439 1
 //////////////////////////////////////////////////
 */
 
-
-inoutDevStru inpoutpFlag={0};//输入输出超值的标记位   
+inoutDevStru inpoutpFlag __attribute__((at(0x2000D000)))={0};//输入输出超值的标记位  指定内存地址  防止更改代码后内存地址移位
+//sheet.autoctrl[pindex].output[outputIndex].flag中指针指向了inpoutpFlag
 const static char sign[]="[autoCtrl]";
 char *inName[INOUTNAME_LEN]={"AI","DI","MB",};
 char *outName[INOUTNAME_LEN]={"DO","V3O","V5O","V12O"};
@@ -630,7 +630,10 @@ static void autoctrlInputcfg(char*argv[])
 	  bool ret=false;
 		for(i=0;i<sizeof(inName)/sizeof(inName[0]);i++){
 				if(rt_strcmp(inName[i],argv[1])==0){//find input
-
+						if(inputIndex>=CRTL_IN_NUM){
+								rt_kprintf("%serr:autoctrl input num is %d\n",sign,CRTL_IN_NUM);
+							  return;
+						}
 						switch(i){
 							case 0://AI
 								for(j=0;j<ANALOG_NUM;j++){
@@ -776,8 +779,14 @@ static void autoctrlOutputcfg(char*argv[])
 				rt_kprintf("%sERR:autoctrlOutputcfg argv[5] limit %s should be 0 1\n",sign);
 				return ;
 		}
+		
 		for(i=0;i<sizeof(outName)/sizeof(outName[0]);i++){
 				if(rt_strcmp(outName[i],argv[1])==0){//find output
+
+						if(outputIndex>=CRTL_OUT_NUM){
+								rt_kprintf("%serr:autoctrl output num is %d\n",sign,CRTL_OUT_NUM);
+							  return;
+						}
 						rt_strcpy(sheet.autoctrl[pindex].output[outputIndex].typeName,argv[1]);
 						rt_strcpy(sheet.autoctrl[pindex].output[outputIndex].senseName,argv[2]);
 						rt_strcpy(sheet.autoctrl[pindex].output[outputIndex].ID,argv[3]);
@@ -851,13 +860,13 @@ static void autoctrlOutputcfg(char*argv[])
 	
 }
 //打印自动控制的配置列表
-void ctrlPrintf()
+void printfCtrl()
 {
 		rt_kprintf("%sauto ctrl list\n",sign);
 		for(int i=0;i<CRTL_TOTAL_NUM;i++){
 				//rt_kprintf("%s,autoctrl list",sign);
 			  if(sheet.autoctrl[i].workFlag==true){
-					  rt_kprintf("%s,autoctrl the [%d] inctrl\n",sign,i+1);
+					  rt_kprintf("%sautoctrl the [%d] inctrl\n",sign,i+1);
 						for(int k=0;k<CRTL_IN_NUM;k++){
 								if((sheet.autoctrl[i].input[k].flag!=NULL)&&((uint32_t)(uint32_t*)(sheet.autoctrl[i].input[k].flag)!=0xFFFFFFFF)){
 										rt_kprintf("In:autoctrl ");
@@ -895,7 +904,7 @@ static void autoctrl(char argc,char*argv[])
 			  return;
 		}
 		if(rt_strcmp("list",argv[1])==0){
-				ctrlPrintf();
+				printfCtrl();
 				return;
 		}//打印
 		if(rt_strcmp("sure",argv[1])==0){//确定本次配置按钮  确定完了只能删除 不能取消
@@ -932,9 +941,9 @@ static void autoctrl(char argc,char*argv[])
 				rt_kprintf("%saotuctrl delete OK\n",sign);
 				return;
 		}//打印删除按钮
-		if(pindex==255){
-				rt_kprintf("%saotuCtrl num<=8 ,delete it first\n",sign);
-			  return;
+
+		if(pindex>=CRTL_TOTAL_NUM){
+				rt_kprintf("%serr:autoctrl totoal num is %d\n",sign,CRTL_TOTAL_NUM);
 		}
 		autoctrlInputcfg(argv); //检查是不是输入配置
 		autoctrlOutputcfg(argv);//检查是不是输出配置

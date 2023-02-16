@@ -222,7 +222,7 @@ void   upKeepStateTask(void *para)
 	  extern void printfDIList();
 	  extern void printfOutputList();
 		extern void printfThresholdList();
-		extern void ctrlPrintf();
+		extern void printfCtrl();
 	  uartMutexQueueCfg();//根据flash存储重新配置串口
 //		modbusPrintRead();//modbus配置从flash中读取
 	  uartReconfig();//串口重新配置
@@ -234,8 +234,9 @@ void   upKeepStateTask(void *para)
 	  printfDIList();
 	  printfOutputList();
 		printfThresholdList();
+		printfCtrl();
 	  clearUartData();
-	  ctrlPrintf();
+	  
 	  readMultiCirCulaPoint();//对于环流来讲 运行前需要提取扩大方式
 
 		while(1){

@@ -33,10 +33,10 @@ typedef struct{
 }tempHumStru_p;
 typedef struct{
 		
-	  bool  tempUpFlag;//阈值超限的标记
-	  bool  tempLowFlag;
-	  bool  humUpFlag;
-	  bool  humLowFlag;
+	  uint32_t  tempUpFlag;//阈值超限的标记
+	  uint32_t  tempLowFlag;
+	  uint32_t  humUpFlag;
+	  uint32_t  humLowFlag;
 }tempHumFlagStru;
 //modbus传感器防外破
 typedef struct{
@@ -50,14 +50,14 @@ typedef struct{
 	  uint16_t accZLowLimit;
 }threeAxisStru_p;
 typedef struct{
-		bool  tempUpFlag;//阈值超限的标记
-		bool  tempLowFlag;
-		bool  accXUpFlag;
-		bool  accXLowFlag;
-		bool  accYUpFlag;
-		bool  accYLowFlag;
-		bool  accZUpFlag;
-		bool  accZLowFlag;
+		uint32_t  tempUpFlag;//阈值超限的标记
+		uint32_t  tempLowFlag;
+		uint32_t  accXUpFlag;
+		uint32_t  accXLowFlag;
+		uint32_t  accYUpFlag;
+		uint32_t  accYLowFlag;
+		uint32_t  accZUpFlag;
+		uint32_t  accZLowFlag;
 }threeAxisFlagStru;
 //modbus传感 沉降仪
 typedef struct{
@@ -67,10 +67,10 @@ typedef struct{
 	  float heightLowLimit;
 }pressSettlStru_p;
 typedef struct{
-		bool  tempUpFlag;//阈值超限的标记
-		bool  tempLowFlag;
-		bool  heightUpFlag;
-		bool  heightLowFlag;
+		uint32_t  tempUpFlag;//阈值超限的标记
+		uint32_t  tempLowFlag;
+		uint32_t  heightUpFlag;
+		uint32_t  heightLowFlag;
 }pressSettlFlagStru;
 typedef struct
 {
@@ -83,12 +83,12 @@ typedef struct
 	  float cirCurCLowLimit;
 }circuStru_p;
 typedef struct{
-		bool  cirCurAUpFlag;//阈值超限的标记
-		bool  cirCurALowFlag;
-		bool  cirCurBUpFlag;
-		bool  cirCurBLowFlag;
-		bool  cirCurCUpFlag;
-		bool  cirCurCLowFlag;
+		uint32_t  cirCurAUpFlag;//阈值超限的标记
+		uint32_t  cirCurALowFlag;
+		uint32_t  cirCurBUpFlag;
+		uint32_t  cirCurBLowFlag;
+		uint32_t  cirCurCUpFlag;
+		uint32_t  cirCurCLowFlag;
 }circuFlagStru;
 
 //modbus传感器co
@@ -97,8 +97,8 @@ typedef struct{
 		float coLowLimit;
 }coStru_p;
 typedef struct{
-		bool  coUpFlag;//阈值超限的标记
-		bool  coLowFlag;
+		uint32_t  coUpFlag;//阈值超限的标记
+		uint32_t  coLowFlag;
 }coFlagStru;
 //modbus传感器O2
 typedef struct{
@@ -106,8 +106,8 @@ typedef struct{
 		float o2LowLimit;
 }o2Stru_p;
 typedef struct{
-	  bool  o2UpFlag;//阈值超限的标记
-		bool  o2LowFlag;
+	  uint32_t  o2UpFlag;//阈值超限的标记
+		uint32_t  o2LowFlag;
 }o2FlagStru;
 //modbus传感器ch4
 typedef struct{
@@ -115,8 +115,8 @@ typedef struct{
 		float ch4LowLimit;
 }ch4Stru_p;
 typedef struct{
-	  bool  ch4UpFlag;//阈值超限的标记
-		bool  ch4LowFlag;
+	  uint32_t  ch4UpFlag;//阈值超限的标记
+		uint32_t  ch4LowFlag;
 }ch4FlagStru;
 //modbus传感器h2s
 typedef struct{
@@ -124,8 +124,8 @@ typedef struct{
 		float h2sLowLimit;
 }h2sStru_p;
 typedef  struct{
-	  bool  h2sUpFlag;//阈值超限的标记
-		bool  h2sLowFlag;
+	  uint32_t  h2sUpFlag;//阈值超限的标记
+		uint32_t  h2sLowFlag;
 }h2sFlagStru;
 //modbus传感器waterLev
 typedef struct{
@@ -133,8 +133,8 @@ typedef struct{
 		float depthLowLimit;
 }depthStru_p;
 typedef struct{
-	  bool  depthUpFlag;//阈值超限的标记
-		bool  depthLowFlag;
+	  uint32_t  depthUpFlag;//阈值超限的标记
+		uint32_t  depthLowFlag;
 }depthFlagStru;
 
 //modbus传感器partDischarg
@@ -161,26 +161,26 @@ typedef struct{
 		uint32_t dischargeCLowLimit;
 }partDisChgStru_p;
 typedef struct{
-	  bool  amplitudeAUpFlag;//阈值超限的标记
-		bool  amplitudeALowFlag;
-	  bool  amplitudeBUpFlag;
-		bool  amplitudeBLowFlag;
-		bool  amplitudeCUpFlag;
-		bool  amplitudeCLowFlag;
+	  uint32_t  amplitudeAUpFlag;//阈值超限的标记
+		uint32_t  amplitudeALowFlag;
+	  uint32_t  amplitudeBUpFlag;
+		uint32_t  amplitudeBLowFlag;
+		uint32_t  amplitudeCUpFlag;
+		uint32_t  amplitudeCLowFlag;
 		
-	  bool  freqAUpFlag;//阈值超限的标记
-		bool  freqALowFlag;
-	  bool  freqBUpFlag;
-		bool  freqBLowFlag;
-		bool  freqCUpFlag;
-		bool  freqCLowFlag;
+	  uint32_t  freqAUpFlag;//阈值超限的标记
+		uint32_t  freqALowFlag;
+	  uint32_t  freqBUpFlag;
+		uint32_t  freqBLowFlag;
+		uint32_t  freqCUpFlag;
+		uint32_t  freqCLowFlag;
 
-	  bool  dischargeAUpFlag;//阈值超限的标记
-		bool  dischargeALowFlag;
-	  bool  dischargeBUpFlag;
-		bool  dischargeBLowFlag;
-		bool  dischargeCUpFlag;
-		bool  dischargeCLowFlag;
+	  uint32_t  dischargeAUpFlag;//阈值超限的标记
+		uint32_t  dischargeALowFlag;
+	  uint32_t  dischargeBUpFlag;
+		uint32_t  dischargeBLowFlag;
+		uint32_t  dischargeCUpFlag;
+		uint32_t  dischargeCLowFlag;
 }partDisChgFlagStru;
 
 
@@ -329,8 +329,8 @@ typedef struct{
 }deviceFlashStru;//存储到flash中
 
 typedef struct{
-		bool lowFlag;//低电平
-	  bool upFlag;//高电平
+		uint32_t lowFlag;//低电平
+	  uint32_t upFlag;//高电平
 }digputFlagStru;
 
 

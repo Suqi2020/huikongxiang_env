@@ -157,9 +157,9 @@
         <Bp>
           <Number>0</Number>
           <Type>0</Type>
-          <LineNumber>868</LineNumber>
+          <LineNumber>861</LineNumber>
           <EnabledFlag>1</EnabledFlag>
-          <Address>134278552</Address>
+          <Address>134267322</Address>
           <ByteObject>0</ByteObject>
           <HtxType>0</HtxType>
           <ManyObjects>0</ManyObjects>
@@ -168,44 +168,44 @@
           <BreakIfRCount>1</BreakIfRCount>
           <Filename>.\ctrlConfig\autoCtrl.c</Filename>
           <ExecCommand></ExecCommand>
-          <Expression>\\rt_thread\ctrlConfig/autoCtrl.c\868</Expression>
+          <Expression>\\rt_thread\ctrlConfig/autoCtrl.c\861</Expression>
         </Bp>
         <Bp>
           <Number>1</Number>
           <Type>0</Type>
-          <LineNumber>801</LineNumber>
+          <LineNumber>248</LineNumber>
           <EnabledFlag>1</EnabledFlag>
-          <Address>134267354</Address>
+          <Address>134277508</Address>
           <ByteObject>0</ByteObject>
           <HtxType>0</HtxType>
           <ManyObjects>0</ManyObjects>
           <SizeOfObject>0</SizeOfObject>
           <BreakByAccess>0</BreakByAccess>
           <BreakIfRCount>1</BreakIfRCount>
-          <Filename>.\ctrlConfig\autoCtrl.c</Filename>
+          <Filename>.\applications\autoCtrlTask.c</Filename>
           <ExecCommand></ExecCommand>
-          <Expression>\\rt_thread\ctrlConfig/autoCtrl.c\801</Expression>
+          <Expression>\\rt_thread\applications/autoCtrlTask.c\248</Expression>
         </Bp>
         <Bp>
           <Number>2</Number>
           <Type>0</Type>
-          <LineNumber>830</LineNumber>
+          <LineNumber>237</LineNumber>
           <EnabledFlag>1</EnabledFlag>
-          <Address>134267662</Address>
+          <Address>134277448</Address>
           <ByteObject>0</ByteObject>
           <HtxType>0</HtxType>
           <ManyObjects>0</ManyObjects>
           <SizeOfObject>0</SizeOfObject>
           <BreakByAccess>0</BreakByAccess>
           <BreakIfRCount>1</BreakIfRCount>
-          <Filename>.\ctrlConfig\autoCtrl.c</Filename>
+          <Filename>.\applications\autoCtrlTask.c</Filename>
           <ExecCommand></ExecCommand>
-          <Expression>\\rt_thread\ctrlConfig/autoCtrl.c\830</Expression>
+          <Expression>\\rt_thread\applications/autoCtrlTask.c\237</Expression>
         </Bp>
         <Bp>
           <Number>3</Number>
           <Type>0</Type>
-          <LineNumber>803</LineNumber>
+          <LineNumber>39</LineNumber>
           <EnabledFlag>1</EnabledFlag>
           <Address>0</Address>
           <ByteObject>0</ByteObject>
@@ -214,30 +214,14 @@
           <SizeOfObject>0</SizeOfObject>
           <BreakByAccess>0</BreakByAccess>
           <BreakIfRCount>0</BreakIfRCount>
-          <Filename>.\ctrlConfig\autoCtrl.c</Filename>
+          <Filename>.\applications\autoCtrlTask.c</Filename>
           <ExecCommand></ExecCommand>
           <Expression></Expression>
         </Bp>
         <Bp>
           <Number>4</Number>
           <Type>0</Type>
-          <LineNumber>832</LineNumber>
-          <EnabledFlag>1</EnabledFlag>
-          <Address>0</Address>
-          <ByteObject>0</ByteObject>
-          <HtxType>0</HtxType>
-          <ManyObjects>0</ManyObjects>
-          <SizeOfObject>0</SizeOfObject>
-          <BreakByAccess>0</BreakByAccess>
-          <BreakIfRCount>0</BreakIfRCount>
-          <Filename>.\ctrlConfig\autoCtrl.c</Filename>
-          <ExecCommand></ExecCommand>
-          <Expression></Expression>
-        </Bp>
-        <Bp>
-          <Number>5</Number>
-          <Type>0</Type>
-          <LineNumber>871</LineNumber>
+          <LineNumber>839</LineNumber>
           <EnabledFlag>1</EnabledFlag>
           <Address>0</Address>
           <ByteObject>0</ByteObject>
@@ -265,16 +249,38 @@
         <Ww>
           <count>2</count>
           <WinNumber>1</WinNumber>
-          <ItemText>packFlash</ItemText>
+          <ItemText>inpoutpFlag</ItemText>
+        </Ww>
+        <Ww>
+          <count>3</count>
+          <WinNumber>1</WinNumber>
+          <ItemText>sheet</ItemText>
+        </Ww>
+        <Ww>
+          <count>4</count>
+          <WinNumber>1</WinNumber>
+          <ItemText>sheet</ItemText>
+        </Ww>
+        <Ww>
+          <count>5</count>
+          <WinNumber>1</WinNumber>
+          <ItemText>sheet</ItemText>
         </Ww>
       </WatchWindow1>
+      <WatchWindow2>
+        <Ww>
+          <count>0</count>
+          <WinNumber>2</WinNumber>
+          <ItemText>sheet</ItemText>
+        </Ww>
+      </WatchWindow2>
       <Tracepoint>
         <THDelay>0</THDelay>
       </Tracepoint>
       <DebugFlag>
         <trace>0</trace>
         <periodic>0</periodic>
-        <aLwin>1</aLwin>
+        <aLwin>0</aLwin>
         <aCover>0</aCover>
         <aSer1>0</aSer1>
         <aSer2>0</aSer2>

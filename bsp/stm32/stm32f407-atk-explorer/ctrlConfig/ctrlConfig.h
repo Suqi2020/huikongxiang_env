@@ -26,7 +26,7 @@ typedef struct{
 	  char  subName;
 	  char  limit;
 	 // char  rev[3];
-	  bool  *flag;
+	  uint32_t  *flag;
 }ctrlInOutStru;//本结构体存储为了查看已经设置成功的逻辑控制列表
 
 typedef struct{

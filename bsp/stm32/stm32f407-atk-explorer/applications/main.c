@@ -125,15 +125,17 @@
 //V0.67    输入输出配置增加完成 未测试 20230212
 //V0.68    增加autoctrltask 增加 autoCtrlRun和ctrlOutSetIO函数
 //V0.69    增加modbus ai传感器输入阈值检测置位标记 以及diIOOutSetFlag() di输入检测置位标记
-#define APP_VER       ((0<<8)+69)//0x0105 表示1.5版本
-const char date[]="20230214";
+//V0.70    增加autoctrl的配置以及测试 20230215
+//V0.71    增加test
+#define APP_VER       ((0<<8)+71)//0x0105 表示1.5版本
+const char date[]="20230216";
 
 //static    rt_thread_t tid 	= RT_NULL;
 static    rt_thread_t tidW5500 	  = RT_NULL;
 static    rt_thread_t tidNetRec 	= RT_NULL;
 static    rt_thread_t tidNetSend 	= RT_NULL;
 static    rt_thread_t tidUpkeep 	= RT_NULL;
-static    rt_thread_t tidLCD      = RT_NULL;
+//static    rt_thread_t tidLCD      = RT_NULL;
 static    rt_thread_t tidAutoCtrl = RT_NULL;
 //信号量的定义
 extern  rt_sem_t  w5500Iqr_semp ;//w5500有数据时候中断来临
@@ -213,12 +215,13 @@ int main(void)
 		
 	  rt_kprintf("\n%\n",sign,date,(uint8_t)(APP_VER>>8),(uint8_t)APP_VER);
     rt_kprintf("\n%s%s  ver=%02d.%02d\n",sign,date,(uint8_t)(APP_VER>>8),(uint8_t)APP_VER);
-	  outIOInit();
+	  
 	  rt_kprintf("[%s %f]\n",strnum,atof(strnum));
 	  //rt_kprintf("name %s  %s\n",modbusName[0],modbusName_utf8[0]);
 	  rt_err_t result;
 		stm32_flash_read(FLASH_IP_SAVE_ADDR,    (uint8_t*)&packFlash,sizeof(packFlash));
 		stm32_flash_read(FLASH_MODBUS_SAVE_ADDR,(uint8_t*)&sheet,    sizeof(sheet));
+	  outIOInit();
 		if(packFlash.acuId[0]>=0x7F){
 				rt_strcpy(packFlash.acuId,"000000000000001");//必须加上 执行cJSON_AddStringToObject(root, "acuId",(char *)packFlash.acuId);
 		}                                                //会导致内存泄漏	
@@ -308,7 +311,7 @@ int main(void)
 				rt_kprintf("%sRTcreat upKeepStateTask \r\n",sign);
 		}
 		tidAutoCtrl =  rt_thread_create("autoCtrl",autoCtrlTask,RT_NULL,1024,5, 10 );
-		if(tidLCD!=NULL){
+		if(tidAutoCtrl!=NULL){
 				rt_thread_startup(tidAutoCtrl);													 
 				rt_kprintf("%sRTcreat autoCtrlTask\r\n",sign);
 		}
