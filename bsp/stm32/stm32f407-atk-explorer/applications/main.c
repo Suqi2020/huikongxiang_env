@@ -126,9 +126,10 @@
 //V0.68    增加autoctrltask 增加 autoCtrlRun和ctrlOutSetIO函数
 //V0.69    增加modbus ai传感器输入阈值检测置位标记 以及diIOOutSetFlag() di输入检测置位标记
 //V0.70    增加autoctrl的配置以及测试 20230215
-//V0.71    增加test
-#define APP_VER       ((0<<8)+71)//0x0105 表示1.5版本
-const char date[]="20230216";
+//V0.71    增加test IO输入 输出执行情况
+//V0.72    所有的对外接口的AT命令全部实现 包括边缘控制 简单测试了逻辑控制的最大数目 20230217
+#define APP_VER       ((0<<8)+72)//0x0105 表示1.5版本
+const char date[]="20230217";
 
 //static    rt_thread_t tid 	= RT_NULL;
 static    rt_thread_t tidW5500 	  = RT_NULL;

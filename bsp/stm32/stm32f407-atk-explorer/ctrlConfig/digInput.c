@@ -38,12 +38,12 @@ void diIOSetFlag()
 						if(diReadFun(i)==true){
 								inpoutpFlag.digInput[i].upFlag =true;
 							  inpoutpFlag.digInput[i].lowFlag =false; 
-							  rt_kprintf("%s diIOSet upFlag %d\n",sign,i);
+							  //rt_kprintf("%s diIOSet upFlag %d\n",sign,i);
 						}
 						else {
 							  inpoutpFlag.digInput[i].upFlag =false;
 								inpoutpFlag.digInput[i].lowFlag=true;
-							  rt_kprintf("%s diIOSet lowFlag %d\n",sign,i);
+							  //rt_kprintf("%s diIOSet lowFlag %d\n",sign,i);
 						}
 				}
 		}

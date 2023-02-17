@@ -802,9 +802,10 @@ static void autoctrlOutputcfg(char*argv[])
 														sheet.autoctrl[pindex].output[outputIndex].flag=&inpoutpFlag.digOutput[i].lowFlag;
 												else
 														sheet.autoctrl[pindex].output[outputIndex].flag=&inpoutpFlag.digOutput[i].upFlag;
+												rt_kprintf("%saotuctrl DO OK addr=0x%x\n",sign,sheet.autoctrl[pindex].output[outputIndex].flag);
 												outputIndex++;
 												configFlag=true;
-												rt_kprintf("%saotuctrl DO OK\n",sign);
+												
 										}
 								}
 								break;
@@ -816,9 +817,10 @@ static void autoctrlOutputcfg(char*argv[])
 														sheet.autoctrl[pindex].output[outputIndex].flag=&inpoutpFlag.v33Output[i].lowFlag;
 												else
 														sheet.autoctrl[pindex].output[outputIndex].flag=&inpoutpFlag.v33Output[i].upFlag;
+												rt_kprintf("%saotuctrl V33O OK addr=0x%x\n",sign,sheet.autoctrl[pindex].output[outputIndex].flag);
 												outputIndex++;
 												configFlag=true;
-												rt_kprintf("%saotuctrl V33O OK\n",sign);
+												
 										}
 								}
 								break;
@@ -830,9 +832,10 @@ static void autoctrlOutputcfg(char*argv[])
 														sheet.autoctrl[pindex].output[outputIndex].flag=&inpoutpFlag.v5Output[i].lowFlag;
 												else
 														sheet.autoctrl[pindex].output[outputIndex].flag=&inpoutpFlag.v5Output[i].upFlag;
+												rt_kprintf("%saotuctrl V5O OK  addr=0x%x\n",sign,sheet.autoctrl[pindex].output[outputIndex].flag);
 												outputIndex++;
 												configFlag=true;
-												rt_kprintf("%saotuctrl V5O OK\n",sign);
+												
 										}
 								}
 								break;
@@ -844,9 +847,10 @@ static void autoctrlOutputcfg(char*argv[])
 														sheet.autoctrl[pindex].output[outputIndex].flag=&inpoutpFlag.v12Output[i].lowFlag;
 												else
 														sheet.autoctrl[pindex].output[outputIndex].flag=&inpoutpFlag.v12Output[i].upFlag;
+												rt_kprintf("%saotuctrl V12O OK  addr=0x%x\n",sign,sheet.autoctrl[pindex].output[outputIndex].flag);
 												outputIndex++;
 												configFlag=true;
-												rt_kprintf("%saotuctrl V12O OK\n",sign);
+												
 										}
 								}
 								break;
@@ -899,14 +903,34 @@ static void autoctrl(char argc,char*argv[])
 				firstReadFlag=true;
 				pindex=findCtrlIndex();//每次上电后读取一次即可
 		}
-	  if(pindex==255){
-				rt_kprintf("%sERR:aotuctrl is full,the total number is %d\n",sign,CRTL_TOTAL_NUM);
-			  return;
-		}
+
 		if(rt_strcmp("list",argv[1])==0){
 				printfCtrl();
 				return;
 		}//打印
+		if(rt_strcmp("delete",argv[1])==0){
+			  
+			  int num=atoi16(argv[2],10);
+			  if( num==0){
+						rt_kprintf("%sargv[2] should not 0\n",sign);
+				}
+			  rt_kprintf("%s %d %d\n",sign,num,pindex);
+			  
+			  sheet.autoctrl[num-1].workFlag=false;//本条配置失效
+				for(int j=0;j<CRTL_IN_NUM;j++)
+					 sheet.autoctrl[num-1].input[j].flag=NULL;
+				for(int j=0;j<CRTL_OUT_NUM;j++)
+					 sheet.autoctrl[num-1].output[j].flag=NULL;
+			  if(configFlag==false)
+						pindex =findCtrlIndex();//删除后刷新坐标
+				rt_kprintf("%saotuctrl delete OK\n",sign);
+				return;
+		}//打印删除按钮
+
+	  if(pindex==255){
+				rt_kprintf("%sERR:aotuctrl is full,the total number is %d\n",sign,CRTL_TOTAL_NUM);
+			  return;
+		}
 		if(rt_strcmp("sure",argv[1])==0){//确定本次配置按钮  确定完了只能删除 不能取消
 			  sheet.autoctrl[pindex].workFlag=true;//本条配置生效
 				pindex =findCtrlIndex();//确定后刷新坐标
@@ -931,16 +955,6 @@ static void autoctrl(char argc,char*argv[])
 				rt_kprintf("%saotuctrl cancel OK\n",sign);
 				return;
 		}
-		if(rt_strcmp("delete",argv[1])==0){
-			  
-			  int i=atoi16(argv[2],10);
-			rt_kprintf("%s %d %d\n",sign,i,pindex);
-			  sheet.autoctrl[pindex-1].workFlag=false;//本条配置失效
-			  if(configFlag==false)
-						pindex =findCtrlIndex();//删除后刷新坐标
-				rt_kprintf("%saotuctrl delete OK\n",sign);
-				return;
-		}//打印删除按钮
 
 		if(pindex>=CRTL_TOTAL_NUM){
 				rt_kprintf("%serr:autoctrl totoal num is %d\n",sign,CRTL_TOTAL_NUM);

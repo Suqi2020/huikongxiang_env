@@ -216,25 +216,20 @@ void   upKeepStateTask(void *para)
 		extern void uartReconfig();
 		extern void uartIrqEnaAfterQueue();
 	  extern void clearUartData();
-	  extern void printModbusDevList();
+//	  extern void printModbusDevList();
 	  extern void readMultiCirCulaPoint();
-	  extern void prinfAnalogList();
-	  extern void printfDIList();
-	  extern void printfOutputList();
-		extern void printfThresholdList();
-		extern void printfCtrl();
+//	  extern void prinfAnalogList();
+//	  extern void printfDIList();
+//	  extern void printfOutputList();
+//		extern void printfThresholdList();
+//		extern void printfCtrl();
 	  uartMutexQueueCfg();//根据flash存储重新配置串口
 //		modbusPrintRead();//modbus配置从flash中读取
 	  uartReconfig();//串口重新配置
 		uartIrqEnaAfterQueue();//串口中断中用到了队列  开启中断需要放到后边
     startTimeList();//开启计时器列表
 	  
-	  printModbusDevList();
-	  prinfAnalogList();
-	  printfDIList();
-	  printfOutputList();
-		printfThresholdList();
-		printfCtrl();
+
 	  clearUartData();
 	  
 	  readMultiCirCulaPoint();//对于环流来讲 运行前需要提取扩大方式
