@@ -21,14 +21,14 @@ static void tempHumUartSend(int num,uint8_t *buf,int len)
 {
 		rs485UartSend(sheet.tempHum[num].useUartNum,buf, len);
 }
-
+//返回485温湿度传感器的响应状态
 int tempHumState(int i)
 {
 		return thum[i].respStat;
 }
 
 
-
+//温湿度传感器读取值与阈值比较并设置flag
 static void tempHumCheckSetFlag(int num)
 {
 		if(thum[num].temp>=sheet.modbusTempHum[num].tempUpLimit)
@@ -51,6 +51,7 @@ static void tempHumCheckSetFlag(int num)
 }
 //发 1A 04 00 01 00 02 23 E0
 //收 1A 04 04 0B 1B 00 1C 23 6F
+//通过485接口读取温湿度
 void readTempHum(int num)
 {
 	  uint8_t offset=3;//add+regadd+len
@@ -116,7 +117,7 @@ void readTempHum(int num)
 }
 
 
-
+//温湿度值通过json格式打包
 static uint16_t tempHumJsonPack()
 {
 		char* out = NULL;
@@ -211,7 +212,7 @@ static uint16_t tempHumJsonPack()
 		return len;
 }
 
-
+//温湿度值读取并打包json格式
 void tempHumRead2Send(rt_bool_t netStat)
 {
 	 int workFlag=RT_FALSE;

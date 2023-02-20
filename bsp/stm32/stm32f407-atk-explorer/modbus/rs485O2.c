@@ -29,7 +29,7 @@ static void o2CheckSetFlag(int num)
 }
 
 
-
+//返回O2的通讯状态 true--通讯成功 false--通讯失败
 int o2State(int i)
 {
 		return respStat[i];
@@ -44,6 +44,7 @@ static void o2UartSend(int num,uint8_t *buf,int len)
 
 //发 1A 04 00 01 00 02 23 E0
 //收 1A 04 04 0B 1B 00 1C 23 6F
+//读取o2的含量
 void readO2(int num)
 {
 	  uint8_t offset=3;//add+regadd+len
@@ -195,6 +196,7 @@ static uint16_t o2JsonPack()
 }
 
 */
+//氧气读取  供上层函数调用
 void o2Read2Send()
 {
 	 //int workFlag=RT_FALSE;

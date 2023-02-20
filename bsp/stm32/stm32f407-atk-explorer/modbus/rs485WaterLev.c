@@ -14,14 +14,14 @@ static void waterDepthUartSend(int num,uint8_t *buf,int len)
 {
 		rs485UartSend(sheet.waterDepth[num].useUartNum,buf, len);
 }
-
+//返回水位的通讯状态 true--通讯成功 false--通讯失败
 int waterDepthState(int i)
 {
 		return respStat[i];
 }
 
 
-
+//水位传感器比较阈值并设置相应的flag标记
 static void waterLevCheckSetFlag(int num)
 {
 	
@@ -40,7 +40,8 @@ static void waterLevCheckSetFlag(int num)
 
 //发 1A 04 00 01 00 02 23 E0
 //收 1A 04 04 0B 1B 00 1C 23 6F
-void readWaterDepth(int num)
+//读取水位
+static void readWaterDepth(int num)
 {
 	  uint8_t offset=3;//add+regadd+len
 	  uint8_t  *buf = RT_NULL;
@@ -95,7 +96,7 @@ void readWaterDepth(int num)
 
 
 
-
+//水位值打包成json格式
 static uint16_t waterDepthJsonPack()
 {
 //		char *sprinBuf=RT_NULL;
@@ -194,6 +195,8 @@ static uint16_t waterDepthJsonPack()
 		return len;
 }
 
+
+//水位值的读取和打包发送  仅仅做封装 供别的函数来调用
 void waterDepthRead2Send(rt_bool_t netStat)
 {
 	 int workFlag=RT_FALSE;

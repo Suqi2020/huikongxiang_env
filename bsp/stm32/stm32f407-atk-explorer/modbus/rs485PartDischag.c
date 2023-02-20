@@ -35,7 +35,7 @@ static partDischargeStru partDiscStru_p[PARTDISCHAG_485_NUM];
 
 
 
-
+//局放比较阈值并设置相应的flag标记
 static void partDischCheckSetFlag(int num)
 {
 	  //high
@@ -120,6 +120,7 @@ static void partDischCheckSetFlag(int num)
 		else
 				inpoutpFlag.modbusPartDisChg[num].freqCLowFlag=false;
 }
+//返回局放的通讯状态 true--通讯成功 false--通讯失败
 int partDisState(int i)
 {
 		return partDiscStru_p[i].respStat;
@@ -127,7 +128,7 @@ int partDisState(int i)
 //#define   SLAVE_ADDR     0X01
 #define   LENTH          1024  //工作环流用到的最大接收buf长度
 
-
+//局放读取数据的发送  调用485串口
 static void partDischagUartSend(int num,uint8_t *buf,int len)
 {
 		rs485UartSend(sheet.partDischag[num].useUartNum,buf, len);
@@ -137,7 +138,7 @@ static void partDischagUartSend(int num,uint8_t *buf,int len)
 //读取幅值 频率 放电总能量
 //01 03 0300 0006 C58C
 //01 03 24 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 7B A1 
-
+//读取局放的幅值 频率
 void readPdFreqDischarge(int num)
 {
 	  uint8_t offset=3;//add+regadd+len
@@ -276,6 +277,7 @@ void  partDisWaringEventPack()
 		rt_kprintf("%slater add \n\r",sign);
 		
 }
+//局放的json格式打包
 uint16_t partDischagJsonPack()
 {
 
@@ -399,6 +401,7 @@ uint16_t partDischagJsonPack()
 
 		return len;
 }
+//局放的读取和发送  供其他函数来调用
 void partDischagRead2Send(rt_bool_t netStat)
 {
 		int workFlag=RT_FALSE;

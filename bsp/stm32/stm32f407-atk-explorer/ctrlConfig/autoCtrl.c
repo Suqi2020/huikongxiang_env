@@ -71,8 +71,7 @@ bool firstReadFlag=false;
 
 //char testa=100;
 
-//以上逻辑配置时候如需要删除单个输入或者输出设备，选项为0即可，
-//必须从后往前（图形界面显示）一个一个删除（逻辑控制列表的指针为空）或者重启设备，cancel命令也可以取消本次整体配置
+//指针指向局放的阈值
 static bool crtlCirculaConf(char **argv)
 {
 		uint8_t subname = atoi16(argv[4],10);
@@ -136,7 +135,7 @@ static bool crtlCirculaConf(char **argv)
 }
 
 
-//
+//指针指向局放的阈值
 static bool crtlPartDischagConf(char **argv)
 {
 			uint8_t subname = atoi16(argv[4],10);
@@ -270,7 +269,7 @@ static bool crtlPartDischagConf(char **argv)
 			}
 			return false;
 }
-
+//指针指向防沉降的阈值
 static bool ctrlPressSettlConf(char **argv)
 {
 			uint8_t subname = atoi16(argv[4],10);
@@ -321,8 +320,7 @@ static bool ctrlPressSettlConf(char **argv)
 			return false;
 }
 
-
-
+//指针指向三轴加速度的参数
 static bool ctrlThreeAxisConf(char **argv)
 {
 			uint8_t subname = atoi16(argv[4],10);
@@ -397,7 +395,7 @@ static bool ctrlThreeAxisConf(char **argv)
 			
 						
 #ifdef USE_4GAS
-
+//指针指向甲烷的阈值
 static bool ctrlCh4Conf(char **argv)
 {
 
@@ -436,6 +434,7 @@ static bool ctrlCh4Conf(char **argv)
 			}
 			return false;
 }
+//指针指向氧气的阈值
 static bool ctrlO2Conf(char **argv)
 {
 
@@ -468,6 +467,7 @@ static bool ctrlO2Conf(char **argv)
 			}
 			return false;
 }
+//指针指向硫化氢的阈值
 static bool ctrlH2sConf(char **argv)
 {
 
@@ -502,6 +502,7 @@ static bool ctrlH2sConf(char **argv)
 			}
 			return false;
 }
+//指针指向CO的阈值
 static bool ctrlCoConf(char **argv)
 {
 			uint8_t subname = atoi16(argv[4],10);
@@ -541,7 +542,7 @@ static bool ctrlCoConf(char **argv)
 
 #endif
 
-
+//指针指向温湿度的阈值
 static bool ctrlTemphumConf(char **argv)
 {
 			uint8_t subname = atoi16(argv[4],10);
@@ -585,6 +586,7 @@ static bool ctrlTemphumConf(char **argv)
 			}
 			return false;
 }					
+//指针指向水位传感器的阈值
 static bool  ctrlWaterConf(char **argv)
 {
 			uint8_t subname = atoi16(argv[4],10);
@@ -897,6 +899,8 @@ void printfCtrl()
 		}
 }
 //自动控制输入函数  串口输出命令首先调用此函数解析
+//以上逻辑配置时候如需要删除单个输入或者输出设备，选项为0即可，
+//必须从后往前（图形界面显示）一个一个删除（逻辑控制列表的指针为空）或者重启设备，cancel命令也可以取消本次整体配置
 static void autoctrl(char argc,char*argv[])
 {
 	  if(firstReadFlag==false){

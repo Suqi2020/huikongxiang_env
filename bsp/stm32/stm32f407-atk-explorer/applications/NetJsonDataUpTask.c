@@ -228,12 +228,8 @@ void   upKeepStateTask(void *para)
 	  uartReconfig();//串口重新配置
 		uartIrqEnaAfterQueue();//串口中断中用到了队列  开启中断需要放到后边
     startTimeList();//开启计时器列表
-	  
-
 	  clearUartData();
-	  
 	  readMultiCirCulaPoint();//对于环流来讲 运行前需要提取扩大方式
-
 		while(1){
 				timeOutRunFun();
 				timeInc();

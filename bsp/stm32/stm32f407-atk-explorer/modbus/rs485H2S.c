@@ -16,13 +16,13 @@ static void h2sUartSend(int num,uint8_t *buf,int len)
 {
 		rs485UartSend(sheet.h2s[num].useUartNum,buf, len);
 }
-
+//返回h2s的通讯状态 true--通讯成功 false--通讯失败
 int h2sState(int i)
 {
 		return respStat[i];
 }
 
-
+//h2s比较阈值并设置相应的flag标记
 static void h2sCheckSetFlag(int num)
 {
 	
@@ -38,6 +38,7 @@ static void h2sCheckSetFlag(int num)
 
 //发 1A 04 00 01 00 02 23 E0
 //收 1A 04 04 0B 1B 00 1C 23 6F
+//读取h2s值
 void readH2S(int num)
 {
 	  uint8_t offset=3;//add+regadd+len
@@ -183,6 +184,7 @@ static uint16_t h2sJsonPack()
 		return len;
 }
 */
+//h2s的读取的封装 供别的函数调用
 void h2sRead2Send()
 {
 	 //int workFlag=RT_FALSE;

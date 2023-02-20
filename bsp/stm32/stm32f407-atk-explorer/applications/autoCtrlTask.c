@@ -9,20 +9,11 @@ void aiThresholdOutSetFlag()
 {
 //在各个analog传感器读取数据时候判断完成
 }
-//modbus传感器判断阈值超标后  置位相应的flag
-//void modbusThresholdOutSetFlag()
-//{
-//}
-//digit input检测到符合逻辑的电平 置位相应的flag
-//void diIOOutSetFlag()
-//{
-//}
+
 //自动控制逻辑的处理
-//1/阈值的判断 以及置位标记  仅仅对于输入设备
-//void  thresholdOutSetInputFlag()
-//{
-//}
-//2/根据标记来执行的输出控制标记
+//1、阈值的判断 以及置位标记  仅仅对于输入设备
+//2、根据标记来执行的输出控制标记
+//3、输出控制是个指针 实际改变的是指针指向的输出（3V3 5V 12V DO）标记
 void  autoCtrlRun()
 {
 		volatile int i,j,k;
@@ -58,7 +49,8 @@ void  autoCtrlRun()
 		}
 }
 
-
+//digital output 置高  
+//输入 通道号
 static void digOutputONFun(char num)
 {
 	switch(num)
@@ -73,7 +65,8 @@ static void digOutputONFun(char num)
 			case 7:IOOUT8_ON;break;
 	}
 }
-
+//digital output 置低  
+//输入 通道号
 static void digOutputOFFFun(char num)
 {
 	switch(num)
@@ -88,7 +81,8 @@ static void digOutputOFFFun(char num)
 			case 7:IOOUT8_OFF;break;
 	}
 }
-
+//V3.3 output 置高  
+//输入 通道号
 static void v33OutputONFun(char num)
 {
 	switch(num)
@@ -97,7 +91,8 @@ static void v33OutputONFun(char num)
 			case 1:SPAKER3_ON;break;
 	}
 }
-
+//V3.3 output 置低 
+//输入 通道号
 static void v33OutputOFFFun(char num)
 {
 	switch(num)
@@ -106,6 +101,8 @@ static void v33OutputOFFFun(char num)
 			case 1:SPAKER3_OFF;break;
 	}
 }
+//V5 output 置高  
+//输入 通道号
 static void v5OutputONFun(char num)
 {
 	switch(num)
@@ -114,7 +111,8 @@ static void v5OutputONFun(char num)
 			case 1:SPAKER4_ON;break;
 	}
 }
-
+//V5 output 置低  
+//输入 通道号
 static void v5OutputOFFFun(char num)
 {
 	switch(num)
@@ -125,7 +123,8 @@ static void v5OutputOFFFun(char num)
 }
 
 
-
+//V12 output 置高  
+//输入 通道号
 static void v12OutputONFun(char num)
 {
 	switch(num)
@@ -137,7 +136,8 @@ static void v12OutputONFun(char num)
 
 	}
 }
-
+//V12 output 置低  
+//输入 通道号
 static void v12OutputOFFFun(char num)
 {
 	switch(num)
@@ -154,6 +154,9 @@ static void v12OutputOFFFun(char num)
 
 
 //根据设置的outputIO的高低电平有效来设置上电初始化IO电平		
+//高电平有效的情况下 输出初始化为低
+//低电平有效情况下  输出初始化为高
+
 void  outIOInit()
 {
 		int k,z;

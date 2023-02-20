@@ -11,6 +11,7 @@ float temp =0.00;
 float humi =0.00;
 
 char copyID[MODBID_LEN];//读取ana温湿度时候 顺便把ID拷贝出来
+//模拟的温湿度传感器读取温度湿度值并与阈值比较来做标记
 void  anaTempHumiReadAndSetFlag()
 {
 				for (int i = 0; i < ANALOG_NUM; i++){		
@@ -62,7 +63,7 @@ void  anaTempHumiReadAndSetFlag()
 					}
 				}
 }
-
+//模拟温度湿度json数据打包
 uint16_t analogTempHumJsonPack()
 {
 		char* out = NULL;
@@ -156,6 +157,8 @@ uint16_t analogTempHumJsonPack()
 }
 
 
+
+//模拟温度和湿度值读取以及打包成json格式
 void anaTempHumReadPack()
 {
 		anaTempHumiReadAndSetFlag();

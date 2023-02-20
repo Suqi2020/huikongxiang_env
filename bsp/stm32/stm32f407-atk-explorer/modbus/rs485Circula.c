@@ -52,6 +52,7 @@ static CIRCURStru  cirCurStru_p[CIRCULA_485_NUM];
 //static rt_bool_t writeThresholdVal(uint32_t value);
 //static rt_bool_t writePoint(uint16_t value);
 
+//返回环流的通讯状态 true--通讯成功 false--通讯失败
 int cirCurrtState(int i)
 {
 		return cirCurStru_p[i].respStat;
@@ -63,7 +64,7 @@ void cirCurrUartSend(int num,uint8_t *buf,int len)
 		rs485UartSend(sheet.cirCula[num].useUartNum,buf, len);
 
 }
-
+//环流比较阈值并设置相应的flag标记
 static void circulaCheckSetFlag(int num)
 {
 		if(cirCurStru_p[num].circlCurA>=sheet.modbusCircul[num].cirCurAUpLimit)
@@ -451,7 +452,7 @@ static uint16_t readPoint(int num)
 	  buf=RT_NULL;
 		return ret;
 }
-
+//读取多路小数点处理方式
 void readMultiCirCulaPoint()
 {
 		for (int i = 0; i < CIRCULA_485_NUM; i++)
@@ -653,7 +654,7 @@ void readMultiCirCulaPoint()
 //}
 
 
-
+//环流json格式打包
 uint16_t circulaJsonPack()
 {
 
@@ -796,7 +797,7 @@ void  cirCurrWaringEventPack()
 		
 }
 
-
+//环流读取并打包发送  仅仅做封装而已
 void circulaRead2Send(rt_bool_t netStat)
 {					
 		int workFlag=RT_FALSE;

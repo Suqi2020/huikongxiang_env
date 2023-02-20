@@ -18,7 +18,7 @@ typedef struct{
 //float height;//除以10 传输float类型  单位mm
 }pressSettlStru;
 static pressSettlStru pressSettle[PRESSSETTL_485_NUM];
-
+//返回沉降仪的通讯状态 true--通讯成功 false--通讯失败
 int pressSettleState(int i)
 {
 		return pressSettle[i].respStat;
@@ -47,7 +47,7 @@ uint8_t psReadReg(uint16_t slavAddr,uint16_t regAddr,uint16_t len,uint8_t * out)
 	  out[i]=crcRet;       						i++;
 		return i;
 }
-
+//沉降仪比较阈值并设置相应的flag标记
 static void pressStlCheckSetFlag(int num)
 {
 		if(pressSettle[num].temp>=sheet.modbusPreSettl[num].tempUpLimit)
@@ -72,6 +72,7 @@ static void pressStlCheckSetFlag(int num)
 
 //发 1A 04 00 01 00 02 23 E0
 //收 1A 04 04 0B 1B 00 1C 23 6F
+//读取沉降仪的温度和高度
 void readPSTempHeight(int num)
 {
 	  uint8_t offset=3;//add+regadd+len
@@ -133,7 +134,7 @@ void readPSTempHeight(int num)
 
 
 
-
+//沉降仪json格式打包
 static uint16_t pressSettlJsonPack()
 {
 		char* out = NULL;
@@ -233,7 +234,7 @@ static uint16_t pressSettlJsonPack()
 
 		return len;
 }
-
+//沉降仪读取并打包  供别的函数调用
 void pressSettRead2Send(rt_bool_t netStat)
 {
 	  int workFlag=RT_FALSE;

@@ -3,7 +3,7 @@
 const static char sign[]="[output]";
 
 
-
+//打印digital output输出列表
 void printfDOList()
 {
 		for(int j=0;j<DO_NUM;j++){//查一遍 找到 GYNJLXSD000000499  如果
@@ -18,6 +18,8 @@ void printfDOList()
 }
 
 //按照port来添加 
+//digital output 输入配置
+//digOutput 水泵 GYNJLXSD000000164 GY283 1
 static void digOutput(int argc, char *argv[])
 {
 	  int port;
@@ -57,8 +59,7 @@ MSH_CMD_EXPORT(digOutput,digOutput config);//FINSH_FUNCTION_EXPORT_CMD
 
 
 
-
-
+//打印3V3的输出配置列表
 void printfPower3V3List()
 {
 		for(int j=0;j<V33O_NUM;j++){//查一遍 找到 GYNJLXSD000000499  如果
@@ -73,6 +74,7 @@ void printfPower3V3List()
 }
 
 //按照port来添加 
+//power3V3输出控制 输入配置
 static void power3V3(int argc, char *argv[])
 {
 	  int port;
@@ -113,6 +115,7 @@ MSH_CMD_EXPORT(power3V3,power3V3 config);//FINSH_FUNCTION_EXPORT_CMD
 
 
 
+//打印5V的输出配置列表
 void printfPower5VList()
 {
 		for(int j=0;j<V5O_NUM;j++){//查一遍 找到 GYNJLXSD000000499  如果
@@ -127,6 +130,7 @@ void printfPower5VList()
 }
 
 //按照port来添加 
+//power5V输出控制 输入配置
 static void power5V(int argc, char *argv[])
 {
     int port;
@@ -165,6 +169,7 @@ static void power5V(int argc, char *argv[])
 }
 MSH_CMD_EXPORT(power5V,power5V config);//FINSH_FUNCTION_EXPORT_CMD
 
+//打印12V的输出列表
 void printfPower12VList()
 {
 		for(int j=0;j<V12O_NUM;j++){//查一遍 找到 GYNJLXSD000000499  如果
@@ -179,6 +184,7 @@ void printfPower12VList()
 }
 
 //按照port来添加 
+//power12V输出控制 输入配置
 static void power12V(int argc, char *argv[])
 {
 		int port;
@@ -218,7 +224,11 @@ static void power12V(int argc, char *argv[])
 MSH_CMD_EXPORT(power12V,power12V config);//FINSH_FUNCTION_EXPORT_CMD
 
 
-
+//打印控制输出的列表
+//包括 打印digital output 8路
+//打印3V3输出 2路
+//打印5V输出 2路
+//打印12V输出 4路
 void printfOutputList()
 {
 		printfDOList();

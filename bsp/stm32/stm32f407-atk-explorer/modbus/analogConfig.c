@@ -3,7 +3,7 @@ const static char sign[]="[analogConfig]";
 
 
 
-
+//打印analog所有设备
 void prinfAnalogList()
 {
 		for(int j=0;j<ANALOG_NUM;j++){//查一遍 找到 GYNJLXSD000000499  如果

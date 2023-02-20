@@ -7,7 +7,7 @@ const static char sign[]="[threshold]";
 
 
 
-//必须启用情况下才能得到阈值
+//必须启用情况下才能得到阈值  即workFlag为true
 void printfThresholdList()
 {
 	  int i;
@@ -283,7 +283,8 @@ void printfThresholdList()
 		//打印modbus设置的阈值
 }
 //与modbus传感器不同之处在于 除了判断ID还需要判断子选项
-bool   analogThresholdConfig(int num,char *ID,int sensorSubName,float upLimit,float lowLimit)
+//模拟传感器阈值配置
+bool  analogThresholdConfig(int num,char *ID,int sensorSubName,float upLimit,float lowLimit)
 { 
 		switch(num)
 		{
@@ -309,6 +310,7 @@ bool   analogThresholdConfig(int num,char *ID,int sensorSubName,float upLimit,fl
 		return false;
 }
 //modbus设备  输入依次为 传感器种类 ID号 传感器类型  上限制  下限制
+//modbus传感器阈值配置
 bool   modbusThresholdConfig(int num,char *ID,int sensorSubName,float upLimit,float lowLimit)
 {
 	  int i=0;
@@ -536,7 +538,7 @@ threshold：固定头部
 类型：(1-modbus 2-analog)  为0或255时候删除对应的阈值设置
 选项：传感器功能只有一种情况下值为1，有多种情况下依次递增(1.2.3)如下
      模拟温湿度：1-温度  2-湿度
-	 modbus温湿度：1-温度 2-湿度
+	   modbus温湿度：1-温度 2-湿度
      modbus防外破：1-温度 2-x方向加速度 3-y方向加速度 4-z方向加速度
      modbus沉降仪：1-温度 2-高度
      modbus环流： 1-cirCurA 2-cirCurB 3-cirCurC
@@ -547,7 +549,7 @@ threshold：固定头部
 阈值下限：0-99999999(为0阈值不启用)
 
 */
-
+//传感器（模拟和485）的阈值配置
 static void threshold(int argc,char *argv[])
 {
 		float uplimit ;

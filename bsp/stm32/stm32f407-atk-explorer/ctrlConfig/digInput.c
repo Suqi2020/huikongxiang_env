@@ -4,16 +4,7 @@
 const static char sign[]="[digInput]";
 
 
-
-#define IOIN1_READ       HAL_GPIO_ReadPin(IO_IN1_GPIO_Port, IO_IN1_Pin)
-#define IOIN2_READ       HAL_GPIO_ReadPin(IO_IN2_GPIO_Port, IO_IN2_Pin)
-#define IOIN3_READ       HAL_GPIO_ReadPin(IO_IN3_GPIO_Port, IO_IN3_Pin)
-#define IOIN4_READ       HAL_GPIO_ReadPin(IO_IN4_GPIO_Port, IO_IN4_Pin)
-#define IOIN5_READ       HAL_GPIO_ReadPin(IO_IN5_GPIO_Port, IO_IN5_Pin)
-#define IOIN6_READ       HAL_GPIO_ReadPin(IO_IN6_GPIO_Port, IO_IN6_Pin)
-#define IOIN7_READ       HAL_GPIO_ReadPin(IO_IN7_GPIO_Port, IO_IN7_Pin)
-#define IOIN8_READ       HAL_GPIO_ReadPin(IO_IN8_GPIO_Port, IO_IN8_Pin)
-
+//digital input 读取电平值 高电平返回1   其他返回0
 bool  diReadFun(char num)
 {
 	  int ret=0;
@@ -49,7 +40,7 @@ void diIOSetFlag()
 		}
 }
 
-
+//打印digit input 列表
 void printfDIList()
 {
 		for(int j=0;j<DI_NUM;j++){//查一遍 找到 GYNJLXSD000000499  如果
@@ -69,6 +60,7 @@ void printfDIList()
 }
 
 //digInput 水泵 GYNJLXSD000000162 GY281 1
+//digital input 输入配置
 static void digInput(int argc, char *argv[])
 {
 	 int port;

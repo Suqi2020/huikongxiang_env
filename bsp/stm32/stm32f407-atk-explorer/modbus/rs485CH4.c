@@ -20,12 +20,12 @@ static void ch4UartSend(int num,uint8_t *buf,int len)
 {
 		rs485UartSend(sheet.ch4[num].useUartNum,buf, len);
 }
-
+//返回ch4的通讯状态 true--通讯成功 false--通讯失败
 int ch4State(int i)
 {
 		return respStat[i];
 }
-
+//ch4比较阈值并设置相应的flag标记
 static void ch4CheckSetFlag(int num)
 {
 	
@@ -40,6 +40,7 @@ static void ch4CheckSetFlag(int num)
 }
 //发 1A 04 00 01 00 02 23 E0
 //收 1A 04 04 0B 1B 00 1C 23 6F
+//读取ch4的浓度值
 void readCH4(int num)
 {
 	  uint8_t offset=3;//add+regadd+len
@@ -187,6 +188,7 @@ static uint16_t ch4JsonPack()
 		return len;
 }
 */
+//ch4读取再次封装 供别处函数来调用
 void ch4Read2Send()
 {
 	 //int workFlag=RT_FALSE;

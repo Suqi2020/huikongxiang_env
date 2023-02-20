@@ -20,13 +20,13 @@ static void coUartSend(int num,uint8_t *buf,int len)
 {
 		rs485UartSend(sheet.co[num].useUartNum,buf, len);
 }
-
+//返回co的通讯状态 true--通讯成功 false--通讯失败
 int coState(int i)
 {
 		return respStat[i];
 }
 
-
+//co比较阈值并设置相应的flag标记
 static void coCheckSetFlag(int num)
 {
 	
@@ -41,6 +41,7 @@ static void coCheckSetFlag(int num)
 }
 //发 1A 04 00 01 00 02 23 E0
 //收 1A 04 04 0B 1B 00 1C 23 6F
+//读取co值
 void readCO(int num)
 {
 	  uint8_t offset=3;//add+regadd+len
@@ -195,6 +196,7 @@ static uint16_t coJsonPack()
 }
 
 */
+//co工作情况下读取值
 void coRead2Send()
 {
 	  //int workFlag=RT_FALSE;
@@ -206,6 +208,7 @@ void coRead2Send()
 		}
 
 }
+//4中气体有一个在工作就认为气体传感器在工作
 rt_bool_t gasWork(int num)
 {
 		if((sheet.o2[num].workFlag==RT_TRUE)||\
@@ -219,9 +222,10 @@ rt_bool_t gasWork(int num)
 extern  float o2[O2_485_NUM];;
 extern  float h2s[H2S_485_NUM];
 extern   float ch4[CH4_485_NUM];
+//4中气体打包
 int  gasPack(int num)
 {
-char* out = NULL;
+		char* out = NULL;
 		//创建数组
 		cJSON* Array = NULL;
 		// 创建JSON Object  
@@ -323,7 +327,7 @@ char* out = NULL;
 		sprinBuf=RT_NULL;
 		return len;
 }
-
+//4种气体json打包的二次封装
 void  gasJsonPack(rt_bool_t netStat)
 {
 	

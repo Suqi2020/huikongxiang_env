@@ -25,7 +25,7 @@ typedef struct{
 }threeAxisStru;
 const static char sign[]="[防外破]";
 static threeAxisStru threeAxisp[THREEAXIS_485_NUM];
-
+//返回三轴的通讯状态 true--通讯成功 false--通讯失败
 int threeAxisState(int i)
 {
 		return threeAxisp[i].respStat;
@@ -45,7 +45,7 @@ static void threeAxisUartSend(int num,uint8_t *buf,int len)
 //与压差式传感器共用一个读命令
 extern uint8_t psReadReg(uint16_t slavAddr,uint16_t regAddr,uint16_t len,uint8_t * out);
 
-
+//三轴比较阈值并设置相应的flag标记
 static void threeAccCheckSetFlag(int num)
 {
 	
@@ -87,6 +87,7 @@ static void threeAccCheckSetFlag(int num)
 }
 //发 1A 04 00 01 00 02 23 E0
 //收 1A 04 04 0B 1B 00 1C 23 6F
+//通过485接口读取三轴的值
 void readThreeTempAcc(int num)
 {
 	  uint8_t offset=3;//add+regadd+len
@@ -171,7 +172,7 @@ void readThreeTempAcc(int num)
     "timestamp":"1655172531937"
 }
 */
-
+//三轴相关值通过json打包
 static uint16_t threeAxisJsonPack()
 {
 
@@ -290,7 +291,7 @@ static uint16_t threeAxisJsonPack()
 		return len;
 }
 
-
+//三轴读取modbus数据并打包发送 给其它函数调用
 void threeAxisRead2Send(rt_bool_t netStat)
 {					
 		int workFlag=RT_FALSE;

@@ -5,7 +5,7 @@ const static char     UartName[UART_NUM][6] ={"port1", "port2",  "port3",  "port
 const  uartEnum UartNum[UART_NUM]     ={USE_UART2,USE_UART3,USE_UART6,USE_UART4};//重映射一个名称
 
 		
-		
+//打印所有增加的modbus设备列表
 void printModbusDevList()
 {
 	  rt_kprintf("%s printf modbus device list\n",sign);
@@ -160,7 +160,7 @@ void printModbusDevList()
 			}
 		}
 }
-
+//环流的配置
 static int circulaConf(int uartnum,char *argv[])
 {
 	int i=0;
@@ -202,7 +202,7 @@ static int circulaConf(int uartnum,char *argv[])
 	}
 	return ret;
 }
-
+//局放的配置
 static int partDischagConf(int uartnum,char *argv[])
 {
 	int i=0;
@@ -244,7 +244,7 @@ static int partDischagConf(int uartnum,char *argv[])
 	}
 	return ret;
 }
-
+//沉降仪的配置
 static int pressSettlConf(int uartnum,char *argv[])
 {
 	int i=0;
@@ -287,7 +287,7 @@ static int pressSettlConf(int uartnum,char *argv[])
 	return ret;
 }
 
-
+//三轴的配置
 static int threeAxisConf(int uartnum,char *argv[])
 {
 	int i=0;
@@ -330,6 +330,7 @@ static int threeAxisConf(int uartnum,char *argv[])
 	return ret;
 }
 #ifdef USE_4GAS
+//ch4的配置
 static int ch4Conf(int uartnum,char *argv[])
 {
 	int i=0;
@@ -371,6 +372,7 @@ static int ch4Conf(int uartnum,char *argv[])
 	}
 	return ret;
 }
+//co的配置
 static int coConf(int uartnum,char *argv[])
 {
 	int i=0;
@@ -412,6 +414,7 @@ static int coConf(int uartnum,char *argv[])
 	}
 	return ret;
 }
+//h2s的配置
 static int h2sConf(int uartnum,char *argv[])
 {
 	int i=0;
@@ -453,6 +456,7 @@ static int h2sConf(int uartnum,char *argv[])
 	}
 	return ret;
 }
+//o2的配置
 static int o2Conf(int uartnum,char *argv[])
 {
 	int i=0;
@@ -496,6 +500,7 @@ static int o2Conf(int uartnum,char *argv[])
 	return ret;
 }
 #endif
+//水位的配置
 static int waterDepthConf(int uartnum,char *argv[])
 {
 	int i=0;
@@ -537,6 +542,7 @@ static int waterDepthConf(int uartnum,char *argv[])
 	}
 	return ret;
 }
+//温湿度的配置
 static int tempHumConf(int uartnum,char *argv[])
 {
 	int i=0;
@@ -578,6 +584,7 @@ static int tempHumConf(int uartnum,char *argv[])
 	}
 	return ret;
 }
+//modbus设备的配置
 static int modbusConf(int modbusnum,int uartnum,char *argv[])
 {
 	  int ret=0;
