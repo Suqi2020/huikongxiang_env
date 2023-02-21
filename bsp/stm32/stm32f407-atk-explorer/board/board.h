@@ -11,7 +11,7 @@
 #ifndef __BOARD_H__
 #define __BOARD_H__
 
-
+//#define   rt_log(...)  rt_kprintf(const char *fmt, ...)
 
 #define 	ANALOG_NUM   	        8
 #define   UART_NUM        4//一共4路串口

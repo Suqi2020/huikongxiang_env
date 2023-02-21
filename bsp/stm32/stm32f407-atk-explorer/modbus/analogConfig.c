@@ -9,11 +9,9 @@ void prinfAnalogList()
 		for(int j=0;j<ANALOG_NUM;j++){//查一遍 找到 GYNJLXSD000000499  如果
 				if(sheet.analog[j].workFlag==RT_TRUE){//没打开
 						rt_kprintf("%s analog ",sign);
-
 						rt_kprintf("%s ",sheet.analog[j].name);
-						rt_kprintf("%d ",sheet.analog[j].subName);
-						
 						rt_kprintf("%s ",sheet.analog[j].ID);
+						rt_kprintf("%d ",sheet.analog[j].subName);
 						rt_kprintf("%s ",sheet.analog[j].model);
 						rt_kprintf("%d ",sheet.analog[j].port);
 						rt_kprintf("%d\n",sheet.analog[j].colTime);

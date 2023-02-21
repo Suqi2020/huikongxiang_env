@@ -198,7 +198,8 @@ void startTimeList()
 	  for(int i=0;i<ANALOG_NUM;i++){
 				if(rt_strcmp(sheet.analog[i].name,analogName[0])==0){//用 analogName[0]  指明是温湿度
 					  if(sheet.analog[i].workFlag==RT_TRUE){
-								timeInit(ANA_TEMPHUM_TIME,sheet.analog[i].colTime,30);
+								//timeInit(ANA_TEMPHUM_TIME,sheet.analog[i].colTime,30);
+							timeInit(ANA_TEMPHUM_TIME,10,30);
 								analogTemChanl=i;
 						}
 						break;

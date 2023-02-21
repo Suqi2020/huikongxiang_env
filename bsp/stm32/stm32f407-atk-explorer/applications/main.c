@@ -128,8 +128,10 @@
 //V0.70    增加autoctrl的配置以及测试 20230215
 //V0.71    增加test IO输入 输出执行情况
 //V0.72    所有的对外接口的AT命令全部实现 包括边缘控制 简单测试了逻辑控制的最大数目 20230217
-#define APP_VER       ((0<<8)+72)//0x0105 表示1.5版本
-const char date[]="20230217";
+//V0.73    解决tasklog屏蔽时候出现内存泄漏问题 需要等待任务挂起才能删除任务
+//         更改模拟温湿度读取数值不准确  已经实现并且测试
+#define APP_VER       ((0<<8)+73)//0x0105 表示1.5版本
+const char date[]="20230221";
 
 //static    rt_thread_t tid 	= RT_NULL;
 static    rt_thread_t tidW5500 	  = RT_NULL;
@@ -339,18 +341,23 @@ int main(void)
 				}
     }
 }
-//tasklog delete
+//tasklog delete  线程挂起时候才能删除   
 void  tasklog(int argc, char *argv[])
 {
 		if(argc!=2){
 				goto ERR;
 		}
 		if(rt_strcmp("delete",argv[1])==0){
-				rt_thread_delete(tidW5500);
-			  rt_thread_delete(tidNetRec);
-			  rt_thread_delete(tidNetSend);
-			  rt_thread_delete(tidUpkeep);
-			  rt_thread_delete(tidAutoCtrl);
+			  if((tidW5500->stat & RT_THREAD_STAT_MASK)==RT_THREAD_SUSPEND)
+						rt_thread_delete(tidW5500);
+				if((tidNetRec->stat & RT_THREAD_STAT_MASK)==RT_THREAD_SUSPEND)
+						rt_thread_delete(tidNetRec);
+				if((tidNetSend->stat & RT_THREAD_STAT_MASK)==RT_THREAD_SUSPEND)
+						rt_thread_delete(tidNetSend);
+				if((tidUpkeep->stat & RT_THREAD_STAT_MASK)==RT_THREAD_SUSPEND)
+						rt_thread_delete(tidUpkeep);
+				if((tidAutoCtrl->stat & RT_THREAD_STAT_MASK)==RT_THREAD_SUSPEND)
+						rt_thread_delete(tidAutoCtrl);
 			  rt_kprintf("%s[tasklog delete OK]\n",sign);
 			  return;
 		}

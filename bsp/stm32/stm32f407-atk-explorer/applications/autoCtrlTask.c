@@ -369,31 +369,31 @@ void  autoCtrlTask(void *para)
 		printfThresholdList();
 		printfCtrl();
 	  rt_kprintf("%sautoCtrlTask start\n");
-		int i;
-		for(i=0;i<DI_NUM;i++){
-			rt_kprintf("0x%x 0x%x\n",&inpoutpFlag.digInput[i].lowFlag,&inpoutpFlag.digInput[i].upFlag);
-		}
-		rt_kprintf("\n");
-		for(i=0;i<DO_NUM;i++){
-			rt_kprintf("0x%x 0x%x\n",&inpoutpFlag.digOutput[i].lowFlag,&inpoutpFlag.digOutput[i].upFlag);
-		}
-		rt_kprintf("\n");
-		for(i=0;i<V33O_NUM;i++){
-			rt_kprintf("0x%x 0x%x\n",&inpoutpFlag.v33Output[i].lowFlag,&inpoutpFlag.v33Output[i].upFlag);
-		}
-		rt_kprintf("\n");
-			for(i=0;i<V5O_NUM;i++){
-			rt_kprintf("0x%x 0x%x\n",&inpoutpFlag.v5Output[i].lowFlag,&inpoutpFlag.v5Output[i].upFlag);
-		}
-			rt_kprintf("\n");
-			for(i=0;i<V12O_NUM;i++){
-			rt_kprintf("0x%x 0x%x\n",&inpoutpFlag.v12Output[i].lowFlag,&inpoutpFlag.v12Output[i].upFlag);
-		}
-			rt_kprintf("\n");
-		inpoutpFlag.analogTempHum.humUpFlag=1;
-		inpoutpFlag.analogTempHum.tempUpFlag=1;
-		inpoutpFlag.modbusCh4[0].ch4UpFlag=1;
-		inpoutpFlag.modbusH2s[0].h2sUpFlag=1;
+//		int i;
+//		for(i=0;i<DI_NUM;i++){
+//			rt_kprintf("0x%x 0x%x\n",&inpoutpFlag.digInput[i].lowFlag,&inpoutpFlag.digInput[i].upFlag);
+//		}
+//		rt_kprintf("\n");
+//		for(i=0;i<DO_NUM;i++){
+//			rt_kprintf("0x%x 0x%x\n",&inpoutpFlag.digOutput[i].lowFlag,&inpoutpFlag.digOutput[i].upFlag);
+//		}
+//		rt_kprintf("\n");
+//		for(i=0;i<V33O_NUM;i++){
+//			rt_kprintf("0x%x 0x%x\n",&inpoutpFlag.v33Output[i].lowFlag,&inpoutpFlag.v33Output[i].upFlag);
+//		}
+//		rt_kprintf("\n");
+//			for(i=0;i<V5O_NUM;i++){
+//			rt_kprintf("0x%x 0x%x\n",&inpoutpFlag.v5Output[i].lowFlag,&inpoutpFlag.v5Output[i].upFlag);
+//		}
+//			rt_kprintf("\n");
+//			for(i=0;i<V12O_NUM;i++){
+//			rt_kprintf("0x%x 0x%x\n",&inpoutpFlag.v12Output[i].lowFlag,&inpoutpFlag.v12Output[i].upFlag);
+//		}
+//			rt_kprintf("\n");
+//		inpoutpFlag.analogTempHum.humUpFlag=1;
+//		inpoutpFlag.analogTempHum.tempUpFlag=1;
+//		inpoutpFlag.modbusCh4[0].ch4UpFlag=1;
+//		inpoutpFlag.modbusH2s[0].h2sUpFlag=1;
 		while(1){	
 			  diIOSetFlag();
 			  autoCtrlRun();

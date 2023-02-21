@@ -12,44 +12,62 @@ float humi =0.00;
 
 char copyID[MODBID_LEN];//读取ana温湿度时候 顺便把ID拷贝出来
 //模拟的温湿度传感器读取温度湿度值并与阈值比较来做标记
+
 void  anaTempHumiReadAndSetFlag()
 {
-				for (int i = 0; i < ANALOG_NUM; i++){		
-					if(sheet.analog[i].workFlag==RT_TRUE){
-						if(rt_strcmp(sheet.analog[i].name,analogName[0])==0){
-								if(sheet.analog[i].subName==1){//温度  参考《汇控箱modbus串口配置V0.4》
-										uint16_t  ADCtemp=Get_Adc_Average(chanl[sheet.analog[i].port-1],5);
-									  float Vtemp=ADCtemp*33/4096/10;
-										temp=(10*Vtemp-6)*(80+40)/(30-6)-40;
-									  rt_strcpy(copyID,sheet.analog[i].ID);
-									  if(temp>=sheet.analogTempHum.tempUpLimit){
-												inpoutpFlag.analogTempHum.tempUpFlag=true;
-										}
-										else
-												inpoutpFlag.analogTempHum.tempUpFlag=false;
-										if(temp<=sheet.analogTempHum.tempLowLimit){
-												inpoutpFlag.analogTempHum.tempLowFlag=true;
-										}
-										else
-												inpoutpFlag.analogTempHum.tempLowFlag=false;
+	
+	
+//	adcGetTest();
+//	
+//	
+//					int rt=Get_Adc_Average(ADC_CHANNEL_8,10);
+//				rt_kprintf("ADC_CHANNEL_8 ,adc tick:%d,voltgge 扩大100倍:%dV\n",rt,rt*330/4096);
+//				 rt=Get_Adc_Average(ADC_CHANNEL_9,10);
+//		
+	
+	
+		uint16_t  ADCtemp,ADChumi,porttest;
+		float Vtemp,Vhumi;
+		for (int i = 0; i < ANALOG_NUM; i++){		
+			if(sheet.analog[i].workFlag==RT_TRUE){
+				if(rt_strcmp(sheet.analog[i].name,analogName[0])==0){
+						if(sheet.analog[i].subName==1){//温度  参考《汇控箱modbus串口配置V0.4》
+							  porttest=sheet.analog[i].port-1;
+								ADCtemp=Get_Adc_Average(chanl[sheet.analog[i].port-1],5);
+								Vtemp=ADCtemp*33*10/4096; //扩大100倍
+								temp=((Vtemp-60)*12/24)-40;////	temp=(10*Vtemp-6)*(80+40)/(30-6)-40;
+								rt_kprintf("%stemp=%f\n",sign,temp);
+								rt_strcpy(copyID,sheet.analog[i].ID);
+								if(temp>=sheet.analogTempHum.tempUpLimit){
+										inpoutpFlag.analogTempHum.tempUpFlag=true;
 								}
-								else if(sheet.analog[i].subName==2){//湿度
-										uint16_t  ADChumi=Get_Adc_Average(chanl[sheet.analog[i].port-1],5);
-									  float Vhumi=ADChumi*33/4096/10;
-										humi=(10*Vhumi-6)*(100)/(30-6);
-									  rt_strcpy(copyID,sheet.analog[i].ID);
-										if(humi>=sheet.analogTempHum.humUpLimit){
-												inpoutpFlag.analogTempHum.humUpFlag=true;
-										}
-										else
-												inpoutpFlag.analogTempHum.humUpFlag=false;
-										if(humi<=sheet.analogTempHum.humLowLimit){
-												inpoutpFlag.analogTempHum.humLowFlag=true;
-										}
-										else
-												inpoutpFlag.analogTempHum.humLowFlag=true;
-								}		
+								else
+										inpoutpFlag.analogTempHum.tempUpFlag=false;
+								if(temp<=sheet.analogTempHum.tempLowLimit){
+										inpoutpFlag.analogTempHum.tempLowFlag=true;
+								}
+								else
+										inpoutpFlag.analogTempHum.tempLowFlag=false;
 						}
+						else if(sheet.analog[i].subName==2){//湿度
+							  porttest=sheet.analog[i].port-1;
+								ADChumi=Get_Adc_Average(chanl[sheet.analog[i].port-1],5);
+								Vhumi=ADChumi*33*10/4096;//扩大100倍
+								humi=10*(Vhumi-60)/(30-6);
+								rt_kprintf("%shumi=%f\n",sign,humi);
+								rt_strcpy(copyID,sheet.analog[i].ID);
+								if(humi>=sheet.analogTempHum.humUpLimit){
+										inpoutpFlag.analogTempHum.humUpFlag=true;
+								}
+								else
+										inpoutpFlag.analogTempHum.humUpFlag=false;
+								if(humi<=sheet.analogTempHum.humLowLimit){
+										inpoutpFlag.analogTempHum.humLowFlag=true;
+								}
+								else
+										inpoutpFlag.analogTempHum.humLowFlag=true;
+						}		
+				}
 //						 if(0==strcmp(sheet.analog[i].funName,analogName1Val[0])){//temperature
 //								float temp=1.23;
 //								sprintf(sprinBuf,"%02f",temp);
@@ -60,8 +78,8 @@ void  anaTempHumiReadAndSetFlag()
 //								sprintf(sprinBuf,"%02f",hum );
 //								cJSON_AddItemToObject(nodeobj_p,analogName1Val[1],cJSON_CreateString(sprinBuf));
 //						 }
-					}
-				}
+			}
+		}
 }
 //模拟温度湿度json数据打包
 uint16_t analogTempHumJsonPack()
