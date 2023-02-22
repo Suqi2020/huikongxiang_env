@@ -676,6 +676,7 @@ static void autoctrlInputcfg(char*argv[])
 																}
 																configFlag=true;
 																rt_kprintf("%saotuctrl AI OK\n",sign);
+																break;
 														}
 												}
 										}

@@ -171,7 +171,8 @@ static int circulaConf(int uartnum,char *argv[])
 			if(rt_strcmp(sheet.cirCula[i].ID,argv[2])==0){//配置过
 					if((slaveAddr==0)||(slaveAddr==255)){//关闭
 							sheet.cirCula[i].workFlag=RT_FALSE;//关闭
-						  rt_kprintf("%s del circula\n",sign);
+						  rt_kprintf("%s del circula ok\n",sign);
+						  return 1;
 					}
 					else{
 							sheet.cirCula[i].workFlag=RT_TRUE;//打开
@@ -184,6 +185,9 @@ static int circulaConf(int uartnum,char *argv[])
 					ret =1;
 					break;
 			}
+	}
+	if((slaveAddr==0)||(slaveAddr==255)){
+			return 0;
 	}
 	if(i==CIRCULA_485_NUM){//没有配置过
 			for(int j=0;j<CIRCULA_485_NUM;j++){
@@ -214,6 +218,7 @@ static int partDischagConf(int uartnum,char *argv[])
 					if((slaveAddr==0)||(slaveAddr==255)){//关闭
 							sheet.partDischag[i].workFlag=RT_FALSE;//关闭
 						  rt_kprintf("%s del partDischarge\n",sign);
+							return 1;
 					}
 					else{
 							sheet.partDischag[i].workFlag=RT_TRUE;//打开
@@ -226,6 +231,9 @@ static int partDischagConf(int uartnum,char *argv[])
 					ret =1;
 					break;
 			}
+	}
+	if((slaveAddr==0)||(slaveAddr==255)){
+			return 0;
 	}
 	if(i==PARTDISCHAG_485_NUM){//没有配置过
 			for(int j=0;j<PARTDISCHAG_485_NUM;j++){
@@ -256,6 +264,7 @@ static int pressSettlConf(int uartnum,char *argv[])
 					if((slaveAddr==0)||(slaveAddr==255)){//关闭
 							sheet.pressSetl[i].workFlag=RT_FALSE;//关闭
 						  rt_kprintf("%s del pressSettle\n",sign);
+						  return 1;
 					}
 					else{
 							sheet.pressSetl[i].workFlag=RT_TRUE;//打开
@@ -268,6 +277,9 @@ static int pressSettlConf(int uartnum,char *argv[])
 					ret =1;
 					break;
 			}
+	}
+	if((slaveAddr==0)||(slaveAddr==255)){
+			return 0;
 	}
 	if(i==PRESSSETTL_485_NUM){//没有配置过
 			for(int j=0;j<PRESSSETTL_485_NUM;j++){
@@ -299,6 +311,7 @@ static int threeAxisConf(int uartnum,char *argv[])
 					if((slaveAddr==0)||(slaveAddr==255)){//关闭
 							sheet.threeAxiss[i].workFlag=RT_FALSE;//关闭
 						  rt_kprintf("%s del threeAxis\n",sign);
+						  return 1;
 					}
 					else{
 							sheet.threeAxiss[i].workFlag=RT_TRUE;//打开
@@ -311,6 +324,9 @@ static int threeAxisConf(int uartnum,char *argv[])
 					ret =1;
 					break;
 			}
+	}
+	if((slaveAddr==0)||(slaveAddr==255)){
+			return 0;
 	}
 	if(i==THREEAXIS_485_NUM){//没有配置过
 			for(int j=0;j<THREEAXIS_485_NUM;j++){
@@ -342,6 +358,7 @@ static int ch4Conf(int uartnum,char *argv[])
 					if((slaveAddr==0)||(slaveAddr==255)){//关闭
 							sheet.ch4[i].workFlag=RT_FALSE;//关闭
 							rt_kprintf("%s del ch4\n",sign);
+						  return 1;
 					}
 					else{
 							sheet.ch4[i].workFlag=RT_TRUE;//打开
@@ -354,6 +371,9 @@ static int ch4Conf(int uartnum,char *argv[])
 					ret =1;
 					break;
 			}
+	}
+	if((slaveAddr==0)||(slaveAddr==255)){
+			return 0;
 	}
 	if(i==CH4_485_NUM){//没有配置过
 			for(int j=0;j<CH4_485_NUM;j++){
@@ -384,6 +404,7 @@ static int coConf(int uartnum,char *argv[])
 					if((slaveAddr==0)||(slaveAddr==255)){//关闭
 							sheet.co[i].workFlag=RT_FALSE;//关闭
 						  rt_kprintf("%s del co\n",sign);
+						  return 1;
 					}
 					else{
 							sheet.co[i].workFlag=RT_TRUE;//打开
@@ -396,6 +417,9 @@ static int coConf(int uartnum,char *argv[])
 					ret =1;
 					break;
 			}
+	}
+	if((slaveAddr==0)||(slaveAddr==255)){
+			return 0;
 	}
 	if(i==CO_485_NUM){//没有配置过
 			for(int j=0;j<CO_485_NUM;j++){
@@ -426,6 +450,7 @@ static int h2sConf(int uartnum,char *argv[])
 					if((slaveAddr==0)||(slaveAddr==255)){//关闭
 							sheet.h2s[i].workFlag=RT_FALSE;//关闭
 						  rt_kprintf("%s del h2s\n",sign);
+						  return 1;
 					}
 					else{
 							sheet.h2s[i].workFlag=RT_TRUE;//打开
@@ -438,6 +463,9 @@ static int h2sConf(int uartnum,char *argv[])
 					ret =1;
 					break;
 			}
+	}
+	if((slaveAddr==0)||(slaveAddr==255)){
+			return 0;
 	}
 	if(i==H2S_485_NUM){//没有配置过
 			for(int j=0;j<H2S_485_NUM;j++){
@@ -469,6 +497,7 @@ static int o2Conf(int uartnum,char *argv[])
 					if((slaveAddr==0)||(slaveAddr==255)){//关闭
 							sheet.o2[i].workFlag=RT_FALSE;//关闭
 						  rt_kprintf("%s del o2\n",sign);
+						  return 1;
 					}
 					else{
 							sheet.o2[i].workFlag=RT_TRUE;//打开
@@ -481,6 +510,9 @@ static int o2Conf(int uartnum,char *argv[])
 					ret =1;
 					break;
 			}
+	}
+	if((slaveAddr==0)||(slaveAddr==255)){
+			return 0;
 	}
 	if(i==O2_485_NUM){//没有配置过
 			for(int j=0;j<O2_485_NUM;j++){
@@ -512,6 +544,7 @@ static int waterDepthConf(int uartnum,char *argv[])
 					if((slaveAddr==0)||(slaveAddr==255)){//关闭
 							sheet.waterDepth[i].workFlag=RT_FALSE;//关闭
 							rt_kprintf("%s del waterdepth\n",sign);
+						  return 1;
 					}
 					else{
 							sheet.waterDepth[i].workFlag=RT_TRUE;//打开
@@ -524,6 +557,9 @@ static int waterDepthConf(int uartnum,char *argv[])
 					ret =1;
 					break;
 			}
+	}
+	if((slaveAddr==0)||(slaveAddr==255)){
+			return 0;
 	}
 	if(i==WATERDEPTH_485_NUM){//没有配置过
 			for(int j=0;j<WATERDEPTH_485_NUM;j++){
@@ -554,6 +590,7 @@ static int tempHumConf(int uartnum,char *argv[])
 					if((slaveAddr==0)||(slaveAddr==255)){//关闭
 							sheet.tempHum[i].workFlag=RT_FALSE;//关闭
 							rt_kprintf("%s del temp humi\n",sign);
+						  return 1;
 					}
 					else{
 							sheet.tempHum[i].workFlag=RT_TRUE;//打开
@@ -566,6 +603,9 @@ static int tempHumConf(int uartnum,char *argv[])
 					ret =1;
 					break;
 			}
+	}
+	if((slaveAddr==0)||(slaveAddr==255)){
+			return 0;
 	}
 	if(i==TEMPHUM_485_NUM){//没有配置过
 			for(int j=0;j<TEMPHUM_485_NUM;j++){
@@ -589,7 +629,7 @@ static int modbusConf(int modbusnum,int uartnum,char *argv[])
 {
 	  int ret=0;
 	  //int slaveAddr=atoi32(argv[5],10);//提取设备地址 前面已经核对过
-		rt_kprintf("conf:%d %d\n",modbusnum,uartnum);
+//		rt_kprintf("conf:%d %d\n",modbusnum,uartnum);
 		switch(modbusnum)
 		{
 			case CIRCULA:

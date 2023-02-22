@@ -362,6 +362,8 @@ void  autoCtrlTask(void *para)
 	  extern void printfOutputList();
 		extern void printfThresholdList();
 		extern void printfCtrl();
+	  extern void printAcuid();
+	  printAcuid();
 		printModbusDevList();
 	  prinfAnalogList();
 	  printfDIList();

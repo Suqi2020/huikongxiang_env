@@ -108,3 +108,9 @@ static void acuid(int argc, char *argv[])
 MSH_CMD_EXPORT(acuid,acuid config);//FINSH_FUNCTION_EXPORT_CMD
 
 
+void printAcuid()
+{
+		rt_kprintf("%sAcuid:%s\n",sign,packFlash.acuId);
+	//  rt_kprintf("%Acuid:s%s\n",sign,packFlash.acuId);
+}
+

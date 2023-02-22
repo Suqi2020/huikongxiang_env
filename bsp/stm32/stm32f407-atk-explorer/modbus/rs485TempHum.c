@@ -111,6 +111,7 @@ void readTempHum(int num)
 				thum[num].hum=0;
 			  rt_kprintf("%s read fail\n",sign);
 		}
+		tempHumCheckSetFlag(num);//TEST ONLY
 	  rt_mutex_release(uartDev[sheet.tempHum[num].useUartNum].uartMutex);
 		rt_free(buf);
 	  buf=RT_NULL;				

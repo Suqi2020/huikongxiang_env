@@ -130,8 +130,9 @@
 //V0.72    所有的对外接口的AT命令全部实现 包括边缘控制 简单测试了逻辑控制的最大数目 20230217
 //V0.73    解决tasklog屏蔽时候出现内存泄漏问题 需要等待任务挂起才能删除任务
 //         更改模拟温湿度读取数值不准确  已经实现并且测试
-#define APP_VER       ((0<<8)+73)//0x0105 表示1.5版本
-const char date[]="20230221";
+//V0.74    修复配置threadshold 时候高低值放反的问题 
+#define APP_VER       ((0<<8)+74)//0x0105 表示1.5版本
+const char date[]="20230222";
 
 //static    rt_thread_t tid 	= RT_NULL;
 static    rt_thread_t tidW5500 	  = RT_NULL;
@@ -219,7 +220,7 @@ int main(void)
 	  rt_kprintf("\n%\n",sign,date,(uint8_t)(APP_VER>>8),(uint8_t)APP_VER);
     rt_kprintf("\n%s%s  ver=%02d.%02d\n",sign,date,(uint8_t)(APP_VER>>8),(uint8_t)APP_VER);
 	  
-	  rt_kprintf("[%s %f]\n",strnum,atof(strnum));
+	 // rt_kprintf("[%s %f]\n",strnum,atof(strnum));
 	  //rt_kprintf("name %s  %s\n",modbusName[0],modbusName_utf8[0]);
 	  rt_err_t result;
 		stm32_flash_read(FLASH_IP_SAVE_ADDR,    (uint8_t*)&packFlash,sizeof(packFlash));
