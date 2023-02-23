@@ -24,7 +24,7 @@ typedef struct{
 	  uint8_t  respStat;
 }threeAxisStru;
 const static char sign[]="[防外破]";
-static threeAxisStru threeAxisp[THREEAXIS_485_NUM];
+threeAxisStru threeAxisp[THREEAXIS_485_NUM];
 //返回三轴的通讯状态 true--通讯成功 false--通讯失败
 int threeAxisState(int i)
 {
@@ -138,6 +138,7 @@ void readThreeTempAcc(int num)
 			  threeAxisp[num].acclrationY = 0;
 			  rt_kprintf("%stemp height read fail\n",sign);
 		}
+//		threeAccCheckSetFlag(num);
 	  rt_mutex_release(uartDev[sheet.threeAxiss[num].useUartNum].uartMutex);
 		rt_free(buf);
 	  buf=RT_NULL;

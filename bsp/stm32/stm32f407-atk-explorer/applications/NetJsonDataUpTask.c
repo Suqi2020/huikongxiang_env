@@ -96,7 +96,7 @@ void coRead2Send(rt_bool_t netStat);
 void anaTempHumReadPack(void);;
 uint16_t devRegJsonPack(void);
 uint16_t heartUpJsonPack(void);
-extern uint8_t analogTemChanl;
+//extern uint8_t analogTemChanl;
 extern void gasJsonPack(rt_bool_t netStat);
 //定时时间到  执行相应事件
 static void  timeOutRunFun()
@@ -200,7 +200,7 @@ void startTimeList()
 					  if(sheet.analog[i].workFlag==RT_TRUE){
 								timeInit(ANA_TEMPHUM_TIME,sheet.analog[i].colTime,30);
 								//timeInit(ANA_TEMPHUM_TIME,10,30);
-								analogTemChanl=i;
+//								analogTemChanl=i;
 						}
 						break;
 				}

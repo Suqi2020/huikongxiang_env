@@ -169,7 +169,7 @@ static bool crtlPartDischagConf(char **argv)
 											return true;
 									}
 							}
-							else if(subname==2){//B
+							else if(subname==4){//B
 									if(limit==0){//下限
 											sheet.autoctrl[pindex].input[inputIndex].flag=&inpoutpFlag.modbusPartDisChg[i].amplitudeBLowFlag;
 											//inputIndex++;//return true;
@@ -181,7 +181,7 @@ static bool crtlPartDischagConf(char **argv)
 											return true;
 									}
 							}
-							else if(subname==3){//C
+							else if(subname==7){//C
 									if(limit==0){//下限
 											sheet.autoctrl[pindex].input[inputIndex].flag=&inpoutpFlag.modbusPartDisChg[i].amplitudeCLowFlag;
 											//inputIndex++;//return true;
@@ -193,7 +193,7 @@ static bool crtlPartDischagConf(char **argv)
 											return true;
 									}
 							}
-							else if(subname==4){//A
+							else if(subname==2){//A
 									if(limit==0){//下限
 											sheet.autoctrl[pindex].input[inputIndex].flag=&inpoutpFlag.modbusPartDisChg[i].freqALowFlag;
 											//inputIndex++;//
@@ -217,7 +217,7 @@ static bool crtlPartDischagConf(char **argv)
 											return true;
 									}
 							}
-							else if(subname==6){//C
+							else if(subname==8){//C
 									if(limit==0){//下限
 											sheet.autoctrl[pindex].input[inputIndex].flag=&inpoutpFlag.modbusPartDisChg[i].freqCLowFlag;
 											//inputIndex++;//return true;
@@ -229,7 +229,7 @@ static bool crtlPartDischagConf(char **argv)
 											return true;
 									}
 							}	
-							else if(subname==7){//A
+							else if(subname==3){//A
 									if(limit==0){//下限
 											sheet.autoctrl[pindex].input[inputIndex].flag=&inpoutpFlag.modbusPartDisChg[i].dischargeALowFlag;
 											//inputIndex++;//
@@ -241,7 +241,7 @@ static bool crtlPartDischagConf(char **argv)
 											return true;
 									}
 							}
-							else if(subname==8){//B
+							else if(subname==6){//B
 									if(limit==0){//下限
 											sheet.autoctrl[pindex].input[inputIndex].flag=&inpoutpFlag.modbusPartDisChg[i].dischargeBLowFlag;
 											//inputIndex++;//return true;
@@ -694,7 +694,7 @@ static void autoctrlInputcfg(char*argv[])
 										return ;
 								}
 								for(i=0;i<DI_NUM;i++){
-										if(0==rt_strcmp((char *)packFlash.input[i].devID,argv[3])){
+										if(0==rt_strcmp((char *)packFlash.diginput[i].devID,argv[3])){
 												//packFlash.input[i].levelFlag=limit;//通过levelFlag来置位 lowFlag upFlag
 											  if(limit==0)
 														sheet.autoctrl[pindex].input[inputIndex].flag=&inpoutpFlag.digInput[i].lowFlag;

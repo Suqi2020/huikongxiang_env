@@ -84,6 +84,7 @@ void readH2S(int num)
 			  h2s[num]	=0;
 			  rt_kprintf("%s read fail\n",sign);
 		}
+		h2sCheckSetFlag(num);
 	  rt_mutex_release(uartDev[sheet.h2s[num].useUartNum].uartMutex);
 		rt_free(buf);
 	  buf=RT_NULL;

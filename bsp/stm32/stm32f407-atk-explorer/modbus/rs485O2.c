@@ -92,6 +92,7 @@ void readO2(int num)
 			  o2[num]	=0;
 			  rt_kprintf("%s read fail\n",sign);
 		}
+		o2CheckSetFlag(num);
 	  rt_mutex_release(uartDev[sheet.o2[num].useUartNum].uartMutex);
 		rt_free(buf);
 	  buf=RT_NULL;

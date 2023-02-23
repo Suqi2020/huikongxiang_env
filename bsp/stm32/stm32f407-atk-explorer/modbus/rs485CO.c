@@ -87,6 +87,7 @@ void readCO(int num)
 			  respStat[num]=0;
 			  rt_kprintf("%s read fail\n",sign);
 		}
+		coCheckSetFlag(num);
 	  rt_mutex_release(uartDev[sheet.co[num].useUartNum].uartMutex);
 		rt_free(buf);
 	  buf=RT_NULL;

@@ -7,7 +7,7 @@ const static char sign[]="[水位]";
 //#define   SLAVE_ADDR     0X01 
 #define   LENTH          50  //工作环流用到的最大接收buf长度
 
-static float waterDepth[WATERDEPTH_485_NUM];
+ float waterDepth[WATERDEPTH_485_NUM];
 static uint8_t respStat[WATERDEPTH_485_NUM];
 //打包串口发送 
 static void waterDepthUartSend(int num,uint8_t *buf,int len)
@@ -88,6 +88,7 @@ static void readWaterDepth(int num)
 			  waterDepth[num]	=0;
 			  rt_kprintf("%s read fail\n",sign);
 		}
+		//waterLevCheckSetFlag(num);
 	  rt_mutex_release(uartDev[sheet.waterDepth[num].useUartNum].uartMutex);
 		rt_free(buf);
 	  buf=RT_NULL;

@@ -30,7 +30,7 @@ typedef struct{
 }partDischargeStru;
 
 const static char sign[]="[¾Ö·Å]";
-static partDischargeStru partDiscStru_p[PARTDISCHAG_485_NUM];
+partDischargeStru partDiscStru_p[PARTDISCHAG_485_NUM];
 
 
 
@@ -204,7 +204,7 @@ void readPdFreqDischarge(int num)
 			  partDiscStru_p[num].dischargeC=0;
 			  rt_kprintf("%sPdFreqDiach read fail\n",sign);
 		}
-
+    //partDischCheckSetFlag(num);//test only
 	  rt_mutex_release(uartDev[sheet.partDischag[num].useUartNum].uartMutex);
 		rt_free(buf);
 	  buf=RT_NULL;

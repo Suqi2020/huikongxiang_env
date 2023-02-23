@@ -17,7 +17,7 @@ typedef struct{
 		uint8_t respStat;
 //float height;//除以10 传输float类型  单位mm
 }pressSettlStru;
-static pressSettlStru pressSettle[PRESSSETTL_485_NUM];
+pressSettlStru pressSettle[PRESSSETTL_485_NUM];
 //返回沉降仪的通讯状态 true--通讯成功 false--通讯失败
 int pressSettleState(int i)
 {
@@ -121,6 +121,7 @@ void readPSTempHeight(int num)
 			  pressSettle[num].height.intVal=0;
 			  rt_kprintf("%stemp height read fail\n",sign);
 		}
+//		pressStlCheckSetFlag(num);
 	  rt_mutex_release(uartDev[sheet.pressSetl[num].useUartNum].uartMutex);
 		rt_free(buf);
 	  buf=RT_NULL;

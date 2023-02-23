@@ -5,7 +5,7 @@
 // 0-3.3对应0-4096
 const char *sign="[analogTempH]";
 //num 定时器启动时候找到的对应的0-7通道
-uint8_t analogTemChanl=0;
+//uint8_t analogTemChanl=0;
 
 float temp =0.00;
 float humi =0.00;

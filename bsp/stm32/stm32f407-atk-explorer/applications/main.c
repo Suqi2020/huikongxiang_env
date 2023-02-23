@@ -131,8 +131,9 @@
 //V0.73    解决tasklog屏蔽时候出现内存泄漏问题 需要等待任务挂起才能删除任务
 //         更改模拟温湿度读取数值不准确  已经实现并且测试
 //V0.74    修复配置threadshold 时候高低值放反的问题 
-#define APP_VER       ((0<<8)+74)//0x0105 表示1.5版本
-const char date[]="20230222";
+//V0.75    修复自动配置出现的bug
+#define APP_VER       ((0<<8)+75)//0x0105 表示1.5版本
+const char date[]="20230223";
 
 //static    rt_thread_t tid 	= RT_NULL;
 static    rt_thread_t tidW5500 	  = RT_NULL;

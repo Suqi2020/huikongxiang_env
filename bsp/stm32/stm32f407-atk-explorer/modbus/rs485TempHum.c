@@ -12,7 +12,7 @@ typedef struct{
 	float hum; 
 	uint8_t respStat;
 }thStru;
-static thStru thum[TEMPHUM_485_NUM];
+thStru thum[TEMPHUM_485_NUM];
 
 //float temp[TEMPHUM_485_NUM];
 //float hum[TEMPHUM_485_NUM]; 
@@ -29,7 +29,7 @@ int tempHumState(int i)
 
 
 //温湿度传感器读取值与阈值比较并设置flag
-static void tempHumCheckSetFlag(int num)
+ void tempHumCheckSetFlag(int num)
 {
 		if(thum[num].temp>=sheet.modbusTempHum[num].tempUpLimit)
 				inpoutpFlag.modbusTempHum[num].tempUpFlag=true;

@@ -370,24 +370,29 @@ void  autoCtrlTask(void *para)
 	  printfOutputList();
 		printfThresholdList();
 		printfCtrl();
-	  rt_kprintf("%sautoCtrlTask start\n");
+	  rt_kprintf("%sautoCtrlTask start\n",sign);
 //		int i;
+//		rt_kprintf("%sDI addr\n",sign);
 //		for(i=0;i<DI_NUM;i++){
 //			rt_kprintf("0x%x 0x%x\n",&inpoutpFlag.digInput[i].lowFlag,&inpoutpFlag.digInput[i].upFlag);
 //		}
 //		rt_kprintf("\n");
+//		rt_kprintf("%sDO addr\n",sign);
 //		for(i=0;i<DO_NUM;i++){
 //			rt_kprintf("0x%x 0x%x\n",&inpoutpFlag.digOutput[i].lowFlag,&inpoutpFlag.digOutput[i].upFlag);
 //		}
 //		rt_kprintf("\n");
+//		rt_kprintf("%sV33 addr\n",sign);
 //		for(i=0;i<V33O_NUM;i++){
 //			rt_kprintf("0x%x 0x%x\n",&inpoutpFlag.v33Output[i].lowFlag,&inpoutpFlag.v33Output[i].upFlag);
 //		}
 //		rt_kprintf("\n");
+//		rt_kprintf("%sV5 addr\n",sign);
 //			for(i=0;i<V5O_NUM;i++){
 //			rt_kprintf("0x%x 0x%x\n",&inpoutpFlag.v5Output[i].lowFlag,&inpoutpFlag.v5Output[i].upFlag);
 //		}
 //			rt_kprintf("\n");
+//		rt_kprintf("%sV12 addr\n",sign);
 //			for(i=0;i<V12O_NUM;i++){
 //			rt_kprintf("0x%x 0x%x\n",&inpoutpFlag.v12Output[i].lowFlag,&inpoutpFlag.v12Output[i].upFlag);
 //		}

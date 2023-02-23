@@ -87,6 +87,7 @@ void readCH4(int num)
 			  ch4[num]=0;
 			  rt_kprintf("%s read fail\n",sign);
 		}
+		ch4CheckSetFlag(num);
 	  rt_mutex_release(uartDev[sheet.ch4[num].useUartNum].uartMutex);
 		rt_free(buf);
 	  buf=RT_NULL;

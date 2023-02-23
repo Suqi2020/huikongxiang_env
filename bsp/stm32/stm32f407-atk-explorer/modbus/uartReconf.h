@@ -70,7 +70,7 @@ typedef struct{
 	  uint32_t       uartBps[UART_NUM];    //存储串口配置
 	  char     acuId[ACUID_LEN+1];      //存储acuID
 	  char rev;
-		digitStru input[DI_NUM];   //数字输入
+		digitStru diginput[DI_NUM];   //数字输入
 	  digitStru digoutput[DO_NUM];   //数字输出
 		digitStru v33output[V33O_NUM]; //3V3电源输出
 		digitStru v5output[V5O_NUM];   //5V电源输出

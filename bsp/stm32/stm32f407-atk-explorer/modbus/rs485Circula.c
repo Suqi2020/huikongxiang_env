@@ -44,7 +44,7 @@ const static char sign[]="[环流]";
 #define   LENTH          50  //工作环流用到的最大接收buf长度
 extern uint8_t packBuf[TX_RX_MAX_BUF_SIZE];
 
-static CIRCURStru  cirCurStru_p[CIRCULA_485_NUM];
+ CIRCURStru  cirCurStru_p[CIRCULA_485_NUM];
 //static uint16_t readAcqInterv(int num);
 //static uint16_t readPoint(int num);
 //static uint32_t readThresholdVal(int num);
@@ -163,6 +163,8 @@ void readCirCurrAndWaring(int num)
 			  cirCurStru_p[num].warningD	=0;
 			  rt_kprintf("%s提取电流、报警值fail\r\n",sign);
 		}
+
+//		circulaCheckSetFlag(num);
 		//recFlag = RT_FALSE;
 	  rt_mutex_release(uartDev[sheet.cirCula[num].useUartNum].uartMutex);
 	//	 rt_kprintf("release\r\n");

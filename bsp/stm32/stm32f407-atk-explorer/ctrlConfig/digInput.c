@@ -25,7 +25,7 @@ bool  diReadFun(char num)
 void diIOSetFlag()
 {
 		for(int i=0;i<DI_NUM;i++){
-				if(packFlash.input[i].workFlag==true){
+				if(packFlash.diginput[i].workFlag==true){
 						if(diReadFun(i)==true){
 								inpoutpFlag.digInput[i].upFlag =true;
 							  inpoutpFlag.digInput[i].lowFlag =false; 
@@ -44,14 +44,14 @@ void diIOSetFlag()
 void printfDIList()
 {
 		for(int j=0;j<DI_NUM;j++){//查一遍 找到 GYNJLXSD000000499  如果
-				if(packFlash.input[j].workFlag==RT_TRUE){//打开
+				if(packFlash.diginput[j].workFlag==RT_TRUE){//打开
 						rt_kprintf("%s digInput ",sign);
 
-						rt_kprintf("%s ",packFlash.input[j].name);
-						rt_kprintf("%s ",packFlash.input[j].devID);
+						rt_kprintf("%s ",packFlash.diginput[j].name);
+						rt_kprintf("%s ",packFlash.diginput[j].devID);
 						
-						rt_kprintf("%s ",packFlash.input[j].model);
-						rt_kprintf("%d \n",packFlash.input[j].port);
+						rt_kprintf("%s ",packFlash.diginput[j].model);
+						rt_kprintf("%d \n",packFlash.diginput[j].port);
 
 
 
@@ -74,18 +74,18 @@ static void digInput(int argc, char *argv[])
 		port = atoi16(argv[4],10);
 
 		if((port<=DI_NUM)&&(port>0)){//添加
-				packFlash.input[port-1].workFlag=RT_TRUE;
-				rt_strcpy(packFlash.input[port-1].name, argv[1]);
-				rt_strcpy(packFlash.input[port-1].devID,argv[2]);
-				rt_strcpy(packFlash.input[port-1].model,argv[3]);
-				packFlash.input[port-1].port=port;
+				packFlash.diginput[port-1].workFlag=RT_TRUE;
+				rt_strcpy(packFlash.diginput[port-1].name, argv[1]);
+				rt_strcpy(packFlash.diginput[port-1].devID,argv[2]);
+				rt_strcpy(packFlash.diginput[port-1].model,argv[3]);
+				packFlash.diginput[port-1].port=port;
 				rt_kprintf("%s add diginput chanl %d\n",sign,port);
         rt_kprintf("%s digInput OK\n",sign);
 		}
 		else{//删除
 			 for(int j=0;j<DI_NUM;j++){//查一遍 找到 GYNJLXSD000000499  如果
-					if(rt_strcmp(packFlash.input[j].devID,argv[2])==0){
-							packFlash.input[j].workFlag=RT_FALSE;
+					if(rt_strcmp(packFlash.diginput[j].devID,argv[2])==0){
+							packFlash.diginput[j].workFlag=RT_FALSE;
 							rt_kprintf("%s delete diginput channel %d\n",sign,j+1);
 					}
 			 }

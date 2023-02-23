@@ -17,7 +17,7 @@
 
 #define CRTL_IN_NUM      10   //每条逻辑控制支持10个输入
 #define CRTL_OUT_NUM     5   //每条逻辑控制支持5个输出控制
-#define CRTL_TOTAL_NUM   10  //总共10条逻辑控制
+#define CRTL_TOTAL_NUM   20  //总共10条逻辑控制
 
 typedef struct{
 	  char  typeName[INOUTNAME_LEN];//如果长度大于  8
