@@ -132,15 +132,16 @@
 //         更改模拟温湿度读取数值不准确  已经实现并且测试
 //V0.74    修复配置threadshold 时候高低值放反的问题 
 //V0.75    修复自动配置出现的bug
-#define APP_VER       ((0<<8)+75)//0x0105 表示1.5版本
-const char date[]="20230223";
+//V0.76    增加开关控制的接口显示V3O V12O V5O
+#define APP_VER       ((0<<8)+76)//0x0105 表示1.5版本
+const char date[]="20230309";
 
 //static    rt_thread_t tid 	= RT_NULL;
 static    rt_thread_t tidW5500 	  = RT_NULL;
 static    rt_thread_t tidNetRec 	= RT_NULL;
 static    rt_thread_t tidNetSend 	= RT_NULL;
 static    rt_thread_t tidUpkeep 	= RT_NULL;
-//static    rt_thread_t tidLCD      = RT_NULL;
+static    rt_thread_t tidLCD      = RT_NULL;
 static    rt_thread_t tidAutoCtrl = RT_NULL;
 //信号量的定义
 extern  rt_sem_t  w5500Iqr_semp ;//w5500有数据时候中断来临
@@ -293,11 +294,11 @@ int main(void)
 		
 
 ////////////////////////////////任务////////////////////////////////////
-    tidW5500 =  rt_thread_create("w5500",w5500Task,RT_NULL,1024,3, 10 );
-		if(tidW5500!=NULL){
-				rt_thread_startup(tidW5500);													 
-				rt_kprintf("%sRTcreat w5500Task task\r\n",sign);
-		}
+//    tidW5500 =  rt_thread_create("w5500",w5500Task,RT_NULL,1024,3, 10 );
+//		if(tidW5500!=NULL){
+//				rt_thread_startup(tidW5500);													 
+//				rt_kprintf("%sRTcreat w5500Task task\r\n",sign);
+//		}
 		tidNetRec =  rt_thread_create("netRec",netDataRecTask,RT_NULL,1024,2, 10 );
 		if(tidNetRec!=NULL){
 				rt_thread_startup(tidNetRec);													 
@@ -314,6 +315,11 @@ int main(void)
 		if(tidUpkeep!=NULL){
 				rt_thread_startup(tidUpkeep);													 
 				rt_kprintf("%sRTcreat upKeepStateTask \r\n",sign);
+		}
+		tidLCD    =  rt_thread_create("LCD",LCDTask,RT_NULL,512*3,2, 10 );
+		if(tidLCD!=NULL){
+				rt_thread_startup(tidLCD);													 
+				rt_kprintf("%sRTcreat LCDStateTask \r\n",sign);
 		}
 		tidAutoCtrl =  rt_thread_create("autoCtrl",autoCtrlTask,RT_NULL,1024,5, 10 );
 		if(tidAutoCtrl!=NULL){

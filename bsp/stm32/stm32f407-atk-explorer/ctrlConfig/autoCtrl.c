@@ -34,8 +34,8 @@ autoctrl V12O 水泵  GYNJLXSD000000439 1
 inoutDevStru inpoutpFlag __attribute__((at(0x2000D000)))={0};//输入输出超值的标记位  指定内存地址  防止更改代码后内存地址移位
 //sheet.autoctrl[pindex].output[outputIndex].flag中指针指向了inpoutpFlag
 const static char sign[]="[autoCtrl]";
-char *inName[INOUTNAME_LEN]={"AI","DI","MB",};
-char *outName[INOUTNAME_LEN]={"DO","V3O","V5O","V12O"};
+char inName[INNAME_NUM][INOUTNAME_LEN]={"AI","DI","MB",};
+char outName[OUTNAME_NUM][INOUTNAME_LEN]={"DO","V3O","V5O","V12O"};
 uint8_t inputIndex=0; //本次配置控制逻辑的输入坐标配置   被inputFlag 指针调用
 uint8_t outputIndex=0;//本次配置控制逻辑的输出的坐标配置 被outputFlag指针调用
 

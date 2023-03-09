@@ -773,6 +773,26 @@
               <FileType>1</FileType>
               <FilePath>LCD7inch\7inchRegist.c</FilePath>
             </File>
+            <File>
+              <FileName>lcdDispAutoCtrl.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>.\LCD7inch\lcdDispAutoCtrl.c</FilePath>
+            </File>
+            <File>
+              <FileName>lcdDispModbus.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>.\LCD7inch\lcdDispModbus.c</FilePath>
+            </File>
+            <File>
+              <FileName>lcdKeyEvent.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>.\LCD7inch\lcdKeyEvent.c</FilePath>
+            </File>
+            <File>
+              <FileName>lcdSwitchCtrl.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>.\LCD7inch\lcdSwitchCtrl.c</FilePath>
+            </File>
           </Files>
         </Group>
         <Group>

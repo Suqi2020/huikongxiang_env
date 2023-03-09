@@ -93,7 +93,55 @@
 #define   KEY_MODBUSDISP_ERRNEXT_ADDR  0X150E
 
 
+//开关控制界面
+#define   KEY_SWITCH_INTERFACE_ADDR    0x5400
+#define   KEY_SWITCH_PORT_ADDR         0x5402
+#define   KEY_SWITCH_LEVEL_ADDR        0x5404
+#define   KEY_SWITCH_SURE_ADDR         0x5406
+#define   KEY_SWITCH_RETURN_ADDR       0x5408
 
+#define   DISP_SWITCH_INTERFACE_ADDR   0x540A
+#define   DISP_SWITCH_PORT_ADDR        0x540C
+#define   DISP_SWITCH_NAME_ADDR        0x540E
+#define   DISP_SWITCH_ID_ADDR       	 0x5410
+#define   DISP_SWITCH_TYPE_ADDR        0x5412
+#define   DISP_SWITCH_LEVEL_ADDR       0x5414
+
+//开关控制调出接口显示界面
+#define   DISP_SWITCHINTERF_INTERFACE_ADDR  0x5416
+
+#define   KEY_SWITCHINTERF_SURE_ADDR    		0x5418
+#define   KEY_SWITCHINTERF_NEXT_ADDR        0x541A
+#define   KEY_SWITCHINTERF_LAST_ADDR        0x541C
+#define   KEY_SWITCHINTERF_RETURN_ADDR      0x541E
+//开关控制调出port显示界面
+#define   DISP_SWITCHPORT_PORT_ADDR         0x5420
+
+#define   KEY_SWITCHPORT_SURE_ADDR    			0x5422
+#define   KEY_SWITCHPORT_NEXT_ADDR        	0x5424
+#define   KEY_SWITCHPORT_LAST_ADDR        	0x5426
+#define   KEY_SWITCHPORT_RETURN_ADDR      	0x5428
+//开关控制调出电平显示界面
+#define   KEY_SWITCHLEVEL_ON_ADDR    				0x542A
+#define   KEY_SWITCHLEVEL_OFF_ADDR    			0x542C
+#define   KEY_SWITCHLEVEL_SURE_ADDR    			0x542E
+#define   KEY_SWITCHLEVEL_RETURN_ADDR    		0x5430
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+//保存界面
 
 #define   KEY_SAVE_ADDR             0X1700
 #define   KEY_RESET_ADDR            0X1702
@@ -104,6 +152,7 @@
 #define   MODBUS_ERR_DISPLAY_ADDR   0X1A0E
 
 //kenal lcd command
+///#define   LCD_HEAD       0XAEA5
 #define   LCD_HEAD       0X5AA5
 #define   LCD_FILL_TAIL  0XFFFF
 #define   LCD_WRITE      0X82
@@ -119,13 +168,26 @@
 
 
 
+extern int LCDWtite(uint16_t addr,uint8_t *data,uint8_t dataLen);
 
 
+//typedef struct{
+//		char  name[25];
+//		char  ID[20];
+//		char  model[8];
+//		uint8_t   port;
+//		uint8_t   addr;
+//		uint32_t  colTime;
+//}LCDDispModInfoStru;
+//typedef struct{
+//	  uint8_t X;//modbus设备的种类
+//	  uint8_t Y;//每种modbus的个数
+//	  uint8_t flag;//存在标记为1
+//}modbusPositStru;
 
-
-
-
-
+//extern LCDDispModInfoStru  modbusLCDRead;
+//extern modbusPositStru  modPosit[TOTOLA_485_NUM]; 
+//extern modbusPositStru  modPositErr[TOTOLA_485_NUM];
 
 
 

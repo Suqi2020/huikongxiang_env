@@ -25,6 +25,8 @@
 #define   V5O_NUM         2
 #define   V12O_NUM        4
 #define  MODBID_LEN  		 20
+#define  INNAME_NUM    3
+#define  OUTNAME_NUM   4
 #define   USE_4GAS
 #include <rtthread.h>
 #include "stdbool.h"
