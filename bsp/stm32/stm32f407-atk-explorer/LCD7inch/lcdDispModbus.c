@@ -92,78 +92,6 @@ uint8_t  modbErrDevReadIndex=0;
 modbusPositStru  modPositErr[TOTOLA_485_NUM]={0};
 //////////////////////////////////////////////////
 
-//故障传感器读取界面显示所有信息
-void LDCDispErrMosbusInfo()
-{
-	  uint8_t *buf=NULL;
-	  buf=rt_malloc(50);
-	  //显示中文名
-	 
-		int Len=strlen(modbusLCDErrRead.name);
-		for(int i=0;i<Len;i++){
-				buf[i]=modbusLCDErrRead.name[i];
-		}
-		int j=0;
-		while((Len+j)<sizeof(modbusName[0])){
-				buf[Len+j]=0xff;
-				j++;
-		}
-	  LCDWtite(MODBUSDISP_ERRNAME_ADDR,buf,sizeof(modbusName[0]));
-		//显示ID
-		 Len=strlen(modbusLCDErrRead.ID);
-		for(int i=0;i<Len;i++){
-				buf[i]=modbusLCDErrRead.ID[i];
-		}
-		 j=0;
-		while((Len+j)<MODBID_LEN-2){
-				buf[Len+j]=0xff;
-				j++;
-			  if(j>=2)
-					break;
-		}
-	  LCDWtite(MODBUSDISP_ERRID_ADDR,buf,MODBID_LEN-2);//7寸屏显示18
-		//显示model
-		Len=strlen(modbusLCDErrRead.model);
-		for(int i=0;i<Len;i++){
-				buf[i]=modbusLCDErrRead.model[i];
-		}
-		 j=0;
-		while((Len+j)<MODL_LEN-2){
-				buf[Len+j]=0xff;
-				j++;
-		}
-	  LCDWtite(MODBUSDISP_ERRTYPE_ADDR,buf,MODL_LEN-2);
-		//显示PORT
-		buf[0]=0;
-		buf[1]=modbusLCDErrRead.port+1;
-		LCDWtite(MODBUSDISP_ERRPORT_ADDR,buf,2);
-		//显示addr
-		buf[0]=0;
-		buf[1]=modbusLCDErrRead.addr;
-		LCDWtite(MODBUSDISP_ERRADDR_ADDR,buf,2);
-	  //显示colTime
-		buf[0]=(uint8_t)(modbusLCDErrRead.colTime>>24);
-		buf[1]=(uint8_t)(modbusLCDErrRead.colTime>>16);
-		buf[2]=(uint8_t)(modbusLCDErrRead.colTime>>8);
-		buf[3]=(uint8_t)(modbusLCDErrRead.colTime>>0);
-		LCDWtite(MODBUSDISP_ERRTIME_ADDR,buf,4);
-		//显示总共页
-		buf[0]=0;
-		buf[1]=modbErrTotalIndex;
-		LCDWtite(MODBUSDISP_ERRTOTALNUM_ADDR,buf,2);
-		rt_kprintf("%s total %d\n",sign,modbErrTotalIndex);
-		//显示当前页
-		buf[0]=0;
-		if(modbErrTotalIndex==0)
-				buf[1]=0;
-		else
-				buf[1]=modbErrDevReadIndex+1;
-		LCDWtite(MODBUSDISP_ERRNOWNUM_ADDR,buf,2);
-		
-		
-		rt_free(buf);
-		buf=RT_NULL;
-}
 extern int ch4State(int i);
 extern int waterDepthState(int i);
 extern int pressSettleState(int i);
@@ -321,79 +249,7 @@ void LCDDispErrModbusGet()
 //uint8_t   addr=0;
 //uint32_t  colTime=0;
 LCDDispModInfoStru  modbusLCDRead={0};
-//上电后控件第一次显示的中文名称拷贝 
-//传感器读取界面显示所有信息
-void LDCDispMosbusInfo()
-{
-	  uint8_t *buf=NULL;
-	  buf=rt_malloc(50);
-	  //显示中文名
-	 
-		int Len=strlen(modbusLCDRead.name);
-		for(int i=0;i<Len;i++){
-				buf[i]=modbusLCDRead.name[i];
-		}
-		int j=0;
-		while((Len+j)<sizeof(modbusName[0])){
-				buf[Len+j]=0xff;
-				j++;
-		}
-	  LCDWtite(MODBUSDISP_NAME_ADDR,buf,sizeof(modbusName[0]));
-		//显示ID
-		 Len=strlen(modbusLCDRead.ID);
-		for(int i=0;i<Len;i++){
-				buf[i]=modbusLCDRead.ID[i];
-		}
-		 j=0;
-		while((Len+j)<MODBID_LEN-2){
-				buf[Len+j]=0xff;
-				j++;
-			  if(j>=2)
-					break;
-		}
-	  LCDWtite(MODBUSDISP_ID_ADDR,buf,MODBID_LEN-2);//7寸屏显示18
-		//显示model
-		Len=strlen(modbusLCDRead.model);
-		for(int i=0;i<Len;i++){
-				buf[i]=modbusLCDRead.model[i];
-		}
-		 j=0;
-		while((Len+j)<MODL_LEN-2){
-				buf[Len+j]=0xff;
-				j++;
-		}
-	  LCDWtite(MODBUSDISP_TYPE_ADDR,buf,MODL_LEN-2);
-		//显示PORT
-		buf[0]=0;
-		buf[1]=modbusLCDRead.port+1;
-		LCDWtite(MODBUSDISP_PORT_ADDR,buf,2);
-		//显示addr
-		buf[0]=0;
-		buf[1]=modbusLCDRead.addr;
-		LCDWtite(MODBUSDISP_ADDR_ADDR,buf,2);
-	  //显示colTime
-		buf[0]=(uint8_t)(modbusLCDRead.colTime>>24);
-		buf[1]=(uint8_t)(modbusLCDRead.colTime>>16);
-		buf[2]=(uint8_t)(modbusLCDRead.colTime>>8);
-		buf[3]=(uint8_t)(modbusLCDRead.colTime>>0);
-		LCDWtite(MODBUSDISP_TIME_ADDR,buf,4);
-		//显示总共页
-		buf[0]=0;
-		buf[1]=modbTotalIndex;
-		LCDWtite(MODBUSDISP_TOTALNUM_ADDR,buf,2);
-		rt_kprintf("%s total %d\n",sign,modbTotalIndex);
-		//显示当前页
-		buf[0]=0;
-		if(modbTotalIndex==0)
-				buf[1]=0;
-		else
-				buf[1]=modbDevReadIndex+1;
-		LCDWtite(MODBUSDISP_NOWNUM_ADDR,buf,2);
-		
-		
-		rt_free(buf);
-		buf=RT_NULL;
-}
+
 
 //显示当前的modbus设备信息  modbDevReadIndex
 //每次显示时候提取当前ID号以及所有显示的信息 以便于显示删除
@@ -563,6 +419,158 @@ void LCDDispModInfoCpy(modbusPositStru *posit,uint8_t readIndex,LCDDispModInfoSt
 			}
 }
 
+
+
+
+//上电后控件第一次显示的中文名称拷贝 
+//传感器读取界面显示所有信息
+void LDCDispMosbusInfo()
+{
+	  LCDDispModInfoCpy(modPosit,modbDevReadIndex,&modbusLCDRead);
+	  uint8_t *buf=NULL;
+	  buf=rt_malloc(50);
+	  //显示中文名
+	 
+		int Len=strlen(modbusLCDRead.name);
+		for(int i=0;i<Len;i++){
+				buf[i]=modbusLCDRead.name[i];
+		}
+		int j=0;
+		while((Len+j)<sizeof(modbusName[0])){
+				buf[Len+j]=0xff;
+				j++;
+		}
+	  LCDWtite(MODBUSDISP_NAME_ADDR,buf,sizeof(modbusName[0]));
+		//显示ID
+		 Len=strlen(modbusLCDRead.ID);
+		for(int i=0;i<Len;i++){
+				buf[i]=modbusLCDRead.ID[i];
+		}
+		 j=0;
+		while((Len+j)<MODBID_LEN-2){
+				buf[Len+j]=0xff;
+				j++;
+			  if(j>=2)
+					break;
+		}
+	  LCDWtite(MODBUSDISP_ID_ADDR,buf,MODBID_LEN-2);//7寸屏显示18
+		//显示model
+		Len=strlen(modbusLCDRead.model);
+		for(int i=0;i<Len;i++){
+				buf[i]=modbusLCDRead.model[i];
+		}
+		 j=0;
+		while((Len+j)<MODL_LEN-2){
+				buf[Len+j]=0xff;
+				j++;
+		}
+	  LCDWtite(MODBUSDISP_TYPE_ADDR,buf,MODL_LEN-2);
+		//显示PORT
+		buf[0]=0;
+		buf[1]=modbusLCDRead.port+1;
+		LCDWtite(MODBUSDISP_PORT_ADDR,buf,2);
+		//显示addr
+		buf[0]=0;
+		buf[1]=modbusLCDRead.addr;
+		LCDWtite(MODBUSDISP_ADDR_ADDR,buf,2);
+	  //显示colTime
+		buf[0]=(uint8_t)(modbusLCDRead.colTime>>24);
+		buf[1]=(uint8_t)(modbusLCDRead.colTime>>16);
+		buf[2]=(uint8_t)(modbusLCDRead.colTime>>8);
+		buf[3]=(uint8_t)(modbusLCDRead.colTime>>0);
+		LCDWtite(MODBUSDISP_TIME_ADDR,buf,4);
+		//显示总共页
+		buf[0]=0;
+		buf[1]=modbTotalIndex;
+		LCDWtite(MODBUSDISP_TOTALNUM_ADDR,buf,2);
+		rt_kprintf("%s total %d\n",sign,modbTotalIndex);
+		//显示当前页
+		buf[0]=0;
+		if(modbTotalIndex==0)
+				buf[1]=0;
+		else
+				buf[1]=modbDevReadIndex+1;
+		LCDWtite(MODBUSDISP_NOWNUM_ADDR,buf,2);
+		
+		
+		rt_free(buf);
+		buf=RT_NULL;
+}
+
+
+//故障传感器读取界面显示所有信息
+void LDCDispErrMosbusInfo()
+{
+	  LCDDispModInfoCpy(modPositErr,modbErrDevReadIndex,&modbusLCDErrRead);
+	  uint8_t *buf=NULL;
+	  buf=rt_malloc(50);
+	  //显示中文名
+	 
+		int Len=strlen(modbusLCDErrRead.name);
+		for(int i=0;i<Len;i++){
+				buf[i]=modbusLCDErrRead.name[i];
+		}
+		int j=0;
+		while((Len+j)<sizeof(modbusName[0])){
+				buf[Len+j]=0xff;
+				j++;
+		}
+	  LCDWtite(MODBUSDISP_ERRNAME_ADDR,buf,sizeof(modbusName[0]));
+		//显示ID
+		 Len=strlen(modbusLCDErrRead.ID);
+		for(int i=0;i<Len;i++){
+				buf[i]=modbusLCDErrRead.ID[i];
+		}
+		 j=0;
+		while((Len+j)<MODBID_LEN-2){
+				buf[Len+j]=0xff;
+				j++;
+			  if(j>=2)
+					break;
+		}
+	  LCDWtite(MODBUSDISP_ERRID_ADDR,buf,MODBID_LEN-2);//7寸屏显示18
+		//显示model
+		Len=strlen(modbusLCDErrRead.model);
+		for(int i=0;i<Len;i++){
+				buf[i]=modbusLCDErrRead.model[i];
+		}
+		 j=0;
+		while((Len+j)<MODL_LEN-2){
+				buf[Len+j]=0xff;
+				j++;
+		}
+	  LCDWtite(MODBUSDISP_ERRTYPE_ADDR,buf,MODL_LEN-2);
+		//显示PORT
+		buf[0]=0;
+		buf[1]=modbusLCDErrRead.port+1;
+		LCDWtite(MODBUSDISP_ERRPORT_ADDR,buf,2);
+		//显示addr
+		buf[0]=0;
+		buf[1]=modbusLCDErrRead.addr;
+		LCDWtite(MODBUSDISP_ERRADDR_ADDR,buf,2);
+	  //显示colTime
+		buf[0]=(uint8_t)(modbusLCDErrRead.colTime>>24);
+		buf[1]=(uint8_t)(modbusLCDErrRead.colTime>>16);
+		buf[2]=(uint8_t)(modbusLCDErrRead.colTime>>8);
+		buf[3]=(uint8_t)(modbusLCDErrRead.colTime>>0);
+		LCDWtite(MODBUSDISP_ERRTIME_ADDR,buf,4);
+		//显示总共页
+		buf[0]=0;
+		buf[1]=modbErrTotalIndex;
+		LCDWtite(MODBUSDISP_ERRTOTALNUM_ADDR,buf,2);
+		rt_kprintf("%s total %d\n",sign,modbErrTotalIndex);
+		//显示当前页
+		buf[0]=0;
+		if(modbErrTotalIndex==0)
+				buf[1]=0;
+		else
+				buf[1]=modbErrDevReadIndex+1;
+		LCDWtite(MODBUSDISP_ERRNOWNUM_ADDR,buf,2);
+		
+		
+		rt_free(buf);
+		buf=RT_NULL;
+}
 //void LCDDispModInfoCpy()
 //{
 //	 
@@ -722,6 +730,10 @@ void LCDDispModInfoCpy(modbusPositStru *posit,uint8_t readIndex,LCDDispModInfoSt
 //					break;
 //			}
 //}
+void  delModbusDevbyID_p()
+{
+	delModbusDevbyID(modbusLCDRead.ID);
+}
 
 
 
@@ -907,7 +919,7 @@ static int chinaNameIndex=0;//当前用到的名字标记  根据modbNumEnum对应起来
 
 
 //显示传感器中文名 lcd配置传感器界面的中文名称的选择
-static void dispCinaName(uint8_t *buf)
+void dispCinaName(uint8_t *buf)
 {
 		rt_kprintf("index %d\n",chinaNameIndex);
 		int nameLen=strlen(modbusName[chinaNameIndex]);
@@ -922,207 +934,257 @@ static void dispCinaName(uint8_t *buf)
 		LCDWtite(MODBUS_CFG_NAME2_ADDR,buf,sizeof(modbusName[chinaNameIndex]));
 		LCDWtite(MODBUS_CFG_NAME_ADDR,buf,sizeof(modbusName[chinaNameIndex])); 
 }
-
-
-extern int modbusConfIDCheck(char *inputID);
-extern void dispInterFaceIndexFun();
-//接口名称增加
-void dispInterFaceIndexAdd();
-//接口名称减少
-void dispInterFaceIndexReduc();
-//modbusName[MODBUS_NUM][20]
-//按键触摸返回函数
-void  keyReturn(uint16_t keyAddr)
+void dispChinaNameIndexLow()
 {
-	  uint8_t *buf=NULL;
-	  buf=rt_malloc(50);
-	 // int nameLen=0;
-		switch(keyAddr)
-		{
-			case	KEY_MODBUS_CFG_NAME_ADDR://点击传感器设置名称显示框调出 模糊界面  显示到1380
-				//5A A5 1182 1380 C9CF BAA3 B9C8 D4AA BFC6 BCBC FFFF
-        dispCinaName(buf);
-				break;
-			case	KEY_MODBUS_LASTNAME_ADDR:
-				if(chinaNameIndex==0)
-						chinaNameIndex=MODBUS_NUM-1;
-				else
-						chinaNameIndex--;
-				dispCinaName(buf);
-				break;
-			case	KEY_MODBUS_NEXTNAME_ADDR:
-				if(chinaNameIndex==(MODBUS_NUM-1))
-						chinaNameIndex=0;
-				else
-						chinaNameIndex++;
-				dispCinaName(buf);
-				break;
-			case	KEY_MODBUS_SURENAME_ADDR:// 显示到1360
-//			  dispCinaName(buf);   singlModbConf(chinaNameIndex);
-//			  rt_strcpy(LCDInput.);
-//				LCDWtite(MODBUS_CFG_NAME_ADDR,buf,sizeof(modbusName[chinaNameNum]));
-				break;	
-			case  KEY_IP_READ_ADDR:
-				LCDDispIP();
-				break;
-			case KEY_PORT_READ_ADDR:
-				LCDDispUart();
-				break;
-			case KEY_MCUID_READ_ADDR:
-				LCDDispMCUID();
-				break;
-			case KEY_SAVE_ADDR://保存
-				
-				rt_kprintf("%sflash save OK\n",sign);
-				stm32_flash_erase(FLASH_IP_SAVE_ADDR, sizeof(packFlash));//每次擦除128k字节数据 存储时候需要一起存储
-				stm32_flash_write(FLASH_IP_SAVE_ADDR,(uint8_t*)&packFlash,sizeof(packFlash));
-				stm32_flash_write(FLASH_MODBUS_SAVE_ADDR,(uint8_t*)&sheet,sizeof(sheet));
-				break;
-			case KEY_RESET_ADDR://复位
-				rt_hw_cpu_reset();
-				break;
-			case KEY_MODBUS_CFG_WATCH_ADDR:
-				LCDDispModInfoCpy(modPosit,modbDevReadIndex,&modbusLCDRead);
-				LDCDispMosbusInfo();
-				break;
-			case KEY_MODBUS_CFG_SURE_ADDR:
-				
-				modbusConfIDCheck(LCDInput.ID);
-				singlModbConf(chinaNameIndex);
-				break;
-			case KEY_MODBUSDISP_LAST_ADDR:
-			  if(modbDevReadIndex==0)
-					 modbDevReadIndex=modbTotalIndex-1;
-				else
-					 modbDevReadIndex--;
-				LCDDispModInfoCpy(modPosit,modbDevReadIndex,&modbusLCDRead);
-				LDCDispMosbusInfo();
-				break;
-
-			case  KEY_MODBUSDISP_NEXT_ADDR:
-			  if(modbDevReadIndex+1==modbTotalIndex)
-					 modbDevReadIndex=0;
-				else 
-					 modbDevReadIndex++;
-				
-				LCDDispModInfoCpy(modPosit,modbDevReadIndex,&modbusLCDRead);
-				LDCDispMosbusInfo();
-			  break;
-			
-		
-//LCDDispModInfoStru  modbusLCDErrRead={0};
-//uint8_t  modbErrTotalIndex=0;
-//uint8_t  modbErrDevReadIndex=0;
-//modbusPositStru  modPositErr[TOTOLA_485_NUM]={0};
-//////////////////////////////////////////////////
-
-			case KEY_MODBUSDISP_ERRLAST_ADDR:
-			  if(modbErrDevReadIndex==0)
-					 modbErrDevReadIndex=modbErrTotalIndex-1;
-				else
-					 modbErrDevReadIndex--;
-				LCDDispModInfoCpy(modPositErr,modbErrDevReadIndex,&modbusLCDErrRead);
-				LDCDispErrMosbusInfo();
-				break;
-			case KEY_MODBUSDISP_ERRNEXT_ADDR:
-				if(modbErrDevReadIndex+1==modbErrTotalIndex)
-					 modbErrDevReadIndex=0;
-				else 
-					 modbErrDevReadIndex++;
-				LCDDispModInfoCpy(modPositErr,modbErrDevReadIndex,&modbusLCDErrRead);
-				LDCDispErrMosbusInfo();
-				break;
-//			case  MODBUS_ERR_DISPLAY_ADDR:
-//				LCDDispModInfoCpy(modPositErr,modbErrDevReadIndex);
-//				LDCDispErrMosbusInfo();
-//			break;
-			case  KEY_MODBUSDISP_DEL_ADDR:
-				delModbusDevbyID(modbusLCDRead.ID);
-			  LCDDispModbusGet();
-			 
-			  LCDDispModInfoCpy(modPosit,modbDevReadIndex,&modbusLCDRead);
-			  LDCDispMosbusInfo();
-				break;
-			case  KEY_NETERROR_ADDR:
-				//rt_kprintf("%s按键按下\n",sign);
-				LCDDispNetOffline();
-				break;
-			case  KEY_MODBUSERR_ADDR:
-				LCDDispErrModbusGet();
-				LCDDispModInfoCpy(modPositErr,modbErrDevReadIndex,&modbusLCDErrRead);
-				LDCDispErrMosbusInfo();
-				break;
-			case	NET_OFFLINE_LAST_ADDR:
-				offLineIndex--;
-			  if(offLineIndex==0){
-						offLineIndex = offLine.times;
-				}
-				LCDDispNetOffline();
-				break;
-			case  NET_OFFLINE_NEXT_ADDR:
-				offLineIndex++;
-			  if(offLineIndex>offLine.times){
-						offLineIndex = 1;
-				}
-				LCDDispNetOffline();
-				break;
-		//开关控制start
-
-
-			case  KEY_SWITCH_INTERFACE_ADDR:
-				rt_kprintf("%sKEY_SWITCH_INTERFACE_ADDR \n",sign);
-				dispInterFaceIndexFun();
-				break;
-			
-			case KEY_SWITCH_PORT_ADDR:
-				break;
-			case KEY_SWITCH_LEVEL_ADDR:
-				break;
-			
-			case KEY_SWITCH_SURE_ADDR:
-				break;
-			
-			case KEY_SWITCH_RETURN_ADDR:
-				break;
-			
-
-			case KEY_SWITCHINTERF_SURE_ADDR://do nothing
-				break;
-			case KEY_SWITCHINTERF_NEXT_ADDR:
-				rt_kprintf("%sKEY_SWITCHINTERF_NEXT_ADDR \n",sign);
-				dispInterFaceIndexAdd();
-			  dispInterFaceIndexFun();
-				break;
-			case KEY_SWITCHINTERF_LAST_ADDR:
-				rt_kprintf("%sKEY_SWITCHINTERF_LAST_ADDR \n",sign);
-				dispInterFaceIndexReduc();
-			  dispInterFaceIndexFun();
-				break;
-			case KEY_SWITCHINTERF_RETURN_ADDR://do nothing
-				break;
-			case KEY_SWITCHPORT_SURE_ADDR:
-				break;
-			case KEY_SWITCHPORT_NEXT_ADDR:
-				break;
-			case KEY_SWITCHPORT_LAST_ADDR:
-				break;
-			case KEY_SWITCHPORT_RETURN_ADDR:
-				break;
-			case KEY_SWITCHLEVEL_ON_ADDR:
-				break;
-			case KEY_SWITCHLEVEL_OFF_ADDR:
-				break;
-			case KEY_SWITCHLEVEL_SURE_ADDR:
-				break;
-			case KEY_SWITCHLEVEL_RETURN_ADDR:
-				break;
-
-		//开关控制end
-		}
-		rt_free(buf);
-		buf=RT_NULL;
-		
+	if(chinaNameIndex==0)
+			chinaNameIndex=MODBUS_NUM-1;
+	else
+			chinaNameIndex--;
 }
+void dispChinaNameIndexAdd()
+{
+		if(chinaNameIndex==(MODBUS_NUM-1))
+				chinaNameIndex=0;
+		else
+				chinaNameIndex++;
+}
+
+void  modbDevReadIndexAdd()
+{
+		if(modbDevReadIndex+1==modbTotalIndex)
+			 modbDevReadIndex=0;
+		else 
+			 modbDevReadIndex++;
+}
+void  modbDevReadIndexLow()
+{
+	if(modbDevReadIndex==0)
+		 modbDevReadIndex=modbTotalIndex-1;
+	else
+		 modbDevReadIndex--;
+}
+void  	modbErrDevReadIndexAdd()
+{
+	if(modbErrDevReadIndex+1==modbErrTotalIndex)
+		 modbErrDevReadIndex=0;
+	else 
+		 modbErrDevReadIndex++;
+}
+
+void  	modbErrDevReadIndexLow()
+{
+		if(modbErrDevReadIndex==0)
+			 modbErrDevReadIndex=modbErrTotalIndex-1;
+		else
+			 modbErrDevReadIndex--;
+}
+void  offLineIndexLow()  
+{
+		offLineIndex--;
+		if(offLineIndex==0){
+				offLineIndex = offLine.times;
+		}
+}
+void  offLineIndexAdd()  
+{
+		offLineIndex++;
+		if(offLineIndex>offLine.times){
+				offLineIndex = 1;
+		}
+}
+
+//modbusName[MODBUS_NUM][20]
+////按键触摸返回函数
+//void  keyReturn(uint16_t keyAddr)
+//{
+//	  uint8_t *buf=NULL;
+//	  buf=rt_malloc(50);
+//	 // int nameLen=0;
+//		switch(keyAddr)
+//		{
+//			case	KEY_MODBUS_CFG_NAME_ADDR://点击传感器设置名称显示框调出 模糊界面  显示到1380
+//				//5A A5 1182 1380 C9CF BAA3 B9C8 D4AA BFC6 BCBC FFFF
+//        dispCinaName(buf);
+//				break;
+//			case	KEY_MODBUS_LASTNAME_ADDR:
+//				dispChinaNameIndexLow();
+//				dispCinaName(buf);
+//				break;
+//			case	KEY_MODBUS_NEXTNAME_ADDR:
+//				dispChinaNameIndexAdd();
+//				dispCinaName(buf);
+//				break;
+//			case	KEY_MODBUS_SURENAME_ADDR:// 显示到1360
+////			  dispCinaName(buf);   singlModbConf(chinaNameIndex);
+////			  rt_strcpy(LCDInput.);
+////				LCDWtite(MODBUS_CFG_NAME_ADDR,buf,sizeof(modbusName[chinaNameNum]));
+//				break;	
+//			case  KEY_IP_READ_ADDR:
+//				LCDDispIP();
+//				break;
+//			case KEY_PORT_READ_ADDR:
+//				LCDDispUart();
+//				break;
+//			case KEY_MCUID_READ_ADDR:
+//				LCDDispMCUID();
+//				break;
+//			case KEY_SAVE_ADDR://保存
+//				
+//				rt_kprintf("%sflash save OK\n",sign);
+//				stm32_flash_erase(FLASH_IP_SAVE_ADDR, sizeof(packFlash));//每次擦除128k字节数据 存储时候需要一起存储
+//				stm32_flash_write(FLASH_IP_SAVE_ADDR,(uint8_t*)&packFlash,sizeof(packFlash));
+//				stm32_flash_write(FLASH_MODBUS_SAVE_ADDR,(uint8_t*)&sheet,sizeof(sheet));
+//				break;
+//			case KEY_RESET_ADDR://复位
+//				rt_hw_cpu_reset();
+//				break;
+//			case KEY_MODBUS_CFG_WATCH_ADDR:
+//				LCDDispModInfoCpy(modPosit,modbDevReadIndex,&modbusLCDRead);
+//				LDCDispMosbusInfo();
+//				break;
+//			case KEY_MODBUS_CFG_SURE_ADDR:
+//				
+//				modbusConfIDCheck(LCDInput.ID);
+//				singlModbConf(chinaNameIndex);
+//				break;
+//			case KEY_MODBUSDISP_LAST_ADDR:
+////			  if(modbDevReadIndex==0)
+////					 modbDevReadIndex=modbTotalIndex-1;
+////				else
+////					 modbDevReadIndex--;
+//				modbDevReadIndexLow();
+//				LCDDispModInfoCpy(modPosit,modbDevReadIndex,&modbusLCDRead);
+//				LDCDispMosbusInfo();
+//				break;
+
+//			case  KEY_MODBUSDISP_NEXT_ADDR:
+////			  if(modbDevReadIndex+1==modbTotalIndex)
+////					 modbDevReadIndex=0;
+////				else 
+////					 modbDevReadIndex++;
+//				modbDevReadIndexAdd();
+//				LCDDispModInfoCpy(modPosit,modbDevReadIndex,&modbusLCDRead);
+//				LDCDispMosbusInfo();
+//			  break;
+//			
+//		
+////LCDDispModInfoStru  modbusLCDErrRead={0};
+////uint8_t  modbErrTotalIndex=0;
+////uint8_t  modbErrDevReadIndex=0;
+////modbusPositStru  modPositErr[TOTOLA_485_NUM]={0};
+////////////////////////////////////////////////////
+
+//			case KEY_MODBUSDISP_ERRLAST_ADDR:
+////			  if(modbErrDevReadIndex==0)
+////					 modbErrDevReadIndex=modbErrTotalIndex-1;
+////				else
+////					 modbErrDevReadIndex--;
+//				modbErrDevReadIndexLow();
+//				LCDDispModInfoCpy(modPositErr,modbErrDevReadIndex,&modbusLCDErrRead);
+//				LDCDispErrMosbusInfo();
+//				break;
+//			case KEY_MODBUSDISP_ERRNEXT_ADDR:
+////				if(modbErrDevReadIndex+1==modbErrTotalIndex)
+////					 modbErrDevReadIndex=0;
+////				else 
+////					 modbErrDevReadIndex++;
+//				modbErrDevReadIndexAdd();
+//				LCDDispModInfoCpy(modPositErr,modbErrDevReadIndex,&modbusLCDErrRead);
+//				LDCDispErrMosbusInfo();
+//				break;
+////			case  MODBUS_ERR_DISPLAY_ADDR:
+////				LCDDispModInfoCpy(modPositErr,modbErrDevReadIndex);
+////				LDCDispErrMosbusInfo();
+////			break;
+//			case  KEY_MODBUSDISP_DEL_ADDR:
+//				delModbusDevbyID(modbusLCDRead.ID);
+//			  LCDDispModbusGet();
+//			 
+//			  LCDDispModInfoCpy(modPosit,modbDevReadIndex,&modbusLCDRead);
+//			  LDCDispMosbusInfo();
+//				break;
+//			case  KEY_NETERROR_ADDR:
+//				//rt_kprintf("%s按键按下\n",sign);
+//				LCDDispNetOffline();
+//				break;
+//			case  KEY_MODBUSERR_ADDR:
+//				LCDDispErrModbusGet();
+//				LCDDispModInfoCpy(modPositErr,modbErrDevReadIndex,&modbusLCDErrRead);
+//				LDCDispErrMosbusInfo();
+//				break;
+//			case	NET_OFFLINE_LAST_ADDR:
+////				offLineIndex--;
+////			  if(offLineIndex==0){
+////						offLineIndex = offLine.times;
+////				}
+//				offLineIndexLow();
+//				LCDDispNetOffline();
+//				break;
+//			case  NET_OFFLINE_NEXT_ADDR:
+////				offLineIndex++;
+////			  if(offLineIndex>offLine.times){
+////						offLineIndex = 1;
+////				}
+//				offLineIndexAdd();
+//				LCDDispNetOffline();
+//				break;
+//		//开关控制start
+
+
+//			case  KEY_SWITCH_INTERFACE_ADDR:
+//				rt_kprintf("%sKEY_SWITCH_INTERFACE_ADDR \n",sign);
+//				dispInterFaceIndexFun();
+//				break;
+//			
+//			case KEY_SWITCH_PORT_ADDR:
+//				break;
+//			case KEY_SWITCH_LEVEL_ADDR:
+//				break;
+//			
+//			case KEY_SWITCH_SURE_ADDR:
+//				break;
+//			
+//			case KEY_SWITCH_RETURN_ADDR:
+//				break;
+//			
+
+//			case KEY_SWITCHINTERF_SURE_ADDR://do nothing
+//				break;
+//			case KEY_SWITCHINTERF_NEXT_ADDR:
+//				rt_kprintf("%sKEY_SWITCHINTERF_NEXT_ADDR \n",sign);
+//				dispInterFaceIndexAdd();
+//			  dispInterFaceIndexFun();
+//				break;
+//			case KEY_SWITCHINTERF_LAST_ADDR:
+//				rt_kprintf("%sKEY_SWITCHINTERF_LAST_ADDR \n",sign);
+//				dispInterFaceIndexReduc();
+//			  dispInterFaceIndexFun();
+//				break;
+//			case KEY_SWITCHINTERF_RETURN_ADDR://do nothing
+//				break;
+//			case KEY_SWITCHPORT_SURE_ADDR:
+//				break;
+//			case KEY_SWITCHPORT_NEXT_ADDR:
+//				break;
+//			case KEY_SWITCHPORT_LAST_ADDR:
+//				break;
+//			case KEY_SWITCHPORT_RETURN_ADDR:
+//				break;
+//			case KEY_SWITCHLEVEL_ON_ADDR:
+//				break;
+//			case KEY_SWITCHLEVEL_OFF_ADDR:
+//				break;
+//			case KEY_SWITCHLEVEL_SURE_ADDR:
+//				break;
+//			case KEY_SWITCHLEVEL_RETURN_ADDR:
+//				break;
+
+//		//开关控制end
+//		}
+//		rt_free(buf);
+//		buf=RT_NULL;
+//		
+//}
 
 //lcd 发来的配置解析
 void LCDDispConfig(uint8_t *recBuf,int len)
@@ -1235,4 +1297,12 @@ void LCDDispConfig(uint8_t *recBuf,int len)
 				keyReturn((uint16_t)(recBuf[7]<<8)+recBuf[8]);
 				break;
 		}
+}
+
+
+
+void keyModbusCfgSure()
+{
+		modbusConfIDCheck(LCDInput.ID);
+		singlModbConf(chinaNameIndex);
 }

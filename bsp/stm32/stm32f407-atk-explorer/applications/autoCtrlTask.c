@@ -51,7 +51,7 @@ void  autoCtrlRun()
 
 //digital output 置高  
 //输入 通道号
-static void digOutputONFun(char num)
+void digOutputONFun(char num)
 {
 	switch(num)
 	{
@@ -67,7 +67,7 @@ static void digOutputONFun(char num)
 }
 //digital output 置低  
 //输入 通道号
-static void digOutputOFFFun(char num)
+void digOutputOFFFun(char num)
 {
 	switch(num)
 	{
@@ -83,7 +83,7 @@ static void digOutputOFFFun(char num)
 }
 //V3.3 output 置高  
 //输入 通道号
-static void v33OutputONFun(char num)
+void v33OutputONFun(char num)
 {
 	switch(num)
 	{
@@ -93,7 +93,7 @@ static void v33OutputONFun(char num)
 }
 //V3.3 output 置低 
 //输入 通道号
-static void v33OutputOFFFun(char num)
+void v33OutputOFFFun(char num)
 {
 	switch(num)
 	{
@@ -103,7 +103,7 @@ static void v33OutputOFFFun(char num)
 }
 //V5 output 置高  
 //输入 通道号
-static void v5OutputONFun(char num)
+void v5OutputONFun(char num)
 {
 	switch(num)
 	{
@@ -113,7 +113,7 @@ static void v5OutputONFun(char num)
 }
 //V5 output 置低  
 //输入 通道号
-static void v5OutputOFFFun(char num)
+void v5OutputOFFFun(char num)
 {
 	switch(num)
 	{
@@ -125,7 +125,7 @@ static void v5OutputOFFFun(char num)
 
 //V12 output 置高  
 //输入 通道号
-static void v12OutputONFun(char num)
+void v12OutputONFun(char num)
 {
 	switch(num)
 	{
@@ -138,7 +138,7 @@ static void v12OutputONFun(char num)
 }
 //V12 output 置低  
 //输入 通道号
-static void v12OutputOFFFun(char num)
+void v12OutputOFFFun(char num)
 {
 	switch(num)
 	{

@@ -44,6 +44,15 @@ static int LCDWriteResp(uint8_t *recBuf,int lenth)
 		}
 		return 0;
 }
+
+
+
+//5a a5 15 82 54 10 47 59 4e 4a 4c 58 53 44 30 30 30 30 30 30 31 36 38 ff 
+//5a a5 15 82 14 20 47 59 4e 4a 4c 58 53 44 30 30 30 30 30 30 31 36 38 ff 
+
+
+// 5a a5 15 82 14 20 47 59 4e 4a 4c 58 53 44 30 30 30 30 30 30 35 36 32 ff 
+// 5a a5 15 82 54 10 47 59 4e 4a 4c 58 53 44 30 30 30 30 30 30 31 36 38 ff 
 //结果 return 0 无响应  1 正常响应 
 int LCDWtite(uint16_t addr,uint8_t *data,uint8_t dataLen)
 {
@@ -64,7 +73,7 @@ int LCDWtite(uint16_t addr,uint8_t *data,uint8_t dataLen)
 		while(repTimes--){
 			//data send
 				LCDDataSend(sendLCDBuf,len);
-		for(int i=0;i<INOUTNAME_LEN;i++){//ACUID_LEN
+		for(int i=0;i<len;i++){//ACUID_LEN
 			 	rt_kprintf("%0x ",sendLCDBuf[i]);
 		}
 		rt_kprintf("%\n ");
@@ -184,9 +193,9 @@ void LCDDispUart()
 
 void LCDDispMCUID()
 {
-	  int k=0;
+	  //int k=0;
 	  uint8_t buf[ACUID_LEN]={0};
-		k=sizeof(packFlash.acuId);
+//		k=sizeof(packFlash.acuId);
 		for(int i=0;i<sizeof(packFlash.acuId);i++){//ACUID_LEN
 			  if((uint8_t)packFlash.acuId[i]==0xff){
 					 packFlash.acuId[i]=0;
@@ -194,7 +203,7 @@ void LCDDispMCUID()
 			 	buf[i]=packFlash.acuId[i];
 		}
 		int j=0;
-		k=strlen(packFlash.acuId);
+		//k=strlen(packFlash.acuId);
 		while((strlen(packFlash.acuId)+j)<ACUID_LEN){
 				buf[strlen(packFlash.acuId)+j]=0xff;
 				j++;

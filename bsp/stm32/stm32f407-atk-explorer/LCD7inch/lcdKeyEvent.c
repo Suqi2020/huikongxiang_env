@@ -12,18 +12,40 @@
 const static char sign[]="[LCDKeyEvent]";
 
 
-/*
-uint8_t  modbTotalIndex=0;
-uint8_t  modbDevReadIndex=0;
-static int chinaNameIndex=0;//当前用到的名字标记  根据modbNumEnum对应起来
-extern LCDDispModInfoStru  modbusLCDRead;
-extern int offLineIndex;
-extern uint8_t  modbErrTotalIndex;
-extern uint8_t  modbErrDevReadIndex;
-extern modbusStru LCDInput;
+int modbusConfIDCheck(char *inputID);
+void dispInterFaceIndexFun(void);
+//接口名称增加
+void dispInterFaceIndexAdd(void);
+//接口名称减少
+void dispInterFaceIndexReduc(void);
 
-//modbusName[MODBUS_NUM][20]
-//按键触摸返回函数
+
+void	LCDDispIP(void);
+void	LCDDispUart(void);
+void	LCDDispMCUID(void);
+void  LCDDispNetOffline(void);
+void  offLineIndexAdd(void);
+void  dispCinaName(uint8_t *buf);
+void  dispChinaNameIndexLow(void);
+void  dispChinaNameIndexAdd(void);
+void  LDCDispMosbusInfo(void);
+void  keyModbusCfgSure(void);
+void  modbDevReadIndexLow(void);
+void  modbDevReadIndexAdd(void);
+void	modbErrDevReadIndexLow(void);
+void	LDCDispErrMosbusInfo(void);
+void  modbErrDevReadIndexAdd(void);
+void	delModbusDevbyID_p(void);
+void	LCDDispModbusGet(void);
+void	LCDDispErrModbusGet(void);
+void	offLineIndexLow(void);
+void  dispPortIndexLow(void);
+void  dispPortIndexFun(void);
+void  rstPortIndexFun(void);
+void  dispPortIndexAdd(void);
+void  dispOutputNameIDType(void);
+void  dispLevelState(char level);
+//按键触发总接口
 void  keyReturn(uint16_t keyAddr)
 {
 	  uint8_t *buf=NULL;
@@ -36,23 +58,14 @@ void  keyReturn(uint16_t keyAddr)
         dispCinaName(buf);
 				break;
 			case	KEY_MODBUS_LASTNAME_ADDR:
-				if(chinaNameIndex==0)
-						chinaNameIndex=MODBUS_NUM-1;
-				else
-						chinaNameIndex--;
+				dispChinaNameIndexLow();
 				dispCinaName(buf);
 				break;
 			case	KEY_MODBUS_NEXTNAME_ADDR:
-				if(chinaNameIndex==(MODBUS_NUM-1))
-						chinaNameIndex=0;
-				else
-						chinaNameIndex++;
+				dispChinaNameIndexAdd();
 				dispCinaName(buf);
 				break;
 			case	KEY_MODBUS_SURENAME_ADDR:// 显示到1360
-//			  dispCinaName(buf);   singlModbConf(chinaNameIndex);
-//			  rt_strcpy(LCDInput.);
-//				LCDWtite(MODBUS_CFG_NAME_ADDR,buf,sizeof(modbusName[chinaNameNum]));
 				break;	
 			case  KEY_IP_READ_ADDR:
 				LCDDispIP();
@@ -74,65 +87,36 @@ void  keyReturn(uint16_t keyAddr)
 				rt_hw_cpu_reset();
 				break;
 			case KEY_MODBUS_CFG_WATCH_ADDR:
-				LCDDispModInfoCpy(modPosit,modbDevReadIndex,&modbusLCDRead);
+
 				LDCDispMosbusInfo();
 				break;
 			case KEY_MODBUS_CFG_SURE_ADDR:
-				
-				modbusConfIDCheck(LCDInput.ID);
-				singlModbConf(chinaNameIndex);
+				keyModbusCfgSure();
 				break;
 			case KEY_MODBUSDISP_LAST_ADDR:
-			  if(modbDevReadIndex==0)
-					 modbDevReadIndex=modbTotalIndex-1;
-				else
-					 modbDevReadIndex--;
-				LCDDispModInfoCpy(modPosit,modbDevReadIndex,&modbusLCDRead);
+				modbDevReadIndexLow();
 				LDCDispMosbusInfo();
 				break;
 
 			case  KEY_MODBUSDISP_NEXT_ADDR:
-			  if(modbDevReadIndex+1==modbTotalIndex)
-					 modbDevReadIndex=0;
-				else 
-					 modbDevReadIndex++;
-				
-				LCDDispModInfoCpy(modPosit,modbDevReadIndex,&modbusLCDRead);
+				modbDevReadIndexAdd();
 				LDCDispMosbusInfo();
 			  break;
 			
-		
-//LCDDispModInfoStru  modbusLCDErrRead={0};
-//uint8_t  modbErrTotalIndex=0;
-//uint8_t  modbErrDevReadIndex=0;
-//modbusPositStru  modPositErr[TOTOLA_485_NUM]={0};
+
 //////////////////////////////////////////////////
 
 			case KEY_MODBUSDISP_ERRLAST_ADDR:
-			  if(modbErrDevReadIndex==0)
-					 modbErrDevReadIndex=modbErrTotalIndex-1;
-				else
-					 modbErrDevReadIndex--;
-				LCDDispModInfoCpy(modPositErr,modbErrDevReadIndex,&modbusLCDErrRead);
+				modbErrDevReadIndexLow();
 				LDCDispErrMosbusInfo();
 				break;
 			case KEY_MODBUSDISP_ERRNEXT_ADDR:
-				if(modbErrDevReadIndex+1==modbErrTotalIndex)
-					 modbErrDevReadIndex=0;
-				else 
-					 modbErrDevReadIndex++;
-				LCDDispModInfoCpy(modPositErr,modbErrDevReadIndex,&modbusLCDErrRead);
+				modbErrDevReadIndexAdd();
 				LDCDispErrMosbusInfo();
 				break;
-//			case  MODBUS_ERR_DISPLAY_ADDR:
-//				LCDDispModInfoCpy(modPositErr,modbErrDevReadIndex);
-//				LDCDispErrMosbusInfo();
-//			break;
 			case  KEY_MODBUSDISP_DEL_ADDR:
-				delModbusDevbyID(modbusLCDRead.ID);
+				delModbusDevbyID_p();
 			  LCDDispModbusGet();
-			 
-			  LCDDispModInfoCpy(modPosit,modbDevReadIndex,&modbusLCDRead);
 			  LDCDispMosbusInfo();
 				break;
 			case  KEY_NETERROR_ADDR:
@@ -141,26 +125,88 @@ void  keyReturn(uint16_t keyAddr)
 				break;
 			case  KEY_MODBUSERR_ADDR:
 				LCDDispErrModbusGet();
-				LCDDispModInfoCpy(modPositErr,modbErrDevReadIndex,&modbusLCDErrRead);
 				LDCDispErrMosbusInfo();
 				break;
 			case	NET_OFFLINE_LAST_ADDR:
-				offLineIndex--;
-			  if(offLineIndex==0){
-						offLineIndex = offLine.times;
-				}
+				offLineIndexLow();
 				LCDDispNetOffline();
 				break;
 			case  NET_OFFLINE_NEXT_ADDR:
-				offLineIndex++;
-			  if(offLineIndex>offLine.times){
-						offLineIndex = 1;
-				}
+
+				offLineIndexAdd();
 				LCDDispNetOffline();
 				break;
+			case  KEY_SWITCH_INTERFACE_ADDR:
+				rt_kprintf("%sKEY_SWITCH_INTERFACE_ADDR \n",sign);
+				dispInterFaceIndexFun();
+			  dispPortIndexFun();
+				break;
+			case KEY_SWITCH_PORT_ADDR:
+				break;
+			case KEY_SWITCH_LEVEL_ADDR:
+				break;
+			
+			case KEY_SWITCH_SURE_ADDR:
+				break;
+			
+			case KEY_SWITCH_RETURN_ADDR:
+				break;
+			
+
+			case KEY_SWITCHINTERF_SURE_ADDR://do nothing
+				break;
+			case KEY_SWITCHINTERF_NEXT_ADDR:
+				rt_kprintf("%sKEY_SWITCHINTERF_NEXT_ADDR \n",sign);
+				dispInterFaceIndexAdd();
+			  dispInterFaceIndexFun();
+				rstPortIndexFun();
+			  dispPortIndexFun();
+			  dispOutputNameIDType();
+				break;
+			case KEY_SWITCHINTERF_LAST_ADDR:
+				rt_kprintf("%sKEY_SWITCHINTERF_LAST_ADDR \n",sign);
+				dispInterFaceIndexReduc();
+			  dispInterFaceIndexFun();
+			  rstPortIndexFun();
+			  dispPortIndexFun();
+			  dispOutputNameIDType();
+				break;
+			case KEY_SWITCHINTERF_RETURN_ADDR://
+				
+				break;
+			case KEY_SWITCHPORT_SURE_ADDR:
+				break;
+			case KEY_SWITCHPORT_NEXT_ADDR:
+				dispPortIndexAdd();
+			  dispPortIndexFun();
+			  dispOutputNameIDType();
+				break;
+			case KEY_SWITCHPORT_LAST_ADDR:
+				dispPortIndexLow();
+			  dispPortIndexFun();
+			  dispOutputNameIDType();
+				break;
+			case KEY_SWITCHPORT_RETURN_ADDR:
+				//dispOutputNameIDType();
+				break;
+			case KEY_SWITCHLEVEL_ON_ADDR:
+				rt_kprintf("%s ON\n",sign);
+			  dispLevelState(1);
+			  levelSet(1);
+				break;
+			case KEY_SWITCHLEVEL_OFF_ADDR:
+				rt_kprintf("%s OFF\n",sign);
+			  dispLevelState(0);
+			  levelSet(0);
+				break;
+			case KEY_SWITCHLEVEL_SURE_ADDR:
+				break;
+			case KEY_SWITCHLEVEL_RETURN_ADDR:
+				break;
+
+		//开关控制end
 		}
 		rt_free(buf);
 		buf=RT_NULL;
 		
 }
-*/

@@ -36,6 +36,7 @@ inoutDevStru inpoutpFlag __attribute__((at(0x2000D000)))={0};//ÊäÈëÊä³ö³¬ÖµµÄ±ê¼
 const static char sign[]="[autoCtrl]";
 char inName[INNAME_NUM][INOUTNAME_LEN]={"AI","DI","MB",};
 char outName[OUTNAME_NUM][INOUTNAME_LEN]={"DO","V3O","V5O","V12O"};
+char outSwitchNum[OUTNAME_NUM]={DO_NUM,V33O_NUM,V5O_NUM,V12O_NUM};
 uint8_t inputIndex=0; //±¾´ÎÅäÖÃ¿ØÖÆÂß¼­µÄÊäÈë×ø±êÅäÖÃ   ±»inputFlag Ö¸Õëµ÷ÓÃ
 uint8_t outputIndex=0;//±¾´ÎÅäÖÃ¿ØÖÆÂß¼­µÄÊä³öµÄ×ø±êÅäÖÃ ±»outputFlagÖ¸Õëµ÷ÓÃ
 

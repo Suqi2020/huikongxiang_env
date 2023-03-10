@@ -791,6 +791,9 @@ int modbusConfIDCheck(char *inputID)
 				break;
 			}
 		}
+		
+		
+		
 		return 0;
 }
 //相同种类的传感器必须挂到同一个port下边

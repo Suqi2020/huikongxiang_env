@@ -133,8 +133,9 @@
 //V0.74    修复配置threadshold 时候高低值放反的问题 
 //V0.75    修复自动配置出现的bug
 //V0.76    增加开关控制的接口显示V3O V12O V5O
-#define APP_VER       ((0<<8)+76)//0x0105 表示1.5版本
-const char date[]="20230309";
+//V0.77    增加开关控制对接LCD屏，测试OK
+#define APP_VER       ((0<<8)+77)//0x0105 表示1.5版本
+const char date[]="20230310";
 
 //static    rt_thread_t tid 	= RT_NULL;
 static    rt_thread_t tidW5500 	  = RT_NULL;
