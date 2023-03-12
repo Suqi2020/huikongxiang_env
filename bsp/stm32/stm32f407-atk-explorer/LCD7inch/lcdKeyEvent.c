@@ -45,11 +45,14 @@ void  rstPortIndexFun(void);
 void  dispPortIndexAdd(void);
 void  dispOutputNameIDType(void);
 void  dispLevelState(char level);
+bool levelRead(void);
+void levelSet(char level);
 //按键触发总接口
 void  keyReturn(uint16_t keyAddr)
 {
 	  uint8_t *buf=NULL;
 	  buf=rt_malloc(50);
+	  bool ret;
 	 // int nameLen=0;
 		switch(keyAddr)
 		{
@@ -162,6 +165,9 @@ void  keyReturn(uint16_t keyAddr)
 				rstPortIndexFun();
 			  dispPortIndexFun();
 			  dispOutputNameIDType();
+			  ret=levelRead();
+			  dispLevelState(ret);
+			  levelSet(ret);
 				break;
 			case KEY_SWITCHINTERF_LAST_ADDR:
 				rt_kprintf("%sKEY_SWITCHINTERF_LAST_ADDR \n",sign);
@@ -170,6 +176,9 @@ void  keyReturn(uint16_t keyAddr)
 			  rstPortIndexFun();
 			  dispPortIndexFun();
 			  dispOutputNameIDType();
+			  ret=levelRead();
+			  dispLevelState(ret);
+			  levelSet(ret);
 				break;
 			case KEY_SWITCHINTERF_RETURN_ADDR://
 				
@@ -180,11 +189,17 @@ void  keyReturn(uint16_t keyAddr)
 				dispPortIndexAdd();
 			  dispPortIndexFun();
 			  dispOutputNameIDType();
+				ret=levelRead();
+			  dispLevelState(ret);
+			  levelSet(ret);
 				break;
 			case KEY_SWITCHPORT_LAST_ADDR:
 				dispPortIndexLow();
 			  dispPortIndexFun();
 			  dispOutputNameIDType();
+				ret=levelRead();
+			  dispLevelState(ret);
+			  levelSet(ret);
 				break;
 			case KEY_SWITCHPORT_RETURN_ADDR:
 				//dispOutputNameIDType();

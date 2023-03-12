@@ -150,9 +150,53 @@ void v12OutputOFFFun(char num)
 	}
 }
 
+bool digOutputReadFun(char num)
+{
+	switch(num)
+	{
+			case 0:return IOOUT1_READ;
+			case 1:return IOOUT2_READ;
+			case 2:return IOOUT3_READ;
+			case 3:return IOOUT4_READ;
+			case 4:return IOOUT5_READ;
+			case 5:return IOOUT6_READ;
+			case 6:return IOOUT7_READ;
+			case 7:return IOOUT8_READ;
+	}
+	return false;
+}
 
+bool v33OutputReadFun(char num)
+{
+	switch(num)
+	{
+			case 0:return SPAKER1_READ;
+			case 1:return SPAKER3_READ;
+	}
+	return false;
+}
 
+bool v5OutputReadFun(char num)
+{
+	switch(num)
+	{
+			case 0:return SPAKER2_READ;
+			case 1:return SPAKER4_READ;
+	}
+	return false;
+}
+bool v12OutputReadFun(char num)
+{
+	switch(num)
+	{
+			case 0:return RELAY1_READ;
+			case 1:return RELAY2_READ;
+			case 2:return RELAY3_READ;
+			case 3:return RELAY4_READ;
 
+	}
+	return false;
+}
 //根据设置的outputIO的高低电平有效来设置上电初始化IO电平		
 //高电平有效的情况下 输出初始化为低
 //低电平有效情况下  输出初始化为高

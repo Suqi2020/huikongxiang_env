@@ -134,8 +134,10 @@
 //V0.75    修复自动配置出现的bug
 //V0.76    增加开关控制的接口显示V3O V12O V5O
 //V0.77    增加开关控制对接LCD屏，测试OK
-#define APP_VER       ((0<<8)+77)//0x0105 表示1.5版本
-const char date[]="20230310";
+//V0.78    增加电平显示窗口默认显示电平值  20230312
+#define APP_VER       ((0<<8)+78)//0x0105 表示1.5版本
+//
+const char date[]="20230312";
 
 //static    rt_thread_t tid 	= RT_NULL;
 static    rt_thread_t tidW5500 	  = RT_NULL;

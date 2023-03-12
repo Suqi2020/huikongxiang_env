@@ -349,7 +349,7 @@ void  dispOutputNameIDType()
 									if(j>=2)
 										break;
 								}
-	
+
 								LCDWtite(DISP_SWITCH_TYPE_ADDR,buf,MODEL_LEN);//7寸屏显示18
 								findFlag=true;
 						}
@@ -358,7 +358,6 @@ void  dispOutputNameIDType()
 				}
 
 				break;
-			
 		}
 		if(findFlag==false){
 				buf[0]=0xff;
@@ -367,8 +366,6 @@ void  dispOutputNameIDType()
 				LCDWtite(DISP_SWITCH_ID_ADDR,buf,2);
 				LCDWtite(DISP_SWITCH_TYPE_ADDR,buf,2);
 		}
-
-		
 		rt_free(buf);
 		buf=RT_NULL;
 }
@@ -421,8 +418,6 @@ void levelSet(char level)
 				for(int k=0;k<V33O_NUM;k++){//查一遍 找到 GYNJLXSD000000499  如果
 					if(packFlash.v33output[k].port==SwitchPortIndexY+1){
 						if(packFlash.v33output[k].workFlag==RT_TRUE){//打开
-							
-							
 								if(level==0){
 										v33OutputOFFFun(SwitchPortIndexY);
 								}
@@ -433,7 +428,6 @@ void levelSet(char level)
 						break;
 					}
 				}
-
 				break;
 			case  2://V5O
 				for(int k=0;k<V5O_NUM;k++){//查一遍 找到 GYNJLXSD000000499  如果
@@ -449,7 +443,6 @@ void levelSet(char level)
 						break;
 					}
 				}
-
 				break;
 			case 3://V12O
 				for(int k=0;k<V12O_NUM;k++){//查一遍 找到 GYNJLXSD000000499  如果
@@ -465,9 +458,59 @@ void levelSet(char level)
 						break;
 					}
 				}
-
 				break;
 			
 		}
 }
-
+bool digOutputReadFun(char num);
+bool v33OutputReadFun(char num);
+bool v5OutputReadFun(char num);
+bool v12OutputReadFun(char num);
+bool levelRead()
+{
+		switch(switchInterfaceIndex)
+		{
+			case 0://DO
+					for(int k=0;k<DO_NUM;k++){//查一遍 找到 GYNJLXSD000000499  如果
+						if(packFlash.digoutput[k].port==SwitchPortIndexY+1){
+							if(packFlash.digoutput[k].workFlag==RT_TRUE){//打开
+								return digOutputReadFun(SwitchPortIndexY);
+							}
+							break;
+						}
+					}
+				break;
+			case 1://V33O
+				for(int k=0;k<V33O_NUM;k++){//查一遍 找到 GYNJLXSD000000499  如果
+					if(packFlash.v33output[k].port==SwitchPortIndexY+1){
+						if(packFlash.v33output[k].workFlag==RT_TRUE){//打开
+								return v33OutputReadFun(SwitchPortIndexY);
+						}
+						break;
+					}
+				}
+				break;
+			case  2://V5O
+				for(int k=0;k<V5O_NUM;k++){//查一遍 找到 GYNJLXSD000000499  如果
+					if(packFlash.v5output[k].port==SwitchPortIndexY+1){
+						if(packFlash.v5output[k].workFlag==RT_TRUE){//打开
+								return v5OutputReadFun(SwitchPortIndexY);
+						}
+						break;
+					}
+				}
+				break;
+			case 3://V12O
+				for(int k=0;k<V12O_NUM;k++){//查一遍 找到 GYNJLXSD000000499  如果
+					if(packFlash.v12output[k].port==SwitchPortIndexY+1){
+						if(packFlash.v12output[k].workFlag==RT_TRUE){//打开
+								return v12OutputReadFun(SwitchPortIndexY);
+						}
+						break;
+					}
+				}
+				break;
+			
+		}
+		return 0;
+}
