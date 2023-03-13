@@ -47,6 +47,16 @@ void  dispOutputNameIDType(void);
 void  dispLevelState(char level);
 bool levelRead(void);
 void levelSet(char level);
+void  lcdInputConfig(void);
+void  dispInput(void);
+
+
+void getInputTotalNum();
+void 	dispInput();
+void 	lastInput();
+void 	nextInput();
+void delOneInput();
+
 //按键触发总接口
 void  keyReturn(uint16_t keyAddr)
 {
@@ -218,10 +228,174 @@ void  keyReturn(uint16_t keyAddr)
 				break;
 			case KEY_SWITCHLEVEL_RETURN_ADDR:
 				break;
-
+			case KEY_INPUTCFG_SURE_ADDR:
+				lcdInputConfig();
+				break;
+			case KEY_INPUTCFG_LOOK_ADDR:
+				getInputTotalNum();
+				dispInput();
+				break;
+			
+			
+			
+			case  KEY_INNPUT_LAST_ADDR:
+				lastInput();
+				dispInput();
+				break;
+			case  KEY_INNPUT_NEXT_ADDR:
+				nextInput();
+				dispInput();
+				break;
+			case  KEY_INNPUT_DEL_ADDR:
+				delOneInput();
+			  getInputTotalNum();
+				dispInput();
+				break;
+			case  KEY_INNPUT_RETURN_ADDR:
+				break;
+			
+			
+			
 		//开关控制end
 		}
 		rt_free(buf);
 		buf=RT_NULL;
 		
 }
+
+
+
+
+extern  modbusStru LCDInput;
+extern  uint32_t   LCDInputTime;
+
+
+void lcdCopyInputName(uint8_t *rec);
+//MODEL_LEN
+void lcdCopyInputID(uint8_t *rec);
+void lcdCopyInputModel(uint8_t *rec);
+void lcdCopyInputPort(uint8_t *rec);
+//lcd 发来的配置解析
+void LCDDispConfig(uint8_t *recBuf,int len)
+{
+	  
+		if((uint16_t)((recBuf[0]<<8)+recBuf[1])!=LCD_HEAD){
+				rt_kprintf("%s head err\n",sign);
+				return;
+		}			
+		if((uint16_t)(recBuf[2]+2+1)!=len){//+2+1  头部长度2 数据长度1
+			  rt_kprintf("%s lenth err\n",sign);
+				return;
+		}	
+		if(recBuf[3]!=LCD_READ){//+2+1  头部长度2 数据长度1
+			  rt_kprintf("%s 0x83 err\n",sign);
+				return;
+		}				
+		uint16_t CMD_ADDR=(uint16_t)(recBuf[4]<<8)+recBuf[5];
+		switch(CMD_ADDR){
+			case  LOCAL_IP1_ADDR:
+				packFlash.netIpFlash.localIp[0]=recBuf[8];
+				break;
+			case LOCAL_IP2_ADDR:
+				packFlash.netIpFlash.localIp[1]=recBuf[8];
+				break;       
+			case LOCAL_IP3_ADDR:
+				packFlash.netIpFlash.localIp[2]=recBuf[8];
+				break;        
+			case LOCAL_IP4_ADDR:
+				packFlash.netIpFlash.localIp[3]=recBuf[8];
+				break;        
+			case PHY_PORT_ADDR:
+				packFlash.netIpFlash.macaddr=recBuf[8];
+				break;        
+			case REMOTE_IP1_ADDR:
+				packFlash.netIpFlash.remoteIp[0]=recBuf[8];
+				break;       
+			case REMOTE_IP2_ADDR:
+				packFlash.netIpFlash.remoteIp[1]=recBuf[8];
+				break;        
+			case REMOTE_IP3_ADDR:
+				packFlash.netIpFlash.remoteIp[2]=recBuf[8];
+				break;        
+			case REMOTE_IP4_ADDR:
+				packFlash.netIpFlash.remoteIp[3]=recBuf[8];
+				break;    		 
+			case REMOTE_PORT_ADDR:
+				packFlash.netIpFlash.remotePort=(uint16_t)(recBuf[9]<<8)+recBuf[10];
+				break;   		 
+
+			case PORT1_ADDR:
+				packFlash.uartBps[0]=(uint32_t)(recBuf[7]<<24)+(uint32_t)(recBuf[8]<<16)+(uint32_t)(recBuf[9]<<8)+recBuf[10];
+				break;     		 			
+			case PORT2_ADDR:
+				packFlash.uartBps[1]=(uint32_t)(recBuf[7]<<24)+(uint32_t)(recBuf[8]<<16)+(uint32_t)(recBuf[9]<<8)+recBuf[10];
+				break;     		 			
+			case PORT3_ADDR:
+				packFlash.uartBps[2]=(uint32_t)(recBuf[7]<<24)+(uint32_t)(recBuf[8]<<16)+(uint32_t)(recBuf[9]<<8)+recBuf[10];
+				break;     		 			
+			case PORT4_ADDR:
+				packFlash.uartBps[3]=(uint32_t)(recBuf[7]<<24)+(uint32_t)(recBuf[8]<<16)+(uint32_t)(recBuf[9]<<8)+recBuf[10];
+				break;     		 			
+
+			//MCUID
+			case MCUID_ADDR:
+				for(int i=0;i<ACUID_LEN+1;i++){
+					packFlash.acuId[i]=recBuf[7+i];
+					if((recBuf[7+i]==0xff)||(recBuf[7+i]==0)){
+							packFlash.acuId[i]=0;
+							break;
+					}
+				}
+				break;         			
+			case MODBUS_CFG_NAME_ADDR:
+				break; 		
+			case MODBUS_CFG_ID_ADDR:
+				for(int i=0;i<20;i++){
+					LCDInput.ID[i]=recBuf[7+i];
+					if((recBuf[7+i]==0xff)||(recBuf[7+i]==0)){
+							LCDInput.ID[i]=0;
+							break;
+					}
+				}
+				break;    		
+			case MODBUS_CFG_SORT_ADDR:
+				//LCDInput.
+				break; 		
+			case MODBUS_CFG_TYPE_ADDR:
+				for(int i=0;i<8;i++){
+					LCDInput.model[i]=recBuf[7+i];
+					if((recBuf[7+i]==0xff)||(recBuf[7+i]==0)){
+							LCDInput.model[i]=0;
+							break;
+					}
+				}
+				break;  		
+			case MODBUS_CFG_PORT_ADDR:
+				LCDInput.useUartNum=(uartEnum)recBuf[8];
+				break;  		
+			case MODBUS_CFG_ADDR_ADDR:
+				LCDInput.slaveAddr=recBuf[8];
+				break;  		
+			case MODBUS_CFG_TIME_ADDR:
+				LCDInputTime=(uint32_t)(recBuf[7]<<24)+(uint32_t)(recBuf[8]<<16)+(uint32_t)(recBuf[9]<<8)+recBuf[10];
+				break; 		
+			case MODBUS_CFG_NAME2_ADDR:
+				break;	
+			case KEY_ADDR:
+				keyReturn((uint16_t)(recBuf[7]<<8)+recBuf[8]);
+				break;
+			case DISP_INPUTCFG_NAME_ADDR:
+				lcdCopyInputName(recBuf);
+				break;
+			case DISP_INPUTCFG_ID_ADDR:
+				lcdCopyInputID(recBuf);
+				break;
+			case DISP_INPUTCFG_TYPE_ADDR:
+				lcdCopyInputModel(recBuf);
+				break;
+			case DISP_INPUTCFG_PORT_ADDR:
+				lcdCopyInputPort(recBuf);
+				break;
+		}
+}
+

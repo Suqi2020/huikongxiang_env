@@ -128,12 +128,27 @@
 #define   KEY_SWITCHLEVEL_RETURN_ADDR    		0x5430
 
 
+//输入界面
 
+#define   KEY_INPUTCFG_LOOK_ADDR      	    0X5000
+#define   KEY_INPUTCFG_SURE_ADDR        	  0X5002
+#define   DISP_INPUTCFG_NAME_ADDR        	 	0X5004
+#define   DISP_INPUTCFG_ID_ADDR        	 	  0X5010
+#define   DISP_INPUTCFG_TYPE_ADDR        	  0X5030
+#define   DISP_INPUTCFG_PORT_ADDR        	  0X5038
 
+//输入查看界面
+#define   DISP_INNPUT_NAME_ADDR             0x5040
+#define   DISP_INNPUT_ID_ADDR               0x5050
+#define   DISP_INNPUT_TYPE_ADDR             0x5064
+#define   DISP_INNPUT_PORT_ADDR             0x5070
+#define   DISP_INNPUT_TOTALNUM_ADDR         0x5072
+#define   DISP_INNPUT_THENUM_ADDR           0x5074
 
-
-
-
+#define   KEY_INNPUT_LAST_ADDR              0x5076
+#define   KEY_INNPUT_NEXT_ADDR              0x5078
+#define   KEY_INNPUT_DEL_ADDR               0x507A
+#define   KEY_INNPUT_RETURN_ADDR            0x507C
 
 
 

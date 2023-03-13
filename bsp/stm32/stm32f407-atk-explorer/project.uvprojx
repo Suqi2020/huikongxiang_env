@@ -793,6 +793,11 @@
               <FileType>1</FileType>
               <FilePath>.\LCD7inch\lcdSwitchCtrl.c</FilePath>
             </File>
+            <File>
+              <FileName>lcdInputCfg.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>.\LCD7inch\lcdInputCfg.c</FilePath>
+            </File>
           </Files>
         </Group>
         <Group>
