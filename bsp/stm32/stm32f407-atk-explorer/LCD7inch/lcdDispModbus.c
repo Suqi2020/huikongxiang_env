@@ -1187,7 +1187,7 @@ void  offLineIndexAdd()
 //}
 
 
-
+int modbusConfIDCheck(char *inputID);
 void keyModbusCfgSure()
 {
 		modbusConfIDCheck(LCDInput.ID);

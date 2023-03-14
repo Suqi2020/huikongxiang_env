@@ -15,17 +15,6 @@ char copyID[MODBID_LEN];//读取ana温湿度时候 顺便把ID拷贝出来
 
 void  anaTempHumiReadAndSetFlag()
 {
-	
-	
-//	adcGetTest();
-//	
-//	
-//					int rt=Get_Adc_Average(ADC_CHANNEL_8,10);
-//				rt_kprintf("ADC_CHANNEL_8 ,adc tick:%d,voltgge 扩大100倍:%dV\n",rt,rt*330/4096);
-//				 rt=Get_Adc_Average(ADC_CHANNEL_9,10);
-//		
-	
-	
 		uint16_t  ADCtemp,ADChumi,porttest;
 		float Vtemp,Vhumi;
 		for (int i = 0; i < ANALOG_NUM; i++){		
@@ -68,16 +57,6 @@ void  anaTempHumiReadAndSetFlag()
 										inpoutpFlag.analogTempHum.humLowFlag=true;
 						}		
 				}
-//						 if(0==strcmp(sheet.analog[i].funName,analogName1Val[0])){//temperature
-//								float temp=1.23;
-//								sprintf(sprinBuf,"%02f",temp);
-//								cJSON_AddItemToObject(nodeobj_p,analogName1Val[0],cJSON_CreateString(sprinBuf));
-//						 }
-//						 else if(0==strcmp(sheet.analog[i].funName,analogName1Val[1])){//humidity
-//								float hum=1.23;
-//								sprintf(sprinBuf,"%02f",hum );
-//								cJSON_AddItemToObject(nodeobj_p,analogName1Val[1],cJSON_CreateString(sprinBuf));
-//						 }
 			}
 		}
 }
@@ -100,7 +79,6 @@ uint16_t analogTempHumJsonPack()
 		cJSON_AddStringToObject(root, "acuId",(char *)packFlash.acuId);
 		char *sprinBuf=RT_NULL;
 		sprinBuf=rt_malloc(20);//20个字符串长度 够用了
-		
 		{
 		Array = cJSON_CreateArray();
 		if (Array == NULL) return 0;

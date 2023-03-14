@@ -136,9 +136,11 @@
 //V0.77    增加开关控制对接LCD屏，测试OK
 //V0.78    增加电平显示窗口默认显示电平值  20230312
 //V0.79    输入设置配置测试OK
-#define APP_VER       ((0<<8)+79)//0x0105 表示1.5版本
+//V0.80    输出设置显示OK 
+
+#define APP_VER       ((0<<8)+80)//0x0105 表示1.5版本
 //
-const char date[]="20230313";
+const char date[]="20230314";
 
 //static    rt_thread_t tid 	= RT_NULL;
 static    rt_thread_t tidW5500 	  = RT_NULL;

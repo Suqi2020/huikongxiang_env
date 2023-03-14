@@ -12,7 +12,7 @@
 const static char sign[]="[LCDKeyEvent]";
 
 
-int modbusConfIDCheck(char *inputID);
+
 void dispInterFaceIndexFun(void);
 //接口名称增加
 void dispInterFaceIndexAdd(void);
@@ -51,12 +51,19 @@ void  lcdInputConfig(void);
 void  dispInput(void);
 
 
-void getInputTotalNum();
-void 	dispInput();
-void 	lastInput();
-void 	nextInput();
-void delOneInput();
-
+void getInputTotalNum(void);
+void 	dispInput(void);
+void 	lastInput(void);
+void 	nextInput(void);
+void delOneInput(void);
+void  dispoutputReadInterf(void);
+//输出设置读取interface接口下一个
+void  dispoutpReadInterfNext(void);
+void  dispoutpReadInterfLast(void);
+void  dispOutputRead(void);
+void  getOutputTotalNum(void);
+void  dispoutpReadNext(void);
+void  dispoutpReadLast(void);
 //按键触发总接口
 void  keyReturn(uint16_t keyAddr)
 {
@@ -228,6 +235,7 @@ void  keyReturn(uint16_t keyAddr)
 				break;
 			case KEY_SWITCHLEVEL_RETURN_ADDR:
 				break;
+			///////////input_start///////////////
 			case KEY_INPUTCFG_SURE_ADDR:
 				lcdInputConfig();
 				break;
@@ -235,26 +243,76 @@ void  keyReturn(uint16_t keyAddr)
 				getInputTotalNum();
 				dispInput();
 				break;
-			
-			
-			
-			case  KEY_INNPUT_LAST_ADDR:
+			case  KEY_INPUT_LAST_ADDR:
 				lastInput();
 				dispInput();
 				break;
-			case  KEY_INNPUT_NEXT_ADDR:
+			case  KEY_INPUT_NEXT_ADDR:
 				nextInput();
 				dispInput();
 				break;
-			case  KEY_INNPUT_DEL_ADDR:
+			case  KEY_INPUT_DEL_ADDR:
 				delOneInput();
 			  getInputTotalNum();
 				dispInput();
 				break;
-			case  KEY_INNPUT_RETURN_ADDR:
+			case  KEY_INPUT_RETURN_ADDR:
 				break;
+			///////////input_end///////////////
+			///////////output_start///////////////
+//#define        KEY_OUTPUT_INTERFACE_ADDR     	0x5142
+//#define        KEY_OUTPUT_SURE_ADDR     		0x5144
+//#define        KEY_OUTPUT_LOOK_ADDR     			0x5146
+//#define        KEY_OUTPUT_RETURN_ADDR     	0x5148
+
+
+//#define        KEY_OUTPUT_SURE_P_ADDR     		0x5150
+//#define        KEY_OUTPUT_LAST_ADDR      //接口滚动  		0x5152
+//#define        KEY_OUTPUT_NEXT_ADDR     	 //接口滚动  	0x5154
+//#define        KEY_OUTPUT_RETURN_P_ADDR     	0x5156
+
+			case  KEY_OUTPUT_READ_LAST_ADDR:
+				dispoutpReadLast();
+			  dispOutputRead();
+				break;
+			case  KEY_OUTPUT_READ_NEXT_ADDR:
+				dispoutpReadNext();
+			  dispOutputRead();
+				break;
+//#define        KEY_OUTPUT_READ_LAST_ADDR     //输出内容滚动  		 0x5188
+//#define        KEY_OUTPUT_READ_NEXT_ADDR     //输出内容滚动		 0x518A
+//#define        KEY_OUTPUT_READ_DELETE_ADDR     	 0x518C
+//#define        KEY_OUTPUT_READ_RETURN_ADDR     	 0x518E
+			case  KEY_OUTPUT_READ_DELETE_ADDR:
+			  delOneOutput();
+				getOutputTotalNum();
+//				dispoutputReadInterf();
+			  dispOutputRead();
+				break;
+			case  KEY_OUTPUT_LOOK_ADDR:
+				getOutputTotalNum();
+				dispoutputReadInterf();
+			  dispOutputRead();
 			
-			
+				break;
+			case  KEY_OUTPUT_READ_INTERFACE_ADDR://进去接口
+				dispoutputReadInterf();
+				dispOutputRead();
+				break;
+			case  KEY_OUTPUT_READ_LAST_P_ADDR://接口滚动  
+				dispoutpReadInterfLast();
+			  dispoutputReadInterf();
+			  dispOutputRead();
+				break;
+			case  KEY_OUTPUT_READ_NEXT_P_ADDR:    //接口滚动 
+				dispoutpReadInterfNext();
+			  dispoutputReadInterf();
+			  dispOutputRead();
+				break;
+
+			case  KEY_OUTPUT_READ_RETURN_P_ADDR:
+				break;
+			///////////output_end///////////////
 			
 		//开关控制end
 		}

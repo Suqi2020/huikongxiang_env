@@ -798,6 +798,11 @@
               <FileType>1</FileType>
               <FilePath>.\LCD7inch\lcdInputCfg.c</FilePath>
             </File>
+            <File>
+              <FileName>lcdOutputCfg .c</FileName>
+              <FileType>1</FileType>
+              <FilePath>.\LCD7inch\lcdOutputCfg .c</FilePath>
+            </File>
           </Files>
         </Group>
         <Group>

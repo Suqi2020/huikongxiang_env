@@ -92,7 +92,7 @@
 #define   KEY_MODBUSDISP_ERRLAST_ADDR  0X150C
 #define   KEY_MODBUSDISP_ERRNEXT_ADDR  0X150E
 
-
+//////////////////////////////////////////////////////////////
 //开关控制界面
 #define   KEY_SWITCH_INTERFACE_ADDR    0x5400
 #define   KEY_SWITCH_PORT_ADDR         0x5402
@@ -126,8 +126,8 @@
 #define   KEY_SWITCHLEVEL_OFF_ADDR    			0x542C
 #define   KEY_SWITCHLEVEL_SURE_ADDR    			0x542E
 #define   KEY_SWITCHLEVEL_RETURN_ADDR    		0x5430
-
-
+//////////////////////////////////////////////////////////////
+//////////////////////////////////////////////////////////////
 //输入界面
 
 #define   KEY_INPUTCFG_LOOK_ADDR      	    0X5000
@@ -138,22 +138,60 @@
 #define   DISP_INPUTCFG_PORT_ADDR        	  0X5038
 
 //输入查看界面
-#define   DISP_INNPUT_NAME_ADDR             0x5040
-#define   DISP_INNPUT_ID_ADDR               0x5050
-#define   DISP_INNPUT_TYPE_ADDR             0x5064
-#define   DISP_INNPUT_PORT_ADDR             0x5070
-#define   DISP_INNPUT_TOTALNUM_ADDR         0x5072
-#define   DISP_INNPUT_THENUM_ADDR           0x5074
+#define   DISP_INPUT_NAME_ADDR             0x5040
+#define   DISP_INPUT_ID_ADDR               0x5050
+#define   DISP_INPUT_TYPE_ADDR             0x5064
+#define   DISP_INPUT_PORT_ADDR             0x5070
+#define   DISP_INPUT_TOTALNUM_ADDR         0x5072
+#define   DISP_INPUT_THENUM_ADDR           0x5074
 
-#define   KEY_INNPUT_LAST_ADDR              0x5076
-#define   KEY_INNPUT_NEXT_ADDR              0x5078
-#define   KEY_INNPUT_DEL_ADDR               0x507A
-#define   KEY_INNPUT_RETURN_ADDR            0x507C
+#define   KEY_INPUT_LAST_ADDR              0x5076
+#define   KEY_INPUT_NEXT_ADDR              0x5078
+#define   KEY_INPUT_DEL_ADDR               0x507A
+#define   KEY_INPUT_RETURN_ADDR            0x507C
+//////////////////////////////////////////////////////////////
+//////////////////////////////////////////////////////////////
+//输出设置
+#define        DISP_OUTPUT_INTERFACE_ADDR     0x5110
+#define        DISP_OUTPUT_NAME_ADDR     			0x5118
+#define        DISP_OUTPUT_ID_ADDR     				0x5128
+#define        DISP_OUTPUT_TYPE_ADDR     			0x5138
+#define        DISP_OUTPUT_PORT_ADDR     			0x5140
+#define        KEY_OUTPUT_INTERFACE_ADDR     	0x5142
+#define        KEY_OUTPUT_SURE_ADDR     		0x5144
+#define        KEY_OUTPUT_LOOK_ADDR     			0x5146
+#define        KEY_OUTPUT_RETURN_ADDR     	0x5148
+
+#define        DISP_OUTPUT_INTERFACE_P_ADDR   0x514A
+#define        KEY_OUTPUT_SURE_P_ADDR     		0x5150
+#define        KEY_OUTPUT_LAST_ADDR     		0x5152
+#define        KEY_OUTPUT_NEXT_ADDR     		0x5154
+#define        KEY_OUTPUT_RETURN_P_ADDR     	0x5156
+
+#define        DISP_OUTPUT_READ_INTERFACE_ADDR   0x5158
+#define        DISP_OUTPUT_READ_NAME_ADDR        0x5160
+#define        DISP_OUTPUT_READ_ID_ADDR          0x5168
+#define        DISP_OUTPUT_READ_TYPE_ADDR        0x5178
+#define        DISP_OUTPUT_READ_PORT_ADDR        0x5180
+#define        DISP_OUTPUT_READ_TOTALNUM_ADDR    0x5182
+#define        DISP_OUTPUT_READ_THENUM_ADDR      0x5184
+#define        KEY_OUTPUT_READ_INTERFACE_ADDR    0x5186
+#define        KEY_OUTPUT_READ_LAST_ADDR    		 0x5188
+#define        KEY_OUTPUT_READ_NEXT_ADDR     		 0x518A
+#define        KEY_OUTPUT_READ_DELETE_ADDR     	 0x518C
+#define        KEY_OUTPUT_READ_RETURN_ADDR     	 0x518E
+
+#define        DISP_OUTPUT_READ_INTERFACE_P_ADDR     0x5190
+#define        KEY_OUTPUT_READ_LAST_P_ADDR     0x5198
+#define        KEY_OUTPUT_READ_NEXT_P_ADDR     0x519A
+#define        KEY_OUTPUT_READ_RETURN_P_ADDR     0x519C
 
 
 
+//////////////////////////////////////////////////////////////
 
 
+//////////////////////////////////////////////////////////////
 //保存界面
 
 #define   KEY_SAVE_ADDR             0X1700
@@ -163,7 +201,7 @@
 #define   KEY_MODBUSERR_ADDR        0X1A02
 #define   NET_ERR_DISPLAY_ADDR      0X1A0C
 #define   MODBUS_ERR_DISPLAY_ADDR   0X1A0E
-
+//////////////////////////////////////////////////////////////
 //kenal lcd command
 ///#define   LCD_HEAD       0XAEA5
 #define   LCD_HEAD       0X5AA5
