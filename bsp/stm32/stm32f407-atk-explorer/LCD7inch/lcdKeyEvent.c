@@ -64,6 +64,11 @@ void  dispOutputRead(void);
 void  getOutputTotalNum(void);
 void  dispoutpReadNext(void);
 void  dispoutpReadLast(void);
+void	lcdOutputConfig(void);
+void	dispoutConfigLast(void);
+void	dispoutputNameInterf(void);
+void	dispoutConfigNext(void);
+void	delOneOutput(void);
 //按键触发总接口
 void  keyReturn(uint16_t keyAddr)
 {
@@ -258,19 +263,21 @@ void  keyReturn(uint16_t keyAddr)
 				break;
 			case  KEY_INPUT_RETURN_ADDR:
 				break;
-			///////////input_end///////////////
-			///////////output_start///////////////
-//#define        KEY_OUTPUT_INTERFACE_ADDR     	0x5142
-//#define        KEY_OUTPUT_SURE_ADDR     		0x5144
-//#define        KEY_OUTPUT_LOOK_ADDR     			0x5146
-//#define        KEY_OUTPUT_RETURN_ADDR     	0x5148
 
-
-//#define        KEY_OUTPUT_SURE_P_ADDR     		0x5150
-//#define        KEY_OUTPUT_LAST_ADDR      //接口滚动  		0x5152
-//#define        KEY_OUTPUT_NEXT_ADDR     	 //接口滚动  	0x5154
-//#define        KEY_OUTPUT_RETURN_P_ADDR     	0x5156
-
+			case KEY_OUTPUT_SURE_ADDR://
+				lcdOutputConfig();
+				break;
+			case KEY_OUTPUT_LAST_ADDR:
+				dispoutConfigLast();
+				dispoutputNameInterf();
+				break;
+			case KEY_OUTPUT_NEXT_ADDR:
+				dispoutConfigNext();
+				dispoutputNameInterf();
+				break;
+			case KEY_OUTPUT_INTERFACE_ADDR:
+				dispoutputNameInterf();
+				break;
 			case  KEY_OUTPUT_READ_LAST_ADDR:
 				dispoutpReadLast();
 			  dispOutputRead();
@@ -279,10 +286,7 @@ void  keyReturn(uint16_t keyAddr)
 				dispoutpReadNext();
 			  dispOutputRead();
 				break;
-//#define        KEY_OUTPUT_READ_LAST_ADDR     //输出内容滚动  		 0x5188
-//#define        KEY_OUTPUT_READ_NEXT_ADDR     //输出内容滚动		 0x518A
-//#define        KEY_OUTPUT_READ_DELETE_ADDR     	 0x518C
-//#define        KEY_OUTPUT_READ_RETURN_ADDR     	 0x518E
+
 			case  KEY_OUTPUT_READ_DELETE_ADDR:
 			  delOneOutput();
 				getOutputTotalNum();
@@ -313,7 +317,38 @@ void  keyReturn(uint16_t keyAddr)
 			case  KEY_OUTPUT_READ_RETURN_P_ADDR:
 				break;
 			///////////output_end///////////////
-			
+//#define        KEY_ANA_SUBNAME_INTERFACE_ADDR     0x522C
+//#define        KEY_ANA_SURE_ADDR     0x522E
+			case   KEY_ANA_LOOK_ADDR :
+				getAnaTotalNum();
+			  dispAna();
+				break;
+////#define        KEY_ANA_RETURN_ADDR     0x5232
+
+////#define             0x5208
+//#define        KEY_ANA_SURE_ADDR     0x5236
+//#define        KEY_ANA_LAST_ADDR     0x5238
+//#define        KEY_ANA_NEXT_ADDR     0x523A
+
+
+//#define        DISP_ANAREAD_NAME_ADDR    0x5240
+//#define        DISP_ANAREAD_SUBNAME_ADDR 0x5248
+//#define        DISP_ANAREAD_ID_ADDR     0x5250
+//#define        DISP_ANAREAD_TYPE_ADDR     0x5260
+//#define        DISP_ANAREAD_PORT_ADDR     0x5268
+//#define        DISP_ANAREAD_TIME_ADDR     0x526A
+//#define        DISP_ANAREAD_TOTALNUM_ADDR     0x526C
+//#define        DISP_ANAREAD_THENUM_ADDR     0x526E
+			case   KEY_ANAREAD_LAST_ADDR:
+				lastAna();
+			  dispAna();
+				break;
+			case   KEY_ANAREAD_NEXT_ADDR:
+				nextAna();
+			  dispAna();
+				break;
+			case   KEY_ANAREAD_DEL_ADDR:
+				break;
 		//开关控制end
 		}
 		rt_free(buf);
@@ -333,6 +368,10 @@ void lcdCopyInputName(uint8_t *rec);
 void lcdCopyInputID(uint8_t *rec);
 void lcdCopyInputModel(uint8_t *rec);
 void lcdCopyInputPort(uint8_t *rec);
+void	lcdCopyOutputName(uint8_t *rec);
+void	lcdCopyOutputID(uint8_t *rec);
+void	lcdCopyOutputModel(uint8_t *rec);
+void	lcdCopyOutputPort(uint8_t *rec);
 //lcd 发来的配置解析
 void LCDDispConfig(uint8_t *recBuf,int len)
 {
@@ -405,8 +444,7 @@ void LCDDispConfig(uint8_t *recBuf,int len)
 					}
 				}
 				break;         			
-			case MODBUS_CFG_NAME_ADDR:
-				break; 		
+
 			case MODBUS_CFG_ID_ADDR:
 				for(int i=0;i<20;i++){
 					LCDInput.ID[i]=recBuf[7+i];
@@ -454,6 +492,20 @@ void LCDDispConfig(uint8_t *recBuf,int len)
 			case DISP_INPUTCFG_PORT_ADDR:
 				lcdCopyInputPort(recBuf);
 				break;
+			case DISP_OUTPUT_NAME_ADDR:
+				lcdCopyOutputName(recBuf);
+				break;
+			case DISP_OUTPUT_ID_ADDR:
+				lcdCopyOutputID(recBuf);
+				break;
+
+			case DISP_OUTPUT_TYPE_ADDR:
+				lcdCopyOutputModel(recBuf);
+				break;
+			case DISP_OUTPUT_PORT_ADDR:
+				lcdCopyOutputPort(recBuf);
+				break;
+
 		}
 }
 

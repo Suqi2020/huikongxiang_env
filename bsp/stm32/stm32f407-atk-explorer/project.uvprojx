@@ -803,6 +803,11 @@
               <FileType>1</FileType>
               <FilePath>.\LCD7inch\lcdOutputCfg .c</FilePath>
             </File>
+            <File>
+              <FileName>lcdDispAna.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>.\LCD7inch\lcdDispAna.c</FilePath>
+            </File>
           </Files>
         </Group>
         <Group>

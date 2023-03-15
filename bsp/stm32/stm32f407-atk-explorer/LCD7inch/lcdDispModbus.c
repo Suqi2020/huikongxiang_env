@@ -932,7 +932,7 @@ void dispCinaName(uint8_t *buf)
 				j++;
 		}
 		LCDWtite(MODBUS_CFG_NAME2_ADDR,buf,sizeof(modbusName[chinaNameIndex]));
-		LCDWtite(MODBUS_CFG_NAME_ADDR,buf,sizeof(modbusName[chinaNameIndex])); 
+//		LCDWtite(MODBUS_CFG_NAME_ADDR,buf,sizeof(modbusName[chinaNameIndex])); 
 }
 void dispChinaNameIndexLow()
 {

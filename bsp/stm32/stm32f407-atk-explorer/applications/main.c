@@ -137,10 +137,12 @@
 //V0.78    增加电平显示窗口默认显示电平值  20230312
 //V0.79    输入设置配置测试OK
 //V0.80    输出设置显示OK 
-
-#define APP_VER       ((0<<8)+80)//0x0105 表示1.5版本
+//         除了modbus传感器，输入输出以及模拟传感器的配置按照端口号来的
+//         输入新的配置如果端口号相同会导致原来的失效
+//V0.81    增加模拟传感器读取成功
+#define APP_VER       ((0<<8)+81)//0x0105 表示1.5版本
 //
-const char date[]="20230314";
+const char date[]="20230315";
 
 //static    rt_thread_t tid 	= RT_NULL;
 static    rt_thread_t tidW5500 	  = RT_NULL;

@@ -24,8 +24,8 @@ void dispInterFaceIndexFun()
 			 	rt_kprintf("%0x ",outName[switchInterfaceIndex][i]);
 		}
 		rt_kprintf("%\n ");
-		LCDWtite(DISP_SWITCH_INTERFACE_ADDR,(uint8_t *)outName[switchInterfaceIndex],INOUTNAME_LEN);
-		LCDWtite(DISP_SWITCHINTERF_INTERFACE_ADDR,(uint8_t *)outName[switchInterfaceIndex],INOUTNAME_LEN);
+		LCDWtite(DISP_SWITCH_INTERFACE_ADDR,			(uint8_t *)outName[switchInterfaceIndex],INOUTNAME_LEN);
+		//LCDWtite(DISP_SWITCHINTERF_INTERFACE_ADDR,(uint8_t *)outName[switchInterfaceIndex],INOUTNAME_LEN);
 }
 //接口名称增加
 void dispInterFaceIndexAdd()

@@ -38,7 +38,7 @@
 #define		KEY_MCUID_SURE_ADDR		  0X1202
 #define		KEY_MCUID_READ_ADDR		  0X1204
 //MODBUS
-#define		MODBUS_CFG_NAME_ADDR  		0x1360
+//#define		MODBUS_CFG_NAME_ADDR  		0x1360
 #define		MODBUS_CFG_ID_ADDR    		0x1320
 #define		MODBUS_CFG_SORT_ADDR  		0X1300
 #define		MODBUS_CFG_TYPE_ADDR  		0x1350
@@ -100,7 +100,7 @@
 #define   KEY_SWITCH_SURE_ADDR         0x5406
 #define   KEY_SWITCH_RETURN_ADDR       0x5408
 
-#define   DISP_SWITCH_INTERFACE_ADDR   0x5440
+//#define   DISP_SWITCH_INTERFACE_ADDR   0x5440
 #define   DISP_SWITCH_PORT_ADDR        0x540C
 #define   DISP_SWITCH_NAME_ADDR        0x5450
 #define   DISP_SWITCH_ID_ADDR       	 0x5460
@@ -108,7 +108,7 @@
 #define   DISP_SWITCH_LEVEL_ADDR       0x5414
 
 //开关控制调出接口显示界面
-#define   DISP_SWITCHINTERF_INTERFACE_ADDR  0x5410
+#define   DISP_SWITCH_INTERFACE_ADDR  0x5410
 
 #define   KEY_SWITCHINTERF_SURE_ADDR    		0x5418
 #define   KEY_SWITCHINTERF_NEXT_ADDR        0x541A
@@ -152,7 +152,7 @@
 //////////////////////////////////////////////////////////////
 //////////////////////////////////////////////////////////////
 //输出设置
-#define        DISP_OUTPUT_INTERFACE_ADDR     0x5110
+//#define        DISP_OUTPUT_INTERFACE_ADDR     0x5110
 #define        DISP_OUTPUT_NAME_ADDR     			0x5118
 #define        DISP_OUTPUT_ID_ADDR     				0x5128
 #define        DISP_OUTPUT_TYPE_ADDR     			0x5138
@@ -162,8 +162,8 @@
 #define        KEY_OUTPUT_LOOK_ADDR     			0x5146
 #define        KEY_OUTPUT_RETURN_ADDR     	0x5148
 
-#define        DISP_OUTPUT_INTERFACE_P_ADDR   0x514A
-#define        KEY_OUTPUT_SURE_P_ADDR     		0x5150
+#define        DISP_OUTPUT_INTERFACE_ADDR   0x514A
+//#define        KEY_OUTPUT_SURE_P_ADDR     		0x5150
 #define        KEY_OUTPUT_LAST_ADDR     		0x5152
 #define        KEY_OUTPUT_NEXT_ADDR     		0x5154
 #define        KEY_OUTPUT_RETURN_P_ADDR     	0x5156
@@ -186,11 +186,40 @@
 #define        KEY_OUTPUT_READ_NEXT_P_ADDR     0x519A
 #define        KEY_OUTPUT_READ_RETURN_P_ADDR     0x519C
 
-
-
 //////////////////////////////////////////////////////////////
+//////////////////////////////////////////////////////////////
+//模拟传感器配置显示
+#define        DISP_ANA_NAME_ADDR     	 0x5200
+#define        DISP_ANA_SUBNAME_ADDR     0x5208
+#define        DISP_ANA_ID_ADDR     		0x5210
+#define        DISP_ANA_TYPE_ADDR     0x5220
+#define        DISP_ANA_PORT_ADDR     0x5228
+#define        DISP_ANA_TIME_ADDR     0x522A
+
+#define        KEY_ANA_SUBNAME_INTERFACE_ADDR     0x522C
+#define        KEY_ANA_SURE_ADDR     0x522E
+#define        KEY_ANA_LOOK_ADDR     0x5230
+//#define        KEY_ANA_RETURN_ADDR     0x5232
+
+//#define             0x5208
+#define        KEY_ANA_SURE_ADDR     0x5236
+#define        KEY_ANA_LAST_ADDR     0x5238
+#define        KEY_ANA_NEXT_ADDR     0x523A
 
 
+#define        DISP_ANAREAD_NAME_ADDR    0x5240
+#define        DISP_ANAREAD_SUBNAME_ADDR 0x5248
+#define        DISP_ANAREAD_ID_ADDR     0x5250
+#define        DISP_ANAREAD_TYPE_ADDR     0x5260
+#define        DISP_ANAREAD_PORT_ADDR     0x5268
+#define        DISP_ANAREAD_TIME_ADDR     0x526A
+#define        DISP_ANAREAD_TOTALNUM_ADDR     0x526C
+#define        DISP_ANAREAD_THENUM_ADDR     0x526E
+#define        KEY_ANAREAD_LAST_ADDR     0x5270
+#define        KEY_ANAREAD_NEXT_ADDR     0x5272
+#define        KEY_ANAREAD_DEL_ADDR     0x5274
+//#define        KEY_ANAREAD_RETURN_ADDR     0x5276
+//////////////////////////////////////////////////////////////
 //////////////////////////////////////////////////////////////
 //保存界面
 

@@ -4,8 +4,8 @@
 #include  "board.h"
 #define   ANALOGNAME_NUM      1
 ////////////////////////////////////////////////////////////////////////////
-const static char  analogName[ANALOGNAME_NUM][20]={"梁物業"};
-//const static char  analogName1Val[2][20]={"temperature","humidity"};
+const static char  analogName[ANALOGNAME_NUM][NAME_LEN]={"梁物業"};
+const static char  anaSubName1Val[2][NAME_LEN]={"梁業","物業"};
 //typedef enum{
 //		enumAnaTemp=1,
 //	  enumAnaHum=2

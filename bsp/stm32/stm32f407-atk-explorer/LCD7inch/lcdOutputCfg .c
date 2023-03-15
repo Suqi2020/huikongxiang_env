@@ -57,24 +57,99 @@ void lcdCopyOutputPort(uint8_t *rec)
 
 
 
-//char outName[OUTNAME_NUM][INOUTNAME_LEN]={"DO","V3O","V5O","V12O"};
-//char outSwitchNum[OUTNAME_NUM]={DO_NUM,V33O_NUM,V5O_NUM,V12O_NUM};
+
+uint8_t su8OutNameCfgIndex=0;//输入菜单的坐标
+extern char outName[OUTNAME_NUM][INOUTNAME_LEN];
+
+//输出设置读取interface接口下一个
+void  dispoutConfigNext()
+{
+
+		su8OutNameCfgIndex++;
+	  if(su8OutNameCfgIndex>=OUTNAME_NUM)
+				su8OutNameCfgIndex=0;
+}
+
+//输出设置读取interface接口上一个
+void  dispoutConfigLast()
+{
+		if(su8OutNameCfgIndex==0)
+				su8OutNameCfgIndex=OUTNAME_NUM;
+		su8OutNameCfgIndex--;
+}
+void  dispoutputNameInterf()
+{
+		uint8_t *buf=NULL;
+	  buf=rt_malloc(50);
+		int Len=strlen(outName[su8OutNameCfgIndex]);
+		for(int i=0;i<Len;i++){
+				buf[i]=outName[su8OutNameCfgIndex][i];
+		}
+		int j=0;
+		while((Len+j)<INOUTNAME_LEN){
+				buf[Len+j]=0xff;
+				j++;
+		}
+		LCDWtite(DISP_OUTPUT_INTERFACE_ADDR,buf,NAME_LEN);
+		
+		//显示输出接口 {"DO","V3O","V5O","V12O"}中的一个
+}
 
 
-//#define        DISP_OUTPUT_READ_INTERFACE_ADDR   0x5158
-//#define        DISP_OUTPUT_READ_NAME_ADDR        0x5160
-//#define        DISP_OUTPUT_READ_ID_ADDR          0x5168
-//#define        DISP_OUTPUT_READ_TYPE_ADDR        0x5178
-//#define        DISP_OUTPUT_READ_PORT_ADDR        0x5180
-//#define        DISP_OUTPUT_READ_TOTALNUM_ADDR    0x5182
-//#define        DISP_OUTPUT_READ_THENUM_ADDR      0x5184
-//#define        KEY_OUTPUT_READ_INTERFACE_ADDR    0x5186
-//#define        KEY_OUTPUT_READ_LAST_ADDR    		 0x5188
-//#define        KEY_OUTPUT_READ_NEXT_ADDR     		 0x518A
-//#define        KEY_OUTPUT_READ_DELETE_ADDR     	 0x518C
-//#define        KEY_OUTPUT_READ_RETURN_ADDR     	 0x518E
+//被输出设置确定按键调用
+void  lcdOutputConfig()
+{
+	  int port=outputLCD.port;
+		switch(su8OutNameCfgIndex)
+		{
+			case 0:
+				if((port<=DO_NUM)&&(port>0)){//添加
+						packFlash.digoutput[port-1].workFlag=RT_TRUE;
+						rt_strcpy(packFlash.digoutput[port-1].name, outputLCD.name);
+						rt_strcpy(packFlash.digoutput[port-1].devID,outputLCD.devID);
+						rt_strcpy(packFlash.digoutput[port-1].model,outputLCD.model);
+						packFlash.digoutput[port-1].port=port;
+						rt_kprintf("%s add digoutput chanl %d\n",sign,port);
+						rt_kprintf("%s digoutput OK\n",sign);
+				}
+				break;
+			case 1:
+				if((port<=V33O_NUM)&&(port>0)){//添加
+						packFlash.v33output[port-1].workFlag=RT_TRUE;
+						rt_strcpy(packFlash.v33output[port-1].name, outputLCD.name);
+						rt_strcpy(packFlash.v33output[port-1].devID,outputLCD.devID);
+						rt_strcpy(packFlash.v33output[port-1].model,outputLCD.model);
+						packFlash.v33output[port-1].port=port;
+						rt_kprintf("%s add v33output chanl %d\n",sign,port);
+						rt_kprintf("%s digoutput OK\n",sign);
+				}
+				break;
+			case 2:
+				if((port<=V5O_NUM)&&(port>0)){//添加
+						packFlash.v5output[port-1].workFlag=RT_TRUE;
+						rt_strcpy(packFlash.v5output[port-1].name, outputLCD.name);
+						rt_strcpy(packFlash.v5output[port-1].devID,outputLCD.devID);
+						rt_strcpy(packFlash.v5output[port-1].model,outputLCD.model);
+						packFlash.v5output[port-1].port=port;
+						rt_kprintf("%s add v5output chanl %d\n",sign,port);
+						rt_kprintf("%s digoutput OK\n",sign);
+				}
+				break;
+			case 3:
+				if((port<=V12O_NUM)&&(port>0)){//添加
+						packFlash.v12output[port-1].workFlag=RT_TRUE;
+						rt_strcpy(packFlash.v12output[port-1].name, outputLCD.name);
+						rt_strcpy(packFlash.v12output[port-1].devID,outputLCD.devID);
+						rt_strcpy(packFlash.v12output[port-1].model,outputLCD.model);
+						packFlash.v12output[port-1].port=port;
+						rt_kprintf("%s add v12output chanl %d\n",sign,port);
+						rt_kprintf("%s digoutput OK\n",sign);
+				}
+				break;
+		}
+}
 
-//#define        DISP_OUTPUT_READ_INTERFACE_P_ADDR     0x5190
+
 
 
 uint8_t su8OutNameReadIndex=0;//开始指向 DO
@@ -83,7 +158,7 @@ uint8_t  su8OutputTotalNum[OUTNAME_NUM]={0};//显示总页数
 uint8_t  su8OutputTheNum[OUTNAME_NUM]={0};  //显示第几页
 uint8_t  su8WorkOutput[OUTNAME_NUM][DI_NUM]={0};//记录真正配置过的角标  没有配置过登记为0
 
-extern char outName[OUTNAME_NUM][INOUTNAME_LEN];
+
 
 
 
@@ -95,7 +170,7 @@ void getOutputTotalNum()
 {
 	  su8OutputSubNum=0;
 	  for(int p=0;p<OUTNAME_NUM;p++)
-			su8OutputTotalNum[p]=0;
+				su8OutputTotalNum[p]=0;
 		for(int i=0;i<DO_NUM;i++){
 				if(packFlash.digoutput[i].workFlag==RT_TRUE){
 						su8WorkOutput[0][su8OutputTotalNum[0]]=i;
@@ -111,12 +186,6 @@ void getOutputTotalNum()
 						rt_kprintf("v33outputTotalNum:%d  %d\n",su8OutputTotalNum[1],i);
 				}
 		}
-//		for(int i=0;i<V33O_NUM;i++){
-//		rt_kprintf("%sid %s\n",sign,packFlash.v33output[i].devID);
-//		rt_kprintf("%smod %s\n",sign,packFlash.v33output[i].model);
-//		rt_kprintf("%sname %s\n",sign,packFlash.v33output[i].name);
-//		rt_kprintf("%sport %d\n",sign,packFlash.v33output[i].port);
-//		}
 		for(int i=0;i<V5O_NUM;i++){
 				if(packFlash.v5output[i].workFlag==RT_TRUE){
 						su8WorkOutput[2][su8OutputTotalNum[2]]=i;
@@ -140,12 +209,12 @@ void getOutputTotalNum()
 		
 		
 		for(int i=0;i<OUTNAME_NUM;i++){
-			if(su8OutputTotalNum[i]>0){
-					su8OutputTheNum[i]=1;
-			}
-			else{
-					su8OutputTheNum[i]=0;
-			}
+				if(su8OutputTotalNum[i]>0){
+						su8OutputTheNum[i]=1;
+				}
+				else{
+						su8OutputTheNum[i]=0;
+				}
 		}
 }
 
@@ -225,18 +294,11 @@ digitStru  *outputp[DO_NUM]={0};//用digoutput v33output v5output v12output的最大
 
 void  delOneOutput()
 {
-	uint8_t p=su8WorkOutput[su8OutNameReadIndex][su8OutputSubNum];
-	if(outputp[p]!=NULL){
-		outputp[p]->workFlag=RT_FALSE;
-				  rt_kprintf("del one:%s %s %s\n",outputp[p]->name,outputp[p]->devID);
-	}
-//				if(rt_strcmp(packFlash.diginput[p].devID,packFlash.diginput[su8WorkInput[su8inputTheNum-1]].devID)==0){
-
-//						packFlash.diginput[p].workFlag=RT_FALSE;
-//						rt_kprintf("del one:%d %d %d\n",p,su8inputTotalNum,su8inputTheNum);
-//					  rt_kprintf("del one:%s %s %s\n",packFlash.diginput[p].name,packFlash.diginput[p].devID,packFlash.diginput[p].model);
-//				}
-
+		uint8_t p=su8WorkOutput[su8OutNameReadIndex][su8OutputSubNum];
+		if(outputp[p]!=NULL){
+			outputp[p]->workFlag=RT_FALSE;
+						rt_kprintf("del one:%s %s %s\n",outputp[p]->name,outputp[p]->devID);
+		}
 }
 
 //输入显示发数据给LCD
@@ -303,7 +365,7 @@ void  dispOutputRead()
 	  //显示中文名
 		uint8_t p=su8WorkOutput[su8OutNameReadIndex][su8OutputSubNum];
 	//if(packFlash.diginput[p].workFlag==RT_TRUE){
-	 int Len=strlen(outputp[p]->name);
+		int Len=strlen(outputp[p]->name);
 		for(int i=0;i<Len;i++){
 				buf[i]=outputp[p]->name[i];
 		}
@@ -315,16 +377,12 @@ void  dispOutputRead()
 		LCDWtite(DISP_OUTPUT_READ_NAME_ADDR,buf,NAME_LEN);
 		
 		//显示输出接口 {"DO","V3O","V5O","V12O"}中的一个
-//		rt_kprintf("%sid %s\n",sign,outputp[p]->devID);
-//		rt_kprintf("%smod %s\n",sign,outputp[p]->model);
-//		rt_kprintf("%sname %s\n",sign,outputp[p]->name);
-//		rt_kprintf("%sport %d\n",sign,outputp[p]->port);
 		
 		//显示ID
 		 Len=strlen(outputp[p]->devID);
-		for(int i=0;i<Len;i++){
-				buf[i]=outputp[p]->devID[i];
-		}
+			for(int i=0;i<Len;i++){
+					buf[i]=outputp[p]->devID[i];
+			}
 		 j=0;
 		while((Len+j)<DEVID_LEN){
 				buf[Len+j]=0xff;
@@ -364,5 +422,6 @@ void  dispOutputRead()
 		rt_free(buf);
 		buf=RT_NULL;
 }
+
 
 
