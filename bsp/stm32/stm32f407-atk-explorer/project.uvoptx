@@ -157,9 +157,9 @@
         <Bp>
           <Number>0</Number>
           <Type>0</Type>
-          <LineNumber>151</LineNumber>
+          <LineNumber>260</LineNumber>
           <EnabledFlag>1</EnabledFlag>
-          <Address>134291528</Address>
+          <Address>134294940</Address>
           <ByteObject>0</ByteObject>
           <HtxType>0</HtxType>
           <ManyObjects>0</ManyObjects>
@@ -168,14 +168,30 @@
           <BreakIfRCount>1</BreakIfRCount>
           <Filename>.\LCD7inch\lcdDispAna.c</Filename>
           <ExecCommand></ExecCommand>
-          <Expression>\\rt_thread\LCD7inch/lcdDispAna.c\151</Expression>
+          <Expression>\\rt_thread\LCD7inch/lcdDispAna.c\260</Expression>
         </Bp>
         <Bp>
           <Number>1</Number>
           <Type>0</Type>
+          <LineNumber>281</LineNumber>
+          <EnabledFlag>1</EnabledFlag>
+          <Address>134304038</Address>
+          <ByteObject>0</ByteObject>
+          <HtxType>0</HtxType>
+          <ManyObjects>0</ManyObjects>
+          <SizeOfObject>0</SizeOfObject>
+          <BreakByAccess>0</BreakByAccess>
+          <BreakIfRCount>1</BreakIfRCount>
+          <Filename>.\LCD7inch\lcdKeyEvent.c</Filename>
+          <ExecCommand></ExecCommand>
+          <Expression>\\rt_thread\LCD7inch/lcdKeyEvent.c\281</Expression>
+        </Bp>
+        <Bp>
+          <Number>2</Number>
+          <Type>0</Type>
           <LineNumber>382</LineNumber>
           <EnabledFlag>1</EnabledFlag>
-          <Address>134294676</Address>
+          <Address>134294196</Address>
           <ByteObject>0</ByteObject>
           <HtxType>0</HtxType>
           <ManyObjects>0</ManyObjects>
@@ -187,25 +203,41 @@
           <Expression>\\rt_thread\LCD7inch/lcdOutputCfg .c\382</Expression>
         </Bp>
         <Bp>
-          <Number>2</Number>
+          <Number>3</Number>
           <Type>0</Type>
-          <LineNumber>268</LineNumber>
+          <LineNumber>293</LineNumber>
           <EnabledFlag>1</EnabledFlag>
-          <Address>134303702</Address>
+          <Address>134295160</Address>
           <ByteObject>0</ByteObject>
           <HtxType>0</HtxType>
           <ManyObjects>0</ManyObjects>
           <SizeOfObject>0</SizeOfObject>
           <BreakByAccess>0</BreakByAccess>
           <BreakIfRCount>1</BreakIfRCount>
-          <Filename>.\LCD7inch\lcdKeyEvent.c</Filename>
+          <Filename>.\LCD7inch\lcdDispAna.c</Filename>
           <ExecCommand></ExecCommand>
-          <Expression>\\rt_thread\LCD7inch/lcdKeyEvent.c\268</Expression>
+          <Expression>\\rt_thread\LCD7inch/lcdDispAna.c\293</Expression>
         </Bp>
         <Bp>
-          <Number>3</Number>
+          <Number>4</Number>
           <Type>0</Type>
-          <LineNumber>266</LineNumber>
+          <LineNumber>297</LineNumber>
+          <EnabledFlag>1</EnabledFlag>
+          <Address>134295188</Address>
+          <ByteObject>0</ByteObject>
+          <HtxType>0</HtxType>
+          <ManyObjects>0</ManyObjects>
+          <SizeOfObject>0</SizeOfObject>
+          <BreakByAccess>0</BreakByAccess>
+          <BreakIfRCount>1</BreakIfRCount>
+          <Filename>.\LCD7inch\lcdDispAna.c</Filename>
+          <ExecCommand></ExecCommand>
+          <Expression>\\rt_thread\LCD7inch/lcdDispAna.c\297</Expression>
+        </Bp>
+        <Bp>
+          <Number>5</Number>
+          <Type>0</Type>
+          <LineNumber>280</LineNumber>
           <EnabledFlag>1</EnabledFlag>
           <Address>0</Address>
           <ByteObject>0</ByteObject>
@@ -219,9 +251,25 @@
           <Expression></Expression>
         </Bp>
         <Bp>
-          <Number>4</Number>
+          <Number>6</Number>
           <Type>0</Type>
-          <LineNumber>274</LineNumber>
+          <LineNumber>282</LineNumber>
+          <EnabledFlag>1</EnabledFlag>
+          <Address>0</Address>
+          <ByteObject>0</ByteObject>
+          <HtxType>0</HtxType>
+          <ManyObjects>0</ManyObjects>
+          <SizeOfObject>0</SizeOfObject>
+          <BreakByAccess>0</BreakByAccess>
+          <BreakIfRCount>0</BreakIfRCount>
+          <Filename>.\LCD7inch\lcdKeyEvent.c</Filename>
+          <ExecCommand></ExecCommand>
+          <Expression></Expression>
+        </Bp>
+        <Bp>
+          <Number>7</Number>
+          <Type>0</Type>
+          <LineNumber>288</LineNumber>
           <EnabledFlag>1</EnabledFlag>
           <Address>0</Address>
           <ByteObject>0</ByteObject>
@@ -350,6 +398,11 @@
           <count>22</count>
           <WinNumber>1</WinNumber>
           <ItemText>su8OutputTheNum</ItemText>
+        </Ww>
+        <Ww>
+          <count>23</count>
+          <WinNumber>1</WinNumber>
+          <ItemText>buf</ItemText>
         </Ww>
       </WatchWindow1>
       <WatchWindow2>

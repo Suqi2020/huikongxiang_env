@@ -384,13 +384,13 @@ void  dispOutputRead()
 					buf[i]=outputp[p]->devID[i];
 			}
 		 j=0;
-		while((Len+j)<DEVID_LEN){
+		while((Len+j)<DEVID_LEN+2){
 				buf[Len+j]=0xff;
 				j++;
 				if(j>=2)
 					break;
 		}
-		LCDWtite(DISP_OUTPUT_READ_ID_ADDR,buf,DEVID_LEN);//7´çÆÁÏÔÊ¾18
+		LCDWtite(DISP_OUTPUT_READ_ID_ADDR,buf,DEVID_LEN+2);//7´çÆÁÏÔÊ¾18
 		//ÏÔÊ¾model
 		Len=strlen(outputp[p]->model);
 		for(int i=0;i<Len;i++){

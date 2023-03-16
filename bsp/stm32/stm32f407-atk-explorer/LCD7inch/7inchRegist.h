@@ -195,14 +195,14 @@
 #define        DISP_ANA_TYPE_ADDR     0x5220
 #define        DISP_ANA_PORT_ADDR     0x5228
 #define        DISP_ANA_TIME_ADDR     0x522A
-
+#define        KEY_ANA_NAME_INTERFACE_ADDR     0x523C
 #define        KEY_ANA_SUBNAME_INTERFACE_ADDR     0x522C
 #define        KEY_ANA_SURE_ADDR     0x522E
 #define        KEY_ANA_LOOK_ADDR     0x5230
 //#define        KEY_ANA_RETURN_ADDR     0x5232
 
 //#define             0x5208
-#define        KEY_ANA_SURE_ADDR     0x5236
+#define        KEY_ANA_SURE_INTERFACE_ADDR     0x5236
 #define        KEY_ANA_LAST_ADDR     0x5238
 #define        KEY_ANA_NEXT_ADDR     0x523A
 

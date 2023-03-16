@@ -140,9 +140,10 @@
 //         除了modbus传感器，输入输出以及模拟传感器的配置按照端口号来的
 //         输入新的配置如果端口号相同会导致原来的失效
 //V0.81    增加模拟传感器读取成功
-#define APP_VER       ((0<<8)+81)//0x0105 表示1.5版本
+//V0.82    增加模拟传感器配置删除成功
+#define APP_VER       ((0<<8)+82)//0x0105 表示1.5版本
 //
-const char date[]="20230315";
+const char date[]="20230316";
 
 //static    rt_thread_t tid 	= RT_NULL;
 static    rt_thread_t tidW5500 	  = RT_NULL;

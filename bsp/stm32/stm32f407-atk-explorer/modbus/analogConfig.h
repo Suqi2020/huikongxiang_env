@@ -5,7 +5,7 @@
 #define   ANALOGNAME_NUM      1
 ////////////////////////////////////////////////////////////////////////////
 const static char  analogName[ANALOGNAME_NUM][NAME_LEN]={"温湿度"};
-const static char  anaSubName1Val[2][NAME_LEN]={"温度","湿度"};
+const static char  anaSubName1Val[ANA_SUBNAME_LEN][NAME_LEN]={"温度","湿度"};
 //typedef enum{
 //		enumAnaTemp=1,
 //	  enumAnaHum=2

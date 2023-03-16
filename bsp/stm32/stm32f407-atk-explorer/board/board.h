@@ -19,6 +19,7 @@
 #define 	DEVID_LEN       20
 #define   MODEL_LEN       8
 #define   NAME_LEN        20
+#define   ANA_SUBNAME_LEN  2
 #define   DI_NUM          8
 #define   DO_NUM          8
 #define   V33O_NUM        2

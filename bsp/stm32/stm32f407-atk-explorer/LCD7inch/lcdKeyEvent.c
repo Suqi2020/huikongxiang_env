@@ -69,6 +69,20 @@ void	dispoutConfigLast(void);
 void	dispoutputNameInterf(void);
 void	dispoutConfigNext(void);
 void	delOneOutput(void);
+void  getAnaTotalNum(void);
+void  dispReadAna(void);
+void  lastReadAna(void);
+void  nextReadAna(void);
+
+
+
+
+void dispName(void);
+void dispSubName(void);
+void nextSubName(void);
+void lastSubName(void);
+void lcdAnaConfig(void);
+void  delOneAna(void);
 //按键触发总接口
 void  keyReturn(uint16_t keyAddr)
 {
@@ -321,33 +335,44 @@ void  keyReturn(uint16_t keyAddr)
 //#define        KEY_ANA_SURE_ADDR     0x522E
 			case   KEY_ANA_LOOK_ADDR :
 				getAnaTotalNum();
-			  dispAna();
+			  dispReadAna();
 				break;
-////#define        KEY_ANA_RETURN_ADDR     0x5232
+			
+			
+			case  KEY_ANA_NAME_INTERFACE_ADDR:
+				dispName();
+				break;
+			case  KEY_ANA_SUBNAME_INTERFACE_ADDR:
+				dispSubName();
+				break;
+			case  KEY_ANA_SURE_ADDR:
+				lcdAnaConfig();
+				break;
+			case	KEY_ANA_LAST_ADDR:
+				lastSubName();
+				dispSubName();
+				break;
+			
+			case  KEY_ANA_NEXT_ADDR:
+				nextSubName();
+				dispSubName();
+				break;
 
-////#define             0x5208
-//#define        KEY_ANA_SURE_ADDR     0x5236
-//#define        KEY_ANA_LAST_ADDR     0x5238
-//#define        KEY_ANA_NEXT_ADDR     0x523A
-
-
-//#define        DISP_ANAREAD_NAME_ADDR    0x5240
-//#define        DISP_ANAREAD_SUBNAME_ADDR 0x5248
-//#define        DISP_ANAREAD_ID_ADDR     0x5250
-//#define        DISP_ANAREAD_TYPE_ADDR     0x5260
-//#define        DISP_ANAREAD_PORT_ADDR     0x5268
-//#define        DISP_ANAREAD_TIME_ADDR     0x526A
-//#define        DISP_ANAREAD_TOTALNUM_ADDR     0x526C
-//#define        DISP_ANAREAD_THENUM_ADDR     0x526E
+			
+			
+			
 			case   KEY_ANAREAD_LAST_ADDR:
-				lastAna();
-			  dispAna();
+				lastReadAna();
+			  dispReadAna();
 				break;
 			case   KEY_ANAREAD_NEXT_ADDR:
-				nextAna();
-			  dispAna();
+				nextReadAna();
+			  dispReadAna();
 				break;
 			case   KEY_ANAREAD_DEL_ADDR:
+				delOneAna();
+				getAnaTotalNum();
+			  dispReadAna();
 				break;
 		//开关控制end
 		}
@@ -372,6 +397,16 @@ void	lcdCopyOutputName(uint8_t *rec);
 void	lcdCopyOutputID(uint8_t *rec);
 void	lcdCopyOutputModel(uint8_t *rec);
 void	lcdCopyOutputPort(uint8_t *rec);
+
+
+
+void lcdCopyAnaID(uint8_t *rec);
+//拷贝输入的type到AnaInputLCD中
+void lcdCopyAnaModel(uint8_t *rec);
+//拷贝输入的port到AnadigInputLCD中
+void lcdCopyAnaPort(uint8_t *rec);
+//拷贝输入的time到AnaInput中
+void lcdCopyAnaTime(uint8_t *rec);
 //lcd 发来的配置解析
 void LCDDispConfig(uint8_t *recBuf,int len)
 {
@@ -505,7 +540,19 @@ void LCDDispConfig(uint8_t *recBuf,int len)
 			case DISP_OUTPUT_PORT_ADDR:
 				lcdCopyOutputPort(recBuf);
 				break;
-
+			case DISP_ANA_ID_ADDR:
+				lcdCopyAnaID(recBuf);
+				break;
+			case DISP_ANA_TYPE_ADDR:
+				lcdCopyAnaModel(recBuf);
+				break;
+			case DISP_ANA_PORT_ADDR:
+				lcdCopyAnaPort(recBuf);
+				break;
+			case DISP_ANA_TIME_ADDR:
+				lcdCopyAnaTime(recBuf);
+				break;
+			
 		}
 }
 

@@ -192,13 +192,13 @@ void  dispInput()
 				buf[i]=packFlash.diginput[p].devID[i];
 		}
 		 j=0;
-		while((Len+j)<DEVID_LEN){
+		while((Len+j)<DEVID_LEN+2){
 				buf[Len+j]=0xff;
 				j++;
 				if(j>=2)
 					break;
 		}
-		LCDWtite(DISP_INPUT_ID_ADDR,buf,DEVID_LEN);//7¥Á∆¡œ‘ æ18
+		LCDWtite(DISP_INPUT_ID_ADDR,buf,DEVID_LEN+2);//7¥Á∆¡œ‘ æ18
 		//œ‘ æmodel
 		Len=strlen(packFlash.diginput[p].model);
 		for(int i=0;i<Len;i++){
