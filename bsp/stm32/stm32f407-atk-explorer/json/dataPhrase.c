@@ -3,6 +3,7 @@
 //https://blog.csdn.net/woody218/article/details/119634171  json解析参考
 extern uint16_t RTU_CRC(uint8_t *puchMsg , uint16_t usDataLen);
 const static char sign[]="[dataPhrs]";
+uint32_t  respMid=0;
 //数据校验 头尾 校验和 是否正确
 //rt_TRUE 正确 rt_FALSE 错误
 rt_bool_t dataCheck(char *data,int lenth)
@@ -34,24 +35,15 @@ rt_bool_t dataCheck(char *data,int lenth)
 //分别找出下行数据的类型并分类    
 packTypeEnum  downLinkPackTpyeGet(cJSON  *TYPE)
 {
+	  int size =sizeof(typeHeadDown)/sizeof(typeHeadDown[0]);
 	
-	
-	  if(rt_strcmp(TYPE->valuestring,"CMD_HEARTBEA_RESPONSE")==0){
-				return heartResp;
+	  for(int i=0;i<size;i++){
+				if(rt_strcmp(TYPE->valuestring,typeHeadDown[i])==0){
+						return i;
+				}
 		}
-		else if(rt_strcmp(TYPE->valuestring,"CMD_DEVICE_REGISTER_RESPONSE")==0){
-				return devRegResp;
-		}
-		else if(rt_strcmp(TYPE->valuestring,"CMD_REPORTDATA_RESPONSE")==0){
-				return repDataResp;
-		}else if(rt_strcmp(TYPE->valuestring,"CMD_REQUESTDATA")==0){
-				return CMDRepData;
-		}
-		else{
-				rt_kprintf("%serr:packetType  %s %d\r\n",sign,TYPE->valuestring,strlen(TYPE->valuestring));
-		}
-		
-		return errResp;
+		rt_kprintf("%serr:type head [%s]\n",TYPE->valuestring);	
+		return ERRRESP;
 }
 
 
@@ -129,10 +121,6 @@ rt_bool_t comRespFun(cJSON  *Json,uint32_t mesgID)
 void AllDownPhrase(char *data,int lenth)
 {
 		rt_kprintf("%sphrase len:%d\r\n",sign,lenth);
-		
-//		for(int i=0;i<lenth;i++)
-//				rt_kprintf("%02x",data[i]);
-//		rt_kprintf("\r\n");
 	  if(dataCheck(data,lenth)==RT_FALSE){
 				return;
 		}
@@ -160,35 +148,89 @@ void AllDownPhrase(char *data,int lenth)
 		
 		if(Json!=RT_NULL){//解析json数据
 				cJSON  *pkType = cJSON_GetObjectItem(Json,"packetType");
+			  cJSON  *pkIdentf = cJSON_GetObjectItem(Json,"identifier");
+			
+				cJSON  *mid =cJSON_GetObjectItem(Json,"mid");
+			  respMid = mid->valueint;
+		
 			  switch(downLinkPackTpyeGet(pkType)){
-					case 	heartResp:
+
+					case	PROPERTIES_HEART_RESP:
 						if(RT_TRUE==heartRespFun(Json)){//收到心跳回应 怎么通知发送层
 								rt_kprintf("%srec heart resp\r\n",sign);
 						}
 						break;
-					case devRegResp:
+					case	PROPERTIES_REG_RESP:
 						if(RT_TRUE==comRespFun(Json,mcu.devRegMessID)){//收到注册回应 怎么通知发送层
 								rt_kprintf("%sreg dev succ\r\n",sign);
 							  extern rt_bool_t gbRegFlag;
 							  gbRegFlag = RT_TRUE;
 						}
 						break;
-					case repDataResp:
+					case	PROPERTIES_485DATA_REP_RESP:
 						if(RT_TRUE==comRespFun(Json,mcu.repDataMessID)){//收到数据包回应 怎么通知发送层
 								rt_kprintf("%sreport data succ\r\n",sign);
 						}
 						break;
-					case CMDRepData:
+					case	PROPERTIES_485DATA_GET:
+						void  readModbusDataResp(char *monitor);
+					  readModbusDataResp(pkIdentf->valuestring);
 						break;
-					case CMDRepEvt:
+					case	PROPERTIES_ANADATA_REP_RESP:
 						break;
-					case CMDReqData:
+					case	PROPERTIES_ANADATA_GET:
+						
+						void  readAnaDataResp(char *monitor);
+					  readAnaDataResp(pkIdentf->valuestring);
+					
 						break;
-					case CMDReqHis:
+					case	PROPERTIES_485TIM_GET:
 						break;
-					case errResp:
+					case	PROPERTIES_485TIM_SET:
 						break;
-					default:
+					case	PROPERTIES_ANATIM_GET:
+						break;
+					case	PROPERTIES_ANATIM_SET:
+						break;
+					case	PROPERTIES_485TH_GET:
+						break;
+					case	PROPERTIES_485TH_SET:
+						break;
+					case	PROPERTIES_ANATH_GET:
+						break;
+					case	PROPERTIES_ANATH_SET:
+						break;
+					case	PROPERTIES_INPUT_REP_RESP:
+						break;
+					case	PROPERTIES_INPUT_GET:
+						break;
+					case	PROPERTIES_OUTPUT_REP_RESP:
+						break;
+					case	PROPERTIES_OUTPUT_GET:
+						break;
+					case	PROPERTIES_OUTPUT_SET:
+						break;
+					case	SERVICES_CTRLCFG_READ:
+						break;
+					case	SERVICES_CTRLCFG_ADD:
+						break;
+					case	SERVICES_CTRLCFG_DEL:
+						break;
+					case	SERVICES_DEV_REBOOT:
+						break;
+					case	SERVICES_ACU_REBOOT:
+						break;
+					case	SERVICES_HISTORY_READ:
+						break;
+					case	SERVICES_OTA_WRITE:
+						break;
+					case	SERVICES_SAVE:
+						break;
+					case	EVENTS_485_ALARM_RESP:
+						break;
+					case	EVENTS_ANA_ALARM_RESP:
+						break;
+					case  ERRRESP:
 						break;
 				}
 		}

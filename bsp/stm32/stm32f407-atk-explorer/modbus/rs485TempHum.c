@@ -119,7 +119,9 @@ void readTempHum(int num)
 
 
 //温湿度值通过json格式打包
-static uint16_t tempHumJsonPack()
+//输入 respFlag 为true就是回应
+//              为false就是report数据
+static uint16_t tempHumJsonPack(bool respFlag)
 {
 		char* out = NULL;
 		//创建数组
@@ -131,8 +133,17 @@ static uint16_t tempHumJsonPack()
 		root = cJSON_CreateObject();
 		if (root == NULL) return 0;
 		// 加入节点（键值对）
-		cJSON_AddNumberToObject(root, "mid",mcu.upMessID);
-		cJSON_AddStringToObject(root, "packetType","CMD_REPORTDATA");
+		
+	  if(respFlag==true){
+				cJSON_AddNumberToObject(root, "mid",respMid);
+				cJSON_AddStringToObject(root, "packetType","PROPERTIES_485_DATA_GET_RESP");
+				cJSON_AddStringToObject(root, "code","0");
+		}
+		else
+		{
+				cJSON_AddNumberToObject(root, "mid",mcu.upMessID);
+				cJSON_AddStringToObject(root, "packetType","PROPERTIES_485_DATA_REP");
+		}
 		cJSON_AddStringToObject(root, "identifier","temperature_and_humidity_monitor");
 		cJSON_AddStringToObject(root, "acuId",(char *)packFlash.acuId);
 		char *sprinBuf=RT_NULL;
@@ -147,8 +158,8 @@ static uint16_t tempHumJsonPack()
 				nodeobj = cJSON_CreateObject();
 				cJSON_AddItemToArray(Array, nodeobj);
 			  cJSON_AddItemToObject(nodeobj,"deviceId",cJSON_CreateString(sheet.tempHum[i].ID));
-				sprintf(sprinBuf,"%d",thum[i].respStat);
-				cJSON_AddItemToObject(nodeobj,"responseStatus",cJSON_CreateString(sprinBuf));
+				//sprintf(sprinBuf,"%d",thum[i].respStat);
+				cJSON_AddNumberToObject(nodeobj,"responseStatus",thum[i].respStat);
 				
 				nodeobj_p= cJSON_CreateObject();
 				cJSON_AddItemToObject(nodeobj, "data", nodeobj_p);
@@ -201,9 +212,11 @@ static uint16_t tempHumJsonPack()
 		packBuf[len]=(uint8_t)(TAIL>>8); len++;
 		packBuf[len]=(uint8_t)(TAIL);    len++;
 		packBuf[len]=0;//len++;//结尾 补0
-		mcu.repDataMessID =mcu.upMessID;
-		//mcu.devRegMessID =mcu.upMessID;
-		upMessIdAdd();
+		if(respFlag==false){
+				mcu.repDataMessID =mcu.upMessID;
+				//mcu.devRegMessID =mcu.upMessID;
+				upMessIdAdd();
+		}
 		rt_kprintf("%s len:%d\r\n",sign,len);
 		rt_kprintf("\r\n%slen：%d str0:%x str1:%x str[2]:%d  str[3]:%d\r\n",sign,len,packBuf[0],packBuf[1],packBuf[2],packBuf[3]);
 
@@ -214,7 +227,7 @@ static uint16_t tempHumJsonPack()
 }
 
 //温湿度值读取并打包json格式
-void tempHumRead2Send(rt_bool_t netStat)
+void tempHumRead2Send(rt_bool_t netStat,bool respFlag)
 {
 	 int workFlag=RT_FALSE;
 		for(int i=0;i<TEMPHUM_485_NUM;i++){
@@ -225,7 +238,7 @@ void tempHumRead2Send(rt_bool_t netStat)
 	}
 	if(workFlag==RT_TRUE){
 			rt_kprintf("%s打包采集的temphum数据\r\n",sign);
-			tempHumJsonPack();
+			tempHumJsonPack(respFlag);
 			if(netStat==RT_TRUE)
 					rt_mb_send_wait(&mbNetSendData, (rt_ubase_t)&packBuf,RT_WAITING_FOREVER);
 	}

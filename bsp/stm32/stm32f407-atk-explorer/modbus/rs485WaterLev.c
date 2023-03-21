@@ -98,7 +98,9 @@ static void readWaterDepth(int num)
 
 
 //水位值打包成json格式
-static uint16_t waterDepthJsonPack()
+//输入 respFlag 为true就是回应
+//              为false就是report数据
+uint16_t waterDepthJsonPack(bool respFlag)
 {
 //		char *sprinBuf=RT_NULL;
 //		sprinBuf=rt_malloc(20);//20个字符串长度 够用了
@@ -112,8 +114,17 @@ static uint16_t waterDepthJsonPack()
 		root = cJSON_CreateObject();
 		if (root == NULL) return 0;
 		// 加入节点（键值对）
-		cJSON_AddNumberToObject(root, "mid",mcu.upMessID);
-		cJSON_AddStringToObject(root, "packetType","CMD_REPORTDATA");
+		
+		if(respFlag==true){
+				cJSON_AddNumberToObject(root, "mid",respMid);
+				cJSON_AddStringToObject(root, "packetType","PROPERTIES_485_DATA_GET_RESP");
+				cJSON_AddStringToObject(root, "code","0");
+		}
+		else
+		{
+				cJSON_AddNumberToObject(root, "mid",mcu.upMessID);
+				cJSON_AddStringToObject(root, "packetType","PROPERTIES_485_DATA_REP");
+		}
 		cJSON_AddStringToObject(root, "identifier","water_level_monitor");
 		cJSON_AddStringToObject(root, "acuId",(char *)packFlash.acuId);
 //	  cJSON_AddItemToObject(root,"acuId",cJSON_CreateString(packFlash.acuId));
@@ -130,8 +141,8 @@ static uint16_t waterDepthJsonPack()
 				nodeobj = cJSON_CreateObject();
 				cJSON_AddItemToArray(Array, nodeobj);
 			  cJSON_AddItemToObject(nodeobj,"deviceId",cJSON_CreateString(sheet.waterDepth[i].ID));
-				sprintf(sprinBuf,"%d",respStat[i]);
-				cJSON_AddItemToObject(nodeobj,"responseStatus",cJSON_CreateString(sprinBuf));
+				//sprintf(sprinBuf,"%d",respStat[i]);
+				cJSON_AddNumberToObject(nodeobj,"responseStatus",respStat[i]);
 				
 				nodeobj_p= cJSON_CreateObject();
 				cJSON_AddItemToObject(nodeobj, "data", nodeobj_p);
@@ -184,9 +195,10 @@ static uint16_t waterDepthJsonPack()
 		packBuf[len]=(uint8_t)(TAIL>>8); len++;
 		packBuf[len]=(uint8_t)(TAIL);    len++;
 		packBuf[len]=0;//len++;//结尾 补0
-		mcu.repDataMessID =mcu.upMessID;
-		//mcu.devRegMessID =mcu.upMessID;
-		upMessIdAdd();
+		if(respFlag==false){
+			mcu.repDataMessID =mcu.upMessID;
+			upMessIdAdd();
+		}
 		rt_kprintf("%s len:%d\r\n",sign,len);
 		rt_kprintf("\r\n%slen：%d str0:%x str1:%x str[2]:%d  str[3]:%d\r\n",sign,len,packBuf[0],packBuf[1],packBuf[2],packBuf[3]);
 
@@ -198,7 +210,7 @@ static uint16_t waterDepthJsonPack()
 
 
 //水位值的读取和打包发送  仅仅做封装 供别的函数来调用
-void waterDepthRead2Send(rt_bool_t netStat)
+void waterDepthRead2Send(rt_bool_t netStat,bool respFlag)
 {
 	 int workFlag=RT_FALSE;
 			for(int i=0;i<WATERDEPTH_485_NUM;i++){
@@ -209,7 +221,7 @@ void waterDepthRead2Send(rt_bool_t netStat)
 			}
 			if(workFlag==RT_TRUE){
 					rt_kprintf("%s打包采集的waterdepth数据\r\n",sign);
-					waterDepthJsonPack();
+					waterDepthJsonPack(respFlag);
 					if(netStat==RT_TRUE)
 							rt_mb_send_wait(&mbNetSendData, (rt_ubase_t)&packBuf,RT_WAITING_FOREVER);
 			}

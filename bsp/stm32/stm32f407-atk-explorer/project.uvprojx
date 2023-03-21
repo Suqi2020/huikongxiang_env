@@ -674,11 +674,6 @@
           <GroupName>Json</GroupName>
           <Files>
             <File>
-              <FileName>dataPack.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>json\dataPack.c</FilePath>
-            </File>
-            <File>
               <FileName>cJSON.c</FileName>
               <FileType>1</FileType>
               <FilePath>json\cJSON.c</FilePath>
@@ -692,6 +687,56 @@
               <FileName>dataPhrase.c</FileName>
               <FileType>1</FileType>
               <FilePath>json\dataPhrase.c</FilePath>
+            </File>
+            <File>
+              <FileName>registHeart.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>.\json\registHeart.c</FilePath>
+            </File>
+            <File>
+              <FileName>didoCfg.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>.\json\didoCfg.c</FilePath>
+            </File>
+            <File>
+              <FileName>history.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>.\json\history.c</FilePath>
+            </File>
+            <File>
+              <FileName>logCtrl.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>.\json\logCtrl.c</FilePath>
+            </File>
+            <File>
+              <FileName>ota.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>.\json\ota.c</FilePath>
+            </File>
+            <File>
+              <FileName>rebootSave.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>.\json\rebootSave.c</FilePath>
+            </File>
+            <File>
+              <FileName>sensorEvent.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>.\json\sensorEvent.c</FilePath>
+            </File>
+            <File>
+              <FileName>sensorTHCfg.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>.\json\sensorTHCfg.c</FilePath>
+            </File>
+            <File>
+              <FileName>sensorTimecfg.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>.\json\sensorTimecfg.c</FilePath>
+            </File>
+            <File>
+              <FileName>dataPack.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>.\json\dataPack.c</FilePath>
             </File>
           </Files>
         </Group>
@@ -807,6 +852,11 @@
               <FileName>lcdDispAna.c</FileName>
               <FileType>1</FileType>
               <FilePath>.\LCD7inch\lcdDispAna.c</FilePath>
+            </File>
+            <File>
+              <FileName>lcdDispTHCfg.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>.\LCD7inch\lcdDispTHCfg.c</FilePath>
             </File>
           </Files>
         </Group>

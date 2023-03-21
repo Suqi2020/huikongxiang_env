@@ -230,7 +230,10 @@ int main(void)
 		
 	  rt_kprintf("\n%\n",sign,date,(uint8_t)(APP_VER>>8),(uint8_t)APP_VER);
     rt_kprintf("\n%s%s  ver=%02d.%02d\n",sign,date,(uint8_t)(APP_VER>>8),(uint8_t)APP_VER);
-	  
+		if(1.00001==1)
+			rt_kprintf("(1.00001==1)\n");
+		if(1.0000000==1)
+			rt_kprintf("(1.00000==1)\n");
 	 // rt_kprintf("[%s %f]\n",strnum,atof(strnum));
 	  //rt_kprintf("name %s  %s\n",modbusName[0],modbusName_utf8[0]);
 	  rt_err_t result;
@@ -303,11 +306,11 @@ int main(void)
 		
 
 ////////////////////////////////ÈÎÎñ////////////////////////////////////
-//    tidW5500 =  rt_thread_create("w5500",w5500Task,RT_NULL,1024,3, 10 );
-//		if(tidW5500!=NULL){
-//				rt_thread_startup(tidW5500);													 
-//				rt_kprintf("%sRTcreat w5500Task task\r\n",sign);
-//		}
+    tidW5500 =  rt_thread_create("w5500",w5500Task,RT_NULL,1024,3, 10 );
+		if(tidW5500!=NULL){
+				rt_thread_startup(tidW5500);													 
+				rt_kprintf("%sRTcreat w5500Task task\r\n",sign);
+		}
 		tidNetRec =  rt_thread_create("netRec",netDataRecTask,RT_NULL,1024,2, 10 );
 		if(tidNetRec!=NULL){
 				rt_thread_startup(tidNetRec);													 

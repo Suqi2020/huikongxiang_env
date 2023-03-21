@@ -224,7 +224,9 @@ extern  float o2[O2_485_NUM];;
 extern  float h2s[H2S_485_NUM];
 extern   float ch4[CH4_485_NUM];
 //4中气体打包
-int  gasPack(int num)
+//输入 respFlag 为true就是回应
+//              为false就是report数据
+static uint16_t gasPack(int num,bool respFlag)
 {
 		char* out = NULL;
 		//创建数组
@@ -238,8 +240,17 @@ int  gasPack(int num)
 		char *sprinBuf=RT_NULL;
 		sprinBuf=rt_malloc(20);//20个字符串长度 够用了
 		// 加入节点（键值对）
-		cJSON_AddNumberToObject(root, "mid",mcu.upMessID);
-		cJSON_AddStringToObject(root, "packetType","CMD_REPORTDATA");
+		
+	  if(respFlag==true){
+				cJSON_AddNumberToObject(root, "mid",respMid);
+				cJSON_AddStringToObject(root, "packetType","PROPERTIES_485_DATA_GET_RESP");
+				cJSON_AddStringToObject(root, "code","0");
+		}
+		else
+		{
+				cJSON_AddNumberToObject(root, "mid",mcu.upMessID);
+				cJSON_AddStringToObject(root, "packetType","PROPERTIES_485_DATA_REP");
+		}	
 		cJSON_AddStringToObject(root, "identifier","gas_monitor");
 		cJSON_AddStringToObject(root, "acuId",(char *)packFlash.acuId);
 		
@@ -254,8 +265,8 @@ int  gasPack(int num)
 				nodeobj = cJSON_CreateObject();
 				cJSON_AddItemToArray(Array, nodeobj);
 			  cJSON_AddItemToObject(nodeobj,"deviceId",cJSON_CreateString(sheet.co[num].ID));
-				sprintf(sprinBuf,"%d",1);//respStat[num]);
-				cJSON_AddItemToObject(nodeobj,"responseStatus",cJSON_CreateString(sprinBuf));
+//				sprintf(sprinBuf,"%d",1);//respStat[num]);
+				cJSON_AddNumberToObject(nodeobj,"responseStatus",1);
 				
 				nodeobj_p= cJSON_CreateObject();
 				cJSON_AddItemToObject(nodeobj, "data", nodeobj_p);
@@ -318,9 +329,11 @@ int  gasPack(int num)
 		packBuf[len]=(uint8_t)(TAIL>>8); len++;
 		packBuf[len]=(uint8_t)(TAIL);    len++;
 		packBuf[len]=0;//len++;//结尾 补0
-		mcu.repDataMessID =mcu.upMessID;
-		//mcu.devRegMessID =mcu.upMessID;
-		upMessIdAdd();
+		if(respFlag==false){
+				mcu.repDataMessID =mcu.upMessID;
+				//mcu.devRegMessID =mcu.upMessID;
+				upMessIdAdd();
+		}
 		rt_kprintf("%s len:%d\r\n",sign,len);
 		rt_kprintf("\r\n%slen：%d str0:%x str1:%x str[2]:%d  str[3]:%d\r\n",sign,len,packBuf[0],packBuf[1],packBuf[2],packBuf[3]);
 
@@ -329,7 +342,7 @@ int  gasPack(int num)
 		return len;
 }
 //4种气体json打包的二次封装
-void  gasJsonPack(rt_bool_t netStat)
+void  gasJsonPack(rt_bool_t netStat,bool respFlag)
 {
 	
 
@@ -338,7 +351,7 @@ void  gasJsonPack(rt_bool_t netStat)
 	
 	      for(int i=0;i<CO_485_NUM;i++){
 					  if(gasWork(i)==RT_TRUE){
-								gasPack(i);
+								gasPack(i,respFlag);
 							if(netStat==RT_TRUE)
 								rt_mb_send_wait(&mbNetSendData, (rt_ubase_t)&packBuf,RT_WAITING_FOREVER);
 							rt_thread_mdelay(2000);//延时发送

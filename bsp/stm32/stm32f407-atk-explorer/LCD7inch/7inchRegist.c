@@ -73,10 +73,10 @@ int LCDWtite(uint16_t addr,uint8_t *data,uint8_t dataLen)
 		while(repTimes--){
 			//data send
 				LCDDataSend(sendLCDBuf,len);
-		for(int i=0;i<len;i++){//ACUID_LEN
-			 	rt_kprintf("%0x ",sendLCDBuf[i]);
-		}
-		rt_kprintf("%\n ");
+//		for(int i=0;i<len;i++){//ACUID_LEN
+//			 	rt_kprintf("%0x ",sendLCDBuf[i]);
+//		}
+//		rt_kprintf("%\n ");
 			//data rec
 				int revLen=0;
 				if(rt_mq_recv(&LCDmque, recLCDBuf+revLen, 1, 25) == RT_EOK){

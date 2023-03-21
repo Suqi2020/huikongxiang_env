@@ -656,8 +656,14 @@ void readMultiCirCulaPoint()
 //}
 
 
+
+
+
+
 //环流json格式打包
-uint16_t circulaJsonPack()
+	//输入 respFlag 为true就是回应
+//              为false就是report数据
+uint16_t circulaJsonPack(bool respFlag)
 {
 
 		char* out = NULL;
@@ -670,8 +676,17 @@ uint16_t circulaJsonPack()
 		root = cJSON_CreateObject();
 		if (root == NULL) return 0;
 		// 加入节点（键值对）
-		cJSON_AddNumberToObject(root, "mid",mcu.upMessID);
-		cJSON_AddStringToObject(root, "packetType","CMD_REPORTDATA");
+		
+		if(respFlag==true){
+			  cJSON_AddNumberToObject(root, "mid",respMid);
+				cJSON_AddStringToObject(root, "packetType","PROPERTIES_485_DATA_GET_RESP");
+				cJSON_AddStringToObject(root, "code","0");
+		}
+		else
+		{
+				cJSON_AddNumberToObject(root, "mid",mcu.upMessID);
+				cJSON_AddStringToObject(root, "packetType","PROPERTIES_485_DATA_REP");
+		}
 		cJSON_AddStringToObject(root, "identifier","grounding_current_monitor");
 		cJSON_AddStringToObject(root, "acuId",(char *)packFlash.acuId);
 		char *sprinBuf=RT_NULL;
@@ -688,8 +703,8 @@ uint16_t circulaJsonPack()
 					nodeobj = cJSON_CreateObject();
 					cJSON_AddItemToArray(Array, nodeobj);
 					cJSON_AddItemToObject(nodeobj,"deviceId",cJSON_CreateString(sheet.cirCula[i].ID));
-				  sprintf(sprinBuf,"%d",cirCurStru_p[i].respStat);
-				  cJSON_AddItemToObject(nodeobj,"responseStatus",cJSON_CreateString(sprinBuf));
+			
+				  cJSON_AddNumberToObject(nodeobj,"responseStatus",cirCurStru_p[i].respStat);
 					
 					nodeobj_p= cJSON_CreateObject();
 					cJSON_AddItemToObject(nodeobj, "data", nodeobj_p);
@@ -767,9 +782,11 @@ uint16_t circulaJsonPack()
 		packBuf[len]=(uint8_t)(TAIL>>8); len++;
 		packBuf[len]=(uint8_t)(TAIL);    len++;
 		packBuf[len]=0;//len++;//结尾 补0
-		mcu.repDataMessID =mcu.upMessID;
-		//mcu.devRegMessID =mcu.upMessID;
-		upMessIdAdd();
+		if(respFlag==false){
+				mcu.repDataMessID =mcu.upMessID;
+				//mcu.devRegMessID =mcu.upMessID;
+				upMessIdAdd();
+		}
 		rt_kprintf("%scirCula len:%d\r\n",sign,len);
 		rt_kprintf("\r\n%slen：%d str0:%x str1:%x str[2]:%d  str[3]:%d\r\n",sign,len,packBuf[0],packBuf[1],packBuf[2],packBuf[3]);
 
@@ -800,7 +817,9 @@ void  cirCurrWaringEventPack()
 }
 
 //环流读取并打包发送  仅仅做封装而已
-void circulaRead2Send(rt_bool_t netStat)
+	//输入 respFlag 为true就是回应
+//              为false就是report数据
+void circulaRead2Send(rt_bool_t netStat,bool respFlag)
 {					
 		int workFlag=RT_FALSE;
 		for(int i=0;i<CIRCULA_485_NUM;i++){
@@ -811,7 +830,7 @@ void circulaRead2Send(rt_bool_t netStat)
 		}
 		if(workFlag==RT_TRUE){
 				rt_kprintf("%s打包采集的circula数据\r\n",sign);
-				circulaJsonPack();
+				circulaJsonPack(respFlag);
 				if(netStat==RT_TRUE)
 						rt_mb_send_wait(&mbNetSendData, (rt_ubase_t)&packBuf,RT_WAITING_FOREVER);
 		}

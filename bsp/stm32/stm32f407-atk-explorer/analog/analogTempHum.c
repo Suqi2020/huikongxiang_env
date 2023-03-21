@@ -61,7 +61,9 @@ void  anaTempHumiReadAndSetFlag()
 		}
 }
 //模拟温度湿度json数据打包
-uint16_t analogTempHumJsonPack()
+//输入 respFlag 为true就是回应
+//              为false就是report数据
+uint16_t analogTempHumJsonPack(bool respFlag)
 {
 		char* out = NULL;
 		//创建数组
@@ -73,8 +75,18 @@ uint16_t analogTempHumJsonPack()
 		root = cJSON_CreateObject();
 		if (root == NULL) return 0;
 		// 加入节点（键值对）
-		cJSON_AddNumberToObject(root, "mid",mcu.upMessID);
-		cJSON_AddStringToObject(root, "packetType","CMD_REPORTDATA");
+		
+		if(respFlag==true){
+			
+			  cJSON_AddNumberToObject(root, "mid",respMid);
+				cJSON_AddStringToObject(root, "packetType","PROPERTIES_ANA_DATA_GET_RESP");
+				cJSON_AddStringToObject(root, "code","0");
+		}
+		else
+		{
+				cJSON_AddNumberToObject(root, "mid",mcu.upMessID);
+				cJSON_AddStringToObject(root, "packetType","PROPERTIES_ANA_DATA_REP");
+		}
 		cJSON_AddStringToObject(root, "identifier","temperature_humidity");
 		cJSON_AddStringToObject(root, "acuId",(char *)packFlash.acuId);
 		char *sprinBuf=RT_NULL;
@@ -140,9 +152,11 @@ uint16_t analogTempHumJsonPack()
 		packBuf[len]=(uint8_t)(TAIL>>8); len++;
 		packBuf[len]=(uint8_t)(TAIL);    len++;
 		packBuf[len]=0;//len++;//结尾 补0
-		mcu.repDataMessID =mcu.upMessID;
-		//mcu.devRegMessID =mcu.upMessID;
-		upMessIdAdd();
+		if(respFlag==false){
+				mcu.repDataMessID =mcu.upMessID;
+				//mcu.devRegMessID =mcu.upMessID;
+				upMessIdAdd();
+		}
 		rt_kprintf("%s len:%d\r\n",sign,len);
 		rt_kprintf("\r\n%slen：%d str0:%x str1:%x str[2]:%d  str[3]:%d\r\n",sign,len,packBuf[0],packBuf[1],packBuf[2],packBuf[3]);
 
@@ -155,8 +169,10 @@ uint16_t analogTempHumJsonPack()
 
 
 //模拟温度和湿度值读取以及打包成json格式
-void anaTempHumReadPack()
+void anaTempHumReadPack2Send(bool gbNetState,bool respFlag)
 {
 		anaTempHumiReadAndSetFlag();
-	  analogTempHumJsonPack();
+	  analogTempHumJsonPack(respFlag);
+		if(gbNetState==RT_TRUE)
+						rt_mb_send_wait(&mbNetSendData, (rt_ubase_t)&packBuf,RT_WAITING_FOREVER);
 }

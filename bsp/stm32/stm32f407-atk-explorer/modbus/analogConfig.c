@@ -1,8 +1,6 @@
 #include "board.h"
 const static char sign[]="[analogConfig]";
 
-
-
 //打印analog所有设备
 void prinfAnalogList()
 {

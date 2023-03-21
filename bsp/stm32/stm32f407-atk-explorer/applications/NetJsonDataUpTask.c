@@ -82,22 +82,22 @@ static int timeOut()
 
 
 
-void pressSettRead2Send(rt_bool_t netStat);
-void threeAxisRead2Send(rt_bool_t netStat);
-void partDischagRead2Send(rt_bool_t netStat);
-void circulaRead2Send(rt_bool_t netStat);
-void waterDepthRead2Send(rt_bool_t netStat);
-void tempHumRead2Send(rt_bool_t netStat);
-void o2Read2Send(rt_bool_t netStat);
-void h2sRead2Send(rt_bool_t netStat);	
-void ch4Read2Send(rt_bool_t netStat);	
-void coRead2Send(rt_bool_t netStat);	
+extern void pressSettRead2Send(rt_bool_t netStat,bool respFlag);
+extern void threeAxisRead2Send(rt_bool_t netStat,bool respFlag);
+extern void partDischagRead2Send(rt_bool_t netStat,bool respFlag);
+extern void circulaRead2Send(rt_bool_t netStat,bool respFlag);
+extern void waterDepthRead2Send(rt_bool_t netStat,bool respFlag);
+extern void tempHumRead2Send(rt_bool_t netStat,bool respFlag);
+extern void o2Read2Send(rt_bool_t netStat);
+extern void h2sRead2Send(rt_bool_t netStat);	
+extern void ch4Read2Send(rt_bool_t netStat);	
+extern void coRead2Send(rt_bool_t netStat);	
 //void analogTempHumJsonPack(uint8_t chanl);
-void anaTempHumReadPack(void);;
+extern void anaTempHumReadPack2Send(bool gbNetState,bool respFlag);
 uint16_t devRegJsonPack(void);
 uint16_t heartUpJsonPack(void);
 //extern uint8_t analogTemChanl;
-extern void gasJsonPack(rt_bool_t netStat);
+extern void gasJsonPack(rt_bool_t netStat,bool respFlag);
 //定时时间到  执行相应事件
 static void  timeOutRunFun()
 {
@@ -122,19 +122,19 @@ static void  timeOutRunFun()
 				rt_kprintf("%sreg timer out\r\n",task);
 				break;
 			case CIRCULA_TIME://读取环流
-				circulaRead2Send(gbNetState);
+				circulaRead2Send(gbNetState,false);
 				rt_kprintf("%sCIRCULA_TIME out\r\n",task);
 				break;
 			case PARTDISCHAG_TIME://读取局放
-				partDischagRead2Send(gbNetState);
+				partDischagRead2Send(gbNetState,false);
 				rt_kprintf("%sPARTDISCHAG_TIME out\r\n",task);
 				break;
 			case PRESSSETTL_TIME:
-        pressSettRead2Send(gbNetState);
+        pressSettRead2Send(gbNetState,false);
 				rt_kprintf("%sPRESSSETTL_TIME out\r\n",task);
 				break;
 			case THREEAXIS_TIME:
-				threeAxisRead2Send(gbNetState);
+				threeAxisRead2Send(gbNetState,false);
 				rt_kprintf("%sTHREEAXIS_TIMEout\r\n",task);
 				break;
 //			case  CH4_TIME:
@@ -152,20 +152,19 @@ static void  timeOutRunFun()
 				o2Read2Send(gbNetState);
 				h2sRead2Send(gbNetState);
 			  coRead2Send(gbNetState);
-			  gasJsonPack(gbNetState);
+			  gasJsonPack(gbNetState,false);
 		#endif
 				break;
 			case  TEMPHUM_TIME:
-				tempHumRead2Send(gbNetState);
+				tempHumRead2Send(gbNetState,false);
 				break;
 			case  WATERDEPTH_TIME:
-				waterDepthRead2Send(gbNetState);
+				waterDepthRead2Send(gbNetState,false);
 				break;
 			case  ANA_TEMPHUM_TIME:
 //				analogTempHumJsonPack(analogTemChanl);
-			  anaTempHumReadPack();
-				if(gbNetState==RT_TRUE)
-							rt_mb_send_wait(&mbNetSendData, (rt_ubase_t)&packBuf,RT_WAITING_FOREVER);
+			  anaTempHumReadPack2Send(gbNetState,false);
+		
 				break;
 			default:
 				break;

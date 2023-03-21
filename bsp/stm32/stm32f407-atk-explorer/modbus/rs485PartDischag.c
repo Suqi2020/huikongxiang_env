@@ -278,7 +278,9 @@ void  partDisWaringEventPack()
 		
 }
 //局放的json格式打包
-uint16_t partDischagJsonPack()
+//输入 respFlag 为true就是回应
+//              为false就是report数据
+uint16_t partDischagJsonPack(bool respFlag)
 {
 
 		char* out = NULL;
@@ -291,8 +293,17 @@ uint16_t partDischagJsonPack()
 		root = cJSON_CreateObject();
 		if (root == NULL) return 0;
 		// 加入节点（键值对）
-		cJSON_AddNumberToObject(root, "mid",mcu.upMessID);
-		cJSON_AddStringToObject(root, "packetType","CMD_REPORTDATA");
+	
+		if(respFlag==true){
+				cJSON_AddNumberToObject(root, "mid",respMid);
+				cJSON_AddStringToObject(root, "packetType","PROPERTIES_485_DATA_GET_RESP");
+				cJSON_AddStringToObject(root, "code","0");
+		}
+		else
+		{
+				cJSON_AddNumberToObject(root, "mid",mcu.upMessID);
+				cJSON_AddStringToObject(root, "packetType","PROPERTIES_485_DATA_REP");
+		}
 		cJSON_AddStringToObject(root, "identifier","partial_discharge_monitor");
 		cJSON_AddStringToObject(root, "acuId",(char *)packFlash.acuId);
 		char *sprinBuf=RT_NULL;
@@ -309,9 +320,10 @@ uint16_t partDischagJsonPack()
 				nodeobj = cJSON_CreateObject();
 				cJSON_AddItemToArray(Array, nodeobj);
 			  cJSON_AddItemToObject(nodeobj,"deviceId",cJSON_CreateString(sheet.partDischag[i].ID));
-				sprintf(sprinBuf,"%d",partDiscStru_p[i].respStat);
-				cJSON_AddItemToObject(nodeobj,"responseStatus",cJSON_CreateString(sprinBuf));
-				
+//				sprintf(sprinBuf,"%d",partDiscStru_p[i].respStat);
+				cJSON_AddNumberToObject(nodeobj,"responseStatus",partDiscStru_p[i].respStat);
+//				sprintf(sprinBuf,"%d",partDiscStru_p[i].respStat);
+//				cJSON_AddItemToObject(nodeobj,"responseStatus",cJSON_CreateString(sprinBuf));
 				nodeobj_p= cJSON_CreateObject();
 				cJSON_AddItemToObject(nodeobj, "data", nodeobj_p);
 				
@@ -390,9 +402,11 @@ uint16_t partDischagJsonPack()
 		packBuf[len]=(uint8_t)(TAIL>>8); len++;
 		packBuf[len]=(uint8_t)(TAIL);    len++;
 		packBuf[len]=0;//len++;//结尾 补0
-		mcu.repDataMessID =mcu.upMessID;
-		//mcu.devRegMessID =mcu.upMessID;
-		upMessIdAdd();
+		if(respFlag==false){
+				mcu.repDataMessID =mcu.upMessID;
+				//mcu.devRegMessID =mcu.upMessID;
+				upMessIdAdd();
+		}
 		rt_kprintf("%s len:%d\r\n",sign,len);
 		rt_kprintf("\r\n%slen：%d str0:%x str1:%x str[2]:%d  str[3]:%d\r\n",sign,len,packBuf[0],packBuf[1],packBuf[2],packBuf[3]);
 
@@ -402,7 +416,7 @@ uint16_t partDischagJsonPack()
 		return len;
 }
 //局放的读取和发送  供其他函数来调用
-void partDischagRead2Send(rt_bool_t netStat)
+void partDischagRead2Send(rt_bool_t netStat,bool respFlag)
 {
 		int workFlag=RT_FALSE;
 		for(int i=0;i<PARTDISCHAG_485_NUM;i++){
@@ -414,7 +428,7 @@ void partDischagRead2Send(rt_bool_t netStat)
 		}
 		if(workFlag==RT_TRUE){
 				rt_kprintf("%s打包采集的PARTDISCHAG数据\r\n",sign);
-				partDischagJsonPack();//后期加入
+				partDischagJsonPack(respFlag);//后期加入
 				if(netStat==RT_TRUE)
 						rt_mb_send_wait(&mbNetSendData, (rt_ubase_t)&packBuf,RT_WAITING_FOREVER);
 		}

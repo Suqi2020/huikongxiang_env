@@ -136,7 +136,9 @@ void readPSTempHeight(int num)
 
 
 //沉降仪json格式打包
-static uint16_t pressSettlJsonPack()
+//输入 respFlag 为true就是回应
+//              为false就是report数据
+uint16_t pressSettlJsonPack(bool respFlag)
 {
 		char* out = NULL;
 		//创建数组
@@ -150,8 +152,17 @@ static uint16_t pressSettlJsonPack()
 		char *sprinBuf=RT_NULL;
 		sprinBuf=rt_malloc(20);//20个字符串长度 够用了
 		// 加入节点（键值对）
-		cJSON_AddNumberToObject(root, "mid",mcu.upMessID);
-		cJSON_AddStringToObject(root, "packetType","CMD_REPORTDATA");
+		
+		if(respFlag==true){
+				cJSON_AddNumberToObject(root, "mid",respMid);
+				cJSON_AddStringToObject(root, "packetType","PROPERTIES_485_DATA_GET_RESP");
+				cJSON_AddStringToObject(root, "code","0");
+		}
+		else
+		{
+				cJSON_AddNumberToObject(root, "mid",mcu.upMessID);
+				cJSON_AddStringToObject(root, "packetType","PROPERTIES_485_DATA_REP");
+		}
 		cJSON_AddStringToObject(root, "identifier","settlement_monitor");
 		cJSON_AddStringToObject(root, "acuId",(char *)packFlash.acuId);
 		
@@ -166,8 +177,8 @@ static uint16_t pressSettlJsonPack()
 					nodeobj = cJSON_CreateObject();
 					cJSON_AddItemToArray(Array, nodeobj);
 					cJSON_AddItemToObject(nodeobj,"deviceId",cJSON_CreateString(sheet.pressSetl[i].ID));
-					sprintf(sprinBuf,"%d",pressSettle[i].respStat);
-					cJSON_AddItemToObject(nodeobj,"responseStatus",cJSON_CreateString(sprinBuf));
+					//sprintf(sprinBuf,"%d",pressSettle[i].respStat);
+					cJSON_AddNumberToObject(nodeobj,"responseStatus",pressSettle[i].respStat);
 					
 					nodeobj_p= cJSON_CreateObject();
 					cJSON_AddItemToObject(nodeobj, "data", nodeobj_p);
@@ -224,9 +235,11 @@ static uint16_t pressSettlJsonPack()
 		packBuf[len]=(uint8_t)(TAIL>>8); len++;
 		packBuf[len]=(uint8_t)(TAIL);    len++;
 		packBuf[len]=0;//len++;//结尾 补0
-		mcu.repDataMessID =mcu.upMessID;
-		//mcu.devRegMessID =mcu.upMessID;
-		upMessIdAdd();
+		if(respFlag==false){
+				mcu.repDataMessID =mcu.upMessID;
+				//mcu.devRegMessID =mcu.upMessID;
+				upMessIdAdd();
+		}
 		rt_kprintf("%s len:%d\r\n",sign,len);
 		rt_kprintf("\r\n%slen：%d str0:%x str1:%x str[2]:%d  str[3]:%d\r\n",sign,len,packBuf[0],packBuf[1],packBuf[2],packBuf[3]);
 
@@ -236,7 +249,7 @@ static uint16_t pressSettlJsonPack()
 		return len;
 }
 //沉降仪读取并打包  供别的函数调用
-void pressSettRead2Send(rt_bool_t netStat)
+void pressSettRead2Send(rt_bool_t netStat,bool respFlag)
 {
 	  int workFlag=RT_FALSE;
 		for(int i=0;i<PRESSSETTL_485_NUM;i++){
@@ -247,7 +260,7 @@ void pressSettRead2Send(rt_bool_t netStat)
 		}
 		if(workFlag==RT_TRUE){
 				rt_kprintf("%s打包采集的PRESSSETTL数据\r\n",sign);
-				pressSettlJsonPack();
+				pressSettlJsonPack(respFlag);
 				if(netStat==RT_TRUE)
 						rt_mb_send_wait(&mbNetSendData, (rt_ubase_t)&packBuf,RT_WAITING_FOREVER);
 		}

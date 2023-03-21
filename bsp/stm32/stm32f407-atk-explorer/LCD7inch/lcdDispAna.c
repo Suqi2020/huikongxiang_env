@@ -128,7 +128,7 @@ void lastSubName()
 		su8AnaChoosNum--;
 		
 }
-
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 uint8_t  su8AnaTotalNum=0;//显示总页数
 uint8_t  su8AnaTheNum=0;  //显示第几页
 uint8_t  su8AnaWork[ANALOG_NUM]={0};//记录真正配置过的角标  没有配置过登记为0
