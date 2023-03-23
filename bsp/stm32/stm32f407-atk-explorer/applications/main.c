@@ -142,9 +142,10 @@
 //V0.81    增加模拟传感器读取成功
 //V0.82    增加模拟传感器配置删除成功
 //V0.83    加入子站读取模拟和485传感器数据成功
-#define APP_VER       ((0<<8)+83)//0x0105 表示1.5版本
+//V0.84    设置读取传感器时间测试完成
+#define APP_VER       ((0<<8)+84)//0x0105 表示1.5版本
 //
-const char date[]="20230321";
+const char date[]="20230323";
 
 //static    rt_thread_t tid 	= RT_NULL;
 static    rt_thread_t tidW5500 	  = RT_NULL;

@@ -5,7 +5,7 @@ const static char sign[]="[analogConfig]";
 void prinfAnalogList()
 {
 		for(int j=0;j<ANALOG_NUM;j++){//查一遍 找到 GYNJLXSD000000499  如果
-				if(sheet.analog[j].workFlag==RT_TRUE){//没打开
+				if(sheet.analog[j].workFlag==RT_TRUE){//打开
 						rt_kprintf("%s analog ",sign);
 						rt_kprintf("%s ",sheet.analog[j].name);
 						rt_kprintf("%s ",sheet.analog[j].ID);

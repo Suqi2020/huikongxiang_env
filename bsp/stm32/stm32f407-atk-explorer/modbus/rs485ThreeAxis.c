@@ -199,7 +199,7 @@ static uint16_t threeAxisJsonPack(bool respFlag)
 		if(respFlag==true){
 			  cJSON_AddNumberToObject(root, "mid",respMid);
 				cJSON_AddStringToObject(root, "packetType","PROPERTIES_485_DATA_GET_RESP");
-				cJSON_AddStringToObject(root, "code","0");
+				cJSON_AddNumberToObject(root, "code",0);
 		}
 		else
 		{

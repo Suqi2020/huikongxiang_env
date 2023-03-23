@@ -21,7 +21,10 @@ extern void partDischagRead2Send(rt_bool_t netStat,bool respFlag);
 extern void circulaRead2Send(rt_bool_t netStat,bool respFlag);
 extern void waterDepthRead2Send(rt_bool_t netStat,bool respFlag);
 extern void tempHumRead2Send(rt_bool_t netStat,bool respFlag);
-
+extern void o2Read2Send(rt_bool_t netStat);
+extern void h2sRead2Send(rt_bool_t netStat);	
+extern void ch4Read2Send(rt_bool_t netStat);	
+extern void coRead2Send(rt_bool_t netStat);	
 //void analogTempHumJsonPack(uint8_t chanl);
 extern void anaTempHumReadPack2Send(bool gbNetState,bool respFlag);
 
@@ -45,7 +48,13 @@ void  readModbusDataResp(char *monitor)
 				tempHumRead2Send(true,true);
 		}
 		else if(0==rt_strcmp(monitor,"environment_mointor")){
-			  gasJsonPack(true,true);
+		#ifdef USE_4GAS 	
+   			ch4Read2Send(true);
+				o2Read2Send(true);
+				h2sRead2Send(true);
+			  coRead2Send(true);
+			  gasJsonPack(true,false);
+		#endif
 		}
 		else if(0==rt_strcmp(monitor,"vibration_monitor")){
 				threeAxisRead2Send(true,true);

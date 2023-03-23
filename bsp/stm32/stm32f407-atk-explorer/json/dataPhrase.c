@@ -2,6 +2,12 @@
 #include   "cJSON.h"
 //https://blog.csdn.net/woody218/article/details/119634171  json解析参考
 extern uint16_t RTU_CRC(uint8_t *puchMsg , uint16_t usDataLen);
+void  readModbusDataResp(char *monitor);
+void  readAnaDataResp(char *monitor);
+
+void senseTimeReadJsonResp(char *string,bool  modbusFlag);
+
+void senseTimeJsonSet(cJSON   *Json,bool  modbusFlag);
 const static char sign[]="[dataPhrs]";
 uint32_t  respMid=0;
 //数据校验 头尾 校验和 是否正确
@@ -151,7 +157,7 @@ void AllDownPhrase(char *data,int lenth)
 			  cJSON  *pkIdentf = cJSON_GetObjectItem(Json,"identifier");
 			
 				cJSON  *mid =cJSON_GetObjectItem(Json,"mid");
-			  respMid = mid->valueint;
+			  uint32_t respMid = mid->valueint;
 		
 			  switch(downLinkPackTpyeGet(pkType)){
 
@@ -173,24 +179,57 @@ void AllDownPhrase(char *data,int lenth)
 						}
 						break;
 					case	PROPERTIES_485DATA_GET:
-						void  readModbusDataResp(char *monitor);
+						
 					  readModbusDataResp(pkIdentf->valuestring);
 						break;
 					case	PROPERTIES_ANADATA_REP_RESP:
 						break;
 					case	PROPERTIES_ANADATA_GET:
 						
-						void  readAnaDataResp(char *monitor);
+						
 					  readAnaDataResp(pkIdentf->valuestring);
 					
 						break;
 					case	PROPERTIES_485TIM_GET:
+						senseTimeReadJsonResp(pkIdentf->valuestring,true);
+						rt_mb_send_wait(&mbNetSendData, (rt_ubase_t)&packBuf,RT_WAITING_FOREVER); 
 						break;
 					case	PROPERTIES_485TIM_SET:
+//					  {
+//								
+//								//rt_kprintf("%stime:%s\n\r",sign,time->valuestring);
+//							  cJSON   *array=cJSON_GetObjectItem(Json,"params");
+//							  int array_size = cJSON_GetArraySize(array);
+//							  if(array_size!=1)
+//										rt_kprintf("%serr array_size %d\n",sign,array_size);
+//								for(int i=0;i<array_size;i++)
+//								{
+//										cJSON *item=cJSON_GetArrayItem(array,i);
+//									  cJSON  *time =cJSON_GetObjectItem(item,"calTime");
+//									  uint32_t	calTime =atol(time->valuestring);
+//										senseTimeJsonSet(pkIdentf->valuestring,true,calTime);
+//								}
+//	
+
+//						}
+						senseTimeJsonSet(Json,true);
+						rt_mb_send_wait(&mbNetSendData, (rt_ubase_t)&packBuf,RT_WAITING_FOREVER); 
 						break;
 					case	PROPERTIES_ANATIM_GET:
+						senseTimeReadJsonResp(pkIdentf->valuestring,false);
+						rt_mb_send_wait(&mbNetSendData, (rt_ubase_t)&packBuf,RT_WAITING_FOREVER); 
 						break;
 					case	PROPERTIES_ANATIM_SET:
+//					  {
+//								cJSON  *time =cJSON_GetObjectItem(Json,"timestamp");
+//								//rt_kprintf("%stime:%s\n\r",sign,time->valuestring);
+//								
+//								uint32_t calTime;
+//								calTime =atol(time->valuestring);
+//								senseTimeJsonSet(pkIdentf->valuestring,false,calTime);
+//						}
+						senseTimeJsonSet(Json,false);
+						rt_mb_send_wait(&mbNetSendData, (rt_ubase_t)&packBuf,RT_WAITING_FOREVER); 
 						break;
 					case	PROPERTIES_485TH_GET:
 						break;

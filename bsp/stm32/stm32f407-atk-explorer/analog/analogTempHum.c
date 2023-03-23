@@ -80,7 +80,7 @@ uint16_t analogTempHumJsonPack(bool respFlag)
 			
 			  cJSON_AddNumberToObject(root, "mid",respMid);
 				cJSON_AddStringToObject(root, "packetType","PROPERTIES_ANA_DATA_GET_RESP");
-				cJSON_AddStringToObject(root, "code","0");
+				cJSON_AddNumberToObject(root, "code",0);
 		}
 		else
 		{
