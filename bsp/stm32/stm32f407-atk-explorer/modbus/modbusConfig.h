@@ -305,7 +305,7 @@ typedef struct{
 ///////////////////////////////////////////////////
 			analogStru analog[ANALOG_NUM];
 ///////////////////////////////////////////////////
-//放入各种传感器上限下限值 start
+//放入各种传感器上限下限值 start  跟modbusStru 一一对应
 			circuStru_p      modbusCircul[CIRCULA_485_NUM];
 			partDisChgStru_p modbusPartDisChg[PARTDISCHAG_485_NUM];
 			pressSettlStru_p modbusPreSettl[PRESSSETTL_485_NUM];

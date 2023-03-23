@@ -344,21 +344,15 @@ static uint16_t gasPack(int num,bool respFlag)
 //4种气体json打包的二次封装
 void  gasJsonPack(rt_bool_t netStat,bool respFlag)
 {
-	
-
-				rt_kprintf("%s打包采集的gas数据\r\n",sign);
-	
-	
-	      for(int i=0;i<CO_485_NUM;i++){
-					  if(gasWork(i)==RT_TRUE){
-								gasPack(i,respFlag);
-							if(netStat==RT_TRUE)
-								rt_mb_send_wait(&mbNetSendData, (rt_ubase_t)&packBuf,RT_WAITING_FOREVER);
-							rt_thread_mdelay(2000);//延时发送
-						}
+		rt_kprintf("%s打包采集的gas数据\r\n",sign);
+		for(int i=0;i<CO_485_NUM;i++){
+				if(gasWork(i)==RT_TRUE){
+						gasPack(i,respFlag);
+					if(netStat==RT_TRUE)
+						rt_mb_send_wait(&mbNetSendData, (rt_ubase_t)&packBuf,RT_WAITING_FOREVER);
+					rt_thread_mdelay(2000);//延时发送
 				}
-
-
+		}
 }
 
 #endif

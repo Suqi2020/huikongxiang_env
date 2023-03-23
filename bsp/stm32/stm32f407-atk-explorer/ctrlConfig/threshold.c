@@ -33,6 +33,8 @@ void printfThresholdList()
 						}
 				
 		}
+		
+		
 		for(i=0;i<CIRCULA_485_NUM;i++){
 				if(sheet.cirCula[i].workFlag==RT_TRUE){//找到工作的设备  环流需要连续打印三次
 						rt_kprintf("%s threshold ",sign);

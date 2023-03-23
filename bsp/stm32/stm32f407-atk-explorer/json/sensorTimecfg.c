@@ -76,13 +76,6 @@ void senseTimeReadJsonResp(char *string,bool  modbusFlag)
 		if(result==true){
 			
 			cJSON_AddNumberToObject(root, "code",0);
-			Array = cJSON_CreateArray();
-			if(Array==NULL) return;
-			cJSON_AddItemToObject(root, "params", Array);
-			nodeobj = cJSON_CreateObject();
-			cJSON_AddItemToArray(Array, nodeobj);
-			sprintf(sprinBuf,"%d",caltime);
-			cJSON_AddItemToObject(nodeobj,"calTime",cJSON_CreateString(sprinBuf)); 
 		}
 		else{
 			cJSON_AddNumberToObject(root, "code",1);
@@ -141,11 +134,7 @@ void senseTimeJsonSet(cJSON   *Json,bool  modbusFlag)
 		cJSON* nodeobj_p = NULL;
 		root = cJSON_CreateObject();
 		if (root == NULL) return;
-	
-	
-	
-	
-	
+
 	  uint32_t	calTime=0;
 	
 		cJSON   *array=cJSON_GetObjectItem(Json,"params");
@@ -164,7 +153,7 @@ void senseTimeJsonSet(cJSON   *Json,bool  modbusFlag)
 	  cJSON_AddNumberToObject(root,"mid",respMid);
 	  bool result=false;
 	  if(modbusFlag==true){
-			  rt_kprintf("modbusFlag=%d\n",modbusFlag);
+	
 				cJSON_AddStringToObject(root,"packetType","PROPERTIES_485TTIM_SET_RESP");
 				  if(rt_strcmp(pkIdentf->valuestring,"partial_discharge_monitor")==0){
 							result=true;

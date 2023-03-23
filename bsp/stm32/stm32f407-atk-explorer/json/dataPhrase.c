@@ -4,7 +4,7 @@
 extern uint16_t RTU_CRC(uint8_t *puchMsg , uint16_t usDataLen);
 void  readModbusDataResp(char *monitor);
 void  readAnaDataResp(char *monitor);
-
+void  senseTHGetJsonResp(cJSON   *Json,bool modbusFlag);
 void senseTimeReadJsonResp(char *string,bool  modbusFlag);
 
 void senseTimeJsonSet(cJSON   *Json,bool  modbusFlag);
@@ -195,23 +195,6 @@ void AllDownPhrase(char *data,int lenth)
 						rt_mb_send_wait(&mbNetSendData, (rt_ubase_t)&packBuf,RT_WAITING_FOREVER); 
 						break;
 					case	PROPERTIES_485TIM_SET:
-//					  {
-//								
-//								//rt_kprintf("%stime:%s\n\r",sign,time->valuestring);
-//							  cJSON   *array=cJSON_GetObjectItem(Json,"params");
-//							  int array_size = cJSON_GetArraySize(array);
-//							  if(array_size!=1)
-//										rt_kprintf("%serr array_size %d\n",sign,array_size);
-//								for(int i=0;i<array_size;i++)
-//								{
-//										cJSON *item=cJSON_GetArrayItem(array,i);
-//									  cJSON  *time =cJSON_GetObjectItem(item,"calTime");
-//									  uint32_t	calTime =atol(time->valuestring);
-//										senseTimeJsonSet(pkIdentf->valuestring,true,calTime);
-//								}
-//	
-
-//						}
 						senseTimeJsonSet(Json,true);
 						rt_mb_send_wait(&mbNetSendData, (rt_ubase_t)&packBuf,RT_WAITING_FOREVER); 
 						break;
@@ -220,18 +203,12 @@ void AllDownPhrase(char *data,int lenth)
 						rt_mb_send_wait(&mbNetSendData, (rt_ubase_t)&packBuf,RT_WAITING_FOREVER); 
 						break;
 					case	PROPERTIES_ANATIM_SET:
-//					  {
-//								cJSON  *time =cJSON_GetObjectItem(Json,"timestamp");
-//								//rt_kprintf("%stime:%s\n\r",sign,time->valuestring);
-//								
-//								uint32_t calTime;
-//								calTime =atol(time->valuestring);
-//								senseTimeJsonSet(pkIdentf->valuestring,false,calTime);
-//						}
 						senseTimeJsonSet(Json,false);
 						rt_mb_send_wait(&mbNetSendData, (rt_ubase_t)&packBuf,RT_WAITING_FOREVER); 
 						break;
 					case	PROPERTIES_485TH_GET:
+						senseTHGetJsonResp(Json,true);
+						rt_mb_send_wait(&mbNetSendData, (rt_ubase_t)&packBuf,RT_WAITING_FOREVER); 
 						break;
 					case	PROPERTIES_485TH_SET:
 						break;
