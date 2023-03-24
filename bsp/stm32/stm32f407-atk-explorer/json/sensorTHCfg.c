@@ -26,6 +26,7 @@ void senseTHGetJsonResp(cJSON   *Json,bool modbusFlag)
 		
 	  char *string =pkIdentf->valuestring;
 	  cJSON_AddNumberToObject(root,"mid",respMid);
+
 	  bool result=false;
 
 	  cJSON_AddStringToObject(root, "acuId",(char *)packFlash.acuId);
@@ -97,7 +98,7 @@ void senseTHGetJsonResp(cJSON   *Json,bool modbusFlag)
 				}
 
 				else if(rt_strcmp(string,"grounding_current_monitor")==0){
-						result=true;
+
 						arrayNew = cJSON_CreateArray();
 						if(arrayNew==NULL) return;
 						cJSON_AddItemToObject(root, "params", arrayNew);
@@ -145,7 +146,7 @@ void senseTHGetJsonResp(cJSON   *Json,bool modbusFlag)
 						}
 				}
 				else if(rt_strcmp(string,"water_level_monitor")==0){
-						result=true;
+
 						arrayNew = cJSON_CreateArray();
 						if(arrayNew==NULL) return;
 						cJSON_AddItemToObject(root, "params", arrayNew);
@@ -172,7 +173,7 @@ void senseTHGetJsonResp(cJSON   *Json,bool modbusFlag)
 						}
 				}
 				else if(rt_strcmp(string,"temperature_and_humidity_monitor")==0){
-						result=true;
+	
 						arrayNew = cJSON_CreateArray();
 						if(arrayNew==NULL) return;
 						cJSON_AddItemToObject(root, "params", arrayNew);
@@ -204,7 +205,7 @@ void senseTHGetJsonResp(cJSON   *Json,bool modbusFlag)
 						}
 				}
 				else if(rt_strcmp(string,"environment_mointor")==0){
-						result=true;
+			
 						arrayNew = cJSON_CreateArray();
 						if(arrayNew==NULL) return;
 						cJSON_AddItemToObject(root, "params", arrayNew);
@@ -246,7 +247,7 @@ void senseTHGetJsonResp(cJSON   *Json,bool modbusFlag)
 						}
 				}
 				else if(rt_strcmp(string,"vibration_monitor")==0){
-					result=true;
+
 					arrayNew = cJSON_CreateArray();
 						if(arrayNew==NULL) return;
 						cJSON_AddItemToObject(root, "params", arrayNew);
@@ -288,7 +289,7 @@ void senseTHGetJsonResp(cJSON   *Json,bool modbusFlag)
 						}
 				}
 				else if(rt_strcmp(string,"settlement_monitor")==0){
-						result=true;
+				
 						arrayNew = cJSON_CreateArray();
 						if(arrayNew==NULL) return;
 						cJSON_AddItemToObject(root, "params", arrayNew);
@@ -323,8 +324,6 @@ void senseTHGetJsonResp(cJSON   *Json,bool modbusFlag)
 		else{
 				cJSON_AddStringToObject(root,"packetType","PROPERTIES_ANATH_GET_RESP");
 				if(rt_strcmp(string,"temperature_and_humidity_monitor")==0){
-						result=true;
-		
 						arrayNew = cJSON_CreateArray();
 						if(arrayNew==NULL) return;
 						cJSON_AddItemToObject(root, "params", arrayNew);
@@ -350,11 +349,11 @@ void senseTHGetJsonResp(cJSON   *Json,bool modbusFlag)
 												cJSON_AddStringToObject(nodeobj_p,"humidity_low",sprinBuf);
 												sprintf(sprinBuf,"%02f",sheet.analogTempHum.humUpLimit );
 												cJSON_AddStringToObject(nodeobj_p,"humidity_high",sprinBuf);
-
-								}
-							}
+											 break;
+										}
+							 }
 						}
-					}
+				}
 		}
 		if(result==true){
 			
@@ -403,8 +402,311 @@ void senseTHGetJsonResp(cJSON   *Json,bool modbusFlag)
 		sprinBuf=RT_NULL;
 }
 
-
-void senseTHSetJsonResp(cJSON   *Json)
+//设置阈值
+void senseTHSetJsonResp(cJSON   *Json,bool  modbusFlag)
 {
+		char* out = NULL;
+		// 创建JSON Object  
+		cJSON* root = NULL;
+		root = cJSON_CreateObject();
+		if (root == NULL) return;
+		cJSON   *arrayGet=cJSON_GetObjectItem(Json,"params");
+	  cJSON  *pkIdentf = cJSON_GetObjectItem(Json,"identifier");
+		int arrayGet_size = cJSON_GetArraySize(arrayGet);
+		char *sprinBuf=RT_NULL;
+		sprinBuf=rt_malloc(20);//20个字符串长度 够用了
+	  char *string =pkIdentf->valuestring;
+	  cJSON_AddNumberToObject(root,"mid",respMid);
+	  bool result=false;
+	  cJSON_AddStringToObject(root, "acuId",(char *)packFlash.acuId);
+		cJSON_AddStringToObject(root, "identifier",string);
+		if(modbusFlag==true){
+				cJSON_AddStringToObject(root,"packetType","PROPERTIES_485TH_SET_RESP");
+				if(rt_strcmp(pkIdentf->valuestring,"partial_discharge_monitor")==0){
+						for(int i=0;i<arrayGet_size;i++)
+						{
+								cJSON *item=cJSON_GetArrayItem(arrayGet,i);
+								cJSON  *devID =cJSON_GetObjectItem(item,"deviceId");
+								for(int j=0;j<PARTDISCHAG_485_NUM;j++){//核对有没有配置过
+										if(0==rt_strcmp(sheet.partDischag[j].ID,devID->valuestring)){
+											  result=true;
+											  cJSON  *data =cJSON_GetObjectItem(item,"data");
+											  cJSON  *fvalue= cJSON_GetObjectItem(data,"pdA_low");
+											  sheet.modbusPartDisChg[j].amplitudeALowLimit =atol(fvalue->valuestring);
+										  	fvalue= cJSON_GetObjectItem(data,"pdA_high");
+											  sheet.modbusPartDisChg[j].amplitudeAUpLimit =atol(fvalue->valuestring);
+												fvalue= cJSON_GetObjectItem(data,"freqA_low");
+											  sheet.modbusPartDisChg[j].freqALowLimit =atol(fvalue->valuestring);
+												fvalue= cJSON_GetObjectItem(data,"freqA_high");
+											  sheet.modbusPartDisChg[j].freqAUpLimit =atol(fvalue->valuestring);
+												fvalue= cJSON_GetObjectItem(data,"dischargeDateA_low");
+											  sheet.modbusPartDisChg[j].dischargeALowLimit =atol(fvalue->valuestring);
+												fvalue= cJSON_GetObjectItem(data,"dischargeDateA_high");
+											  sheet.modbusPartDisChg[j].dischargeAUpLimit =atol(fvalue->valuestring);
+											
+											  fvalue= cJSON_GetObjectItem(data,"pdB_low");
+											  sheet.modbusPartDisChg[j].amplitudeBLowLimit =atol(fvalue->valuestring);
+										  	fvalue= cJSON_GetObjectItem(data,"pdB_high");
+											  sheet.modbusPartDisChg[j].amplitudeBUpLimit =atol(fvalue->valuestring);
+												fvalue= cJSON_GetObjectItem(data,"freqB_low");
+											  sheet.modbusPartDisChg[j].freqBLowLimit =atol(fvalue->valuestring);
+												fvalue= cJSON_GetObjectItem(data,"freqB_high");
+											  sheet.modbusPartDisChg[j].freqBUpLimit =atol(fvalue->valuestring);
+												fvalue= cJSON_GetObjectItem(data,"dischargeDateB_low");
+											  sheet.modbusPartDisChg[j].dischargeBLowLimit =atol(fvalue->valuestring);
+												fvalue= cJSON_GetObjectItem(data,"dischargeDateB_high");
+											  sheet.modbusPartDisChg[j].dischargeBUpLimit =atol(fvalue->valuestring);
+							
+										    fvalue= cJSON_GetObjectItem(data,"pdC_low");
+											  sheet.modbusPartDisChg[j].amplitudeCLowLimit =atol(fvalue->valuestring);
+										  	fvalue= cJSON_GetObjectItem(data,"pdC_high");
+											  sheet.modbusPartDisChg[j].amplitudeCUpLimit =atol(fvalue->valuestring);
+												fvalue= cJSON_GetObjectItem(data,"freqC_low");
+											  sheet.modbusPartDisChg[j].freqCLowLimit =atol(fvalue->valuestring);
+												fvalue= cJSON_GetObjectItem(data,"freqC_high");
+											  sheet.modbusPartDisChg[j].freqCUpLimit =atol(fvalue->valuestring);
+												fvalue= cJSON_GetObjectItem(data,"dischargeDateC_low");
+											  sheet.modbusPartDisChg[j].dischargeCLowLimit =atol(fvalue->valuestring);
+												fvalue= cJSON_GetObjectItem(data,"dischargeDateC_high");
+											  sheet.modbusPartDisChg[j].dischargeCUpLimit =atol(fvalue->valuestring);
+										}
+								}
+						}
+				}
+				else if(rt_strcmp(string,"grounding_current_monitor")==0){
+						for(int i=0;i<arrayGet_size;i++)
+						{
+								cJSON *item=cJSON_GetArrayItem(arrayGet,i);
+								cJSON  *devID =cJSON_GetObjectItem(item,"deviceId");
+
+								for(int j=0;j<CIRCULA_485_NUM;j++){//核对有没有配置过
+										if(0==rt_strcmp(sheet.cirCula[j].ID,devID->valuestring)){
+											  result=true;
+											  cJSON  *data =cJSON_GetObjectItem(item,"data");
+											  cJSON  *fvalue= cJSON_GetObjectItem(data,"earthCurA_low");
+											  sheet.modbusCircul[j].cirCurALowLimit=atof(fvalue->valuestring);
+												fvalue= cJSON_GetObjectItem(data,"earthCurA_high");
+											  sheet.modbusCircul[j].cirCurAUpLimit=atof(fvalue->valuestring);
+											
+//												fvalue= cJSON_GetObjectItem(data,"runCurA_low");
+//											  sheet.modbusCircul[j].cirCurAUpLimit=atof(fvalue->valuestring);
+//												fvalue= cJSON_GetObjectItem(data,"runCurA_high");
+//											  sheet.modbusCircul[j].cirCurAUpLimit=atof(fvalue->valuestring);
+//												fvalue= cJSON_GetObjectItem(data,"loadRatioA_low");
+//											  sheet.modbusCircul[j].cirCurAUpLimit=atof(fvalue->valuestring);
+//												fvalue= cJSON_GetObjectItem(data,"loadRatioA_high");
+//											  sheet.modbusCircul[j].cirCurAUpLimit=atof(fvalue->valuestring);		
+											
+												fvalue= cJSON_GetObjectItem(data,"earthCurB_low");
+											  sheet.modbusCircul[j].cirCurBLowLimit=atof(fvalue->valuestring);
+												fvalue= cJSON_GetObjectItem(data,"earthCurB_high");
+											  sheet.modbusCircul[j].cirCurBUpLimit=atof(fvalue->valuestring);
+											
+												fvalue= cJSON_GetObjectItem(data,"earthCurC_low");
+											  sheet.modbusCircul[j].cirCurCLowLimit=atof(fvalue->valuestring);
+												fvalue= cJSON_GetObjectItem(data,"earthCurC_high");
+											  sheet.modbusCircul[j].cirCurCUpLimit=atof(fvalue->valuestring);
+										}
+								}
+						}
+				}
+				else if(rt_strcmp(string,"water_level_monitor")==0){
+						for(int i=0;i<arrayGet_size;i++)
+						{
+								cJSON *item=cJSON_GetArrayItem(arrayGet,i);
+								cJSON  *devID =cJSON_GetObjectItem(item,"deviceId");
+								for(int j=0;j<WATERDEPTH_485_NUM;j++){//核对有没有配置过
+										if(0==rt_strcmp(sheet.cirCula[j].ID,devID->valuestring)){
+											  result=true;
+												cJSON  *data =cJSON_GetObjectItem(item,"data");
+											  cJSON  *fvalue= cJSON_GetObjectItem(data,"depth_low");
+											  sheet.modbusWaterDepth[j].depthLowLimit=atof(fvalue->valuestring);
+											  fvalue= cJSON_GetObjectItem(data,"depth_high");
+											  sheet.modbusWaterDepth[j].depthUpLimit=atof(fvalue->valuestring);
+										}
+								}
+						}
+				}
+				else if(rt_strcmp(string,"temperature_and_humidity_monitor")==0){
+						for(int i=0;i<arrayGet_size;i++)
+						{
+								cJSON *item=cJSON_GetArrayItem(arrayGet,i);
+								cJSON  *devID =cJSON_GetObjectItem(item,"deviceId");
+								for(int j=0;j<TEMPHUM_485_NUM;j++){//核对有没有配置过
+										if(0==rt_strcmp(sheet.tempHum[j].ID,devID->valuestring)){
+											  result=true;
+												cJSON  *data =cJSON_GetObjectItem(item,"data");
+											  cJSON  *fvalue= cJSON_GetObjectItem(data,"temperature_low");
+											  sheet.modbusTempHum[j].tempLowLimit=atof(fvalue->valuestring);
+											  fvalue= cJSON_GetObjectItem(data,"temperature_high");
+											  sheet.modbusTempHum[j].tempUpLimit=atof(fvalue->valuestring);
+											  fvalue= cJSON_GetObjectItem(data,"humidity_low");
+											  sheet.modbusTempHum[j].humLowLimit=atof(fvalue->valuestring);							
+											  fvalue= cJSON_GetObjectItem(data,"humidity_high");
+											  sheet.modbusTempHum[j].humUpLimit=atof(fvalue->valuestring);
+										}
+								}
+						}
+				}
+				else if(rt_strcmp(string,"environment_mointor")==0){
+						for(int i=0;i<arrayGet_size;i++)
+						{
+								cJSON *item=cJSON_GetArrayItem(arrayGet,i);
+								cJSON  *devID =cJSON_GetObjectItem(item,"deviceId");
+								for(int j=0;j<CO_485_NUM;j++){//核对有没有配置过
+										if(0==rt_strcmp(sheet.co[j].ID,devID->valuestring)){
+											  result=true;
+												cJSON  *data =cJSON_GetObjectItem(item,"data");
+											  cJSON  *fvalue= cJSON_GetObjectItem(data,"oxy_low");
+											  sheet.modbusO2[j].o2LowLimit =atof(fvalue->valuestring);
+											  fvalue= cJSON_GetObjectItem(data,"oxy_high");
+											  sheet.modbusO2[j].o2UpLimit =atof(fvalue->valuestring);
+											
+												fvalue= cJSON_GetObjectItem(data,"monoxide_low");
+											  sheet.modbusCo[j].coLowLimit =atof(fvalue->valuestring);
+											  fvalue= cJSON_GetObjectItem(data,"monoxide_high");
+											  sheet.modbusCo[j].coUpLimit =atof(fvalue->valuestring);
+											
+										  	fvalue= cJSON_GetObjectItem(data,"hydrogenSulfide_low");
+											  sheet.modbusH2s[j].h2sLowLimit =atof(fvalue->valuestring);
+											  fvalue= cJSON_GetObjectItem(data,"hydrogenSulfide_high");
+											  sheet.modbusH2s[j].h2sUpLimit =atof(fvalue->valuestring);
+											
+											  fvalue= cJSON_GetObjectItem(data,"methane_low");
+											  sheet.modbusCh4[j].ch4LowLimit =atof(fvalue->valuestring);
+											  fvalue= cJSON_GetObjectItem(data,"methane_high");
+											  sheet.modbusCh4[j].ch4UpLimit =atof(fvalue->valuestring);
+										
+	
+										}
+								}
+						}
+				}
+				else if(rt_strcmp(string,"vibration_monitor")==0){
+						for(int i=0;i<arrayGet_size;i++)
+						{
+								cJSON *item=cJSON_GetArrayItem(arrayGet,i);
+								cJSON  *devID =cJSON_GetObjectItem(item,"deviceId");
+								for(int j=0;j<THREEAXIS_485_NUM;j++){//核对有没有配置过
+										if(0==rt_strcmp(sheet.threeAxiss[j].ID,devID->valuestring)){
+											  result=true;
+												cJSON  *data =cJSON_GetObjectItem(item,"data");
+											  cJSON  *fvalue= cJSON_GetObjectItem(data,"temperature_low");
+											  sheet.modbusThreAxis[j].tempLowLimit=atof(fvalue->valuestring);
+											  fvalue= cJSON_GetObjectItem(data,"temperature_high");
+											  sheet.modbusThreAxis[j].tempUpLimit=atof(fvalue->valuestring);
+											
+												fvalue= cJSON_GetObjectItem(data,"accelerationX_low");
+												sheet.modbusThreAxis[j].accXLowLimit=atof(fvalue->valuestring);
+												fvalue= cJSON_GetObjectItem(data,"accelerationX_high");
+												sheet.modbusThreAxis[j].accXUpLimit=atof(fvalue->valuestring);
+												fvalue= cJSON_GetObjectItem(data,"accelerationY_low");
+												sheet.modbusThreAxis[j].accYLowLimit=atof(fvalue->valuestring);
+												fvalue= cJSON_GetObjectItem(data,"accelerationY_high");
+												sheet.modbusThreAxis[j].accYUpLimit=atof(fvalue->valuestring);
+												fvalue= cJSON_GetObjectItem(data,"accelerationZ_low");
+												sheet.modbusThreAxis[j].accZLowLimit=atof(fvalue->valuestring);
+												fvalue= cJSON_GetObjectItem(data,"accelerationZ_high");
+												sheet.modbusThreAxis[j].accZUpLimit=atof(fvalue->valuestring);
+	
+										}
+								}
+						}
+				}
+				else if(rt_strcmp(string,"settlement_monitor")==0){
+						for(int i=0;i<arrayGet_size;i++)
+						{
+								cJSON *item=cJSON_GetArrayItem(arrayGet,i);
+								cJSON  *devID =cJSON_GetObjectItem(item,"deviceId");
+								for(int j=0;j<PRESSSETTL_485_NUM;j++){//核对有没有配置过
+										if(0==rt_strcmp(sheet.pressSetl[j].ID,devID->valuestring)){
+											  result=true;
+												cJSON  *data =cJSON_GetObjectItem(item,"data");
+											  cJSON  *fvalue= cJSON_GetObjectItem(data,"temperature_low");
+												sheet.modbusPreSettl[j].tempLowLimit=atof(fvalue->valuestring);
+											  fvalue= cJSON_GetObjectItem(data,"temperature_high");
+											  sheet.modbusPreSettl[j].tempUpLimit=atof(fvalue->valuestring);
+											  fvalue= cJSON_GetObjectItem(data,"height_low");
+											  sheet.modbusPreSettl[j].heightLowLimit=atof(fvalue->valuestring);
+											  fvalue= cJSON_GetObjectItem(data,"height_high");
+											  sheet.modbusPreSettl[j].heightUpLimit=atof(fvalue->valuestring);
+	
+										}
+								}
+						}
+				}
+		}
+		else{
+				cJSON_AddStringToObject(root,"packetType","PROPERTIES_ANATH_SET_RESP");
+				if(rt_strcmp(string,"temperature_and_humidity_monitor")==0){
+						for(int i=0;i<arrayGet_size;i++)
+						{
+								cJSON *item=cJSON_GetArrayItem(arrayGet,i);
+								cJSON  *devID =cJSON_GetObjectItem(item,"deviceId");
+								for(int j=0;j<ANALOG_NUM;j++){//核对有没有配置过
+										if(0==rt_strcmp(sheet.analog[j].ID,devID->valuestring)){
+											  result=true;
+												cJSON  *data =cJSON_GetObjectItem(item,"data");
+											  cJSON  *fvalue= cJSON_GetObjectItem(data,"temperature_low");
+											  sheet.analogTempHum.tempLowLimit=atof(fvalue->valuestring);
+											  fvalue= cJSON_GetObjectItem(data,"temperature_high");
+											  sheet.analogTempHum.tempUpLimit =atof(fvalue->valuestring);
+											  fvalue= cJSON_GetObjectItem(data,"humidity_low");
+											  sheet.analogTempHum.humLowLimit =atof(fvalue->valuestring);
+											  fvalue= cJSON_GetObjectItem(data,"humidity_high");
+											  sheet.analogTempHum.humUpLimit  =atof(fvalue->valuestring);
+
+											 break;
+										}
+							 }
+						}
+				}
+		}
+		if(result==true){
+			
+			cJSON_AddNumberToObject(root, "code",0);
+
+		}
+		else{
+			cJSON_AddNumberToObject(root, "code",1);
+		}
+		sprintf(sprinBuf,"%llu",utcTime());
+		cJSON_AddStringToObject(root,"timestamp",sprinBuf);
+		//打包
+		int len=0;
+		packBuf[len]= (uint8_t)(HEAD>>8); len++;
+		packBuf[len]= (uint8_t)(HEAD);    len++;
+		len+=LENTH_LEN;//json长度最后再填写
 		
+		// 释放内存  
+		out = cJSON_Print(root);
+		rt_strcpy((char *)packBuf+len,out);
+		len+=rt_strlen(out);
+		if(out!=NULL){
+				for(int i=0;i<rt_strlen(out);i++)
+						rt_kprintf("%c",out[i]);
+				rt_kprintf("\n");
+				rt_free(out);
+				out=NULL;
+		}
+		if(root!=NULL){
+			cJSON_Delete(root);
+			out=NULL;
+		}
+		//lenth
+	  packBuf[2]=(uint8_t)((len-LENTH_LEN-HEAD_LEN)>>8);//更新json长度
+	  packBuf[3]=(uint8_t)(len-LENTH_LEN-HEAD_LEN);
+	  uint16_t jsonBodyCrc=RTU_CRC(packBuf+HEAD_LEN+LENTH_LEN,len-HEAD_LEN-LENTH_LEN);
+	  //crc
+	  packBuf[len]=(uint8_t)(jsonBodyCrc>>8); len++;//更新crc
+	  packBuf[len]=(uint8_t)(jsonBodyCrc);    len++;
+
+		//tail
+		packBuf[len]=(uint8_t)(TAIL>>8); len++;
+		packBuf[len]=(uint8_t)(TAIL);    len++;
+		packBuf[len]=0;//len++;//结尾 补0
+		rt_free(sprinBuf);
+		sprinBuf=RT_NULL;	
 }
+
+

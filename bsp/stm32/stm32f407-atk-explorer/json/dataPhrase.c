@@ -6,7 +6,7 @@ void  readModbusDataResp(char *monitor);
 void  readAnaDataResp(char *monitor);
 void  senseTHGetJsonResp(cJSON   *Json,bool modbusFlag);
 void senseTimeReadJsonResp(char *string,bool  modbusFlag);
-
+void senseTHSetJsonResp(cJSON   *Json,bool  modbusFlag);
 void senseTimeJsonSet(cJSON   *Json,bool  modbusFlag);
 const static char sign[]="[dataPhrs]";
 uint32_t  respMid=0;
@@ -157,8 +157,8 @@ void AllDownPhrase(char *data,int lenth)
 			  cJSON  *pkIdentf = cJSON_GetObjectItem(Json,"identifier");
 			
 				cJSON  *mid =cJSON_GetObjectItem(Json,"mid");
-			  uint32_t respMid = mid->valueint;
-		
+			  respMid = mid->valueint;
+		 
 			  switch(downLinkPackTpyeGet(pkType)){
 
 					case	PROPERTIES_HEART_RESP:
@@ -179,16 +179,12 @@ void AllDownPhrase(char *data,int lenth)
 						}
 						break;
 					case	PROPERTIES_485DATA_GET:
-						
 					  readModbusDataResp(pkIdentf->valuestring);
 						break;
 					case	PROPERTIES_ANADATA_REP_RESP:
 						break;
 					case	PROPERTIES_ANADATA_GET:
-						
-						
 					  readAnaDataResp(pkIdentf->valuestring);
-					
 						break;
 					case	PROPERTIES_485TIM_GET:
 						senseTimeReadJsonResp(pkIdentf->valuestring,true);
@@ -211,10 +207,16 @@ void AllDownPhrase(char *data,int lenth)
 						rt_mb_send_wait(&mbNetSendData, (rt_ubase_t)&packBuf,RT_WAITING_FOREVER); 
 						break;
 					case	PROPERTIES_485TH_SET:
+						senseTHSetJsonResp(Json,true);
+					  rt_mb_send_wait(&mbNetSendData, (rt_ubase_t)&packBuf,RT_WAITING_FOREVER); 
 						break;
 					case	PROPERTIES_ANATH_GET:
+						senseTHGetJsonResp(Json,false);
+						rt_mb_send_wait(&mbNetSendData, (rt_ubase_t)&packBuf,RT_WAITING_FOREVER); 
 						break;
 					case	PROPERTIES_ANATH_SET:
+						senseTHSetJsonResp(Json,false);
+					  rt_mb_send_wait(&mbNetSendData, (rt_ubase_t)&packBuf,RT_WAITING_FOREVER); 
 						break;
 					case	PROPERTIES_INPUT_REP_RESP:
 						break;
