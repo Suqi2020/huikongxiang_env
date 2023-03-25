@@ -33,7 +33,7 @@ int threeAxisState(int i)
 //#define   SLAVE_ADDR     0X02 
 #define   LENTH          50  //工作环流用到的最大接收buf长度
 
-
+static  bool alarmFLag=false;
 //打包串口发送 
 static void threeAxisUartSend(int num,uint8_t *buf,int len)
 {
@@ -48,42 +48,51 @@ extern uint8_t psReadReg(uint16_t slavAddr,uint16_t regAddr,uint16_t len,uint8_t
 //三轴比较阈值并设置相应的flag标记
 static void threeAccCheckSetFlag(int num)
 {
-	
-		if(threeAxisp[num].temp>=sheet.modbusThreAxis[num].tempUpLimit)
-				inpoutpFlag.modbusThreAxis[num].tempUpFlag=true;
-		else
-			  inpoutpFlag.modbusThreAxis[num].tempUpFlag=false;
-		if(threeAxisp[num].temp<=sheet.modbusThreAxis[num].tempLowLimit)
-				inpoutpFlag.modbusThreAxis[num].tempLowFlag=true;
-		else
-			  inpoutpFlag.modbusThreAxis[num].tempLowFlag=false;
-		
-		if(threeAxisp[num].acclrationX>=sheet.modbusThreAxis[num].accXUpLimit)
-				inpoutpFlag.modbusThreAxis[num].accXUpFlag=true;
-		else
-			  inpoutpFlag.modbusThreAxis[num].accXUpFlag=false;
-		if(threeAxisp[num].acclrationX<=sheet.modbusThreAxis[num].accXLowLimit)
-				inpoutpFlag.modbusThreAxis[num].accXLowFlag=true;
-		else
-			  inpoutpFlag.modbusThreAxis[num].accXLowFlag=false;
+	  alarmFLag=false;
+	  if(sheet.modbusThreAxis[num].tempUpLimit!=0){
+			if(threeAxisp[num].temp>=sheet.modbusThreAxis[num].tempUpLimit){
+					inpoutpFlag.modbusThreAxis[num].tempUpFlag=true;alarmFLag=true;
+			}
+		}
+		if(sheet.modbusThreAxis[num].tempLowLimit!=0){
+			if(threeAxisp[num].temp<=sheet.modbusThreAxis[num].tempLowLimit){
+					inpoutpFlag.modbusThreAxis[num].tempLowFlag=true;alarmFLag=true;
+			}
+		}
 
-		if(threeAxisp[num].acclrationY>=sheet.modbusThreAxis[num].accYUpLimit)
-				inpoutpFlag.modbusThreAxis[num].accYUpFlag=true;
-		else
-			  inpoutpFlag.modbusThreAxis[num].accYUpFlag=false;
-		if(threeAxisp[num].acclrationY<=sheet.modbusThreAxis[num].accYLowLimit)
-				inpoutpFlag.modbusThreAxis[num].accYLowFlag=true;
-		else
-			  inpoutpFlag.modbusThreAxis[num].accYLowFlag=false;
+		if(sheet.modbusThreAxis[num].accXUpLimit!=0){
+			if(threeAxisp[num].acclrationX>=sheet.modbusThreAxis[num].accXUpLimit){
+					inpoutpFlag.modbusThreAxis[num].accXUpFlag=true;alarmFLag=true;
+			}
+		}
+		if(sheet.modbusThreAxis[num].accXLowLimit!=0){
+			if(threeAxisp[num].acclrationX<=sheet.modbusThreAxis[num].accXLowLimit){
+					inpoutpFlag.modbusThreAxis[num].accXLowFlag=true;alarmFLag=true;
+			}
+		}
 
-		if(threeAxisp[num].acclrationZ>=sheet.modbusThreAxis[num].accZUpLimit)
-				inpoutpFlag.modbusThreAxis[num].accZUpFlag=true;
-		else
-			  inpoutpFlag.modbusThreAxis[num].accZUpFlag=false;
-		if(threeAxisp[num].acclrationZ<=sheet.modbusThreAxis[num].accZLowLimit)
-				inpoutpFlag.modbusThreAxis[num].accZLowFlag=true;
-		else
-			  inpoutpFlag.modbusThreAxis[num].accZLowFlag=false;
+		if(sheet.modbusThreAxis[num].accYUpLimit!=0){
+			if(threeAxisp[num].acclrationY>=sheet.modbusThreAxis[num].accYUpLimit){
+					inpoutpFlag.modbusThreAxis[num].accYUpFlag=true;alarmFLag=true;
+			}
+		}
+		if(sheet.modbusThreAxis[num].accYLowLimit!=0){
+			if(threeAxisp[num].acclrationY<=sheet.modbusThreAxis[num].accYLowLimit){
+					inpoutpFlag.modbusThreAxis[num].accYLowFlag=true;alarmFLag=true;
+			}
+		}
+
+		if(sheet.modbusThreAxis[num].accZUpLimit!=0){
+			if(threeAxisp[num].acclrationZ>=sheet.modbusThreAxis[num].accZUpLimit){
+					inpoutpFlag.modbusThreAxis[num].accZUpFlag=true;alarmFLag=true;
+			}
+		}
+    if(sheet.modbusThreAxis[num].accZLowLimit!=0){
+			if(threeAxisp[num].acclrationZ<=sheet.modbusThreAxis[num].accZLowLimit){
+					inpoutpFlag.modbusThreAxis[num].accZLowFlag=true;alarmFLag=true;
+			}
+		}
+
 }
 //发 1A 04 00 01 00 02 23 E0
 //收 1A 04 04 0B 1B 00 1C 23 6F
@@ -311,6 +320,173 @@ static uint16_t threeAxisJsonPack(bool respFlag)
 
 		return len;
 }
+//温湿度传感器读取值与阈值比较并设置flag
+ void threeAxisCheckSetFlag(int num)
+{
+	  alarmFLag=false;
+		
+		if(sheet.modbusThreAxis[num].tempUpLimit!=0){
+			  if(threeAxisp[num].temp>=sheet.modbusThreAxis[num].tempUpLimit){
+					inpoutpFlag.modbusThreAxis[num].tempUpFlag=true;
+					alarmFLag=true;
+				}
+		}
+		
+		if(sheet.modbusThreAxis[num].tempLowLimit!=0){
+				if(threeAxisp[num].temp<=sheet.modbusThreAxis[num].tempLowLimit){
+					inpoutpFlag.modbusThreAxis[num].tempLowFlag=true;
+					alarmFLag=true;
+				}
+		}
+		if(sheet.modbusThreAxis[num].accXUpLimit!=0){
+				if(threeAxisp[num].acclrationX>=sheet.modbusThreAxis[num].accXUpLimit){
+					inpoutpFlag.modbusThreAxis[num].accXUpFlag=true;
+					alarmFLag=true;
+				}
+		}
+		if(sheet.modbusThreAxis[num].accXLowLimit!=0){
+				if(threeAxisp[num].temp<=sheet.modbusThreAxis[num].accXLowLimit){
+					inpoutpFlag.modbusThreAxis[num].accXLowFlag=true;
+					alarmFLag=true;
+				}
+		}
+
+		if(sheet.modbusThreAxis[num].accYUpLimit!=0){
+				if(threeAxisp[num].acclrationY>=sheet.modbusThreAxis[num].accYUpLimit){
+					inpoutpFlag.modbusThreAxis[num].accYUpFlag=true;
+					alarmFLag=true;
+				}
+		}
+		if(sheet.modbusThreAxis[num].accYLowLimit!=0){
+				if(threeAxisp[num].temp<=sheet.modbusThreAxis[num].accYLowLimit){
+					inpoutpFlag.modbusThreAxis[num].accYLowFlag=true;
+					alarmFLag=true;
+				}
+		}
+		if(sheet.modbusThreAxis[num].accZUpLimit!=0){
+				if(threeAxisp[num].acclrationX>=sheet.modbusThreAxis[num].accZUpLimit){
+					inpoutpFlag.modbusThreAxis[num].accZUpFlag=true;
+					alarmFLag=true;
+				}
+		}
+		if(sheet.modbusThreAxis[num].accZLowLimit!=0){
+				if(threeAxisp[num].temp<=sheet.modbusThreAxis[num].accZLowLimit){
+					inpoutpFlag.modbusThreAxis[num].accZLowFlag=true;
+					alarmFLag=true;
+				}
+		}
+}
+//复位温湿度的warn状态值
+void resetThreeAxisWarnFlag()
+{
+		for (int i = 0; i < THREEAXIS_485_NUM; i++)
+		{		
+				inpoutpFlag.modbusThreAxis[i].tempUpFlag =false;
+				inpoutpFlag.modbusThreAxis[i].tempLowFlag=false;
+				inpoutpFlag.modbusThreAxis[i].accXLowFlag=false;
+				inpoutpFlag.modbusThreAxis[i].accXUpFlag =false;
+				inpoutpFlag.modbusThreAxis[i].accYLowFlag=false;
+				inpoutpFlag.modbusThreAxis[i].accYUpFlag =false;
+				inpoutpFlag.modbusThreAxis[i].accZLowFlag=false;
+				inpoutpFlag.modbusThreAxis[i].accZUpFlag =false;
+		}
+}
+
+
+
+
+
+//模拟温度和湿度值读取以及打包成json格式  返回true 有告警 false 无告警
+bool modThreeAxisWarn2Send()
+{
+//		if(alarmFLag==false)//TEST
+//			return false;
+		char* out = NULL;
+		//创建数组
+		cJSON* Array = NULL;
+		// 创建JSON Object  
+		cJSON* root = NULL;
+		cJSON* nodeobj = NULL;
+		cJSON* nodeobj_p = NULL;
+		root = cJSON_CreateObject();
+		if (root == NULL) return false;
+		// 加入节点（键值对）
+		cJSON_AddNumberToObject(root, "mid",mcu.upMessID);
+		cJSON_AddStringToObject(root, "packetType","EVENTS_485_ALARM");
+		cJSON_AddStringToObject(root, "identifier","vibration_monitor");
+		cJSON_AddStringToObject(root, "acuId",(char *)packFlash.acuId);
+		char *sprinBuf=RT_NULL;
+		sprinBuf=rt_malloc(20);//20个字符串长度 够用了
+		{
+				Array = cJSON_CreateArray();
+				if (Array == NULL) return false;
+				cJSON_AddItemToObject(root, "params", Array);
+				for (int i = 0; i < THREEAXIS_485_NUM; i++)
+				{		
+						if(sheet.threeAxiss[i].workFlag==RT_TRUE){
+							nodeobj = cJSON_CreateObject();
+							cJSON_AddItemToArray(Array, nodeobj);
+							cJSON_AddItemToObject(nodeobj,"deviceId",cJSON_CreateString(sheet.threeAxiss[i].ID));
+							cJSON_AddNumberToObject(nodeobj,"alarmStatus",1);
+							nodeobj_p= cJSON_CreateObject();
+							cJSON_AddItemToObject(nodeobj, "data", nodeobj_p);
+							cJSON_AddNumberToObject(nodeobj_p,"temperature_low_alarm",inpoutpFlag.modbusThreAxis[i].tempLowFlag);//cJSON_CreateNumber("10"));
+							cJSON_AddNumberToObject(nodeobj_p,"temperature_high_alarm",inpoutpFlag.modbusThreAxis[i].tempUpFlag);
+							cJSON_AddNumberToObject(nodeobj_p,"accelerationX_low_alarm",inpoutpFlag.modbusThreAxis[i].accXLowFlag);
+							cJSON_AddNumberToObject(nodeobj_p,"accelerationX_high_alarm",inpoutpFlag.modbusThreAxis[i].accXUpFlag);		
+							cJSON_AddNumberToObject(nodeobj_p,"accelerationY_low_alarm",inpoutpFlag.modbusThreAxis[i].accYLowFlag);
+							cJSON_AddNumberToObject(nodeobj_p,"accelerationY_high_alarm",inpoutpFlag.modbusThreAxis[i].accYUpFlag);
+							cJSON_AddNumberToObject(nodeobj_p,"accelerationZ_low_alarm",inpoutpFlag.modbusThreAxis[i].accZLowFlag);
+							cJSON_AddNumberToObject(nodeobj_p,"accelerationZ_high_alarm",inpoutpFlag.modbusThreAxis[i].accZUpFlag);			
+							sprintf(sprinBuf,"%llu",utcTime());
+							cJSON_AddItemToObject(nodeobj_p,"monitoringTime",cJSON_CreateString(sprinBuf));
+						}
+				}
+		}
+		sprintf(sprinBuf,"%llu",utcTime());
+		cJSON_AddStringToObject(root,"timestamp",sprinBuf);
+		//打包
+		int len=0;
+		packBuf[len]= (uint8_t)(HEAD>>8); len++;
+		packBuf[len]= (uint8_t)(HEAD);    len++;
+		len+=LENTH_LEN;//json长度最后再填写
+		// 释放内存  
+		out = cJSON_Print(root);
+		rt_strcpy((char *)packBuf+len,out);
+		len+=rt_strlen(out);
+		if(out!=NULL){
+				for(int i=0;i<rt_strlen(out);i++)
+						rt_kprintf("%c",out[i]);
+				rt_kprintf("\n");
+				rt_free(out);
+				out=NULL;
+		}
+		if(root!=NULL){
+			cJSON_Delete(root);
+			out=NULL;
+		}
+		//lenth
+	  packBuf[2]=(uint8_t)((len-LENTH_LEN-HEAD_LEN)>>8);//更新json长度
+	  packBuf[3]=(uint8_t)(len-LENTH_LEN-HEAD_LEN);
+	  uint16_t jsonBodyCrc=RTU_CRC(packBuf+HEAD_LEN+LENTH_LEN,len-HEAD_LEN-LENTH_LEN);
+	  //crc
+	  packBuf[len]=(uint8_t)(jsonBodyCrc>>8); len++;//更新crc
+	  packBuf[len]=(uint8_t)(jsonBodyCrc);    len++;
+		//tail
+		packBuf[len]=(uint8_t)(TAIL>>8); len++;
+		packBuf[len]=(uint8_t)(TAIL);    len++;
+		packBuf[len]=0;//len++;//结尾 补0
+		mcu.repDataMessID =mcu.upMessID;
+		//mcu.devRegMessID =mcu.upMessID;
+		upMessIdAdd();
+		rt_free(sprinBuf);
+		sprinBuf=RT_NULL;
+		return true;
+}
+
+
+
+
 
 //三轴读取modbus数据并打包发送 给其它函数调用
 void threeAxisRead2Send(rt_bool_t netStat,bool respFlag)
@@ -327,5 +503,11 @@ void threeAxisRead2Send(rt_bool_t netStat,bool respFlag)
 					threeAxisJsonPack(respFlag);//circulaJsonPack();
 					if(netStat==RT_TRUE)
 							rt_mb_send_wait(&mbNetSendData, (rt_ubase_t)&packBuf,RT_WAITING_FOREVER);
+					if(modThreeAxisWarn2Send()==true){
+							resetThreeAxisWarnFlag();//每次判断后复位warnflag状态值
+							rt_thread_mdelay(500);
+							if(netStat==RT_TRUE)
+									rt_mb_send_wait(&mbNetSendData, (rt_ubase_t)&packBuf,RT_WAITING_FOREVER);
+					}
 			}
 }

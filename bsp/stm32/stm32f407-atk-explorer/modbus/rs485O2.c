@@ -13,19 +13,23 @@ const static char sign[]="[ΡυΖψ]";
 float  o2[O2_485_NUM];
 static uint8_t respStat[O2_485_NUM];
 
-
+extern bool gasAlarmFlag;
 
 static void o2CheckSetFlag(int num)
 {
-	
-		if(o2[num]>=sheet.modbusO2[num].o2UpLimit)
-				inpoutpFlag.modbusO2[num].o2UpFlag=true;
-		else
-				inpoutpFlag.modbusO2[num].o2UpFlag=false;
-		if(o2[num]<=sheet.modbusO2[num].o2LowLimit)
-				inpoutpFlag.modbusO2[num].o2LowFlag=true;
-		else
-				inpoutpFlag.modbusO2[num].o2LowFlag=false;
+	  gasAlarmFlag=false;
+		if(sheet.modbusO2[num].o2UpLimit!=0){
+			if(o2[num]>=sheet.modbusO2[num].o2UpLimit){
+					inpoutpFlag.modbusO2[num].o2UpFlag=true;
+				  gasAlarmFlag=true;
+			}
+		}
+		if(sheet.modbusO2[num].o2LowLimit!=0){
+			if(o2[num]<=sheet.modbusO2[num].o2LowLimit){
+					inpoutpFlag.modbusO2[num].o2LowFlag=true;
+					gasAlarmFlag=true;
+			}
+		}
 }
 
 

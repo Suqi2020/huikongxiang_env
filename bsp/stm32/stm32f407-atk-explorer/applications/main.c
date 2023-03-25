@@ -145,9 +145,10 @@
 //V0.84    设置读取传感器时间测试完成
 //V0.85    增加对子站通讯json格式 读取和配置阈值完成  20230323
 //V0.86    增加485和模拟告警上报    20230324
-#define APP_VER       ((0<<8)+86)//0x0105 表示1.5版本
+//V0.87    完善所有的modbus告警上报 20230325
+#define APP_VER       ((0<<8)+87)//0x0105 表示1.5版本
 //
-const char date[]="20230323";
+const char date[]="20230325";
 
 //static    rt_thread_t tid 	= RT_NULL;
 static    rt_thread_t tidW5500 	  = RT_NULL;

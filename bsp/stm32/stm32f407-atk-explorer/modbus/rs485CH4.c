@@ -15,6 +15,7 @@ const static char sign[]="[甲烷]";
 
  float ch4[CH4_485_NUM];
 static uint8_t respStat[CH4_485_NUM];
+extern bool gasAlarmFlag;
 //打包串口发送 
 static void ch4UartSend(int num,uint8_t *buf,int len)
 {
@@ -28,15 +29,18 @@ int ch4State(int i)
 //ch4比较阈值并设置相应的flag标记
 static void ch4CheckSetFlag(int num)
 {
-	
-		if(ch4[num]>=sheet.modbusCh4[num].ch4UpLimit)
-				inpoutpFlag.modbusCh4[num].ch4UpFlag=true;
-		else
-				inpoutpFlag.modbusCh4[num].ch4UpFlag=false;
-		if(ch4[num]<=sheet.modbusCh4[num].ch4LowLimit)
-				inpoutpFlag.modbusCh4[num].ch4LowFlag=true;
-		else
-				inpoutpFlag.modbusCh4[num].ch4LowFlag=false;
+		gasAlarmFlag=false;
+		if(sheet.modbusCh4[num].ch4UpLimit!=0){
+			if(ch4[num]>=sheet.modbusCh4[num].ch4UpLimit){
+					inpoutpFlag.modbusCh4[num].ch4UpFlag=true;gasAlarmFlag=true;
+			}
+		}
+		if(sheet.modbusCh4[num].ch4LowLimit!=0){
+			if(ch4[num]<=sheet.modbusCh4[num].ch4LowLimit){
+					inpoutpFlag.modbusCh4[num].ch4LowFlag=true;gasAlarmFlag=true;
+			}
+		}
+
 }
 //发 1A 04 00 01 00 02 23 E0
 //收 1A 04 04 0B 1B 00 1C 23 6F

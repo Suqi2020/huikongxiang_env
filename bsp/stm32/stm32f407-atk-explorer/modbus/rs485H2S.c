@@ -11,6 +11,7 @@ const static char sign[]="[硫化氢]";
 
  float h2s[H2S_485_NUM];
 static uint8_t respStat[H2S_485_NUM];
+extern bool gasAlarmFlag;
 //打包串口发送 
 static void h2sUartSend(int num,uint8_t *buf,int len)
 {
@@ -25,15 +26,19 @@ int h2sState(int i)
 //h2s比较阈值并设置相应的flag标记
 static void h2sCheckSetFlag(int num)
 {
-	
-		if(h2s[num]>=sheet.modbusH2s[num].h2sUpLimit)
-				inpoutpFlag.modbusH2s[num].h2sUpFlag=true;
-		else
-				inpoutpFlag.modbusH2s[num].h2sUpFlag=false;
-		if(h2s[num]<=sheet.modbusH2s[num].h2sLowLimit)
-				inpoutpFlag.modbusH2s[num].h2sLowFlag=true;
-		else
-				inpoutpFlag.modbusH2s[num].h2sLowFlag=false;
+	  gasAlarmFlag=false;
+		if(sheet.modbusH2s[num].h2sUpLimit!=0){
+			if(h2s[num]>=sheet.modbusH2s[num].h2sUpLimit){
+					inpoutpFlag.modbusH2s[num].h2sUpFlag=true;
+					gasAlarmFlag=true;
+			}
+		}
+		if(sheet.modbusH2s[num].h2sLowLimit!=0){
+			if(h2s[num]<=sheet.modbusH2s[num].h2sLowLimit){
+					inpoutpFlag.modbusH2s[num].h2sLowFlag=true;
+					gasAlarmFlag=true;
+			}
+		}
 }
 
 //发 1A 04 00 01 00 02 23 E0

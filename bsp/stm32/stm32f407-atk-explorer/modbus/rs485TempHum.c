@@ -6,7 +6,7 @@ const static char sign[]="[温湿度]";
 
 //#define   SLAVE_ADDR     0X01 
 #define   LENTH          50  //工作环流用到的最大接收buf长度
-bool alarmFLag=false;
+static bool alarmFLag=false;
 typedef struct{
 	float temp;
 	float hum; 
@@ -32,39 +32,30 @@ int tempHumState(int i)
  void tempHumCheckSetFlag(int num)
 {
 	  alarmFLag=false;
-		if(thum[num].temp>=sheet.modbusTempHum[num].tempUpLimit){
-				if(sheet.modbusTempHum[num].tempUpLimit!=0){
+		if(sheet.modbusTempHum[num].tempUpLimit!=0){
+				if(thum[num].temp>=sheet.modbusTempHum[num].tempUpLimit){
 					inpoutpFlag.modbusTempHum[num].tempUpFlag=true;
 					alarmFLag=true;
 				}
 		}
-		else
-				inpoutpFlag.modbusTempHum[num].tempUpFlag=false;
-		if(thum[num].temp<=sheet.modbusTempHum[num].tempLowLimit){
-			  if(sheet.modbusTempHum[num].tempLowLimit!=0){
+		if(sheet.modbusTempHum[num].tempLowLimit!=0){
+				if(thum[num].temp<=sheet.modbusTempHum[num].tempLowLimit){
 					inpoutpFlag.modbusTempHum[num].tempLowFlag=true;
 					alarmFLag=true;
 				}
 		}
-		else
-				inpoutpFlag.modbusTempHum[num].tempLowFlag=false;
-		
-		if(thum[num].hum>=sheet.modbusTempHum[num].humUpLimit){
-				if(sheet.modbusTempHum[num].humUpLimit!=0){
+		if(sheet.modbusTempHum[num].humUpLimit!=0){
+				if(thum[num].hum>=sheet.modbusTempHum[num].humUpLimit){
 					inpoutpFlag.modbusTempHum[num].humUpFlag=true;
 					alarmFLag=true;
 				}
 		}
-		else
-				inpoutpFlag.modbusTempHum[num].humUpFlag=false;
-		if(thum[num].temp<=sheet.modbusTempHum[num].humLowLimit){
-				if(sheet.modbusTempHum[num].humLowLimit!=0){
+		if(sheet.modbusTempHum[num].humLowLimit!=0){
+				if(thum[num].temp<=sheet.modbusTempHum[num].humLowLimit){	
 					inpoutpFlag.modbusTempHum[num].humLowFlag=true;
 					alarmFLag=true;
 				}
 		}
-		else
-				inpoutpFlag.modbusTempHum[num].humLowFlag=false;
 }
 //复位温湿度的warn状态值
 void resetTempHumWarnFlag()
@@ -263,8 +254,8 @@ static uint16_t tempHumJsonPack(bool respFlag)
 //模拟温度和湿度值读取以及打包成json格式  返回true 有告警 false 无告警
 bool modTempHumWarn2Send()
 {
-		if(alarmFLag==false)//TEST
-			return false;
+//		if(alarmFLag==false)//TEST
+//			return false;
 		char* out = NULL;
 		//创建数组
 		cJSON* Array = NULL;
@@ -368,7 +359,7 @@ void tempHumRead2Send(rt_bool_t netStat,bool respFlag)
 					rt_thread_mdelay(500);
 					if(netStat==RT_TRUE)
 							rt_mb_send_wait(&mbNetSendData, (rt_ubase_t)&packBuf,RT_WAITING_FOREVER);
-				}
+			}
 	}
 }
 

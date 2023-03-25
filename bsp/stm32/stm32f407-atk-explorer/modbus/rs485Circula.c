@@ -14,6 +14,7 @@
 //迅速切换其它485接口来使用 方法：只需要修改串口发送接口 和中断接收接口即可
 // rs485Circula.c-cirCurrUartSend(uint8_t *buf,int len) 和drv_uart.c-USART2_IRQHandler中
 // cirCurrUartSend(uint8_t *buf,int len)   cirCurrUartRec(uint8_t dat)
+static  bool alarmFLag=false;
 typedef struct
 {
 	  //环流值 放大了100倍
@@ -67,35 +68,37 @@ void cirCurrUartSend(int num,uint8_t *buf,int len)
 //环流比较阈值并设置相应的flag标记
 static void circulaCheckSetFlag(int num)
 {
-		if(cirCurStru_p[num].circlCurA>=sheet.modbusCircul[num].cirCurAUpLimit)
-				inpoutpFlag.modbusCircul[num].cirCurAUpFlag=true;
-		else
-				inpoutpFlag.modbusCircul[num].cirCurAUpFlag=false;
-		if(cirCurStru_p[num].circlCurA<=sheet.modbusCircul[num].cirCurALowLimit)
-				inpoutpFlag.modbusCircul[num].cirCurALowFlag=true;
-		else
-				inpoutpFlag.modbusCircul[num].cirCurALowFlag=false;
-		
-		if(cirCurStru_p[num].circlCurB>=sheet.modbusCircul[num].cirCurBUpLimit)
-				inpoutpFlag.modbusCircul[num].cirCurBUpFlag=true;
-		else
-				inpoutpFlag.modbusCircul[num].cirCurBUpFlag=false;
-		if(cirCurStru_p[num].circlCurB<=sheet.modbusCircul[num].cirCurBLowLimit)
-				inpoutpFlag.modbusCircul[num].cirCurBLowFlag=true;
-		else
-				inpoutpFlag.modbusCircul[num].cirCurBLowFlag=false;
-		
-		
-		if(cirCurStru_p[num].circlCurC>=sheet.modbusCircul[num].cirCurCUpLimit)
-				inpoutpFlag.modbusCircul[num].cirCurCUpFlag=true;
-		else
-				inpoutpFlag.modbusCircul[num].cirCurCUpFlag=false;
-		
-		if(cirCurStru_p[num].circlCurC<=sheet.modbusCircul[num].cirCurCLowLimit)
-				inpoutpFlag.modbusCircul[num].cirCurCLowFlag=true;
-		else
-				inpoutpFlag.modbusCircul[num].cirCurCLowFlag=false;
-		
+	  alarmFLag=false;
+	  if(sheet.modbusCircul[num].cirCurAUpLimit!=0){
+			if(cirCurStru_p[num].circlCurA>=sheet.modbusCircul[num].cirCurAUpLimit){
+					inpoutpFlag.modbusCircul[num].cirCurAUpFlag=true;alarmFLag=true;
+			}
+		}
+		if(sheet.modbusCircul[num].cirCurALowLimit!=0){
+			if(cirCurStru_p[num].circlCurA<=sheet.modbusCircul[num].cirCurALowLimit){
+					inpoutpFlag.modbusCircul[num].cirCurALowFlag=true;alarmFLag=true;
+			}
+		}
+		if(sheet.modbusCircul[num].cirCurBUpLimit!=0){
+			if(cirCurStru_p[num].circlCurB>=sheet.modbusCircul[num].cirCurBUpLimit){
+					inpoutpFlag.modbusCircul[num].cirCurBUpFlag=true;alarmFLag=true;
+			}
+		}
+		if(sheet.modbusCircul[num].cirCurBLowLimit!=0){
+			if(cirCurStru_p[num].circlCurB<=sheet.modbusCircul[num].cirCurBLowLimit){
+					inpoutpFlag.modbusCircul[num].cirCurBLowFlag=true;alarmFLag=true;
+			}
+		}
+		if(sheet.modbusCircul[num].cirCurCUpLimit!=0){
+			if(cirCurStru_p[num].circlCurC>=sheet.modbusCircul[num].cirCurCUpLimit){
+					inpoutpFlag.modbusCircul[num].cirCurCUpFlag=true;alarmFLag=true;
+			}
+		}
+		if(sheet.modbusCircul[num].cirCurCUpLimit!=0){
+			if(cirCurStru_p[num].circlCurC<=sheet.modbusCircul[num].cirCurCLowLimit){
+					inpoutpFlag.modbusCircul[num].cirCurCLowFlag=true;alarmFLag=true;
+			}
+		}
 
 }
 ///////////////////////////////////////读写寄存器相关操作////////////////////////////////////////
@@ -173,240 +176,7 @@ void readCirCurrAndWaring(int num)
 	  buf=RT_NULL;
 		
 }
-//每次上电后需要从flash中读出存储的值与modbus回复的值进行比较
-//void cirCurrConf()
-//{
-//		//给个初值 后期需要从flash中读取
-//	  rt_thread_mdelay(1000); //初始化时候需要延时 等待设备初始化完成
-//		cirCurStru_p.AcqInterv=5;
-//		cirCurStru_p.point =100;       //非modbus真实值  此处读取modbus后经过了转换便于直接计算  0 -扩大了100倍 1-2 扩大了10倍
-//	  cirCurStru_p.thresholdVal=350;//3.5A扩大了100倍
-////		rt_kprintf("readAcqInterv:%d\n",readAcqInterv());
-////		rt_kprintf("readThresholdVal:%d\n",readThresholdVal());
-////		rt_kprintf("readPoint:%d\n",readPoint());
-// 
-//	  if(readAcqInterv()!=cirCurStru_p.AcqInterv){
-//				if(RT_FALSE==writeAcqInterv(cirCurStru_p.AcqInterv)){
-//						rt_kprintf("%swriteAcqInterv err\n",sign);
-//				}
-//		}
-//		if(readThresholdVal()!=cirCurStru_p.thresholdVal){
-//				if(RT_FALSE==writeThresholdVal(cirCurStru_p.thresholdVal)){
-//						rt_kprintf("%swriteThresholdVal err\n",sign);
-//				}
-//		}
-//		if(readPoint()!=cirCurStru_p.point){
-//				if(RT_FALSE==writePoint(cirCurStru_p.point)){
-//						rt_kprintf("%swritePoint err\n",sign);
-//				}
-//		}
 
-//}
-
-////读取采集间隔
-//uint16_t readAcqInterv()
-//{
-//	  uint8_t offset=3;//add+regadd+len
-//	  uint8_t  *buf = RT_NULL;
-//		buf = rt_malloc(LENTH);
-//	  uint16_t len = modbusReadReg(modbusFlash[CIRCULA].slaveAddr,0x0004,READ_03,1,buf);
-//	  uint16_t ret =0;
-//		//recFlag = RT_TRUE;
-//		rt_mutex_take(uartDev[modbusFlash[CIRCULA].useUartNum].uartMutex,RT_WAITING_FOREVER);
-//	  //485发送buf  len  等待modbus回应
-//		cirCurrUartSend(buf,len);
-//	  rt_kprintf("%sreadAcqInterv send:",sign);
-//		for(int j=0;j<len;j++){
-//				rt_kprintf("%x ",buf[j]);
-//		}
-//		rt_kprintf("\n");
-//		memset(buf,0,LENTH);
-//    len=0;
-//		while(rt_mq_recv(uartDev[modbusFlash[CIRCULA].useUartNum].uartMessque, buf+len, 1, 500) == RT_EOK){//115200 波特率1ms 10个数据
-//				len++;
-//		}
-//		rt_kprintf("%srec:",sign);
-//		for(int j=0;j<len;j++){
-//				rt_kprintf("%x ",buf[j]);
-//		}
-//		rt_kprintf("\n");
-////		uartDev[modbusFlash[CIRCULA].useUartNum].offline=RT_FALSE;
-//		//提取环流值 第一步判断crc 第二部提取
-//		int ret2=modbusRespCheck(modbusFlash[CIRCULA].slaveAddr,buf,len,RT_TRUE);
-//		if(0 == ret2){//刷新读取到的值
-
-//			  ret	=(buf[offset]<<8)	+buf[offset+1];	//offset+=2;
-//			  rt_kprintf("%s提取采集间隔成功 %d\r\n",sign,ret);
-//		} 
-//		else{
-//				if(ret2==2){
-////					   uartDev[modbusFlash[CIRCULA].useUartNum].offline=RT_TRUE;
-//						//rt_kprintf("%sERR:请检查485接线或者供电\r\n",sign);
-//				}
-//		}
-//		
-//    //
-//		//recFlag = RT_FALSE;
-//	  rt_mutex_release(uartDev[modbusFlash[CIRCULA].useUartNum].uartMutex);
-//		rt_free(buf);
-//	  buf=RT_NULL;
-//		return ret;
-//}
-
-//设置采集间隔
-//01 06 00 04 00 05 08 08	# RECV HEX>
-//01 06 00 04 00 05 08 08
-//rt_bool_t writeAcqInterv(uint16_t value)
-//{
-//		
-//	  uint8_t  *buf = RT_NULL;
-//		buf = rt_malloc(LENTH);
-//	  uint16_t len = modbusWriteOneReg(modbusFlash[CIRCULA].slaveAddr,0x0004,value,buf);//modbusWriteReg(SLAVE_ADDR,0x0004,1,buf);
-//		rt_mutex_take(uartDev[modbusFlash[CIRCULA].useUartNum].uartMutex,RT_WAITING_FOREVER);
-//	  //recFlag = RT_TRUE;
-//	  rt_bool_t ret=RT_FALSE;
-//	  //485发送buf  len  等待modbus回应
-//		cirCurrUartSend(buf,len);
-//	  rt_kprintf("%swrAcqInterv send:",sign);
-//		for(int j=0;j<len;j++){
-//				rt_kprintf("%x ",buf[j]);
-//		}
-//		rt_kprintf("\n");
-//		memset(buf,0,LENTH);
-//    len=0;
-//		while(rt_mq_recv(uartDev[modbusFlash[CIRCULA].useUartNum].uartMessque, buf+len, 1, 500) == RT_EOK){//115200 波特率1ms 10个数据
-//				len++;
-//		}
-//		rt_kprintf("%srec:",sign);
-//		for(int j=0;j<len;j++){
-//				rt_kprintf("%x ",buf[j]);
-//		}
-//		rt_kprintf("\n");
-////		uartDev[modbusFlash[CIRCULA].useUartNum].offline=RT_FALSE;
-//		//提取环流值 第一步判断crc 第二判断对错
-//		int ret2= modbusRespCheck(modbusFlash[CIRCULA].slaveAddr,buf,len,RT_FALSE);
-//		if(0 ==  ret2){//刷新读取到的值
-//        if(buf[1]==WRITE){
-//						ret= RT_TRUE;
-//				}
-//		} 
-//		else{
-//				if(ret2==2){
-////					  uartDev[modbusFlash[CIRCULA].useUartNum].offline=RT_TRUE;
-//						//rt_kprintf("%sERR:请检查485接线或者供电\r\n",sign);
-//				}
-//		}
-//    //
-//		//recFlag = RT_FALSE;
-//	  rt_mutex_release(uartDev[modbusFlash[CIRCULA].useUartNum].uartMutex);
-//		rt_free(buf);
-//	  buf=RT_NULL;
-//	  
-//	
-//		return ret;
-//}
-//读取报警阈值
-//uint32_t readThresholdVal(int num)
-//{
-//	  uint8_t offset=3;//add+regadd+len
-//	  uint8_t  *buf = RT_NULL;
-//		buf = rt_malloc(LENTH);
-//	  uint16_t len = modbusReadReg(modbusFlash[CIRCULA].slaveAddr,0x0009,READ_03,4,buf);
-//	  uint32_t ret =0;		
-//	  //recFlag = RT_TRUE;
-
-//		rt_mutex_take(uartDev[modbusFlash[CIRCULA].useUartNum].uartMutex,RT_WAITING_FOREVER);
-//	  //485发送buf  len  等待modbus回应
-//		cirCurrUartSend(buf,len);
-//	  rt_kprintf("%sreadthresholdVal send:",sign);
-//		for(int j=0;j<len;j++){
-//				rt_kprintf("%x ",buf[j]);
-//		}
-//		rt_kprintf("\n");
-//		memset(buf,0,LENTH);
-//    len=0;
-//		while(rt_mq_recv(uartDev[modbusFlash[CIRCULA].useUartNum].uartMessque, buf+len, 1, 500) == RT_EOK){//115200 波特率1ms 10个数据
-//				len++;
-//		}
-//		rt_kprintf("%srec:",sign);
-//		for(int j=0;j<len;j++){
-//				rt_kprintf("%x ",buf[j]);
-//		}
-//		rt_kprintf("\n");
-////		uartDev[modbusFlash[CIRCULA].useUartNum].offline=RT_FALSE;
-//		//提取环流值 第一步判断crc 第二部提取
-//		int ret2=modbusRespCheck(modbusFlash[CIRCULA].slaveAddr,buf,len,RT_TRUE);
-//		if(0 ==ret2){//刷新读取到的值
-
-//			  ret	=(buf[offset]<<24)+(buf[offset+1]<<16)+(buf[offset+2]<<8)+buf[offset+3];//offset+=2;
-//			  rt_kprintf("%s提取报警阈值 %d\r\n",sign,ret);
-//		} 
-//		else{
-//				if(ret2==2){
-////						uartDev[modbusFlash[CIRCULA].useUartNum].offline=RT_TRUE;
-//						//rt_kprintf("%sERR:请检查485接线或者供电\r\n",sign);
-//				}
-//		}
-//		//recFlag = RT_FALSE;
-//	  rt_mutex_release(uartDev[modbusFlash[CIRCULA].useUartNum].uartMutex);
-//		rt_free(buf);
-//	  buf=RT_NULL;
-//		return ret;
-//}
-//设置报警阈值  rt_true 成功 rt-false 失败
-//rt_bool_t writeThresholdVal(uint32_t value)
-//{
-//    rt_bool_t ret=RT_FALSE;
-//	  uint8_t  *buf = RT_NULL;
-//		buf = rt_malloc(LENTH);
-//	  uint8_t sendD[4]={0};
-//		sendD[0]=(uint8_t)(value>>24);
-//		sendD[1]=(uint8_t)(value>>16);
-//		sendD[2]=(uint8_t)(value>>8);
-//		sendD[3]=value;
-//	  uint16_t len = modbusWriteMultReg(modbusFlash[CIRCULA].slaveAddr,0x0009,sizeof(uint32_t),sendD,buf);
-//    //recFlag = RT_TRUE;
-//		rt_mutex_take(uartDev[modbusFlash[CIRCULA].useUartNum].uartMutex,RT_WAITING_FOREVER);  
-//	  //485发送buf  len  等待modbus回应
-//		cirCurrUartSend(buf,len);
-//	  rt_kprintf("%swrAcqInterv send:",sign);
-//		for(int j=0;j<len;j++){
-//				rt_kprintf("%x ",buf[j]);
-//		}
-//		rt_kprintf("\n");
-//		memset(buf,0,LENTH);
-//    len=0;
-//		while(rt_mq_recv(uartDev[modbusFlash[CIRCULA].useUartNum].uartMessque, buf+len, 1, 500) == RT_EOK){//115200 波特率1ms 10个数据
-//				len++;
-//		}
-//		rt_kprintf("%srec:",sign);
-//		for(int j=0;j<len;j++){
-//				rt_kprintf("%x ",buf[j]);
-//		}
-//		rt_kprintf("\n");
-////		uartDev[modbusFlash[CIRCULA].useUartNum].offline=RT_FALSE;
-//		//提取环流值 第一步判断crc 第二判断对错
-//		int ret2 = modbusRespCheck(modbusFlash[CIRCULA].slaveAddr,buf,len,RT_FALSE);
-//		if(0 ==  ret2){//刷新读取到的值
-//        if(buf[1]==WRITE_MUL){
-//						ret= RT_TRUE;
-//				}
-//		} 
-//		else{
-//				if(ret2==2){
-/////					  uartDev[modbusFlash[CIRCULA].useUartNum].offline=RT_TRUE;
-//						//rt_kprintf("%sERR:请检查485接线或者供电\r\n",sign);
-//				}
-//		}
-//		//recFlag = RT_FALSE;
-//	  rt_mutex_release(uartDev[modbusFlash[CIRCULA].useUartNum].uartMutex);
-//		rt_free(buf);
-//	  buf=RT_NULL;
-//	
-//	
-//		return ret;
-//	
-//}
 //读取小数处理方式
 static uint16_t readPoint(int num)
 {
@@ -464,198 +234,6 @@ void readMultiCirCulaPoint()
 				}
 		}
 }
-//设置小数处理方式
-//设置采集间隔
-//rt_bool_t writePoint(uint16_t value)
-//{
-
-//	  uint8_t  *buf = RT_NULL;
-//		buf = rt_malloc(LENTH);
-//	  uint16_t len = modbusWriteOneReg(modbusFlash[CIRCULA].slaveAddr,0x000b,value,buf);//modbusWriteReg(SLAVE_ADDR,0x0004,1,buf);
-//		rt_mutex_take(uartDev[modbusFlash[CIRCULA].useUartNum].uartMutex,RT_WAITING_FOREVER);
-//		//recFlag = RT_TRUE;
-//		rt_bool_t ret=RT_FALSE;
-//	  //485发送buf  len  等待modbus回应
-//		cirCurrUartSend(buf,len);
-//	  rt_kprintf("%swrAcqInterv send:",sign);
-//		for(int j=0;j<len;j++){
-//				rt_kprintf("%x ",buf[j]);
-//		}
-//		rt_kprintf("\n");
-//		memset(buf,0,LENTH);
-//    len=0;
-//		while(rt_mq_recv(uartDev[modbusFlash[CIRCULA].useUartNum].uartMessque, buf+len, 1, 500) == RT_EOK){//115200 波特率1ms 10个数据
-//				len++;
-//		}
-//		if(len!=0){
-//				rt_kprintf("%srec:",sign);
-//				for(int j=0;j<len;j++){
-//						rt_kprintf("%x ",buf[j]);
-//				}
-//				rt_kprintf("\n");
-//		}
-////		uartDev[modbusFlash[CIRCULA].useUartNum].offline=RT_FALSE;
-//		//提取环流值 第一步判断crc 第二判断对错
-//		int ret2=modbusRespCheck(modbusFlash[CIRCULA].slaveAddr,buf,len,RT_FALSE);
-//		if(0 == ret2 ){//刷新读取到的值
-//        if(buf[1]==WRITE){
-//						ret= RT_TRUE;
-//				}
-//		} 
-//		else{
-//				if(ret2==2){
-////					  uartDev[modbusFlash[CIRCULA].useUartNum].offline=RT_TRUE;
-//						//rt_kprintf("%sERR:请检查485接线或者供电\r\n",sign);
-//				}
-//		}
-//		//recFlag = RT_FALSE;
-//	  rt_mutex_release(uartDev[modbusFlash[CIRCULA].useUartNum].uartMutex);
-//		rt_free(buf);
-//	  buf=RT_NULL;
-//	
-//	
-//		return ret;
-//	
-
-//}
-
-//数据主动定时上行的打包  打包前需要调用 readCirCurrAndWaring()
-/*
-{
-     "mid":1234,
-     "packetType":"CMD_REPORTDATA",
-     "param":
-     {
-          "identifier":"grounding_current_monitor",
-          "acuId":"100000000000001",
-          "deviceId":"1000000000003",?
-          "data":
-          {
-               "earthCurA":"22.2",
-               "runCurA":"",
-               "loadRatioA":"",
-               "earthCurB":"22.2",
-               "runCurB":"",
-               "loadRatioB":"",
-               "earthCurC":"22.2",
-               "runCurC":"",
-               "loadRatioC":"",
-               "monitoringTime":"1655172531937"
-          }
-     },
-     "timestamp":"1655172531937"
-}
-*/
-
-
-
-/////////////////////////////////////////JSON格式打包//////////////////////////////////////////
-//电流值打包
-//uint16_t 	cirCulaDataPack()
-//{
-//	 
-//	  memset(packBuf,0,sizeof(packBuf));
-//		int len=0;
-//    //head+lenth
-//	  packBuf[len]= (uint8_t)(HEAD>>8); len++;
-//	  packBuf[len]= (uint8_t)(HEAD);    len++;
-//	  len+=LENTH_LEN;//json长度最后再填写
-//	  //json
-//	  char str[50]={0};//临时使用的数组
-//		rt_sprintf(str,"{\"mid\":%lu,",mcu.upMessID);
-//		rt_strcpy((char *)packBuf+len,str);
-//    len+=rt_strlen(str);
-//		
-//		rt_strcpy(str,"\"packetType\":\"CMD_REPORTDATA\",");
-//		rt_strcpy((char *)packBuf+len,str);
-//    len+=rt_strlen(str);
-//		
-//		rt_strcpy(str,"\"param\":{");
-//		rt_strcpy((char *)packBuf+len,str);
-//    len+=rt_strlen(str);
-
-//		rt_strcpy(str,"\"identifier\":\"grounding_current_monitor\",");
-//		rt_strcpy((char *)packBuf+len,str);
-//		len+=rt_strlen(str);
-
-//		rt_sprintf(str,"\"acuId\":\"%s\",",mcu.devID);
-//		rt_strcpy((char *)packBuf+len,str);
-//		len+=rt_strlen(str);
-//		
-//		sprintf(str,"\"deviceId\":\"%s\",",devi[CIRCULA].ID);
-//		rt_strcpy((char *)packBuf+len,str);
-//		len+=rt_strlen(str);
-
-//		rt_strcpy(str,"\"data\":{");
-//		rt_strcpy((char *)packBuf+len,str);
-//		len+=rt_strlen(str);
-//	 	//sprintf(str,"test:%0.2f",(float)121/100);				 
-//		sprintf(str,"\"earthCurA\":\"%0.2f\",",(float)((float)cirCurStru_p.circlCurA/cirCurStru_p.point));	 
-//		rt_strcpy((char *)packBuf+len,str);
-//		len+=rt_strlen(str);
-//		
-//		rt_strcpy(str,"\"runCurA\":\"\",");
-//		rt_strcpy((char *)packBuf+len,str);
-//		len+=rt_strlen(str);
-//		rt_strcpy(str,"\"loadRatioA\":\"\",");
-//		rt_strcpy((char *)packBuf+len,str);
-//		len+=rt_strlen(str);
-//		
-//		sprintf(str,"\"earthCurB\":\"%0.2f\",",(float)((float)cirCurStru_p.circlCurB/cirCurStru_p.point));	 
-//		rt_strcpy((char *)packBuf+len,str);
-//		len+=rt_strlen(str);
-//		
-//		rt_strcpy(str,"\"runCurB\":\"\",");
-//		rt_strcpy((char *)packBuf+len,str);
-//		len+=rt_strlen(str);
-//		rt_strcpy(str,"\"loadRatioB\":\"\",");
-//		rt_strcpy((char *)packBuf+len,str);
-//		len+=rt_strlen(str);
-//		
-//		sprintf(str,"\"earthCurC\":\"%0.2f\",",(float)((float)cirCurStru_p.circlCurC/cirCurStru_p.point));	 
-//		rt_strcpy((char *)packBuf+len,str);
-//		len+=rt_strlen(str);
-//		
-//		rt_strcpy(str,"\"runCurC\":\"\",");
-//		rt_strcpy((char *)packBuf+len,str);
-//		len+=rt_strlen(str);
-//		rt_strcpy(str,"\"loadRatioC\":\"\",");
-//		rt_strcpy((char *)packBuf+len,str);
-//		len+=rt_strlen(str);
-//		
-//		rt_sprintf(str,"\"monitoringTime\":\"%lu\"}},",utcTime());
-//		rt_strcpy((char *)packBuf+len,str);
-//    len+=rt_strlen(str);
-//		
-//		rt_sprintf(str,"\"timestamp\":\"%lu\"}",utcTime());
-//		rt_strcpy((char *)packBuf+len,str);
-//    len+=rt_strlen(str);
-//		
-//		//lenth
-//	  packBuf[2]=(uint8_t)((len-LENTH_LEN-HEAD_LEN)>>8);//更新json长度
-//	  packBuf[3]=(uint8_t)(len-LENTH_LEN-HEAD_LEN);
-//	  uint16_t jsonBodyCrc=RTU_CRC(packBuf+HEAD_LEN+LENTH_LEN,len-HEAD_LEN-LENTH_LEN);
-//	  //crc
-//	  packBuf[len]=(uint8_t)(jsonBodyCrc>>8); len++;//更新crc
-//	  packBuf[len]=(uint8_t)(jsonBodyCrc);    len++;
-
-//		//tail
-//		packBuf[len]= (uint8_t)(TAIL>>8); len++;
-//		packBuf[len]= (uint8_t)(TAIL);    len++;
-//		packBuf[len] =0;//len++;//结尾 补0
-//		
-//		mcu.repDataMessID =mcu.upMessID;
-//		upMessIdAdd();
-//		rt_kprintf("%scircula len:%d\r\n",sign,len);
-//		
-////		for(int i=0;i<len;i++)
-////				rt_kprintf("%02x",packBuf[i]);
-//		rt_kprintf("\r\n%slen：%d str0:%x str1:%x str[2]:%d  str[3]:%d\r\n",sign,len,packBuf[0],packBuf[1],packBuf[2],packBuf[3]);
-//		//rt_kprintf("heart:%s \n",packBuf);
-//		return len;
-//}
-
-
 
 
 
@@ -732,18 +310,7 @@ uint16_t circulaJsonPack(bool respFlag)
 		sprintf(sprinBuf,"%llu",utcTime());
 		cJSON_AddStringToObject(root,"timestamp",sprinBuf);
 		// 打印JSON数据包  
-//		out = cJSON_Print(root);
-//		if(out!=NULL){
-//			for(int i=0;i<rt_strlen(out);i++)
-//					rt_kprintf("%c",out[i]);
-//			rt_kprintf("\n");
-//			rt_free(out);
-//			out=NULL;
-//		}
-//		if(root!=NULL){
-//			cJSON_Delete(root);
-//			out=NULL;
-//		}
+
 
 		//打包
 		int len=0;
@@ -816,6 +383,132 @@ void  cirCurrWaringEventPack()
 		
 }
 
+
+
+
+
+
+
+
+//复位温湿度的warn状态值
+void resetCirCurrlWarnFlag()
+{
+		for (int i = 0; i < CIRCULA_485_NUM; i++)
+		{		
+				inpoutpFlag.modbusCircul[i].cirCurALowFlag =false;
+				inpoutpFlag.modbusCircul[i].cirCurAUpFlag=false;
+				inpoutpFlag.modbusCircul[i].cirCurBLowFlag=false;
+				inpoutpFlag.modbusCircul[i].cirCurBUpFlag =false;
+				inpoutpFlag.modbusCircul[i].cirCurCLowFlag=false;
+				inpoutpFlag.modbusCircul[i].cirCurCUpFlag =false;
+		}
+}
+
+
+
+
+
+//模拟温度和湿度值读取以及打包成json格式  返回true 有告警 false 无告警
+bool modCirCurrWarn2Send()
+{
+//		if(alarmFLag==false)//TEST
+//			return false;
+		char* out = NULL;
+		//创建数组
+		cJSON* Array = NULL;
+		// 创建JSON Object  
+		cJSON* root = NULL;
+		cJSON* nodeobj = NULL;
+		cJSON* nodeobj_p = NULL;
+		root = cJSON_CreateObject();
+		if (root == NULL) return false;
+		// 加入节点（键值对）
+		cJSON_AddNumberToObject(root, "mid",mcu.upMessID);
+		cJSON_AddStringToObject(root, "packetType","EVENTS_485_ALARM");
+		cJSON_AddStringToObject(root, "identifier","grounding_current_monitor");
+		cJSON_AddStringToObject(root, "acuId",(char *)packFlash.acuId);
+		char *sprinBuf=RT_NULL;
+		sprinBuf=rt_malloc(20);//20个字符串长度 够用了
+		{
+				Array = cJSON_CreateArray();
+				if (Array == NULL) return false;
+				cJSON_AddItemToObject(root, "params", Array);
+				for (int i = 0; i < CIRCULA_485_NUM; i++)
+				{		
+						if(sheet.cirCula[i].workFlag==RT_TRUE){
+							nodeobj = cJSON_CreateObject();
+							cJSON_AddItemToArray(Array, nodeobj);
+							cJSON_AddItemToObject(nodeobj,"deviceId",cJSON_CreateString(sheet.cirCula[i].ID));
+							cJSON_AddNumberToObject(nodeobj,"alarmStatus",1);
+							nodeobj_p= cJSON_CreateObject();
+							cJSON_AddItemToObject(nodeobj, "data", nodeobj_p);
+							
+							cJSON_AddNumberToObject(nodeobj_p,"earthCurA_low_alarm",inpoutpFlag.modbusCircul[i].cirCurALowFlag );//cJSON_CreateNumber("10"));
+							cJSON_AddNumberToObject(nodeobj_p,"earthCurA_high_alarm",inpoutpFlag.modbusCircul[i].cirCurAUpFlag);
+							cJSON_AddNumberToObject(nodeobj_p,"runCurA_low_alarm",0);
+							cJSON_AddNumberToObject(nodeobj_p,"runCurA_high_alarm",0);		
+							cJSON_AddNumberToObject(nodeobj_p,"loadRatioA_low_alarm",0);
+							cJSON_AddNumberToObject(nodeobj_p,"loadRatioA_high_alarm",0);		
+							cJSON_AddNumberToObject(nodeobj_p,"earthCurB_low_alarm",inpoutpFlag.modbusCircul[i].cirCurBLowFlag );//cJSON_CreateNumber("10"));
+							cJSON_AddNumberToObject(nodeobj_p,"earthCurB_high_alarm",inpoutpFlag.modbusCircul[i].cirCurBUpFlag);
+							cJSON_AddNumberToObject(nodeobj_p,"runCurB_low_alarm",0);
+							cJSON_AddNumberToObject(nodeobj_p,"runCurB_high_alarm",0);		
+							cJSON_AddNumberToObject(nodeobj_p,"loadRatioB_low_alarm",0);
+							cJSON_AddNumberToObject(nodeobj_p,"loadRatioB_high_alarm",0);	
+							cJSON_AddNumberToObject(nodeobj_p,"earthCurC_low_alarm",inpoutpFlag.modbusCircul[i].cirCurCLowFlag );//cJSON_CreateNumber("10"));
+							cJSON_AddNumberToObject(nodeobj_p,"earthCurC_high_alarm",inpoutpFlag.modbusCircul[i].cirCurCUpFlag);
+							cJSON_AddNumberToObject(nodeobj_p,"runCurC_low_alarm",0);
+							cJSON_AddNumberToObject(nodeobj_p,"runCurC_high_alarm",0);		
+							cJSON_AddNumberToObject(nodeobj_p,"loadRatioC_low_alarm",0);
+							cJSON_AddNumberToObject(nodeobj_p,"loadRatioC_high_alarm",0);								
+							sprintf(sprinBuf,"%llu",utcTime());
+							cJSON_AddItemToObject(nodeobj_p,"monitoringTime",cJSON_CreateString(sprinBuf));
+						}
+				}
+		}
+		sprintf(sprinBuf,"%llu",utcTime());
+		cJSON_AddStringToObject(root,"timestamp",sprinBuf);
+		//打包
+		int len=0;
+		packBuf[len]= (uint8_t)(HEAD>>8); len++;
+		packBuf[len]= (uint8_t)(HEAD);    len++;
+		len+=LENTH_LEN;//json长度最后再填写
+		// 释放内存  
+		out = cJSON_Print(root);
+		rt_strcpy((char *)packBuf+len,out);
+		len+=rt_strlen(out);
+		if(out!=NULL){
+				for(int i=0;i<rt_strlen(out);i++)
+						rt_kprintf("%c",out[i]);
+				rt_kprintf("\n");
+				rt_free(out);
+				out=NULL;
+		}
+		if(root!=NULL){
+			cJSON_Delete(root);
+			out=NULL;
+		}
+		//lenth
+	  packBuf[2]=(uint8_t)((len-LENTH_LEN-HEAD_LEN)>>8);//更新json长度
+	  packBuf[3]=(uint8_t)(len-LENTH_LEN-HEAD_LEN);
+	  uint16_t jsonBodyCrc=RTU_CRC(packBuf+HEAD_LEN+LENTH_LEN,len-HEAD_LEN-LENTH_LEN);
+	  //crc
+	  packBuf[len]=(uint8_t)(jsonBodyCrc>>8); len++;//更新crc
+	  packBuf[len]=(uint8_t)(jsonBodyCrc);    len++;
+		//tail
+		packBuf[len]=(uint8_t)(TAIL>>8); len++;
+		packBuf[len]=(uint8_t)(TAIL);    len++;
+		packBuf[len]=0;//len++;//结尾 补0
+		mcu.repDataMessID =mcu.upMessID;
+		//mcu.devRegMessID =mcu.upMessID;
+		upMessIdAdd();
+		rt_free(sprinBuf);
+		sprinBuf=RT_NULL;
+		return true;
+}
+
+
+
 //环流读取并打包发送  仅仅做封装而已
 	//输入 respFlag 为true就是回应
 //              为false就是report数据
@@ -833,6 +526,12 @@ void circulaRead2Send(rt_bool_t netStat,bool respFlag)
 				circulaJsonPack(respFlag);
 				if(netStat==RT_TRUE)
 						rt_mb_send_wait(&mbNetSendData, (rt_ubase_t)&packBuf,RT_WAITING_FOREVER);
+				if(modCirCurrWarn2Send()==true){
+							resetCirCurrlWarnFlag();//每次判断后复位warnflag状态值
+							rt_thread_mdelay(500);
+							if(netStat==RT_TRUE)
+									rt_mb_send_wait(&mbNetSendData, (rt_ubase_t)&packBuf,RT_WAITING_FOREVER);
+				}
 		}
 }
 
