@@ -98,6 +98,8 @@ uint16_t devRegJsonPack(void);
 uint16_t heartUpJsonPack(void);
 //extern uint8_t analogTemChanl;
 extern void gasJsonPack(rt_bool_t netStat,bool respFlag);
+uint16_t digitalInputReport(void);
+uint16_t digitalOutputReport(char *identify);
 //定时时间到  执行相应事件
 static void  timeOutRunFun()
 {
@@ -110,12 +112,30 @@ static void  timeOutRunFun()
 						rt_mb_send_wait(&mbNetSendData, (rt_ubase_t)&packBuf,RT_WAITING_FOREVER); 
 			  rt_kprintf("%sheart timer out\r\n",task);
 				break;
-			case REG_TIME://注册 注册成功后定时器就关闭
+			case REG_TIME://注册 注册成功后定时器就关闭 输入输出状态跟谁注册信息上发
 			  if(gbRegFlag==RT_FALSE){
 					  devRegJsonPack();//devRegJsonPack();
 					  if(gbNetState==RT_TRUE)
 								rt_mb_send_wait(&mbNetSendData, (rt_ubase_t)&packBuf,RT_WAITING_FOREVER); 
 					  timeStop(REG_TIME);//正式使用时候需要去掉
+						if(gbNetState==RT_TRUE){
+							  digitalInputReport();//数字输入上报
+								rt_thread_delay(500);
+								
+								rt_mb_send_wait(&mbNetSendData, (rt_ubase_t)&packBuf,RT_WAITING_FOREVER); 
+								digitalOutputReport("3v3_output");
+								rt_thread_delay(500);
+								rt_mb_send_wait(&mbNetSendData, (rt_ubase_t)&packBuf,RT_WAITING_FOREVER); 
+								digitalOutputReport("5v_output");
+								rt_thread_delay(500);
+								rt_mb_send_wait(&mbNetSendData, (rt_ubase_t)&packBuf,RT_WAITING_FOREVER); 
+								digitalOutputReport("12v_output");
+								rt_thread_delay(500);
+								rt_mb_send_wait(&mbNetSendData, (rt_ubase_t)&packBuf,RT_WAITING_FOREVER); 
+								digitalOutputReport("digital_output");
+								rt_thread_delay(500);
+								rt_mb_send_wait(&mbNetSendData, (rt_ubase_t)&packBuf,RT_WAITING_FOREVER); 
+						}
 				}
 				else
 						timeStop(REG_TIME);

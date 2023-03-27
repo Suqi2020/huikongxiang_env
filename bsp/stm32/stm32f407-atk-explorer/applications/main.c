@@ -146,9 +146,10 @@
 //V0.85    增加对子站通讯json格式 读取和配置阈值完成  20230323
 //V0.86    增加485和模拟告警上报    20230324
 //V0.87    完善所有的modbus告警上报 20230325
-#define APP_VER       ((0<<8)+87)//0x0105 表示1.5版本
-//
-const char date[]="20230325";
+//v0.88    增加数字输入输出的开机上报与读取 20230327
+#define APP_VER       ((0<<8)+88)//0x0105 表示1.5版本
+
+const char date[]="20230327";
 
 //static    rt_thread_t tid 	= RT_NULL;
 static    rt_thread_t tidW5500 	  = RT_NULL;

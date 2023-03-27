@@ -207,13 +207,13 @@ static uint16_t threeAxisJsonPack(bool respFlag)
 	
 		if(respFlag==true){
 			  cJSON_AddNumberToObject(root, "mid",respMid);
-				cJSON_AddStringToObject(root, "packetType","PROPERTIES_485_DATA_GET_RESP");
+				cJSON_AddStringToObject(root, "packetType","PROPERTIES_485DATA_GET_RESP");
 				cJSON_AddNumberToObject(root, "code",0);
 		}
 		else
 		{
 				cJSON_AddNumberToObject(root, "mid",mcu.upMessID);
-				cJSON_AddStringToObject(root, "packetType","PROPERTIES_485_DATA_REP");
+				cJSON_AddStringToObject(root, "packetType","PROPERTIES_485DATA_REP");
 		}
 		cJSON_AddStringToObject(root, "identifier","vibration_monitor");
 	  cJSON_AddStringToObject(root, "acuId",(char *)packFlash.acuId);
@@ -399,8 +399,8 @@ void resetThreeAxisWarnFlag()
 //模拟温度和湿度值读取以及打包成json格式  返回true 有告警 false 无告警
 bool modThreeAxisWarn2Send()
 {
-//		if(alarmFLag==false)//TEST
-//			return false;
+		if(alarmFLag==false)//TEST
+			return false;
 		char* out = NULL;
 		//创建数组
 		cJSON* Array = NULL;

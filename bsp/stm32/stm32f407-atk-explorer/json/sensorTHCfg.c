@@ -516,11 +516,12 @@ void senseTHSetJsonResp(cJSON   *Json,bool  modbusFlag)
 								cJSON *item=cJSON_GetArrayItem(arrayGet,i);
 								cJSON  *devID =cJSON_GetObjectItem(item,"deviceId");
 								for(int j=0;j<WATERDEPTH_485_NUM;j++){//核对有没有配置过
-										if(0==rt_strcmp(sheet.cirCula[j].ID,devID->valuestring)){
+										if(0==rt_strcmp(sheet.waterDepth[j].ID,devID->valuestring)){
 											  result=true;
 												cJSON  *data =cJSON_GetObjectItem(item,"data");
 											  cJSON  *fvalue= cJSON_GetObjectItem(data,"depth_low");
 											  sheet.modbusWaterDepth[j].depthLowLimit=atof(fvalue->valuestring);
+
 											  fvalue= cJSON_GetObjectItem(data,"depth_high");
 											  sheet.modbusWaterDepth[j].depthUpLimit=atof(fvalue->valuestring);
 										}

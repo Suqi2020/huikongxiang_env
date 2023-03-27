@@ -8,6 +8,7 @@ void  senseTHGetJsonResp(cJSON   *Json,bool modbusFlag);
 void senseTimeReadJsonResp(char *string,bool  modbusFlag);
 void senseTHSetJsonResp(cJSON   *Json,bool  modbusFlag);
 void senseTimeJsonSet(cJSON   *Json,bool  modbusFlag);
+extern uint16_t digitalInputGetResp(cJSON *Json);
 const static char sign[]="[dataPhrs]";
 uint32_t  respMid=0;
 //数据校验 头尾 校验和 是否正确
@@ -48,7 +49,7 @@ packTypeEnum  downLinkPackTpyeGet(cJSON  *TYPE)
 						return i;
 				}
 		}
-		rt_kprintf("%serr:type head [%s]\n",TYPE->valuestring);	
+		rt_kprintf("%serr:type head [%s] listsize=%d\n",sign,TYPE->valuestring,size);	
 		return ERRRESP;
 }
 
@@ -219,12 +220,20 @@ void AllDownPhrase(char *data,int lenth)
 					  rt_mb_send_wait(&mbNetSendData, (rt_ubase_t)&packBuf,RT_WAITING_FOREVER); 
 						break;
 					case	PROPERTIES_INPUT_REP_RESP:
+						rt_kprintf("%sdi rep response\r\n",sign);
 						break;
 					case	PROPERTIES_INPUT_GET:
+					  uint16_t digitalInputGetResp(cJSON *Json);
+					  digitalInputGetResp(Json);
+						rt_mb_send_wait(&mbNetSendData, (rt_ubase_t)&packBuf,RT_WAITING_FOREVER); 
 						break;
 					case	PROPERTIES_OUTPUT_REP_RESP:
+						rt_kprintf("%sdo rep response\r\n",sign);
 						break;
 					case	PROPERTIES_OUTPUT_GET:
+						uint16_t digitalOutputGetResp(cJSON *Json,char *identify);
+						digitalOutputGetResp(Json,pkIdentf->valuestring);
+						rt_mb_send_wait(&mbNetSendData, (rt_ubase_t)&packBuf,RT_WAITING_FOREVER); 
 						break;
 					case	PROPERTIES_OUTPUT_SET:
 						break;

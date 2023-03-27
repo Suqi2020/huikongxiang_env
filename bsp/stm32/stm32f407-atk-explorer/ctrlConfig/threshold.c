@@ -156,7 +156,7 @@ void printfThresholdList()
 					
 						rt_kprintf("%s threshold ",sign);
 						rt_kprintf("%s ",modbusName[PRESSSETTL]);
-						rt_kprintf("%s ",sheet.cirCula[i].ID);
+						rt_kprintf("%s ",sheet.pressSetl[i].ID);
 						rt_kprintf("1 ");
 						rt_kprintf("2 ");
 						rt_kprintf("%0.2f ",sheet.modbusPreSettl[i].heightLowLimit);
