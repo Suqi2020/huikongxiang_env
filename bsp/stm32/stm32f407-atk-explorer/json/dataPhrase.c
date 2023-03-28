@@ -9,6 +9,12 @@ void senseTimeReadJsonResp(char *string,bool  modbusFlag);
 void senseTHSetJsonResp(cJSON   *Json,bool  modbusFlag);
 void senseTimeJsonSet(cJSON   *Json,bool  modbusFlag);
 extern uint16_t digitalInputGetResp(cJSON *Json);
+uint16_t digitalOutputSetResp(cJSON *Json,char *identify);
+uint16_t digitalInputGetResp(cJSON *Json);
+uint16_t digitalOutputGetResp(cJSON *Json,char *identify);
+uint16_t resetDeviceResp(cJSON *Json,char *identify);
+uint16_t resetMcuResp(cJSON *Json);
+uint16_t saveMcuResp();
 const static char sign[]="[dataPhrs]";
 uint32_t  respMid=0;
 //数据校验 头尾 校验和 是否正确
@@ -147,7 +153,7 @@ void AllDownPhrase(char *data,int lenth)
 //		rt_kprintf("\r\n");
 
 		//开始解析json
-		rt_kprintf("%sgetJson:%s  \r\n",sign,Buffer);	
+//		rt_kprintf("%sgetJson:%s  \r\n",sign,Buffer);	
 		//rt_kprintf("getJson:%.*s  %d\r\n",len,Buffer,len);			
 		cJSON  *Json=NULL;
 		Json = cJSON_Parse(Buffer);
@@ -223,7 +229,6 @@ void AllDownPhrase(char *data,int lenth)
 						rt_kprintf("%sdi rep response\r\n",sign);
 						break;
 					case	PROPERTIES_INPUT_GET:
-					  uint16_t digitalInputGetResp(cJSON *Json);
 					  digitalInputGetResp(Json);
 						rt_mb_send_wait(&mbNetSendData, (rt_ubase_t)&packBuf,RT_WAITING_FOREVER); 
 						break;
@@ -231,11 +236,13 @@ void AllDownPhrase(char *data,int lenth)
 						rt_kprintf("%sdo rep response\r\n",sign);
 						break;
 					case	PROPERTIES_OUTPUT_GET:
-						uint16_t digitalOutputGetResp(cJSON *Json,char *identify);
+						
 						digitalOutputGetResp(Json,pkIdentf->valuestring);
 						rt_mb_send_wait(&mbNetSendData, (rt_ubase_t)&packBuf,RT_WAITING_FOREVER); 
 						break;
 					case	PROPERTIES_OUTPUT_SET:
+					  digitalOutputSetResp(Json,pkIdentf->valuestring);
+					  rt_mb_send_wait(&mbNetSendData, (rt_ubase_t)&packBuf,RT_WAITING_FOREVER); 
 						break;
 					case	SERVICES_CTRLCFG_READ:
 						break;
@@ -244,14 +251,26 @@ void AllDownPhrase(char *data,int lenth)
 					case	SERVICES_CTRLCFG_DEL:
 						break;
 					case	SERVICES_DEV_REBOOT:
+					  resetDeviceResp(Json,pkIdentf->valuestring);
+						rt_mb_send_wait(&mbNetSendData, (rt_ubase_t)&packBuf,RT_WAITING_FOREVER); 
 						break;
 					case	SERVICES_ACU_REBOOT:
+						resetMcuResp(Json);
+						rt_mb_send_wait(&mbNetSendData, (rt_ubase_t)&packBuf,RT_WAITING_FOREVER); 
+						rt_thread_delay(500);//1秒后重启
+						rt_hw_cpu_reset();
+	
 						break;
 					case	SERVICES_HISTORY_READ:
 						break;
 					case	SERVICES_OTA_WRITE:
 						break;
 					case	SERVICES_SAVE:
+					  saveMcuResp();
+//						stm32_flash_erase(FLASH_IP_SAVE_ADDR, sizeof(packFlash));//每次擦除128k字节数据 存储时候需要一起存储
+//						stm32_flash_write(FLASH_IP_SAVE_ADDR,(uint8_t*)&packFlash,sizeof(packFlash));
+//						stm32_flash_write(FLASH_MODBUS_SAVE_ADDR,(uint8_t*)&sheet,sizeof(sheet));
+						rt_kprintf("%sflash save success\n",sign);
 						break;
 					case	EVENTS_485_ALARM_RESP:
 						break;
@@ -262,7 +281,7 @@ void AllDownPhrase(char *data,int lenth)
 				}
 		}
 		else{
-			rt_kprintf("%serr:json empty\r\n",sign);	
+			rt_kprintf("%serr:json cannot phrase\r\n",sign);	
 		}
 		cJSON_Delete(Json);
 		rt_free(Buffer);
