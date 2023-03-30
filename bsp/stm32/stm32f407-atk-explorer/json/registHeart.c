@@ -118,59 +118,6 @@ uint16_t heartUpJsonPack()
 }
 
 
-//uint16_t heartUpPack()
-//{
-//	  
-//	  memset(packBuf,0,sizeof(packBuf));
-//		int len=0;
-//    //head+lenth
-//	  packBuf[len]= (uint8_t)(HEAD>>8); len++;
-//	  packBuf[len]= (uint8_t)(HEAD);    len++;
-//	  len+=LENTH_LEN;//json长度最后再填写
-//	  //json
-//	  char str[50]={0};//临时使用的数组
-//		rt_sprintf(str,"{\"mid\":%lu,",mcu.upMessID);
-//		rt_strcpy((char *)packBuf+len,str);
-//    len+=rt_strlen(str);
-//		
-//		rt_strcpy(str,"\"packetType\":\"CMD_HEARTBEAT\",");
-//		rt_strcpy((char *)packBuf+len,str);
-//    len+=rt_strlen(str);
-//		
-//		rt_sprintf(str,"\"timestamp\":\"%lu\",",utcTime());
-//		rt_strcpy((char *)packBuf+len,str);
-//    len+=rt_strlen(str);
-//			
-//		rt_strcpy(str,"\"param\":{\"identifier\":\"area_control_unit\",");
-//		rt_strcpy((char *)packBuf+len,str);
-//    len+=rt_strlen(str);
-//	
-//		rt_sprintf(str,"\"id\":\"%s\"}}",mcu.devID);
-//		rt_strcpy((char *)packBuf+len,str);
-//    len+=rt_strlen(str);
-//		//lenth
-//	  packBuf[2]=(uint8_t)((len-LENTH_LEN-HEAD_LEN)>>8);//更新json长度
-//	  packBuf[3]=(uint8_t)(len-LENTH_LEN-HEAD_LEN);
-//	  uint16_t jsonBodyCrc=RTU_CRC(packBuf+HEAD_LEN+LENTH_LEN,len-HEAD_LEN-LENTH_LEN);
-//	  //crc
-//	  packBuf[len]=(uint8_t)(jsonBodyCrc>>8); len++;//更新crc
-//	  packBuf[len]=(uint8_t)(jsonBodyCrc);    len++;
-
-//		//tail
-//		packBuf[len]= (uint8_t)(TAIL>>8); len++;
-//		packBuf[len]= (uint8_t)(TAIL);    len++;
-//		packBuf[len] =0;//len++;//结尾 补0
-//		
-//		mcu.upHeartMessID =mcu.upMessID;
-//		upMessIdAdd();
-//		rt_kprintf("%sheart len:%d\r\n",sign,len);
-//		
-////		for(int i=0;i<len;i++)
-////				rt_kprintf("%02x",packBuf[i]);
-//		rt_kprintf("\r\n%slen：%d str0:%x str1:%x str[2]:%d  str[3]:%d\r\n",sign,len,packBuf[0],packBuf[1],packBuf[2],packBuf[3]);
-//		//rt_kprintf("heart:%s \n",packBuf);
-//		return len;
-//}
 //上行心跳包 注册信息建立一个task  用来维护
 //1、主动发送上行数据每次发送后启动定时器 如果收不到回应就一直重发  间隔5秒
 //2、发送用发送邮箱 
@@ -585,6 +532,17 @@ uint16_t devRegJsonPack()
 									cJSON_AddItemToObject(nodeobj,"model",cJSON_CreateString(sheet.waterDepth[j].model));
 									cJSON_AddItemToObject(nodeobj,"name",cJSON_CreateString(modbusName[i]));
 									cJSON_AddItemToObject(nodeobj,"deviceId",cJSON_CreateString(sheet.waterDepth[j].ID));
+							}
+					}
+				break;
+				case CRACKMETER:
+					for(int j=0;j<CRACKMETER_485_NUM;j++){//核对有没有配置过
+							if(sheet.crackMeter[j].workFlag==RT_TRUE){
+									nodeobj = cJSON_CreateObject();
+									cJSON_AddItemToArray(Array, nodeobj);
+									cJSON_AddItemToObject(nodeobj,"model",cJSON_CreateString(sheet.crackMeter[j].model));
+									cJSON_AddItemToObject(nodeobj,"name",cJSON_CreateString(modbusName[i]));
+									cJSON_AddItemToObject(nodeobj,"deviceId",cJSON_CreateString(sheet.crackMeter[j].ID));
 							}
 					}
 				break;

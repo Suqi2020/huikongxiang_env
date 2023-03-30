@@ -321,10 +321,10 @@ void waterDepthRead2Send(rt_bool_t netStat,bool respFlag)
 					if(netStat==RT_TRUE)
 							rt_mb_send_wait(&mbNetSendData, (rt_ubase_t)&packBuf,RT_WAITING_FOREVER);
 					
-					
+					rt_thread_mdelay(500);
 					if(modPWaterLevWarn2Send()==true){
 							resetWaterLevWarnFlag();//每次判断后复位warnflag状态值
-							rt_thread_mdelay(500);
+							//rt_thread_mdelay(500);
 							if(netStat==RT_TRUE)
 									rt_mb_send_wait(&mbNetSendData, (rt_ubase_t)&packBuf,RT_WAITING_FOREVER);
 					}

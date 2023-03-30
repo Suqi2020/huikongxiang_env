@@ -167,6 +167,15 @@ uint16_t resetDeviceResp(cJSON *Json,char *identify)
 									}
 							}
 					}
+					else if(rt_strcmp(identify,"crackmeter_monitor")==0){
+							for(int j=0;j<CRACKMETER_485_NUM;j++){//核对有没有配置过
+									if(0==rt_strcmp(sheet.crackMeter[j].ID,devID->valuestring)){
+										 rt_kprintf("%scrackMeter rst ok id[%s],port[%d]\n",sign,sheet.crackMeter[j].ID,sheet.crackMeter[j].useUartNum);
+										 if((++devRstNum)==arrayGet_size)
+											break;
+									}
+							}
+					}
 					else if(rt_strcmp(identify,"environment_mointor")==0){
 								for(int j=0;j<CO_485_NUM;j++){//核对有没有配置过
 										if(0==rt_strcmp(sheet.co[j].ID,devID->valuestring)){

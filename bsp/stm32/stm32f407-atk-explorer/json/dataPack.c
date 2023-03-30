@@ -47,6 +47,9 @@ void  readModbusDataResp(char *monitor)
 		else if(0==rt_strcmp(monitor,"temperature_and_humidity_monitor")){
 				tempHumRead2Send(true,true);
 		}
+		else if(0==rt_strcmp(monitor,"crackmeter_monitor")){
+			crackMeterRead2Send(true,true);
+		}
 		else if(0==rt_strcmp(monitor,"environment_mointor")){
 		#ifdef USE_4GAS 	
    			ch4Read2Send(true);

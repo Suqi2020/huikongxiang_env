@@ -1088,6 +1088,11 @@
               <FileType>1</FileType>
               <FilePath>.\LCD7inch\readme.c</FilePath>
             </File>
+            <File>
+              <FileName>rs485CrackMeter.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>.\modbus\rs485CrackMeter.c</FilePath>
+            </File>
           </Files>
         </Group>
         <Group>

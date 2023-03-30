@@ -1,48 +1,49 @@
 #include "board.h"
-//参考 《H-STC系列压差式沉降仪Modbus RTU协议说明-20191031》
-//<<压差式沉降仪 GY-STC-2000>> 默认波特率9600  modbus地址 0xb1(有误) 见机身标签后2位  协议文档有误
-//修改设备地址 FF FF 03 0A＋设备完整的长地址＋01＋短地址 
-//   FF FF 03 0A 6E 01 20 21 09 08 00 B1 01 01
+//<<TH-DCM数字式裂缝计串口通讯协议说明-20210622>>
 //  24+红色，24-黑色，A+蓝色，B-绿色
-const static char sign[]="[沉降仪]";
+const static char sign[]="[裂缝仪]";
 static  bool alarmFLag=false;
 //#define   SLAVE_ADDR     0X02 
 #define   LENTH          50  //工作环流用到的最大接收buf长度
 
 typedef struct{
-	  float temp;//除以100 传输float类型  单位0C
+	  //float temp;//除以100 传输float类型  单位0C
 	   union {
 				float flotVal;
 				int   intVal;
-		} height;
+		} distanc;
+		 union {
+				float flotVal;
+				int   intVal;
+		} temp;
 		uint8_t respStat;
 //float height;//除以10 传输float类型  单位mm
-}pressSettlStru;
-pressSettlStru pressSettle[PRESSSETTL_485_NUM];
+}crackMeterStru;
+crackMeterStru crackMeter[CRACKMETER_485_NUM];
 //返回沉降仪的通讯状态 true--通讯成功 false--通讯失败
-int pressSettleState(int i)
+int  crackMeterState(int i)
 {
-		return pressSettle[i].respStat;
+		return crackMeter[i].respStat;
 }
 //打包串口发送 
-static void pressSettlUartSend(int num,uint8_t *buf,int len)
+static void  crackMeterUartSend(int num,uint8_t *buf,int len)
 {
-		rs485UartSend(sheet.pressSetl[num].useUartNum,buf, len);
+		rs485UartSend(sheet.crackMeter[num].useUartNum,buf, len);
 }
 
 ///////////////////////////////////////读写寄存器相关操作////////////////////////////////////////
 
 
 
-uint8_t psReadReg(uint16_t slavAddr,uint16_t regAddr,uint16_t len,uint8_t * out)
+uint8_t crkMetReadReg(uint16_t slavAddr,uint8_t * out)
 {
 		int i=0;
-	  out[i]=slavAddr;					 			i++;
-	  out[i]=0x04;      					 		i++;
-	  out[i]=(uint8_t)(regAddr>>8);   i++;
-	  out[i]=(uint8_t) regAddr;       i++;
-		out[i]=(uint8_t)(len>>8);       i++;
-	  out[i]=(uint8_t) len;       		i++;
+	  out[i]=(uint8_t)(slavAddr>>8);				i++;
+	  out[i]=(uint8_t)slavAddr;      	i++;
+	  out[i]=0x83;   									i++;
+	  out[i]=0x02;       							i++;
+		out[i]=0x03;       							i++;
+	  out[i]=0x04;       							i++;
 	  uint16_t crcRet=RTU_CRC(out ,i);
 	  out[i]=(uint8_t)(crcRet>>8);    i++;
 	  out[i]=crcRet;       						i++;
@@ -52,43 +53,42 @@ uint8_t psReadReg(uint16_t slavAddr,uint16_t regAddr,uint16_t len,uint8_t * out)
 static void pressStlCheckSetFlag(int num)
 {
 		alarmFLag=false;
-	  if(sheet.modbusPreSettl[num].tempUpLimit!=0){
-			if(pressSettle[num].temp>=sheet.modbusPreSettl[num].tempUpLimit){
-					inpoutpFlag.modbusPreSettl[num].tempUpFlag=true;alarmFLag=true;
+	  if(sheet.modbusCrackMeter[num].tempUpLimit!=0){
+			if(crackMeter[num].temp.flotVal>=sheet.modbusCrackMeter[num].tempUpLimit){
+					inpoutpFlag.modbusCrackMeter[num].tempUpFlag=true;alarmFLag=true;
 			}
 		}
-		if(sheet.modbusPreSettl[num].tempLowLimit!=0){
-			if(pressSettle[num].temp<=sheet.modbusPreSettl[num].tempLowLimit){
-					inpoutpFlag.modbusPreSettl[num].tempLowFlag=true;alarmFLag=true;
+		if(sheet.modbusCrackMeter[num].tempLowLimit!=0){
+			if(crackMeter[num].temp.flotVal<=sheet.modbusCrackMeter[num].tempLowLimit){
+					inpoutpFlag.modbusCrackMeter[num].tempLowFlag=true;alarmFLag=true;
 			}
 		}
-		if(sheet.modbusPreSettl[num].heightUpLimit!=0){
-			if(pressSettle[num].height.flotVal>=sheet.modbusPreSettl[num].heightUpLimit){
-					inpoutpFlag.modbusPreSettl[num].heightUpFlag=true;alarmFLag=true;
+		if(sheet.modbusCrackMeter[num].distancUpLimit!=0){
+			if(crackMeter[num].distanc.flotVal>=sheet.modbusCrackMeter[num].distancUpLimit){
+					inpoutpFlag.modbusCrackMeter[num].distancUpFlag=true;alarmFLag=true;
 			}
 		}
-		if(sheet.modbusPreSettl[num].heightLowLimit!=0){
-			if(pressSettle[num].height.flotVal<=sheet.modbusPreSettl[num].heightLowLimit){
-					inpoutpFlag.modbusPreSettl[num].heightLowFlag=true;alarmFLag=true;
+		if(sheet.modbusCrackMeter[num].distancLowLimit!=0){
+			if(crackMeter[num].distanc.flotVal<=sheet.modbusCrackMeter[num].distancLowLimit){
+					inpoutpFlag.modbusCrackMeter[num].distancLowFlag=true;alarmFLag=true;
 			}
 		}
 
 }
 
 
-//发 1A 04 00 01 00 02 23 E0
-//收 1A 04 04 0B 1B 00 1C 23 6F
+
 //读取沉降仪的温度和高度
-void readPSTempHeight(int num)
+void readCrackMeter(int num)
 {
-	  uint8_t offset=3;//add+regadd+len
+	  //uint8_t offset=3;//add+regadd+len
 	  uint8_t  *buf = RT_NULL;
 		buf = rt_malloc(LENTH);
-	  uint16_t len = psReadReg(sheet.pressSetl[num].slaveAddr,0X0001,2,buf);
-		rt_mutex_take(uartDev[sheet.pressSetl[num].useUartNum].uartMutex,RT_WAITING_FOREVER);
+	  uint16_t len = crkMetReadReg(sheet.crackMeter[num].slaveAddr,buf);
+		rt_mutex_take(uartDev[sheet.crackMeter[num].useUartNum].uartMutex,RT_WAITING_FOREVER);
 	  //485发送buf  len  等待modbus回应
-		pressSettlUartSend(num,buf,len);
-	  rt_kprintf("%spressSettl send:",sign);
+		crackMeterUartSend(num,buf,len);
+	  rt_kprintf("%CrackMeter send:",sign);
 		for(int j=0;j<len;j++){
 				rt_kprintf("%x ",buf[j]);
 		}
@@ -96,7 +96,7 @@ void readPSTempHeight(int num)
     len=0;
 		memset(buf,0,LENTH);
 		
-		while(rt_mq_recv(uartDev[sheet.pressSetl[num].useUartNum].uartMessque, buf+len, 1, 500) == RT_EOK){//115200 波特率1ms 10个数据
+		while(rt_mq_recv(uartDev[sheet.crackMeter[num].useUartNum].uartMessque, buf+len, 1, 500) == RT_EOK){//115200 波特率1ms 10个数据
 				len++;
 		}
 		if(len!=0){
@@ -107,29 +107,29 @@ void readPSTempHeight(int num)
 				rt_kprintf("\n");
 		}
 		//提取环流值 第一步判断crc 第二部提取
-		int ret2=modbusRespCheck(sheet.pressSetl[num].slaveAddr,buf,len,RT_TRUE);
+		int ret2=modbusRespCheck(sheet.crackMeter[num].slaveAddr,buf,len,RT_TRUE);
 		if(0 == ret2){//刷新读取到的值
-
-        int temp	=(buf[offset]<<8)+buf[offset+1];offset+=2;
-			  pressSettle[num].height.intVal=(buf[offset]<<8)+buf[offset+1];
-			
-				pressSettle[num].temp =temp/100;
-				pressSettle[num].respStat=1;
+        int offset =7;//FF FE 84 0B 02 03 04 3E 5F 70 00 41 F5 00 00 FF 8B
+        //int temp	=(buf[offset]<<8)+buf[offset+1];offset+=2;
+			  crackMeter[num].distanc.intVal=(buf[offset]<24)+(buf[offset+1]<<16)+(buf[offset+2]<<8)+buf[offset+3];
+			  offset+=4;
+			  crackMeter[num].temp.intVal   =(buf[offset]<24)+(buf[offset+1]<<16)+(buf[offset+2]<<8)+buf[offset+3];
+				crackMeter[num].respStat=1;
 				pressStlCheckSetFlag(num);
 			
-			  rt_kprintf("%stemp:%0.2f*C height:%0.1fmm read ok\n",sign,pressSettle[num].temp,pressSettle[num].height.flotVal);  
+			  rt_kprintf("%stemp:%0.2f*C distance:%0.1fmm read ok\n",sign,crackMeter[num].temp,crackMeter[num].distanc.flotVal);  
 		} 
 		else{//读不到给0
 				if(ret2==2){
 						//rt_kprintf("%sERR:请检查485接线或者供电\r\n",sign);
 				}
-				pressSettle[num].respStat=0;
-			  pressSettle[num].temp	=0;
-			  pressSettle[num].height.intVal=0;
-			  rt_kprintf("%stemp height read fail\n",sign);
+				crackMeter[num].respStat=0;
+			  crackMeter[num].temp.intVal	=0;
+			  crackMeter[num].distanc.intVal=0;
+			  rt_kprintf("%stemp distance read fail\n",sign);
 		}
 //		pressStlCheckSetFlag(num);
-	  rt_mutex_release(uartDev[sheet.pressSetl[num].useUartNum].uartMutex);
+	  rt_mutex_release(uartDev[sheet.crackMeter[num].useUartNum].uartMutex);
 		rt_free(buf);
 	  buf=RT_NULL;
 
@@ -145,7 +145,7 @@ void readPSTempHeight(int num)
 //沉降仪json格式打包
 //输入 respFlag 为true就是回应
 //              为false就是report数据
-uint16_t pressSettlJsonPack(bool respFlag)
+uint16_t crackMeterJsonPack(bool respFlag)
 {
 		char* out = NULL;
 		//创建数组
@@ -170,7 +170,7 @@ uint16_t pressSettlJsonPack(bool respFlag)
 				cJSON_AddNumberToObject(root, "mid",mcu.upMessID);
 				cJSON_AddStringToObject(root, "packetType","PROPERTIES_485DATA_REP");
 		}
-		cJSON_AddStringToObject(root, "identifier","settlement_monitor");
+		cJSON_AddStringToObject(root, "identifier","crackmeter_monitor");
 		cJSON_AddStringToObject(root, "acuId",(char *)packFlash.acuId);
 		
 		
@@ -178,22 +178,22 @@ uint16_t pressSettlJsonPack(bool respFlag)
 			Array = cJSON_CreateArray();
 			if (Array == NULL) return 0;
 			cJSON_AddItemToObject(root, "params", Array);
-			for (int i = 0; i < PRESSSETTL_485_NUM; i++)
+			for (int i = 0; i < CRACKMETER_485_NUM; i++)
 			{		
-				if(sheet.pressSetl[i].workFlag==RT_TRUE){
+				if(sheet.crackMeter[i].workFlag==RT_TRUE){
 					nodeobj = cJSON_CreateObject();
 					cJSON_AddItemToArray(Array, nodeobj);
-					cJSON_AddItemToObject(nodeobj,"deviceId",cJSON_CreateString(sheet.pressSetl[i].ID));
+					cJSON_AddItemToObject(nodeobj,"deviceId",cJSON_CreateString(sheet.crackMeter[i].ID));
 					//sprintf(sprinBuf,"%d",pressSettle[i].respStat);
-					cJSON_AddNumberToObject(nodeobj,"responseStatus",pressSettle[i].respStat);
+					cJSON_AddNumberToObject(nodeobj,"responseStatus",crackMeter[i].respStat);
 					
 					nodeobj_p= cJSON_CreateObject();
 					cJSON_AddItemToObject(nodeobj, "data", nodeobj_p);
-					sprintf(sprinBuf,"%02f",pressSettle[i].temp);
+					sprintf(sprinBuf,"%02f",crackMeter[i].temp.flotVal);
 					cJSON_AddItemToObject(nodeobj_p,"temperature",cJSON_CreateString(sprinBuf));
 
-					sprintf(sprinBuf,"%02f",pressSettle[i].height.flotVal );
-					cJSON_AddItemToObject(nodeobj_p,"height",cJSON_CreateString(sprinBuf));
+					sprintf(sprinBuf,"%02f",crackMeter[i].distanc.flotVal );
+					cJSON_AddItemToObject(nodeobj_p,"distance",cJSON_CreateString(sprinBuf));
 					sprintf(sprinBuf,"%llu",utcTime());
 					cJSON_AddItemToObject(nodeobj_p,"monitoringTime",cJSON_CreateString(sprinBuf));
 				}
@@ -260,48 +260,15 @@ uint16_t pressSettlJsonPack(bool respFlag)
 
 
 
-
-//void pressSetlCheckSetFlag(int num)
-//{
-//	  alarmFLag=false;
-//		
-//		if(sheet.modbusPreSettl[num].tempUpLimit!=0){
-//			  if(pressSettle[num].temp>=sheet.modbusPreSettl[num].tempUpLimit){
-//					inpoutpFlag.modbusThreAxis[num].tempUpFlag=true;
-//					alarmFLag=true;
-//				}
-//		}
-//		
-//		if(sheet.modbusPreSettl[num].tempLowLimit!=0){
-//				if(pressSettle[num].temp<=sheet.modbusPreSettl[num].tempLowLimit){
-//					inpoutpFlag.modbusThreAxis[num].tempLowFlag=true;
-//					alarmFLag=true;
-//				}
-//		}
-//		if(sheet.modbusPreSettl[num].heightUpLimit!=0){
-//				if(pressSettle[num].height.flotVal>=sheet.modbusPreSettl[num].heightUpLimit){
-//					inpoutpFlag.modbusThreAxis[num].accXUpFlag=true;
-//					alarmFLag=true;
-//				}
-//		}
-//		if(sheet.modbusPreSettl[num].heightLowLimit!=0){
-//				if(pressSettle[num].height.flotVal<=sheet.modbusPreSettl[num].heightLowLimit){
-//					inpoutpFlag.modbusThreAxis[num].accXLowFlag=true;
-//					alarmFLag=true;
-//				}
-//		}
-
-
-//}
 //复位温湿度的warn状态值
-void resetPressSetlWarnFlag()
+void resetCrackMeterWarnFlag()
 {
-		for (int i = 0; i < PRESSSETTL_485_NUM; i++)
+		for (int i = 0; i < CRACKMETER_485_NUM; i++)
 		{		
-				inpoutpFlag.modbusPreSettl[i].tempUpFlag =false;
-				inpoutpFlag.modbusPreSettl[i].tempLowFlag=false;
-				inpoutpFlag.modbusPreSettl[i].heightLowFlag=false;
-				inpoutpFlag.modbusPreSettl[i].heightUpFlag =false;
+				inpoutpFlag.modbusCrackMeter[i].tempUpFlag =false;
+				inpoutpFlag.modbusCrackMeter[i].tempLowFlag=false;
+				inpoutpFlag.modbusCrackMeter[i].distancLowFlag=false;
+				inpoutpFlag.modbusCrackMeter[i].distancUpFlag =false;
 		}
 }
 
@@ -310,10 +277,10 @@ void resetPressSetlWarnFlag()
 
 
 //模拟温度和湿度值读取以及打包成json格式  返回true 有告警 false 无告警
-bool modPressSetlWarn2Send()
+bool modCrackMeterWarn2Send()
 {
-		if(alarmFLag==false)//TEST
-			return false;
+//		if(alarmFLag==false)//TEST
+//			return false;
 		char* out = NULL;
 		//创建数组
 		cJSON* Array = NULL;
@@ -326,7 +293,7 @@ bool modPressSetlWarn2Send()
 		// 加入节点（键值对）
 		cJSON_AddNumberToObject(root, "mid",mcu.upMessID);
 		cJSON_AddStringToObject(root, "packetType","EVENTS_485_ALARM");
-		cJSON_AddStringToObject(root, "identifier","settlement_monitor");
+		cJSON_AddStringToObject(root, "identifier","crackmeter_monitor");
 		cJSON_AddStringToObject(root, "acuId",(char *)packFlash.acuId);
 		char *sprinBuf=RT_NULL;
 		sprinBuf=rt_malloc(20);//20个字符串长度 够用了
@@ -334,19 +301,19 @@ bool modPressSetlWarn2Send()
 				Array = cJSON_CreateArray();
 				if (Array == NULL) return false;
 				cJSON_AddItemToObject(root, "params", Array);
-				for (int i = 0; i < PRESSSETTL_485_NUM; i++)
+				for (int i = 0; i < CRACKMETER_485_NUM; i++)
 				{		
-						if(sheet.pressSetl[i].workFlag==RT_TRUE){
+						if(sheet.crackMeter[i].workFlag==RT_TRUE){
 							nodeobj = cJSON_CreateObject();
 							cJSON_AddItemToArray(Array, nodeobj);
-							cJSON_AddItemToObject(nodeobj,"deviceId",cJSON_CreateString(sheet.pressSetl[i].ID));
+							cJSON_AddItemToObject(nodeobj,"deviceId",cJSON_CreateString(sheet.crackMeter[i].ID));
 							cJSON_AddNumberToObject(nodeobj,"alarmStatus",1);
 							nodeobj_p= cJSON_CreateObject();
 							cJSON_AddItemToObject(nodeobj, "data", nodeobj_p);
-							cJSON_AddNumberToObject(nodeobj_p,"temperature_low_alarm",inpoutpFlag.modbusPreSettl[i].tempLowFlag);//cJSON_CreateNumber("10"));
-							cJSON_AddNumberToObject(nodeobj_p,"temperature_high_alarm",inpoutpFlag.modbusPreSettl[i].tempUpFlag);
-							cJSON_AddNumberToObject(nodeobj_p,"height_low_alarm",inpoutpFlag.modbusPreSettl[i].tempLowFlag);
-							cJSON_AddNumberToObject(nodeobj_p,"height_high_alarm",inpoutpFlag.modbusPreSettl[i].tempUpFlag);		
+							cJSON_AddNumberToObject(nodeobj_p,"temperature_low_alarm",inpoutpFlag.modbusCrackMeter[i].tempLowFlag);//cJSON_CreateNumber("10"));
+							cJSON_AddNumberToObject(nodeobj_p,"temperature_high_alarm",inpoutpFlag.modbusCrackMeter[i].tempUpFlag);
+							cJSON_AddNumberToObject(nodeobj_p,"distance_low_alarm",inpoutpFlag.modbusCrackMeter[i].tempLowFlag);
+							cJSON_AddNumberToObject(nodeobj_p,"distancedistance_high_alarm",inpoutpFlag.modbusCrackMeter[i].tempUpFlag);		
 							
 							sprintf(sprinBuf,"%llu",utcTime());
 							cJSON_AddItemToObject(nodeobj_p,"monitoringTime",cJSON_CreateString(sprinBuf));
@@ -398,24 +365,23 @@ bool modPressSetlWarn2Send()
 
 
 //沉降仪读取并打包  供别的函数调用
-void pressSettRead2Send(rt_bool_t netStat,bool respFlag)
+void crackMeterRead2Send(rt_bool_t netStat,bool respFlag)
 {
 	  int workFlag=RT_FALSE;
-		for(int i=0;i<PRESSSETTL_485_NUM;i++){
-				if(sheet.pressSetl[i].workFlag==RT_TRUE){
-						readPSTempHeight(i);
+		for(int i=0;i<CRACKMETER_485_NUM;i++){
+				if(sheet.crackMeter[i].workFlag==RT_TRUE){
+						readCrackMeter(i);
 						workFlag=RT_TRUE;
 				}
 		}
 		if(workFlag==RT_TRUE){
-				rt_kprintf("%s打包采集的PRESSSETTL数据\r\n",sign);
-				pressSettlJsonPack(respFlag);
+				rt_kprintf("%s打包采集的CRACK_METER数据\r\n",sign);
+				crackMeterJsonPack(respFlag);
 				if(netStat==RT_TRUE)
 						rt_mb_send_wait(&mbNetSendData, (rt_ubase_t)&packBuf,RT_WAITING_FOREVER);
 				rt_thread_mdelay(500);
-				if(modPressSetlWarn2Send()==true){
-							resetPressSetlWarnFlag();//每次判断后复位warnflag状态值
-							//rt_thread_mdelay(500);
+				if(modCrackMeterWarn2Send()==true){
+							resetCrackMeterWarnFlag();//每次判断后复位warnflag状态值
 							if(netStat==RT_TRUE)
 									rt_mb_send_wait(&mbNetSendData, (rt_ubase_t)&packBuf,RT_WAITING_FOREVER);
 				}

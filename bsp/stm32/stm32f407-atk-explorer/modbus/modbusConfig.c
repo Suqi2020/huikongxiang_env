@@ -155,6 +155,21 @@ void printModbusDevList()
 							}
 					}
 				break;
+				case CRACKMETER:
+					for(int j=0;j<CRACKMETER_485_NUM;j++){//核对有没有配置过
+							if(sheet.crackMeter[j].workFlag==RT_TRUE){
+									rt_kprintf("%s modbus ",sign);
+									rt_kprintf("%10s",modbusName[i]);
+								  rt_kprintf("(%d)",modbusBps[i]);
+			
+									rt_kprintf("%s ",sheet.crackMeter[j].ID);
+									rt_kprintf("%s ",sheet.crackMeter[j].model);
+									rt_kprintf("%s ",UartName[sheet.crackMeter[j].useUartNum]);
+									rt_kprintf("%d ",sheet.crackMeter[j].slaveAddr);
+									rt_kprintf("%d \n",sheet.crackMeterColTime);
+							}
+					}
+				break;
 				default:
 				break;
 			}
@@ -298,7 +313,52 @@ static int pressSettlConf(int uartnum,char *argv[])
 	}
 	return ret;
 }
-
+//crackmeter 配置
+static int crackMeterConf(int uartnum,char *argv[])
+{
+	int i=0;
+	int ret=0;
+	int slaveAddr=atoi32(argv[5],10);
+	sheet.crackMeterColTime=atoi32(argv[6],10);
+	for( i=0;i<CRACKMETER_485_NUM;i++){//核对有没有配置过
+			if(rt_strcmp(sheet.crackMeter[i].ID,argv[2])==0){//配置过
+					if((slaveAddr==0)||(slaveAddr==255)){//关闭
+							sheet.crackMeter[i].workFlag=RT_FALSE;//关闭
+						  rt_kprintf("%s del crackMeter\n",sign);
+						  return 1;
+					}
+					else{
+							sheet.crackMeter[i].workFlag=RT_TRUE;//打开
+					}
+					sheet.crackMeter[i].slaveAddr=slaveAddr;	
+					sheet.crackMeter[i].useUartNum=UartNum[uartnum];
+					rt_strcpy(sheet.crackMeter[i].model,argv[3]);
+					rt_kprintf("%s crackMeter reconfig %d\n",sign,i);
+					rt_kprintf("%s crackMeter OK\n",sign);
+					ret =1;
+					break;
+			}
+	}
+	if((slaveAddr==0)||(slaveAddr==255)){
+			return 0;
+	}
+	if(i==CRACKMETER_485_NUM){//没有配置过
+			for(int j=0;j<CRACKMETER_485_NUM;j++){
+					if(sheet.crackMeter[j].workFlag!=RT_TRUE){
+							sheet.crackMeter[j].workFlag=RT_TRUE;//打开
+							sheet.crackMeter[j].slaveAddr=slaveAddr;	
+							sheet.crackMeter[j].useUartNum=UartNum[uartnum];
+							rt_strcpy(sheet.crackMeter[j].model,argv[3]);
+							rt_strcpy(sheet.crackMeter[j].ID,argv[2]);
+							rt_kprintf("%s crackMeter config %d\n",sign,j);
+						  rt_kprintf("%s crackMeter OK\n",sign);
+							ret =1;
+							break;
+					}
+			}
+	}
+	return ret;
+}
 //三轴的配置
 static int threeAxisConf(int uartnum,char *argv[])
 {
@@ -664,6 +724,8 @@ static int modbusConf(int modbusnum,int uartnum,char *argv[])
       case WATERDEPTH:
 				ret=waterDepthConf(uartnum,argv);
 			break;
+			case CRACKMETER:
+				ret=crackMeterConf(uartnum,argv);
 			default:
 			break;
 		}
@@ -782,6 +844,17 @@ int modbusConfIDCheck(char *inputID)
 									if(rt_strcmp(sheet.waterDepth[j].ID,inputID)==0){
 											rt_kprintf("del waterDepth same ID\n");
 											sheet.waterDepth[j].workFlag=RT_FALSE;
+										  return 1;
+									}
+							}
+					}
+				break;
+				case CRACKMETER:
+					for(int j=0;j<CRACKMETER_485_NUM;j++){//核对有没有配置过
+							if(sheet.crackMeter[j].workFlag==RT_TRUE){
+									if(rt_strcmp(sheet.crackMeter[j].ID,inputID)==0){
+											rt_kprintf("del crackMeter same ID\n");
+											sheet.crackMeter[j].workFlag=RT_FALSE;
 										  return 1;
 									}
 							}

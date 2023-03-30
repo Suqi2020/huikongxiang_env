@@ -172,6 +172,37 @@ void senseTHGetJsonResp(cJSON   *Json,bool modbusFlag)
 								}
 						}
 				}
+				else if(rt_strcmp(string,"crackmeter_monitor")==0){
+
+						arrayNew = cJSON_CreateArray();
+						if(arrayNew==NULL) return;
+						cJSON_AddItemToObject(root, "params", arrayNew);
+						for(int i=0;i<arrayGet_size;i++)
+						{
+								nodeobj = cJSON_CreateObject();
+								cJSON_AddItemToArray(arrayNew, nodeobj);
+								cJSON *item=cJSON_GetArrayItem(arrayGet,i);
+								cJSON  *devID =cJSON_GetObjectItem(item,"deviceId");
+								for(int j=0;j<CRACKMETER_485_NUM;j++){//核对有没有配置过
+										if(0==rt_strcmp(sheet.crackMeter[j].ID,devID->valuestring)){
+											  result=true;
+												cJSON_AddStringToObject(nodeobj, "deviceId", devID->valuestring);
+												nodeobj_p = cJSON_CreateObject();
+												cJSON_AddItemToObject(nodeobj,"data",nodeobj_p);
+											
+												sprintf(sprinBuf,"%02f",sheet.modbusCrackMeter[j].tempLowLimit);
+												cJSON_AddStringToObject(nodeobj_p,"temperature_low",sprinBuf);
+												sprintf(sprinBuf,"%02f",sheet.modbusCrackMeter[j].tempUpLimit );
+												cJSON_AddStringToObject(nodeobj_p,"temperature_high",sprinBuf);
+												sprintf(sprinBuf,"%02f",sheet.modbusCrackMeter[j].distancLowLimit);
+											
+												cJSON_AddStringToObject(nodeobj_p,"distance_low",sprinBuf);
+												sprintf(sprinBuf,"%02f",sheet.modbusCrackMeter[j].distancUpLimit );
+												cJSON_AddStringToObject(nodeobj_p,"distance_high",sprinBuf);
+										}
+								}
+						}
+				}
 				else if(rt_strcmp(string,"temperature_and_humidity_monitor")==0){
 	
 						arrayNew = cJSON_CreateArray();
@@ -524,6 +555,27 @@ void senseTHSetJsonResp(cJSON   *Json,bool  modbusFlag)
 
 											  fvalue= cJSON_GetObjectItem(data,"depth_high");
 											  sheet.modbusWaterDepth[j].depthUpLimit=atof(fvalue->valuestring);
+										}
+								}
+						}
+				}
+				else if(rt_strcmp(string,"crackmeter_monitor")==0){
+						for(int i=0;i<arrayGet_size;i++)
+						{
+								cJSON *item=cJSON_GetArrayItem(arrayGet,i);
+								cJSON  *devID =cJSON_GetObjectItem(item,"deviceId");
+								for(int j=0;j<CRACKMETER_485_NUM;j++){//核对有没有配置过
+										if(0==rt_strcmp(sheet.crackMeter[j].ID,devID->valuestring)){
+											  result=true;
+												cJSON  *data =cJSON_GetObjectItem(item,"data");
+											  cJSON  *fvalue= cJSON_GetObjectItem(data,"temperature_low");
+											  sheet.modbusCrackMeter[j].tempLowLimit=atof(fvalue->valuestring);
+											  fvalue= cJSON_GetObjectItem(data,"temperature_high");
+											  sheet.modbusCrackMeter[j].tempUpLimit=atof(fvalue->valuestring);
+											  fvalue= cJSON_GetObjectItem(data,"distance_low");
+											  sheet.modbusCrackMeter[j].distancLowLimit=atof(fvalue->valuestring);							
+											  fvalue= cJSON_GetObjectItem(data,"distance_high");
+											  sheet.modbusCrackMeter[j].distancUpLimit=atof(fvalue->valuestring);
 										}
 								}
 						}

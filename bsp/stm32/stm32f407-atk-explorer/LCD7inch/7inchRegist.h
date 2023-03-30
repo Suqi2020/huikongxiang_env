@@ -273,8 +273,11 @@
 //Ö÷½çÃæ
 #define   KEY_NETERROR_ADDR         0X1A00
 #define   KEY_MODBUSERR_ADDR        0X1A02
-#define   NET_ERR_DISPLAY_ADDR      0X1A0C
-#define   MODBUS_ERR_DISPLAY_ADDR   0X1A0E
+//#define   NET_ERR_DISPLAY_ADDR      0X1A0C
+//#define   MODBUS_ERR_DISPLAY_ADDR   0X1A0E
+
+#define   NET_ERR_DISPLAY_ADDR      0X1A20
+#define   MODBUS_ERR_DISPLAY_ADDR   0X1A22
 //////////////////////////////////////////////////////////////
 //kenal lcd command
 ///#define   LCD_HEAD       0XAEA5

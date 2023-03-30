@@ -284,6 +284,28 @@ void printfThresholdList()
 				}
 				//rt_kprintf("\n");
 		}
+		for(i=0;i<CRACKMETER_485_NUM;i++){
+				if(sheet.crackMeter[i].workFlag==RT_TRUE){//找到相同ID的
+						rt_kprintf("%s threshold ",sign);
+						rt_kprintf("%s ",modbusName[CRACKMETER]);
+						rt_kprintf("%s ",sheet.crackMeter[i].ID);
+						rt_kprintf("1 ");
+						rt_kprintf("1 ");
+						rt_kprintf("%0.2f ",sheet.modbusCrackMeter[i].tempLowLimit);
+						rt_kprintf("%0.2f \n",sheet.modbusCrackMeter[i].tempUpLimit);
+					  rt_kprintf("\n");
+					
+						rt_kprintf("%s threshold ",sign);
+						rt_kprintf("%s ",modbusName[CRACKMETER]);
+						rt_kprintf("%s ",sheet.crackMeter[i].ID);
+						rt_kprintf("1 ");
+						rt_kprintf("2 ");
+						rt_kprintf("%0.2f ",sheet.modbusCrackMeter[i].distancLowLimit);
+						rt_kprintf("%0.2f \n",sheet.modbusCrackMeter[i].distancUpLimit);
+					  rt_kprintf("\n");
+				}
+				//rt_kprintf("\n");
+		}
 		//打印modbus设置的阈值
 }
 //与modbus传感器不同之处在于 除了判断ID还需要判断子选项
@@ -528,6 +550,25 @@ bool   modbusThresholdConfig(int num,char *ID,int sensorSubName,float upLimit,fl
 				}
 			  break;
 			default:
+				
+			case CRACKMETER:
+				for(i=0;i<CRACKMETER_485_NUM;i++){
+						if(rt_strcmp(sheet.crackMeter[i].ID,ID)==0){//找到相同ID的
+								if(sensorSubName==1){
+										sheet.modbusCrackMeter[i].tempUpLimit  = upLimit;
+									  sheet.modbusCrackMeter[i].tempLowLimit = lowLimit;
+									  return  true;
+								}
+								else if(sensorSubName==2){
+										sheet.modbusCrackMeter[i].distancUpLimit  = upLimit;
+									  sheet.modbusCrackMeter[i].distancLowLimit = lowLimit;
+									  return  true;
+								}
+								else
+										return  false;
+						}
+				}
+			  break;
 				rt_kprintf("%s ERR:modbusThresholdConfig %d\n",sign,num);
 				break;
 		}

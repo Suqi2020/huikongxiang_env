@@ -62,6 +62,10 @@ void delModbusDevbyID(char *ID)
 					case WATERDEPTH:
 						sheet.waterDepth[modPosit[modbDevReadIndex].Y].workFlag=RT_FALSE;
 						break;
+					case CRACKMETER:
+						sheet.crackMeter[modPosit[modbDevReadIndex].Y].workFlag=RT_FALSE;
+					  rt_kprintf("%sdel crackMeter\n %d",sign);
+						break;
 					default:
 						rt_kprintf("%serror delModbusDevbyID\n %d",sign,modPosit[modbDevReadIndex].X);
 						break;
@@ -102,7 +106,7 @@ extern int cirCurrtState(int i);
 extern int threeAxisState(int i);
 extern int o2State(int i);
 extern int h2sState(int i);
-
+extern int crackMeterState(int i);
 
 //LCD显示故障modbus所有列表的坐标获取  切换界面后需要调用此函数
 void LCDDispErrModbusGet()
@@ -235,6 +239,18 @@ void LCDDispErrModbusGet()
 							}
 					}
 				break;
+				case CRACKMETER:
+					for(int j=0;j<CRACKMETER_485_NUM;j++){//核对有没有配置过
+							if(sheet.crackMeter[j].workFlag==RT_TRUE){
+								if(crackMeterState(j)!=1){
+											modPositErr[modbErrTotalIndex].X=i;
+											modPositErr[modbErrTotalIndex].Y=j;
+											modPositErr[modbErrTotalIndex].flag=1;
+											modbErrTotalIndex++;
+									}
+							}
+					}
+					break;
 				default:
 					rt_kprintf("%serror LCDDispErrModbusGet %d\n",sign,i);
 				break;
@@ -413,6 +429,21 @@ void LCDDispModInfoCpy(modbusPositStru *posit,uint8_t readIndex,LCDDispModInfoSt
 							}
 					}
 					break;
+				case CRACKMETER:
+					for(int j=0;j<CRACKMETER_485_NUM;j++){//核对有没有配置过
+							if(posit_p.Y==j){
+								 if(posit_p.flag==1){
+									 rt_strcpy(lcdRead->name,modbusName[posit_p.X]);
+									 rt_strcpy(lcdRead->ID,  sheet.crackMeter[posit_p.Y].ID);
+									 rt_strcpy(lcdRead->model,sheet.crackMeter[posit_p.Y].model);
+									 lcdRead->port = sheet.crackMeter[posit_p.Y].useUartNum;
+									 lcdRead->addr = sheet.crackMeter[posit_p.Y].slaveAddr;
+									 lcdRead->colTime = sheet.crackMeterColTime;
+								 }
+								 break;
+							}
+					}
+					break;
 				default:
 					rt_kprintf("%serror LCDDispModInfoCpy %d\n",sign,posit_p.X);
 					break;
@@ -426,6 +457,8 @@ void LCDDispModInfoCpy(modbusPositStru *posit,uint8_t readIndex,LCDDispModInfoSt
 //传感器读取界面显示所有信息
 void LDCDispMosbusInfo()
 {
+	  if(modbDevReadIndex>=modbTotalIndex)
+			modbDevReadIndex=0;//最后一页删除的时候要从第一页开始显示
 	  LCDDispModInfoCpy(modPosit,modbDevReadIndex,&modbusLCDRead);
 	  uint8_t *buf=NULL;
 	  buf=rt_malloc(50);
@@ -488,8 +521,9 @@ void LDCDispMosbusInfo()
 		buf[0]=0;
 		if(modbTotalIndex==0)
 				buf[1]=0;
-		else
+		else{
 				buf[1]=modbDevReadIndex+1;
+		}
 		LCDWtite(MODBUSDISP_NOWNUM_ADDR,buf,2);
 		
 		
@@ -571,165 +605,7 @@ void LDCDispErrMosbusInfo()
 		rt_free(buf);
 		buf=RT_NULL;
 }
-//void LCDDispModInfoCpy()
-//{
-//	 
-//		switch(modPosit[modbDevReadIndex].X){
-//				case CIRCULA:	
-//					for(int j=0;j<CIRCULA_485_NUM;j++){//核对有没有配置过
-//							if(modPosit[modbDevReadIndex].Y==j){
-//									if(modPosit[modbDevReadIndex].flag==1){
-//											 rt_strcpy(modbusLCDRead.name,modbusName[modPosit[modbDevReadIndex].X]);
-//											 rt_strcpy(modbusLCDRead.ID,  sheet.cirCula[modPosit[modbDevReadIndex].Y].ID);//ID第一次上电存储的可能是0xff  拷贝会导致内存泄漏
-//											 rt_strcpy(modbusLCDRead.model,sheet.cirCula[modPosit[modbDevReadIndex].Y].model);
-//											 modbusLCDRead.port = sheet.cirCula[modPosit[modbDevReadIndex].Y].useUartNum;
-//											 modbusLCDRead.addr = sheet.cirCula[modPosit[modbDevReadIndex].Y].slaveAddr;
-//											 modbusLCDRead.colTime = sheet.cirCulaColTime;
-//									}
-//								 break;
-//							}
-//					}
-//					break;
-//				case PARTDISCHAG:
-//					for(int j=0;j<PARTDISCHAG_485_NUM;j++){//核对有没有配置过
-//							if(modPosit[modbDevReadIndex].Y==j){
-//								if(modPosit[modbDevReadIndex].flag==1){
-//									 rt_strcpy(modbusLCDRead.name,modbusName[modPosit[modbDevReadIndex].X]);
-//									 rt_strcpy(modbusLCDRead.ID,  sheet.partDischag[modPosit[modbDevReadIndex].Y].ID);
-//									 rt_strcpy(modbusLCDRead.model,sheet.partDischag[modPosit[modbDevReadIndex].Y].model);
-//									 modbusLCDRead.port = sheet.partDischag[modPosit[modbDevReadIndex].Y].useUartNum;
-//									 modbusLCDRead.addr = sheet.partDischag[modPosit[modbDevReadIndex].Y].slaveAddr;
-//									 modbusLCDRead.colTime = sheet.partDischagColTime;
-//								}
-//								 break;
-//							}
-//					}
-//					break;
-//				case PRESSSETTL:
-//					for(int j=0;j<PRESSSETTL_485_NUM;j++){//核对有没有配置过
-//							if(modPosit[modbDevReadIndex].Y==j){
-//								if(modPosit[modbDevReadIndex].flag==1){
-//									 rt_strcpy(modbusLCDRead.name,modbusName[modPosit[modbDevReadIndex].X]);
-//									 rt_strcpy(modbusLCDRead.ID,  sheet.pressSetl[modPosit[modbDevReadIndex].Y].ID);
-//									 rt_strcpy(modbusLCDRead.model,sheet.pressSetl[modPosit[modbDevReadIndex].Y].model);
-//									 modbusLCDRead.port = sheet.pressSetl[modPosit[modbDevReadIndex].Y].useUartNum;
-//									 modbusLCDRead.addr = sheet.pressSetl[modPosit[modbDevReadIndex].Y].slaveAddr;
-//									 modbusLCDRead.colTime = sheet.pressSetlColTime;
-//								}
-//								 break;
-//							}
-//					}
-//					break;
-//				case THREEAXIS:
-//					for(int j=0;j<THREEAXIS_485_NUM;j++){//核对有没有配置过
-//							if(modPosit[modbDevReadIndex].Y==j){
-//								 if(modPosit[modbDevReadIndex].flag==1){
-//									 rt_strcpy(modbusLCDRead.name,modbusName[modPosit[modbDevReadIndex].X]);
-//									 rt_strcpy(modbusLCDRead.ID,  sheet.threeAxiss[modPosit[modbDevReadIndex].Y].ID);
-//									 rt_strcpy(modbusLCDRead.model,sheet.threeAxiss[modPosit[modbDevReadIndex].Y].model);
-//									 modbusLCDRead.port = sheet.threeAxiss[modPosit[modbDevReadIndex].Y].useUartNum;
-//									 modbusLCDRead.addr = sheet.threeAxiss[modPosit[modbDevReadIndex].Y].slaveAddr;
-//									 modbusLCDRead.colTime = sheet.threeAxissColTime;
-//								 }
-//								 break;
-//							}
-//					}
-//					break;
-//				case CH4:
-//					for(int j=0;j<CH4_485_NUM;j++){//核对有没有配置过
-//							if(modPosit[modbDevReadIndex].Y==j){
-//								 if(modPosit[modbDevReadIndex].flag==1){
-//									 rt_strcpy(modbusLCDRead.name,modbusName[modPosit[modbDevReadIndex].X]);
-//									 rt_strcpy(modbusLCDRead.ID,  sheet.ch4[modPosit[modbDevReadIndex].Y].ID);
-//									 rt_strcpy(modbusLCDRead.model,sheet.ch4[modPosit[modbDevReadIndex].Y].model);
-//									 modbusLCDRead.port = sheet.ch4[modPosit[modbDevReadIndex].Y].useUartNum;
-//									 modbusLCDRead.addr = sheet.ch4[modPosit[modbDevReadIndex].Y].slaveAddr;
-//									 modbusLCDRead.colTime = sheet.ch4ColTime;
-//								 }
-//								 break;
-//							}
-//					}
-//					break;
-//				case O2:
-//					for(int j=0;j<O2_485_NUM;j++){//核对有没有配置过
-//							if(modPosit[modbDevReadIndex].Y==j){
-//								if(modPosit[modbDevReadIndex].flag==1){
-//									 rt_strcpy(modbusLCDRead.name,modbusName[modPosit[modbDevReadIndex].X]);
-//									 rt_strcpy(modbusLCDRead.ID,  sheet.o2[modPosit[modbDevReadIndex].Y].ID);
-//									 rt_strcpy(modbusLCDRead.model,sheet.o2[modPosit[modbDevReadIndex].Y].model);
-//									 modbusLCDRead.port = sheet.o2[modPosit[modbDevReadIndex].Y].useUartNum;
-//									 modbusLCDRead.addr = sheet.o2[modPosit[modbDevReadIndex].Y].slaveAddr;
-//									 modbusLCDRead.colTime = sheet.o2ColTime;
-//								 }
-//								 break;
-//							}
-//					}
-//					break;
-//				case H2S:
-//					for(int j=0;j<H2S_485_NUM;j++){//核对有没有配置过
-//							if(modPosit[modbDevReadIndex].Y==j){
-//								 if(modPosit[modbDevReadIndex].flag==1){
-//									 rt_strcpy(modbusLCDRead.name,modbusName[modPosit[modbDevReadIndex].X]);
-//									 rt_strcpy(modbusLCDRead.ID,  sheet.h2s[modPosit[modbDevReadIndex].Y].ID);
-//									 rt_strcpy(modbusLCDRead.model,sheet.h2s[modPosit[modbDevReadIndex].Y].model);
-//									 modbusLCDRead.port = sheet.h2s[modPosit[modbDevReadIndex].Y].useUartNum;
-//									 modbusLCDRead.addr = sheet.h2s[modPosit[modbDevReadIndex].Y].slaveAddr;
-//									 modbusLCDRead.colTime = sheet.h2sColTime;
-//								 }
-//								 break;
-//							}
-//					}
-//					break;
-//				case CO:
-//					for(int j=0;j<CO_485_NUM;j++){//核对有没有配置过
-//							if(modPosit[modbDevReadIndex].Y==j){
-//								 if(modPosit[modbDevReadIndex].flag==1){
-//										 rt_strcpy(modbusLCDRead.name,modbusName[modPosit[modbDevReadIndex].X]);
-//										 rt_strcpy(modbusLCDRead.ID,  sheet.co[modPosit[modbDevReadIndex].Y].ID);
-//										 rt_strcpy(modbusLCDRead.model,sheet.co[modPosit[modbDevReadIndex].Y].model);
-//										 modbusLCDRead.port = sheet.co[modPosit[modbDevReadIndex].Y].useUartNum;
-//										 modbusLCDRead.addr = sheet.co[modPosit[modbDevReadIndex].Y].slaveAddr;
-//										 modbusLCDRead.colTime = sheet.gasColTime;
-//								 }
-//								 break;
-//							}
-//					}
-//					break;
-//				case TEMPHUM:
-//					for(int j=0;j<TEMPHUM_485_NUM;j++){//核对有没有配置过
-//							if(modPosit[modbDevReadIndex].Y==j){
-//								 if(modPosit[modbDevReadIndex].flag==1){
-//									 rt_strcpy(modbusLCDRead.name,modbusName[modPosit[modbDevReadIndex].X]);
-//									 rt_strcpy(modbusLCDRead.ID,  sheet.tempHum[modPosit[modbDevReadIndex].Y].ID);
-//									 rt_strcpy(modbusLCDRead.model,sheet.tempHum[modPosit[modbDevReadIndex].Y].model);
-//									 modbusLCDRead.port = sheet.tempHum[modPosit[modbDevReadIndex].Y].useUartNum;
-//									 modbusLCDRead.addr = sheet.tempHum[modPosit[modbDevReadIndex].Y].slaveAddr;
-//									 modbusLCDRead.colTime = sheet.tempHumColTime;
-//								 }
-//								 break;
-//							}
-//					}
-//					break;
-//				case WATERDEPTH:
-//					for(int j=0;j<WATERDEPTH_485_NUM;j++){//核对有没有配置过
-//							if(modPosit[modbDevReadIndex].Y==j){
-//								 if(modPosit[modbDevReadIndex].flag==1){
-//									 rt_strcpy(modbusLCDRead.name,modbusName[modPosit[modbDevReadIndex].X]);
-//									 rt_strcpy(modbusLCDRead.ID,  sheet.waterDepth[modPosit[modbDevReadIndex].Y].ID);
-//									 rt_strcpy(modbusLCDRead.model,sheet.waterDepth[modPosit[modbDevReadIndex].Y].model);
-//									 modbusLCDRead.port = sheet.waterDepth[modPosit[modbDevReadIndex].Y].useUartNum;
-//									 modbusLCDRead.addr = sheet.waterDepth[modPosit[modbDevReadIndex].Y].slaveAddr;
-//									 modbusLCDRead.colTime = sheet.waterDepthColTime;
-//								 }
-//								 break;
-//							}
-//					}
-//					break;
-//				default:
-//					rt_kprintf("%serror delModbusDevbyID\n",sign);
-//					break;
-//			}
-//}
+
 void  delModbusDevbyID_p()
 {
 	delModbusDevbyID(modbusLCDRead.ID);
@@ -847,6 +723,16 @@ void LCDDispModbusGet()
 							}
 					}
 				break;
+				case CRACKMETER:
+					for(int j=0;j<CRACKMETER_485_NUM;j++){//核对有没有配置过
+							if(sheet.crackMeter[j].workFlag==RT_TRUE){
+								  modPosit[modbTotalIndex].X=i;
+								  modPosit[modbTotalIndex].Y=j;
+								  modPosit[modbTotalIndex].flag=1;
+									modbTotalIndex++;
+							}
+					}
+					break;
 				default:
 					rt_kprintf("%serror LCDDispModbusGet %d\n",sign,i);
 				break;
@@ -862,10 +748,10 @@ modbusStru *singlConfDev=RT_NULL;//
 //modbus设备数量的映射表 需要跟modbNumEnum的列表一一对应
 #ifdef	USE_4GAS
 uint8_t numTable[]={CIRCULA_485_NUM,PARTDISCHAG_485_NUM ,PRESSSETTL_485_NUM,THREEAXIS_485_NUM,\
-										CH4_485_NUM,CO_485_NUM,H2S_485_NUM,O2_485_NUM ,WATERDEPTH_485_NUM,TEMPHUM_485_NUM };
+										CH4_485_NUM,CO_485_NUM,H2S_485_NUM,O2_485_NUM ,WATERDEPTH_485_NUM,TEMPHUM_485_NUM,CRACKMETER_485_NUM };
 #else
 uint8_t numTable[]={CIRCULA_485_NUM,PARTDISCHAG_485_NUM ,PRESSSETTL_485_NUM,THREEAXIS_485_NUM,\
-										WATERDEPTH_485_NUM,TEMPHUM_485_NUM };
+										WATERDEPTH_485_NUM,TEMPHUM_485_NUM,CRACKMETER_485_NUM  };
 #endif
 
 //单种modbus设备分别配置  思路 做好映射关系表
@@ -881,6 +767,7 @@ static int singlModbConf(int num)
 		}
 		singlConcalTime=&sheet.cirCulaColTime+num*1;//指针指向 
 		*singlConcalTime=LCDInputTime;
+		rt_kprintf("%saddr 0x%08X 0x%08X 0x%08X 0x%08X \n",sign,&sheet.cirCulaColTime,singlConcalTime,&sheet.crackMeterColTime);
 //		for( i=0;i<numTable[num];i++){//核对有没有配置过
 //				if(rt_strcmp(singlConfDev[i].ID,LCDInput.ID)==0){//配置过
 //						singlConfDev[i].workFlag=RT_TRUE;//打开
@@ -951,7 +838,7 @@ void dispChinaNameIndexAdd()
 
 void  modbDevReadIndexAdd()
 {
-		if(modbDevReadIndex+1==modbTotalIndex)
+		if(modbDevReadIndex+1>=modbTotalIndex)
 			 modbDevReadIndex=0;
 		else 
 			 modbDevReadIndex++;
@@ -993,198 +880,6 @@ void  offLineIndexAdd()
 		}
 }
 
-//modbusName[MODBUS_NUM][20]
-////按键触摸返回函数
-//void  keyReturn(uint16_t keyAddr)
-//{
-//	  uint8_t *buf=NULL;
-//	  buf=rt_malloc(50);
-//	 // int nameLen=0;
-//		switch(keyAddr)
-//		{
-//			case	KEY_MODBUS_CFG_NAME_ADDR://点击传感器设置名称显示框调出 模糊界面  显示到1380
-//				//5A A5 1182 1380 C9CF BAA3 B9C8 D4AA BFC6 BCBC FFFF
-//        dispCinaName(buf);
-//				break;
-//			case	KEY_MODBUS_LASTNAME_ADDR:
-//				dispChinaNameIndexLow();
-//				dispCinaName(buf);
-//				break;
-//			case	KEY_MODBUS_NEXTNAME_ADDR:
-//				dispChinaNameIndexAdd();
-//				dispCinaName(buf);
-//				break;
-//			case	KEY_MODBUS_SURENAME_ADDR:// 显示到1360
-////			  dispCinaName(buf);   singlModbConf(chinaNameIndex);
-////			  rt_strcpy(LCDInput.);
-////				LCDWtite(MODBUS_CFG_NAME_ADDR,buf,sizeof(modbusName[chinaNameNum]));
-//				break;	
-//			case  KEY_IP_READ_ADDR:
-//				LCDDispIP();
-//				break;
-//			case KEY_PORT_READ_ADDR:
-//				LCDDispUart();
-//				break;
-//			case KEY_MCUID_READ_ADDR:
-//				LCDDispMCUID();
-//				break;
-//			case KEY_SAVE_ADDR://保存
-//				
-//				rt_kprintf("%sflash save OK\n",sign);
-//				stm32_flash_erase(FLASH_IP_SAVE_ADDR, sizeof(packFlash));//每次擦除128k字节数据 存储时候需要一起存储
-//				stm32_flash_write(FLASH_IP_SAVE_ADDR,(uint8_t*)&packFlash,sizeof(packFlash));
-//				stm32_flash_write(FLASH_MODBUS_SAVE_ADDR,(uint8_t*)&sheet,sizeof(sheet));
-//				break;
-//			case KEY_RESET_ADDR://复位
-//				rt_hw_cpu_reset();
-//				break;
-//			case KEY_MODBUS_CFG_WATCH_ADDR:
-//				LCDDispModInfoCpy(modPosit,modbDevReadIndex,&modbusLCDRead);
-//				LDCDispMosbusInfo();
-//				break;
-//			case KEY_MODBUS_CFG_SURE_ADDR:
-//				
-//				modbusConfIDCheck(LCDInput.ID);
-//				singlModbConf(chinaNameIndex);
-//				break;
-//			case KEY_MODBUSDISP_LAST_ADDR:
-////			  if(modbDevReadIndex==0)
-////					 modbDevReadIndex=modbTotalIndex-1;
-////				else
-////					 modbDevReadIndex--;
-//				modbDevReadIndexLow();
-//				LCDDispModInfoCpy(modPosit,modbDevReadIndex,&modbusLCDRead);
-//				LDCDispMosbusInfo();
-//				break;
-
-//			case  KEY_MODBUSDISP_NEXT_ADDR:
-////			  if(modbDevReadIndex+1==modbTotalIndex)
-////					 modbDevReadIndex=0;
-////				else 
-////					 modbDevReadIndex++;
-//				modbDevReadIndexAdd();
-//				LCDDispModInfoCpy(modPosit,modbDevReadIndex,&modbusLCDRead);
-//				LDCDispMosbusInfo();
-//			  break;
-//			
-//		
-////LCDDispModInfoStru  modbusLCDErrRead={0};
-////uint8_t  modbErrTotalIndex=0;
-////uint8_t  modbErrDevReadIndex=0;
-////modbusPositStru  modPositErr[TOTOLA_485_NUM]={0};
-////////////////////////////////////////////////////
-
-//			case KEY_MODBUSDISP_ERRLAST_ADDR:
-////			  if(modbErrDevReadIndex==0)
-////					 modbErrDevReadIndex=modbErrTotalIndex-1;
-////				else
-////					 modbErrDevReadIndex--;
-//				modbErrDevReadIndexLow();
-//				LCDDispModInfoCpy(modPositErr,modbErrDevReadIndex,&modbusLCDErrRead);
-//				LDCDispErrMosbusInfo();
-//				break;
-//			case KEY_MODBUSDISP_ERRNEXT_ADDR:
-////				if(modbErrDevReadIndex+1==modbErrTotalIndex)
-////					 modbErrDevReadIndex=0;
-////				else 
-////					 modbErrDevReadIndex++;
-//				modbErrDevReadIndexAdd();
-//				LCDDispModInfoCpy(modPositErr,modbErrDevReadIndex,&modbusLCDErrRead);
-//				LDCDispErrMosbusInfo();
-//				break;
-////			case  MODBUS_ERR_DISPLAY_ADDR:
-////				LCDDispModInfoCpy(modPositErr,modbErrDevReadIndex);
-////				LDCDispErrMosbusInfo();
-////			break;
-//			case  KEY_MODBUSDISP_DEL_ADDR:
-//				delModbusDevbyID(modbusLCDRead.ID);
-//			  LCDDispModbusGet();
-//			 
-//			  LCDDispModInfoCpy(modPosit,modbDevReadIndex,&modbusLCDRead);
-//			  LDCDispMosbusInfo();
-//				break;
-//			case  KEY_NETERROR_ADDR:
-//				//rt_kprintf("%s按键按下\n",sign);
-//				LCDDispNetOffline();
-//				break;
-//			case  KEY_MODBUSERR_ADDR:
-//				LCDDispErrModbusGet();
-//				LCDDispModInfoCpy(modPositErr,modbErrDevReadIndex,&modbusLCDErrRead);
-//				LDCDispErrMosbusInfo();
-//				break;
-//			case	NET_OFFLINE_LAST_ADDR:
-////				offLineIndex--;
-////			  if(offLineIndex==0){
-////						offLineIndex = offLine.times;
-////				}
-//				offLineIndexLow();
-//				LCDDispNetOffline();
-//				break;
-//			case  NET_OFFLINE_NEXT_ADDR:
-////				offLineIndex++;
-////			  if(offLineIndex>offLine.times){
-////						offLineIndex = 1;
-////				}
-//				offLineIndexAdd();
-//				LCDDispNetOffline();
-//				break;
-//		//开关控制start
-
-
-//			case  KEY_SWITCH_INTERFACE_ADDR:
-//				rt_kprintf("%sKEY_SWITCH_INTERFACE_ADDR \n",sign);
-//				dispInterFaceIndexFun();
-//				break;
-//			
-//			case KEY_SWITCH_PORT_ADDR:
-//				break;
-//			case KEY_SWITCH_LEVEL_ADDR:
-//				break;
-//			
-//			case KEY_SWITCH_SURE_ADDR:
-//				break;
-//			
-//			case KEY_SWITCH_RETURN_ADDR:
-//				break;
-//			
-
-//			case KEY_SWITCHINTERF_SURE_ADDR://do nothing
-//				break;
-//			case KEY_SWITCHINTERF_NEXT_ADDR:
-//				rt_kprintf("%sKEY_SWITCHINTERF_NEXT_ADDR \n",sign);
-//				dispInterFaceIndexAdd();
-//			  dispInterFaceIndexFun();
-//				break;
-//			case KEY_SWITCHINTERF_LAST_ADDR:
-//				rt_kprintf("%sKEY_SWITCHINTERF_LAST_ADDR \n",sign);
-//				dispInterFaceIndexReduc();
-//			  dispInterFaceIndexFun();
-//				break;
-//			case KEY_SWITCHINTERF_RETURN_ADDR://do nothing
-//				break;
-//			case KEY_SWITCHPORT_SURE_ADDR:
-//				break;
-//			case KEY_SWITCHPORT_NEXT_ADDR:
-//				break;
-//			case KEY_SWITCHPORT_LAST_ADDR:
-//				break;
-//			case KEY_SWITCHPORT_RETURN_ADDR:
-//				break;
-//			case KEY_SWITCHLEVEL_ON_ADDR:
-//				break;
-//			case KEY_SWITCHLEVEL_OFF_ADDR:
-//				break;
-//			case KEY_SWITCHLEVEL_SURE_ADDR:
-//				break;
-//			case KEY_SWITCHLEVEL_RETURN_ADDR:
-//				break;
-
-//		//开关控制end
-//		}
-//		rt_free(buf);
-//		buf=RT_NULL;
-//		
-//}
 
 
 int modbusConfIDCheck(char *inputID);

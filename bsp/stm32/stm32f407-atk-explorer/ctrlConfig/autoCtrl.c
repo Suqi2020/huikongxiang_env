@@ -150,7 +150,6 @@ static bool crtlPartDischagConf(char **argv)
 					rt_kprintf("%sERR:partDischagConf argv[5] limit %s should be 0 1\n",sign);
 				  return false;
 			}
-		
 			for(i=0;i<PARTDISCHAG_485_NUM;i++){
 					if(rt_strcmp(sheet.partDischag[i].ID,argv[3])==0){//找到相同ID的
 //						  rt_strcpy(sheet.autoctrl[pindex].input[inputIndex].typeName,argv[1]);
@@ -284,8 +283,6 @@ static bool ctrlPressSettlConf(char **argv)
 					rt_kprintf("%sERR:ctrlPressSettlConf argv[5] limit %s should be 0 1\n",sign);
 				  return false;
 			}
-			
-			
 			for(i=0;i<PRESSSETTL_485_NUM;i++){
 						if(rt_strcmp(sheet.pressSetl[i].ID,argv[3])==0){//找到相同ID的
 //								rt_strcpy(sheet.autoctrl[pindex].input[inputIndex].typeName,argv[1]);
@@ -411,8 +408,6 @@ static bool ctrlCh4Conf(char **argv)
 					rt_kprintf("%sERR:ctrlCh4Conf argv[5] limit %s should be 0 1\n",sign);
 				  return false;
 			}
-			
-			
 			for(i=0;i<CH4_485_NUM;i++){
 						if(rt_strcmp(sheet.ch4[i].ID,argv[3])==0){//找到相同ID的
 //								rt_strcpy(sheet.autoctrl[pindex].input[inputIndex].typeName,argv[1]);
@@ -438,7 +433,6 @@ static bool ctrlCh4Conf(char **argv)
 //指针指向氧气的阈值
 static bool ctrlO2Conf(char **argv)
 {
-
 			uint8_t subname = atoi16(argv[4],10);
 			uint8_t limit   = atoi16(argv[5],10);
 	    int i;
@@ -483,8 +477,6 @@ static bool ctrlH2sConf(char **argv)
 					rt_kprintf("%sERR:ctrlH2sConf argv[5] limit %s should be 0 1\n",sign);
 				  return false;
 			}
-			
-			
 			for(i=0;i<H2S_485_NUM;i++){
 					if(rt_strcmp(sheet.h2s[i].ID,argv[3])==0){//找到相同ID的
 							if(subname==1){//A
@@ -624,7 +616,55 @@ static bool  ctrlWaterConf(char **argv)
 			}
 			return false;
 }													
-
+//指针指向水位传感器的阈值
+static bool  crackMeterConf(char **argv)
+{
+			uint8_t subname = atoi16(argv[4],10);
+			uint8_t limit   = atoi16(argv[5],10);
+	    int i;
+			if((subname==0)||(subname>1)){
+					rt_kprintf("%sERR:ctrlWaterConf argv[4] subname %s should be <=1 and not 0\n",sign);
+				  return false;
+			}
+			if(!((limit==0)||(limit==1))){
+					rt_kprintf("%sERR:ctrlWaterConf argv[5] limit %s should be 0 1\n",sign);
+				  return false;
+			}
+			for(i=0;i<CRACKMETER_485_NUM;i++){
+					if(rt_strcmp(sheet.crackMeter[i].ID,argv[3])==0){//找到相同ID的
+//							rt_strcpy(sheet.autoctrl[pindex].input[inputIndex].typeName,argv[1]);
+//							rt_strcpy(sheet.autoctrl[pindex].input[inputIndex].senseName,argv[2]);
+//							rt_strcpy(sheet.autoctrl[pindex].input[inputIndex].ID,argv[3]);
+//							sheet.autoctrl[pindex].input[inputIndex].subName=subname;
+//              sheet.autoctrl[pindex].input[inputIndex].limit=limit;
+							if(subname==1){//A
+									if(limit==0){//下限
+											sheet.autoctrl[pindex].input[inputIndex].flag=&inpoutpFlag.modbusCrackMeter[i].tempLowFlag;
+											//inputIndex++;//
+											return true;// true;
+									}
+									else{
+											sheet.autoctrl[pindex].input[inputIndex].flag=&inpoutpFlag.modbusCrackMeter[i].tempUpFlag;
+											//inputIndex++;//return true;
+											return true;
+									}
+							}
+							else 	if(subname==2){//A
+									if(limit==0){//下限
+											sheet.autoctrl[pindex].input[inputIndex].flag=&inpoutpFlag.modbusCrackMeter[i].distancLowFlag;
+											//inputIndex++;//
+											return true;// true;
+									}
+									else{
+											sheet.autoctrl[pindex].input[inputIndex].flag=&inpoutpFlag.modbusCrackMeter[i].distancUpFlag;
+											//inputIndex++;//return true;
+											return true;
+									}
+							}
+					}
+			}
+			return false;
+}									
 //输入的指针配置
 static void autoctrlInputcfg(char*argv[])
 {
@@ -751,6 +791,8 @@ static void autoctrlInputcfg(char*argv[])
 													case WATERDEPTH:
 														ret=ctrlWaterConf(argv);
 													break;
+													case CRACKMETER:
+														ret=crackMeterConf(argv);
 													default:
 														rt_kprintf("%sERR:argv[2]>%d\n",sign,WATERDEPTH);
 													break;

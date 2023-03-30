@@ -157,6 +157,7 @@ static void  timeOutRunFun()
 				threeAxisRead2Send(gbNetState,false);
 				rt_kprintf("%sTHREEAXIS_TIMEout\r\n",task);
 				break;
+
 //			case  CH4_TIME:
 //				ch4Read2Send(gbNetState);
 //				break;
@@ -180,6 +181,10 @@ static void  timeOutRunFun()
 				break;
 			case  WATERDEPTH_TIME:
 				waterDepthRead2Send(gbNetState,false);
+				break;
+			case CRACKMETER_TIME:
+				crackMeterRead2Send(gbNetState,false);
+				rt_kprintf("%sTHREEAXIS_TIMEout\r\n",task);
 				break;
 			case  ANA_TEMPHUM_TIME:
 //				analogTempHumJsonPack(analogTemChanl);
@@ -212,6 +217,7 @@ void startTimeList()
 
 		timeInit(TEMPHUM_TIME, 		sheet.tempHumColTime,40);
 		timeInit(WATERDEPTH_TIME, sheet.waterDepthColTime,45);
+		timeInit(CRACKMETER_TIME, sheet.crackMeterColTime,50);
 	  //Æô¶¯ÎÂÊª¶È
 	  
 	  for(int i=0;i<ANALOG_NUM;i++){

@@ -148,9 +148,11 @@
 //V0.87    完善所有的modbus告警上报 20230325
 //v0.88    增加数字输入输出的开机上报与读取 20230327
 //V0.89    增加子站下发重启保存命令  20230328
-#define APP_VER       ((0<<8)+89)//0x0105 表示1.5版本
+//V0.90    增加crackMeter的modbus测试显示 后期厂家可能修改协议格式  
+//         修复lcd显示的出错，控件地址更改    20230330
+#define APP_VER       ((0<<8)+90)//0x0105 表示1.5版本
 
-const char date[]="20230328";
+const char date[]="20230330";
 
 //static    rt_thread_t tid 	= RT_NULL;
 static    rt_thread_t tidW5500 	  = RT_NULL;
