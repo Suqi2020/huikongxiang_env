@@ -205,7 +205,7 @@ typedef struct{
 #define PRESSSETTL_485_NUM    40
 #define CIRCULA_485_NUM   	  5
 #define PARTDISCHAG_485_NUM   5
-#define CRACKMETER_485_NUM    5
+#define CRACKMETER_485_NUM    20
 #ifdef  USE_4GAS
 #define CH4_485_NUM   			  GAS_NUM
 #define CO_485_NUM   				  GAS_NUM
@@ -264,18 +264,38 @@ typedef enum{
 }modbNumEnum;
 #endif
 #ifdef  USE_4GAS
+
+#ifndef     ANA_MASK
 typedef enum{
 		CIRCULA_TIME=0,PARTDISCHAG_TIME,PRESSSETTL_TIME,THREEAXIS_TIME,\
 	  CH4_TIME,O2_TIME,H2S_TIME,CO_TIME,\
 	  TEMPHUM_TIME,WATERDEPTH_TIME,CRACKMETER_TIME,\
+	  ANA_TEMPHUM_TIME,\
+	HEART_TIME,REG_TIME
+}upDataTimEnum;//需要与modbusName 名称一一对应 来实现代码精简高效
+#else
+typedef enum{
+		CIRCULA_TIME=0,PARTDISCHAG_TIME,PRESSSETTL_TIME,THREEAXIS_TIME,\
+	  CH4_TIME,O2_TIME,H2S_TIME,CO_TIME,\
+	  TEMPHUM_TIME,WATERDEPTH_TIME,CRACKMETER_TIME,\
+	HEART_TIME,REG_TIME
+}upDataTimEnum;//需要与modbusName 名称一一对应 来实现代码精简高效
+#endif
+#else
+
+#ifndef     ANA_MASK
+typedef enum{
+		CIRCULA_TIME=0,PARTDISCHAG_TIME,PRESSSETTL_TIME,THREEAXIS_TIME,\
+	  TEMPHUM_TIME,WATERDEPTH_TIME,\
 	  ANA_TEMPHUM_TIME,HEART_TIME,REG_TIME
 }upDataTimEnum;//需要与modbusName 名称一一对应 来实现代码精简高效
 #else
 typedef enum{
 		CIRCULA_TIME=0,PARTDISCHAG_TIME,PRESSSETTL_TIME,THREEAXIS_TIME,\
 	  TEMPHUM_TIME,WATERDEPTH_TIME,\
-	  ANA_TEMPHUM_TIME,HEART_TIME,REG_TIME
+	  HEART_TIME,REG_TIME
 }upDataTimEnum;//需要与modbusName 名称一一对应 来实现代码精简高效
+#endif
 #endif
 #ifdef  USE_4GAS
 
@@ -285,11 +305,17 @@ typedef enum{
 #endif
 
 #ifdef  USE_4GAS
-const static char  modbusName[MODBUS_NUM][NAME_LEN] ={"接地环流","局放","防沉降","防外破","甲烷","氧气","硫化氢","一氧化碳","温湿度","水位","裂缝仪"};
+const static char  modbusName[MODBUS_NUM][NAME_LEN] ={"HuanLiu","JuFang","FangChenJiang","FangWaiPo","JiaWan","YangQi","LiuHuaQing","YiYangHuaTan","WenShiDu","ShuiWei","LieFengYi"};
 const static int   modbusBps[MODBUS_NUM]      ={115200,   115200  ,9600,   9600,   9600,   9600,   9600,   9600,   9600,   9600,19200};
 #else
-const static char  modbusName[MODBUS_NUM][NAME_LEN] ={"接地环流","局放","防沉降","防外破","温湿度","水位","裂缝仪"};
+const static char  modbusName[MODBUS_NUM][NAME_LEN] ={"HuanLiu","JuFang","FangChenJiang","FangWaiPo","WenShiDu","ShuiWei","LieFengYi"};
 const static int   modbusBps[MODBUS_NUM]      ={115200,   115200  ,9600,   9600,     9600,   9600,19200};
+
+//const static char  modbusName[MODBUS_NUM][NAME_LEN] ={"接地环流","局放","防沉降","防外破","甲烷","氧气","硫化氢","一氧化碳","温湿度","水位","裂缝仪"};
+//const static int   modbusBps[MODBUS_NUM]      ={115200,   115200  ,9600,   9600,   9600,   9600,   9600,   9600,   9600,   9600,19200};
+//#else
+//const static char  modbusName[MODBUS_NUM][NAME_LEN] ={"接地环流","局放","防沉降","防外破","温湿度","水位","裂缝仪"};
+//const static int   modbusBps[MODBUS_NUM]      ={115200,   115200  ,9600,   9600,     9600,   9600,19200};
 
 #endif
 //const static int   modbusType[MODBUS_NUM]     ={1,        1,       2,      2, 		 3,  			3,  		3,  		3,  		3,  		3};//想同类型的modbus设备名称相同
@@ -326,7 +352,9 @@ typedef struct{
 			uint32_t  waterDepthColTime;
 			uint32_t  crackMeterColTime;
 ///////////////////////////////////////////////////
+#ifndef     ANA_MASK
 			analogStru analog[ANALOG_NUM];
+#endif
 ///////////////////////////////////////////////////
 //放入各种传感器上限下限值 start  跟modbusStru 一一对应
 			circuStru_p      modbusCircul[CIRCULA_485_NUM];
@@ -342,8 +370,9 @@ typedef struct{
 			tempHumStru_p	   modbusTempHum[TEMPHUM_485_NUM];
 			depthStru_p			 modbusWaterDepth[WATERDEPTH_485_NUM];
 			crackMeterStru_p modbusCrackMeter[CRACKMETER_485_NUM];
+		#ifndef     ANA_MASK
 			tempHumStru_p    analogTempHum;//不支持多路模拟温度传感器
-			
+		#endif
 //放入各种传感器上限下限值 end
   
 			autoCtrl_stru		 autoctrl[CRTL_TOTAL_NUM];

@@ -189,6 +189,7 @@
 //////////////////////////////////////////////////////////////
 //////////////////////////////////////////////////////////////
 //模拟传感器配置显示
+#ifndef     ANA_MASK
 #define        DISP_ANA_NAME_ADDR     	 					0x5200
 #define        DISP_ANA_SUBNAME_ADDR     					0x5208
 #define        DISP_ANA_ID_ADDR     		 					0x5210
@@ -218,6 +219,7 @@
 #define        KEY_ANAREAD_LAST_ADDR     					0x5270
 #define        KEY_ANAREAD_NEXT_ADDR     					0x5272
 #define        KEY_ANAREAD_DEL_ADDR     					0x5274
+#endif
 //#define        KEY_ANAREAD_RETURN_ADDR     0x5276
 //////////////////////////////////////////////////////////////
 //阈值

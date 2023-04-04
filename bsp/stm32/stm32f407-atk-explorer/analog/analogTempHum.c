@@ -12,6 +12,7 @@ float humi =0.00;
 
 char copyID[MODBID_LEN];//读取ana温湿度时候 顺便把ID拷贝出来
 //模拟的温湿度传感器读取温度湿度值并与阈值比较来做标记
+#ifndef     ANA_MASK
 bool anaTempHumWarn2Send();
 void  anaTempHumiReadAndSetFlag()
 {
@@ -285,3 +286,4 @@ void anaTempHumReadPack2Send(bool gbNetState,bool respFlag)
 					rt_mb_send_wait(&mbNetSendData, (rt_ubase_t)&packBuf,RT_WAITING_FOREVER);	
 		}
 }
+#endif

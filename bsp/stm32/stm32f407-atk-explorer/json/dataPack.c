@@ -25,9 +25,11 @@ extern void o2Read2Send(rt_bool_t netStat);
 extern void h2sRead2Send(rt_bool_t netStat);	
 extern void ch4Read2Send(rt_bool_t netStat);	
 extern void coRead2Send(rt_bool_t netStat);	
+extern void crackMeterRead2Send(rt_bool_t netStat,bool respFlag);
 //void analogTempHumJsonPack(uint8_t chanl);
+#ifndef     ANA_MASK
 extern void anaTempHumReadPack2Send(bool gbNetState,bool respFlag);
-
+#endif
 //extern uint8_t analogTemChanl;
 extern void gasJsonPack(rt_bool_t netStat,bool respFlag);
 
@@ -69,7 +71,7 @@ void  readModbusDataResp(char *monitor)
 				rt_kprintf("%sget 485 type err[%s]\r\n",sign,monitor);
 		}
 }
-
+#ifndef     ANA_MASK
 
 void  readAnaDataResp(char *monitor)
 {
@@ -81,3 +83,4 @@ void  readAnaDataResp(char *monitor)
 				rt_kprintf("%sget ana type err[%s]\r\n",sign,monitor);
 		}
 }
+#endif

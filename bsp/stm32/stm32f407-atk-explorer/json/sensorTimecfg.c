@@ -56,6 +56,7 @@ void senseTimeReadJsonResp(char *string,bool  modbusFlag)
 					}
 		}
 		else{
+			#ifndef     ANA_MASK
 				cJSON_AddStringToObject(root,"packetType","PROPERTIES_ANATTIM_GET_RESP");
 				if(rt_strcmp(string,"temperature_and_humidity_monitor")==0){
 						result=true;
@@ -68,6 +69,7 @@ void senseTimeReadJsonResp(char *string,bool  modbusFlag)
 								}
 						}
 					}
+	  	#endif
 		}
 	  cJSON_AddStringToObject(root, "acuId",(char *)packFlash.acuId);
 		cJSON_AddStringToObject(root, "identifier",string);
@@ -185,6 +187,7 @@ void senseTimeJsonSet(cJSON   *Json,bool  modbusFlag)
 					}
 		}
 		else{
+		#ifndef     ANA_MASK
 				cJSON_AddStringToObject(root,"packetType","PROPERTIES_ANATTIM_SET_RESP");
 				if(rt_strcmp(string,"temperature_and_humidity_monitor")==0){
 						result=true;
@@ -196,6 +199,7 @@ void senseTimeJsonSet(cJSON   *Json,bool  modbusFlag)
 								}
 						}
 					}
+			#endif
 		}
 	  cJSON_AddStringToObject(root, "acuId",(char *)packFlash.acuId);
 		cJSON_AddStringToObject(root, "identifier",string);

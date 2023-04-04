@@ -150,9 +150,11 @@
 //V0.89    增加子站下发重启保存命令  20230328
 //V0.90    增加crackMeter的modbus测试显示 后期厂家可能修改协议格式  
 //         修复lcd显示的出错，控件地址更改    20230330
-#define APP_VER       ((0<<8)+90)//0x0105 表示1.5版本
-
-const char date[]="20230330";
+//V0.91    增加自动控制json数据解析 20230404
+#define APP_VER       ((0<<8)+91)//0x0105 表示1.5版本
+//注：本代码中json格式解析非UTF8_格式代码（GB2312格式中文） 会导致解析失败
+//    打印log如下 “[dataPhrs]err:json cannot phrase”  20230403
+const char date[]="20230404";
 
 //static    rt_thread_t tid 	= RT_NULL;
 static    rt_thread_t tidW5500 	  = RT_NULL;

@@ -401,7 +401,9 @@ void  autoCtrlTask(void *para)
 //		}
 //		rt_thread_mdelay(1000);
 	  extern void printModbusDevList();
+	#ifndef     ANA_MASK
 	  extern void prinfAnalogList();
+	#endif
 	  extern void printfDIList();
 	  extern void printfOutputList();
 		extern void printfThresholdList();
@@ -409,7 +411,9 @@ void  autoCtrlTask(void *para)
 	  extern void printAcuid();
 	  printAcuid();
 		printModbusDevList();
+	#ifndef     ANA_MASK
 	  prinfAnalogList();
+	#endif
 	  printfDIList();
 	  printfOutputList();
 		printfThresholdList();

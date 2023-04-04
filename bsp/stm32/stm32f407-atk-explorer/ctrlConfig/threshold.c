@@ -11,6 +11,7 @@ const static char sign[]="[threshold]";
 void printfThresholdList()
 {
 	  int i;
+	#ifndef     ANA_MASK
 		for(int j=0;j<ANALOG_NUM;j++){//查一遍 找到 温湿度的模拟阈值
 			  if(sheet.analog[j].workFlag==RT_TRUE){
 						//if(rt_strcmp(sheet.analog[j].name,analogName[i])==0){
@@ -18,7 +19,7 @@ void printfThresholdList()
 								rt_kprintf("%s ",sheet.analog[j].name);
 								rt_kprintf("%s ",sheet.analog[j].ID);
 								rt_kprintf("2 ");
-								rt_kprintf("%d ",sheet.analog[j].subName);
+								rt_kprintf("%s ",sheet.analog[j].subName);
 							  if(sheet.analog[j].subName==1){//温度
 										
 										rt_kprintf("%0.2f ",sheet.analogTempHum.tempLowLimit);
@@ -33,7 +34,7 @@ void printfThresholdList()
 						}
 				
 		}
-		
+		#endif
 		
 		for(i=0;i<CIRCULA_485_NUM;i++){
 				if(sheet.cirCula[i].workFlag==RT_TRUE){//找到工作的设备  环流需要连续打印三次
@@ -310,6 +311,7 @@ void printfThresholdList()
 }
 //与modbus传感器不同之处在于 除了判断ID还需要判断子选项
 //模拟传感器阈值配置
+#ifndef     ANA_MASK
 bool  analogThresholdConfig(int num,char *ID,int sensorSubName,float upLimit,float lowLimit)
 { 
 		switch(num)
@@ -335,6 +337,7 @@ bool  analogThresholdConfig(int num,char *ID,int sensorSubName,float upLimit,flo
 		}
 		return false;
 }
+#endif
 //modbus设备  输入依次为 传感器种类 ID号 传感器类型  上限制  下限制
 //modbus传感器阈值配置
 bool   modbusThresholdConfig(int num,char *ID,int sensorSubName,float upLimit,float lowLimit)
@@ -634,6 +637,7 @@ static void threshold(int argc,char *argv[])
 						}
 				}
 		}
+#ifndef     ANA_MASK
 		if(sensorType==2){//analog传感器
 			  int i=0;
 			  for(i=0;i<ANALOGNAME_NUM;i++){
@@ -648,6 +652,7 @@ static void threshold(int argc,char *argv[])
 						}
 				}	
 		}
+#endif
 		return;
 		ERR:
 		rt_kprintf("%sfor example\n",sign);

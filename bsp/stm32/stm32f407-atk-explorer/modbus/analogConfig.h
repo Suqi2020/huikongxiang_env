@@ -2,6 +2,8 @@
 #define   _ANALOGCONFIG_H_
 
 #include  "board.h"
+
+#ifndef     ANA_MASK
 #define   ANALOGNAME_NUM      1
 ////////////////////////////////////////////////////////////////////////////
 const static char  analogName[ANALOGNAME_NUM][NAME_LEN]={"温湿度"};
@@ -24,7 +26,7 @@ typedef struct{
 	  uint8_t   	port;
 	  rt_bool_t 	workFlag;
 	  uint32_t   	colTime;
-	  uint8_t     subName;//子选项  比如温湿度中的 温度 湿度
+	  char     subName;//子选项  比如温湿度中的 温度 湿度
 	  uint8_t     rev[3];
 }analogStru;
 
@@ -37,7 +39,7 @@ extern uint16_t Get_Adc_Average(uint16_t ch,uint16_t times);
 
 
 
-
+#endif
 
 
 

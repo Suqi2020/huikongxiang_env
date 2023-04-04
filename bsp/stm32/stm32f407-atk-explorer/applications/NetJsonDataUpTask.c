@@ -93,13 +93,16 @@ extern void h2sRead2Send(rt_bool_t netStat);
 extern void ch4Read2Send(rt_bool_t netStat);	
 extern void coRead2Send(rt_bool_t netStat);	
 //void analogTempHumJsonPack(uint8_t chanl);
+#ifndef     ANA_MASK
 extern void anaTempHumReadPack2Send(bool gbNetState,bool respFlag);
-uint16_t devRegJsonPack(void);
-uint16_t heartUpJsonPack(void);
+#endif
+extern  uint16_t devRegJsonPack(void);
+extern  uint16_t heartUpJsonPack(void);
 //extern uint8_t analogTemChanl;
 extern void gasJsonPack(rt_bool_t netStat,bool respFlag);
-uint16_t digitalInputReport(void);
-uint16_t digitalOutputReport(char *identify);
+extern  uint16_t digitalInputReport(void);
+extern  uint16_t digitalOutputReport(char *identify);
+extern  void crackMeterRead2Send(rt_bool_t netStat,bool respFlag);
 //定时时间到  执行相应事件
 static void  timeOutRunFun()
 {
@@ -186,11 +189,13 @@ static void  timeOutRunFun()
 				crackMeterRead2Send(gbNetState,false);
 				rt_kprintf("%sTHREEAXIS_TIMEout\r\n",task);
 				break;
+#ifndef     ANA_MASK
 			case  ANA_TEMPHUM_TIME:
 //				analogTempHumJsonPack(analogTemChanl);
 			  anaTempHumReadPack2Send(gbNetState,false);
 		
 				break;
+#endif
 			default:
 				break;
 		}
@@ -219,7 +224,7 @@ void startTimeList()
 		timeInit(WATERDEPTH_TIME, sheet.waterDepthColTime,45);
 		timeInit(CRACKMETER_TIME, sheet.crackMeterColTime,50);
 	  //启动温湿度
-	  
+#ifndef     ANA_MASK
 	  for(int i=0;i<ANALOG_NUM;i++){
 				if(rt_strcmp(sheet.analog[i].name,analogName[0])==0){//用 analogName[0]  指明是温湿度
 					  if(sheet.analog[i].workFlag==RT_TRUE){
@@ -230,6 +235,7 @@ void startTimeList()
 						break;
 				}
 		}
+#endif
 }
 
 //char nihao[]="你好局放防沉降防外破";

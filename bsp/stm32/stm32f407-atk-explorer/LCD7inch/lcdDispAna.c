@@ -9,6 +9,7 @@
  */
 
 #include "7inchRegist.h"
+#ifndef     ANA_MASK
 const static char sign[]="[LCDDispAna]";
 
 
@@ -318,4 +319,4 @@ void  dispReadAna()
 		buf=RT_NULL;
 }
 
-
+#endif

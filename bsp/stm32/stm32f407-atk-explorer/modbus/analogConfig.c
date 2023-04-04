@@ -1,4 +1,6 @@
 #include "board.h"
+
+#ifndef     ANA_MASK
 const static char sign[]="[analogConfig]";
 
 //打印analog所有设备
@@ -111,3 +113,4 @@ MSH_CMD_EXPORT(analog,analog config);//FINSH_FUNCTION_EXPORT_CMD
 
 
 
+#endif

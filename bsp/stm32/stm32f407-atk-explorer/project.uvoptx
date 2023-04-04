@@ -157,66 +157,50 @@
         <Bp>
           <Number>0</Number>
           <Type>0</Type>
-          <LineNumber>220</LineNumber>
+          <LineNumber>612</LineNumber>
           <EnabledFlag>1</EnabledFlag>
-          <Address>134421312</Address>
+          <Address>134429694</Address>
           <ByteObject>0</ByteObject>
           <HtxType>0</HtxType>
           <ManyObjects>0</ManyObjects>
           <SizeOfObject>0</SizeOfObject>
           <BreakByAccess>0</BreakByAccess>
           <BreakIfRCount>1</BreakIfRCount>
-          <Filename>applications\NetJsonDataUpTask.c</Filename>
+          <Filename>.\modbus\modbusConfig.c</Filename>
           <ExecCommand></ExecCommand>
-          <Expression>\\rt_thread\applications/NetJsonDataUpTask.c\220</Expression>
+          <Expression>\\rt_thread\modbus/modbusConfig.c\612</Expression>
         </Bp>
         <Bp>
           <Number>1</Number>
           <Type>0</Type>
-          <LineNumber>186</LineNumber>
+          <LineNumber>602</LineNumber>
           <EnabledFlag>1</EnabledFlag>
-          <Address>134431476</Address>
+          <Address>134429632</Address>
           <ByteObject>0</ByteObject>
           <HtxType>0</HtxType>
           <ManyObjects>0</ManyObjects>
           <SizeOfObject>0</SizeOfObject>
           <BreakByAccess>0</BreakByAccess>
           <BreakIfRCount>1</BreakIfRCount>
-          <Filename>applications\NetJsonDataUpTask.c</Filename>
+          <Filename>.\modbus\modbusConfig.c</Filename>
           <ExecCommand></ExecCommand>
-          <Expression>\\rt_thread\applications/NetJsonDataUpTask.c\186</Expression>
+          <Expression>\\rt_thread\modbus/modbusConfig.c\602</Expression>
         </Bp>
         <Bp>
           <Number>2</Number>
           <Type>0</Type>
-          <LineNumber>784</LineNumber>
+          <LineNumber>604</LineNumber>
           <EnabledFlag>1</EnabledFlag>
-          <Address>134419624</Address>
+          <Address>134429654</Address>
           <ByteObject>0</ByteObject>
           <HtxType>0</HtxType>
           <ManyObjects>0</ManyObjects>
           <SizeOfObject>0</SizeOfObject>
           <BreakByAccess>0</BreakByAccess>
           <BreakIfRCount>1</BreakIfRCount>
-          <Filename>.\LCD7inch\lcdDispModbus.c</Filename>
+          <Filename>.\modbus\modbusConfig.c</Filename>
           <ExecCommand></ExecCommand>
-          <Expression>\\rt_thread\LCD7inch/lcdDispModbus.c\784</Expression>
-        </Bp>
-        <Bp>
-          <Number>3</Number>
-          <Type>0</Type>
-          <LineNumber>770</LineNumber>
-          <EnabledFlag>1</EnabledFlag>
-          <Address>134419604</Address>
-          <ByteObject>0</ByteObject>
-          <HtxType>0</HtxType>
-          <ManyObjects>0</ManyObjects>
-          <SizeOfObject>0</SizeOfObject>
-          <BreakByAccess>0</BreakByAccess>
-          <BreakIfRCount>1</BreakIfRCount>
-          <Filename>.\LCD7inch\lcdDispModbus.c</Filename>
-          <ExecCommand></ExecCommand>
-          <Expression>\\rt_thread\LCD7inch/lcdDispModbus.c\770</Expression>
+          <Expression>\\rt_thread\modbus/modbusConfig.c\604</Expression>
         </Bp>
       </Breakpoint>
       <WatchWindow1>
@@ -364,6 +348,21 @@
           <count>28</count>
           <WinNumber>1</WinNumber>
           <ItemText>TYPE</ItemText>
+        </Ww>
+        <Ww>
+          <count>29</count>
+          <WinNumber>1</WinNumber>
+          <ItemText>argv</ItemText>
+        </Ww>
+        <Ww>
+          <count>30</count>
+          <WinNumber>1</WinNumber>
+          <ItemText>argv</ItemText>
+        </Ww>
+        <Ww>
+          <count>31</count>
+          <WinNumber>1</WinNumber>
+          <ItemText>limit</ItemText>
         </Ww>
       </WatchWindow1>
       <WatchWindow2>
@@ -1108,7 +1107,7 @@
 
   <Group>
     <GroupName>Json</GroupName>
-    <tvExp>0</tvExp>
+    <tvExp>1</tvExp>
     <tvExpOptDlg>0</tvExpOptDlg>
     <cbSel>0</cbSel>
     <RteFlg>0</RteFlg>
@@ -1272,7 +1271,7 @@
 
   <Group>
     <GroupName>Kernel</GroupName>
-    <tvExp>1</tvExp>
+    <tvExp>0</tvExp>
     <tvExpOptDlg>0</tvExpOptDlg>
     <cbSel>0</cbSel>
     <RteFlg>0</RteFlg>
@@ -1436,7 +1435,7 @@
 
   <Group>
     <GroupName>LCD7inch</GroupName>
-    <tvExp>1</tvExp>
+    <tvExp>0</tvExp>
     <tvExpOptDlg>0</tvExpOptDlg>
     <cbSel>0</cbSel>
     <RteFlg>0</RteFlg>
@@ -1552,7 +1551,7 @@
 
   <Group>
     <GroupName>Libraries</GroupName>
-    <tvExp>1</tvExp>
+    <tvExp>0</tvExp>
     <tvExpOptDlg>0</tvExpOptDlg>
     <cbSel>0</cbSel>
     <RteFlg>0</RteFlg>
@@ -1872,7 +1871,7 @@
 
   <Group>
     <GroupName>Modbus</GroupName>
-    <tvExp>1</tvExp>
+    <tvExp>0</tvExp>
     <tvExpOptDlg>0</tvExpOptDlg>
     <cbSel>0</cbSel>
     <RteFlg>0</RteFlg>

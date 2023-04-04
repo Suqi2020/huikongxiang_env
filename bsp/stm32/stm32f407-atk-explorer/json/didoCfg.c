@@ -457,7 +457,7 @@ uint16_t digitalOutputSetResp(cJSON *Json,char *identify)
 	
 		char* out = NULL;
 		//创建数组
-		cJSON* Array = NULL;
+//		cJSON* Array = NULL;
 		// 创建JSON Object  
 		cJSON* root = NULL;
 		//cJSON* nodeobj = NULL;

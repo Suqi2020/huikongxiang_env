@@ -938,7 +938,7 @@ static void modbus(int argc, char *argv[])
 		ERR:
 		rt_kprintf("%sfor example:modbus+设备名称(波特率)+ID+model+端口(port1-port4)+设备地址(0/255-关闭设备)+采集间隔(秒)\n",sign);
 		rt_kprintf("%sNOTE:括号内对参数进行解释,不需要输入\n",sign);
-		rt_kprintf("%smodebus list\n",sign);
+		rt_kprintf("%smodbus list\n",sign);
 }
 //FINSH_FUNCTION_EXPORT(modbus, offline finsh);//FINSH_FUNCTION_EXPORT_CMD
 MSH_CMD_EXPORT(modbus,port slaveaddr config);//FINSH_FUNCTION_EXPORT_CMD

@@ -23,16 +23,16 @@ typedef struct{
 	  char  typeName[INOUTNAME_LEN];//如果长度大于  8
 	  char  senseName[20]; 
 	  char  ID[MODBID_LEN];//20
-	  char  subName;
-	  char  limit;
-	 // char  rev[3];
+	  char  subName[20];
+	  int  limit;
+	  //char  rev[2];
 	  uint32_t  *flag;
 }ctrlInOutStru;//本结构体存储为了查看已经设置成功的逻辑控制列表
 
 typedef struct{
-	ctrlInOutStru input[CRTL_IN_NUM];
-	ctrlInOutStru output[CRTL_OUT_NUM];
-	uint8_t workFlag; //1 设置成功  其他-失败
+		ctrlInOutStru input[CRTL_IN_NUM];
+		ctrlInOutStru output[CRTL_OUT_NUM];
+		uint8_t workFlag; //1 设置成功  其他-失败
 }autoCtrl_stru;
 
 

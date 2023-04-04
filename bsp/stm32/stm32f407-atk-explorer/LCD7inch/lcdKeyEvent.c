@@ -81,8 +81,10 @@ void dispName(void);
 void dispSubName(void);
 void nextSubName(void);
 void lastSubName(void);
+#ifndef     ANA_MASK
 void lcdAnaConfig(void);
 void  delOneAna(void);
+#endif
 //按键触发总接口
 void  keyReturn(uint16_t keyAddr)
 {
@@ -333,12 +335,11 @@ void  keyReturn(uint16_t keyAddr)
 			///////////output_end///////////////
 //#define        KEY_ANA_SUBNAME_INTERFACE_ADDR     0x522C
 //#define        KEY_ANA_SURE_ADDR     0x522E
+	#ifndef     ANA_MASK
 			case   KEY_ANA_LOOK_ADDR :
 				getAnaTotalNum();
 			  dispReadAna();
 				break;
-			
-			
 			case  KEY_ANA_NAME_INTERFACE_ADDR:
 				dispName();
 				break;
@@ -357,10 +358,6 @@ void  keyReturn(uint16_t keyAddr)
 				nextSubName();
 				dispSubName();
 				break;
-
-			
-			
-			
 			case   KEY_ANAREAD_LAST_ADDR:
 				lastReadAna();
 			  dispReadAna();
@@ -374,6 +371,7 @@ void  keyReturn(uint16_t keyAddr)
 				getAnaTotalNum();
 			  dispReadAna();
 				break;
+		#endif
 		//开关控制end
 		}
 		rt_free(buf);
@@ -540,6 +538,7 @@ void LCDDispConfig(uint8_t *recBuf,int len)
 			case DISP_OUTPUT_PORT_ADDR:
 				lcdCopyOutputPort(recBuf);
 				break;
+#ifndef     ANA_MASK
 			case DISP_ANA_ID_ADDR:
 				lcdCopyAnaID(recBuf);
 				break;
@@ -552,7 +551,7 @@ void LCDDispConfig(uint8_t *recBuf,int len)
 			case DISP_ANA_TIME_ADDR:
 				lcdCopyAnaTime(recBuf);
 				break;
-			
+#endif
 		}
 }
 

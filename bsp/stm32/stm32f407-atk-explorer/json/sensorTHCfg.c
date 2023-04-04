@@ -353,6 +353,7 @@ void senseTHGetJsonResp(cJSON   *Json,bool modbusFlag)
 				}
 		}
 		else{
+			#ifndef     ANA_MASK
 				cJSON_AddStringToObject(root,"packetType","PROPERTIES_ANATH_GET_RESP");
 				if(rt_strcmp(string,"temperature_and_humidity_monitor")==0){
 						arrayNew = cJSON_CreateArray();
@@ -385,6 +386,7 @@ void senseTHGetJsonResp(cJSON   *Json,bool modbusFlag)
 							 }
 						}
 				}
+				#endif
 		}
 		if(result==true){
 			
@@ -690,6 +692,7 @@ void senseTHSetJsonResp(cJSON   *Json,bool  modbusFlag)
 				}
 		}
 		else{
+			#ifndef     ANA_MASK
 				cJSON_AddStringToObject(root,"packetType","PROPERTIES_ANATH_SET_RESP");
 				if(rt_strcmp(string,"temperature_and_humidity_monitor")==0){
 						for(int i=0;i<arrayGet_size;i++)
@@ -714,6 +717,7 @@ void senseTHSetJsonResp(cJSON   *Json,bool  modbusFlag)
 							 }
 						}
 				}
+				#endif
 		}
 		if(result==true){
 			

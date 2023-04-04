@@ -13,7 +13,7 @@ uint16_t resetMcuResp(cJSON *Json)
 {
 		char* out = NULL;
 		//创建数组
-		cJSON* Array = NULL;
+//		cJSON* Array = NULL;
 		// 创建JSON Object  
 		cJSON* root = NULL;
 		//cJSON* nodeobj = NULL;
@@ -21,7 +21,7 @@ uint16_t resetMcuResp(cJSON *Json)
 		root = cJSON_CreateObject();
 		if (root == NULL) return 0;
 		// 加入节点（键值对）
-		bool rspFlag=false;
+//		bool rspFlag=false;
 		cJSON_AddNumberToObject(root, "mid",respMid);
 		cJSON_AddStringToObject(root, "packetType","SERVICES_ACU_REBOOT_RESP");
 		char *sprinBuf=RT_NULL;
@@ -77,7 +77,7 @@ uint16_t resetDeviceResp(cJSON *Json,char *identify)
 	  int devRstNum=0;
 		char* out = NULL;
 		//创建数组
-		cJSON* Array = NULL;
+//		cJSON* Array = NULL;
 		// 创建JSON Object  
 		cJSON* root = NULL;
 		root = cJSON_CreateObject();
@@ -204,12 +204,14 @@ uint16_t resetDeviceResp(cJSON *Json,char *identify)
 								}
 					}
 					else if(rt_strcmp(identify,"temperature_and_humidity_monitor")==0){
+	#ifndef     ANA_MASK
 								for(int j=0;j<ANALOG_NUM;j++){//核对有没有配置过
 										if(0==rt_strcmp(sheet.analog[j].ID,devID->valuestring)){
 												rt_kprintf("%sanalog rst ok id[%s],port[%d]\n",sign,sheet.analog[j].ID,sheet.analog[j].port);
 												++devRstNum;
 										}
 							 }
+	#endif
 								for(int j=0;j<TEMPHUM_485_NUM;j++){//核对有没有配置过
 										if(0==rt_strcmp(sheet.tempHum[j].ID,devID->valuestring)){
 												rt_kprintf("%sanalog rst ok id[%s],port[%d]\n",sign,sheet.tempHum[j].ID,sheet.tempHum[j].useUartNum);
@@ -284,7 +286,7 @@ uint16_t saveMcuResp()
 	
 		char* out = NULL;
 		//创建数组
-		cJSON* Array = NULL;
+//		cJSON* Array = NULL;
 		// 创建JSON Object  
 		cJSON* root = NULL;
 		//cJSON* nodeobj = NULL;
@@ -292,7 +294,7 @@ uint16_t saveMcuResp()
 		root = cJSON_CreateObject();
 		if (root == NULL) return 0;
 		// 加入节点（键值对）
-		bool rspFlag=false;
+//		bool rspFlag=false;
 
 		cJSON_AddNumberToObject(root, "mid",respMid);
 		cJSON_AddStringToObject(root, "packetType","SERVICES_SAVE_RESP");
@@ -351,3 +353,5 @@ uint16_t saveMcuResp()
 	  return len;
 
 }
+
+

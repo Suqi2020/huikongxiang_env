@@ -562,6 +562,7 @@ uint16_t devRegJsonPack()
 		int i,j;
 		bool  add=true;
 ////////////////////////////////////////////////模拟数据打包////////////////////////////////////////////////////
+#ifndef     ANA_MASK
 		for(i=0;i<ANALOG_NUM;i++){
 			  add=true;
 				if(i>=1){
@@ -583,6 +584,7 @@ uint16_t devRegJsonPack()
 						cJSON_AddItemToObject(nodeobj,"deviceId",cJSON_CreateString(sheet.analog[i].ID));
 				}
 		 }
+#endif
 ////////////////////////////////////////////////数字输入打包////////////////////////////////////////////////////
 		 for(i=0;i<DI_NUM;i++){
 			  add=true;
