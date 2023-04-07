@@ -43,7 +43,7 @@ static void threeAxisUartSend(int num,uint8_t *buf,int len)
 ///////////////////////////////////////读写寄存器相关操作////////////////////////////////////////
 
 //与压差式传感器共用一个读命令
-extern uint8_t psReadReg(uint16_t slavAddr,uint16_t regAddr,uint16_t len,uint8_t * out);
+extern uint8_t tongHeModbusRead(uint16_t slavAddr,uint16_t regAddr,uint16_t len,uint8_t * out);
 
 //三轴比较阈值并设置相应的flag标记
 static void threeAccCheckSetFlag(int num)
@@ -102,7 +102,7 @@ void readThreeTempAcc(int num)
 	  uint8_t offset=3;//add+regadd+len
 	  uint8_t  *buf = RT_NULL;
 		buf = rt_malloc(LENTH);
-	  uint16_t len = psReadReg(sheet.threeAxiss[num].slaveAddr,0X0001,4,buf);
+	  uint16_t len = tongHeModbusRead(sheet.threeAxiss[num].slaveAddr,0X0001,4,buf);
 		rt_mutex_take(uartDev[sheet.threeAxiss[num].useUartNum].uartMutex,RT_WAITING_FOREVER);
 	  //485发送buf  len  等待modbus回应
 		threeAxisUartSend(num,buf,len);

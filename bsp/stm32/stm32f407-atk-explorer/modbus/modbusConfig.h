@@ -306,16 +306,16 @@ typedef enum{
 
 #ifdef  USE_4GAS
 const static char  modbusName[MODBUS_NUM][NAME_LEN] ={"HuanLiu","JuFang","FangChenJiang","FangWaiPo","JiaWan","YangQi","LiuHuaQing","YiYangHuaTan","WenShiDu","ShuiWei","LieFengYi"};
-const static int   modbusBps[MODBUS_NUM]      ={115200,   115200  ,9600,   9600,   9600,   9600,   9600,   9600,   9600,   9600,19200};
+const static int   modbusBps[MODBUS_NUM]      ={115200,   115200  ,9600,   9600,   9600,   9600,   9600,   9600,   9600,   9600,9600};
 #else
 const static char  modbusName[MODBUS_NUM][NAME_LEN] ={"HuanLiu","JuFang","FangChenJiang","FangWaiPo","WenShiDu","ShuiWei","LieFengYi"};
-const static int   modbusBps[MODBUS_NUM]      ={115200,   115200  ,9600,   9600,     9600,   9600,19200};
+const static int   modbusBps[MODBUS_NUM]      ={115200,   115200  ,9600,   9600,     9600,   9600,9600};
 
 //const static char  modbusName[MODBUS_NUM][NAME_LEN] ={"接地环流","局放","防沉降","防外破","甲烷","氧气","硫化氢","一氧化碳","温湿度","水位","裂缝仪"};
-//const static int   modbusBps[MODBUS_NUM]      ={115200,   115200  ,9600,   9600,   9600,   9600,   9600,   9600,   9600,   9600,19200};
+//const static int   modbusBps[MODBUS_NUM]      ={115200,   115200  ,9600,   9600,   9600,   9600,   9600,   9600,   9600,   9600,9600};
 //#else
 //const static char  modbusName[MODBUS_NUM][NAME_LEN] ={"接地环流","局放","防沉降","防外破","温湿度","水位","裂缝仪"};
-//const static int   modbusBps[MODBUS_NUM]      ={115200,   115200  ,9600,   9600,     9600,   9600,19200};
+//const static int   modbusBps[MODBUS_NUM]      ={115200,   115200  ,9600,   9600,     9600,   9600,960};
 
 #endif
 //const static int   modbusType[MODBUS_NUM]     ={1,        1,       2,      2, 		 3,  			3,  		3,  		3,  		3,  		3};//想同类型的modbus设备名称相同

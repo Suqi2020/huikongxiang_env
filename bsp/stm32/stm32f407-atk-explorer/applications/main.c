@@ -151,10 +151,11 @@
 //V0.90    增加crackMeter的modbus测试显示 后期厂家可能修改协议格式  
 //         修复lcd显示的出错，控件地址更改    20230330
 //V0.91    增加自动控制json数据解析 20230404
-#define APP_VER       ((0<<8)+91)//0x0105 表示1.5版本
+//V0.92    裂缝仪厂家更改为标准modbus协议 代码加入测试 20230407
+#define APP_VER       ((0<<8)+92)//0x0105 表示1.5版本
 //注：本代码中json格式解析非UTF8_格式代码（GB2312格式中文） 会导致解析失败
 //    打印log如下 “[dataPhrs]err:json cannot phrase”  20230403
-const char date[]="20230404";
+const char date[]="20230407";
 
 //static    rt_thread_t tid 	= RT_NULL;
 static    rt_thread_t tidW5500 	  = RT_NULL;

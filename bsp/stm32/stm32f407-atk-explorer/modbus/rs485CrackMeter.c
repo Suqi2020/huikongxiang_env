@@ -10,11 +10,11 @@ typedef struct{
 	  //float temp;//除以100 传输float类型  单位0C
 	   union {
 				float flotVal;
-				int   intVal;
+				uint32_t   intVal;
 		} distanc;
 		 union {
 				float flotVal;
-				int   intVal;
+				uint32_t   intVal;
 		} temp;
 		uint8_t respStat;
 //float height;//除以10 传输float类型  单位mm
@@ -35,20 +35,20 @@ static void  crackMeterUartSend(int num,uint8_t *buf,int len)
 
 
 
-uint8_t crkMetReadReg(uint16_t slavAddr,uint8_t * out)
-{
-		int i=0;
-	  out[i]=(uint8_t)(slavAddr>>8);				i++;
-	  out[i]=(uint8_t)slavAddr;      	i++;
-	  out[i]=0x83;   									i++;
-	  out[i]=0x02;       							i++;
-		out[i]=0x03;       							i++;
-	  out[i]=0x04;       							i++;
-	  uint16_t crcRet=RTU_CRC(out ,i);
-	  out[i]=(uint8_t)(crcRet>>8);    i++;
-	  out[i]=crcRet;       						i++;
-		return i;
-}
+//uint8_t crkMetReadReg(uint16_t slavAddr,uint8_t * out)
+//{
+//		int i=0;
+//	  out[i]=(uint8_t)(slavAddr>>8);				i++;
+//	  out[i]=(uint8_t)slavAddr;      	i++;
+//	  out[i]=0x83;   									i++;
+//	  out[i]=0x02;       							i++;
+//		out[i]=0x03;       							i++;
+//	  out[i]=0x04;       							i++;
+//	  uint16_t crcRet=RTU_CRC(out ,i);
+//	  out[i]=(uint8_t)(crcRet>>8);    i++;
+//	  out[i]=crcRet;       						i++;
+//		return i;
+//}
 //沉降仪比较阈值并设置相应的flag标记
 static void pressStlCheckSetFlag(int num)
 {
@@ -76,15 +76,14 @@ static void pressStlCheckSetFlag(int num)
 
 }
 
-
-
+extern uint8_t tongHeModbusRead(uint16_t slavAddr,uint16_t regAddr,uint16_t len,uint8_t * out);
 //读取沉降仪的温度和高度
 void readCrackMeter(int num)
 {
 	  //uint8_t offset=3;//add+regadd+len
 	  uint8_t  *buf = RT_NULL;
 		buf = rt_malloc(LENTH);
-	  uint16_t len = crkMetReadReg(sheet.crackMeter[num].slaveAddr,buf);
+	  uint16_t len = tongHeModbusRead(sheet.crackMeter[num].slaveAddr,0x0001,2,buf);
 		rt_mutex_take(uartDev[sheet.crackMeter[num].useUartNum].uartMutex,RT_WAITING_FOREVER);
 	  //485发送buf  len  等待modbus回应
 		crackMeterUartSend(num,buf,len);
@@ -109,15 +108,25 @@ void readCrackMeter(int num)
 		//提取环流值 第一步判断crc 第二部提取
 		int ret2=modbusRespCheck(sheet.crackMeter[num].slaveAddr,buf,len,RT_TRUE);
 		if(0 == ret2){//刷新读取到的值
-        int offset =7;//FF FE 84 0B 02 03 04 3E 5F 70 00 41 F5 00 00 FF 8B
+        int offset =3;//   2 4 8 3b ae fe 70 41 d4 0 0 26 35 
         //int temp	=(buf[offset]<<8)+buf[offset+1];offset+=2;
-			  crackMeter[num].distanc.intVal=(buf[offset]<24)+(buf[offset+1]<<16)+(buf[offset+2]<<8)+buf[offset+3];
+			  crackMeter[num].distanc.intVal=(uint32_t)((uint32_t)buf[offset]<<24)+((uint32_t)buf[offset+1]<<16)+((uint32_t)buf[offset+2]<<8)+buf[offset+3];
 			  offset+=4;
-			  crackMeter[num].temp.intVal   =(buf[offset]<24)+(buf[offset+1]<<16)+(buf[offset+2]<<8)+buf[offset+3];
+			  crackMeter[num].temp.intVal   =(uint32_t)((uint32_t)buf[offset]<<24)+((uint32_t)buf[offset+1]<<16)+((uint32_t)buf[offset+2]<<8)+buf[offset+3];
 				crackMeter[num].respStat=1;
 				pressStlCheckSetFlag(num);
+		if(len!=0){
+				rt_kprintf("%srec2:",sign);
+				for(int j=0;j<len;j++){
+						rt_kprintf("%x ",buf[j]);
+				}
+				rt_kprintf("\n");
+		}	 
+
+			//rt_kprintf("%stemp:0x%x*C distance:0x%xmm read ok\n",sign,crackMeter[num].temp.intVal,crackMeter[num].distanc.intVal); 			
+	
+			  rt_kprintf("%stemp:%0.8f*C distance:%0.8fmm read ok\n",sign,crackMeter[num].temp.flotVal,crackMeter[num].distanc.flotVal);
 			
-			  rt_kprintf("%stemp:%0.2f*C distance:%0.1fmm read ok\n",sign,crackMeter[num].temp,crackMeter[num].distanc.flotVal);  
 		} 
 		else{//读不到给0
 				if(ret2==2){

@@ -34,7 +34,7 @@ static void pressSettlUartSend(int num,uint8_t *buf,int len)
 
 
 
-uint8_t psReadReg(uint16_t slavAddr,uint16_t regAddr,uint16_t len,uint8_t * out)
+uint8_t tongHeModbusRead(uint16_t slavAddr,uint16_t regAddr,uint16_t len,uint8_t * out)
 {
 		int i=0;
 	  out[i]=slavAddr;					 			i++;
@@ -84,7 +84,7 @@ void readPSTempHeight(int num)
 	  uint8_t offset=3;//add+regadd+len
 	  uint8_t  *buf = RT_NULL;
 		buf = rt_malloc(LENTH);
-	  uint16_t len = psReadReg(sheet.pressSetl[num].slaveAddr,0X0001,2,buf);
+	  uint16_t len = tongHeModbusRead(sheet.pressSetl[num].slaveAddr,0X0001,2,buf);
 		rt_mutex_take(uartDev[sheet.pressSetl[num].useUartNum].uartMutex,RT_WAITING_FOREVER);
 	  //485发送buf  len  等待modbus回应
 		pressSettlUartSend(num,buf,len);
