@@ -152,10 +152,12 @@
 //         修复lcd显示的出错，控件地址更改    20230330
 //V0.91    增加自动控制json数据解析 20230404
 //V0.92    裂缝仪厂家更改为标准modbus协议 代码加入测试 20230407
-#define APP_VER       ((0<<8)+92)//0x0105 表示1.5版本
+//				 界面显示需要增加网关ip设置  连接远程服务器时候需要设置网关跟ip地址在同一个字段
+//V0.93    加入mqtt协议 测试
+#define APP_VER       ((0<<8)+93)//0x0105 表示1.5版本
 //注：本代码中json格式解析非UTF8_格式代码（GB2312格式中文） 会导致解析失败
 //    打印log如下 “[dataPhrs]err:json cannot phrase”  20230403
-const char date[]="20230407";
+const char date[]="20230414";
 
 //static    rt_thread_t tid 	= RT_NULL;
 static    rt_thread_t tidW5500 	  = RT_NULL;
@@ -164,14 +166,15 @@ static    rt_thread_t tidNetSend 	= RT_NULL;
 static    rt_thread_t tidUpkeep 	= RT_NULL;
 static    rt_thread_t tidLCD      = RT_NULL;
 static    rt_thread_t tidAutoCtrl = RT_NULL;
+static    rt_thread_t tidMqtt    = RT_NULL;
 //信号量的定义
-extern  rt_sem_t  w5500Iqr_semp ;//w5500有数据时候中断来临
-
-
+extern  rt_sem_t  w5500Iqr_semp;;//w5500有数据时候中断来临
+rt_mutex_t   netSend_mutex=RT_NULL;;
+rt_mutex_t   netRec_mutex=RT_NULL; //对读取的NetRxBuffer数组进行保护
 //邮箱的定义
-extern struct  rt_mailbox mbNetRecData;
-extern struct  rt_mailbox mbNetSendData;
-static char	 	 mbRecPool[20];//接收缓存20条
+//extern struct  rt_mailbox mbNetRecData;
+extern struct  rt_mailbox mbNetSendData;;
+//static char	 	 mbRecPool[20];//接收缓存20条
 static char 	 mbSendPool[20];//发送缓存20条
 
 
@@ -179,13 +182,14 @@ static char 	 mbSendPool[20];//发送缓存20条
 struct  rt_messagequeue LCDmque;//= {RT_NULL} ;//创建LCD队列
 uint8_t LCDQuePool[LCD_BUF_LEN];  //创建lcd队列池
 //任务的定义
-extern  void   netDataRecTask(void *para);//网络数据接收
+//extern  void   netDataRecTask(void *para);//网络数据接收
 extern  void   netDataSendTask(void *para);//网络数据发送
 extern  void   upKeepStateTask(void *para);//定时打包数据 后期可能加入定时读取modbus
 extern  void   w5500Task(void *parameter);//w5500网络状态的维护
 extern  void   hardWareDriverTest(void);
 extern  void   LCDTask(void *parameter);
 extern  void   autoCtrlTask(void *para);
+extern  void   mqttTask(void *parameter);
 const static char sign[]="[main]";
 //const char errStr[]="[ERR]";
 
@@ -230,6 +234,7 @@ char *strnum="1234.5678";
 
 //char testNum[4]={1,2,3,4};
 void  outIOInit(void);
+struct rt_mutex  test_mutex;
 int main(void)
 {
 
@@ -282,8 +287,29 @@ int main(void)
     {
         rt_kprintf("%screate w5500Iqr_semp failed\n",sign);
     }
+//////////////////////////////////////互斥量//////////////////////////////
+		netSend_mutex= rt_mutex_create("netSend_mutex", RT_IPC_FLAG_FIFO);
+		if (netSend_mutex == RT_NULL)
+    {
+        rt_kprintf("%screate netSend_mutex failed\n",sign);
+    }
+		netRec_mutex = rt_mutex_create("netRec_mutex", RT_IPC_FLAG_FIFO);
+		if (netRec_mutex == RT_NULL)
+    {
+        rt_kprintf("%screate netRec_mutex failed\n",sign);
+    }
 		
-		
+//		test_mutex= rt_mutex_create("test_mutex", RT_IPC_FLAG_FIFO);
+//		if (test_mutex == RT_NULL)
+//    {
+//        rt_kprintf("%screate test_mutex failed\n",sign);
+//    }
+//		
+				//rt_mutex_init(&test_mutex,"test_mutex", RT_IPC_FLAG_FIFO);
+//		if (test_mutex == RT_NULL)
+//    {
+//        rt_kprintf("%screate test_mutex failed\n",sign);
+//    }
 		  /* 创建定时器 周期定时器 */
     timer1 = rt_timer_create("timer1", timeout1,
                              RT_NULL, 100,
@@ -303,18 +329,18 @@ int main(void)
 ////////////////////////////////////邮箱//////////////////////////////////
 		
 
-    result = rt_mb_init(&mbNetRecData,"mbRec",&mbRecPool[0],sizeof(mbRecPool)/4,RT_IPC_FLAG_FIFO);         
-    if (result != RT_EOK)
-    {
-        rt_kprintf("%sinit mailbox NetRecData failed.\n",sign);
-        return -1;
-    }
-    result = rt_mb_init(&mbNetSendData,"mbSend",&mbSendPool[0],sizeof(mbSendPool)/4,RT_IPC_FLAG_FIFO);         
-    if (result != RT_EOK)
-    {
-        rt_kprintf("%sinit mailbox NetSend failed.\n",sign);
-        return -1;
-    }
+//    result = rt_mb_init(&mbNetRecData,"mbRec",&mbRecPool[0],sizeof(mbRecPool)/4,RT_IPC_FLAG_FIFO);         
+//    if (result != RT_EOK)
+//    {
+//        rt_kprintf("%sinit mailbox NetRecData failed.\n",sign);
+//        return -1;
+//    }
+//    result = rt_mb_init(&mbNetSendData,"mbSend",&mbSendPool[0],sizeof(mbSendPool)/4,RT_IPC_FLAG_FIFO);         
+//    if (result != RT_EOK)
+//    {
+//        rt_kprintf("%sinit mailbox NetSend failed.\n",sign);
+//        return -1;
+//    }
 		
 
 ////////////////////////////////任务////////////////////////////////////
@@ -323,17 +349,25 @@ int main(void)
 				rt_thread_startup(tidW5500);													 
 				rt_kprintf("%sRTcreat w5500Task task\r\n",sign);
 		}
-		tidNetRec =  rt_thread_create("netRec",netDataRecTask,RT_NULL,1024,2, 10 );
-		if(tidNetRec!=NULL){
-				rt_thread_startup(tidNetRec);													 
-				rt_kprintf("%sRTcreat netDataRecTask \r\n",sign);
-		}
-		tidNetSend =  rt_thread_create("netSend",netDataSendTask,RT_NULL,1024,2, 10 );
-		if(tidNetSend!=NULL){
-				rt_thread_startup(tidNetSend);													 
-				rt_kprintf("%sRTcreat netDataSendTask \r\n",sign);
-		}
+//		tidNetRec =  rt_thread_create("netRec",netDataRecTask,RT_NULL,1024,2, 10 );
+//		if(tidNetRec!=NULL){
+//				rt_thread_startup(tidNetRec);													 
+//				rt_kprintf("%sRTcreat netDataRecTask \r\n",sign);
+//		}
+//		tidNetSend =  rt_thread_create("netSend",netDataSendTask,RT_NULL,1024,2, 10 );
+//		if(tidNetSend!=NULL){
+//				rt_thread_startup(tidNetSend);													 
+//				rt_kprintf("%sRTcreat netDataSendTask \r\n",sign);
+//		}
 
+		tidMqtt = rt_thread_create("mqtt",mqttTask,RT_NULL,1024,4, 10 );
+		if(tidMqtt!=NULL){
+				rt_thread_startup(tidMqtt);													 
+				rt_kprintf("RTcreat mqtt task\r\n");
+		}
+		else{
+				rt_kprintf("RTcreat mqtt ERR\r\n");
+		}		
 		
 		tidUpkeep 	=  rt_thread_create("upKeep",upKeepStateTask,RT_NULL,512*3,4, 10 );
 		if(tidUpkeep!=NULL){

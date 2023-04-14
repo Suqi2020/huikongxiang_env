@@ -3,12 +3,12 @@
 
 #include   "board.h"
 //#define   ACUID_LEN  18
-#define   HEAD_LEN   2
-#define   LENTH_LEN  2
-#define   CRC_LEN    2
-#define   TAIL_LEN   2
-#define   HEAD      0XAACC
-#define   TAIL      0XCCAA
+//#define   HEAD_LEN   2
+//#define   LENTH_LEN  2
+//#define   CRC_LEN    2
+//#define   TAIL_LEN   2
+//#define   HEAD      0XAACC
+//#define   TAIL      0XCCAA
 
 //需要记录上行的messID用于下行回应的判断
 typedef  struct

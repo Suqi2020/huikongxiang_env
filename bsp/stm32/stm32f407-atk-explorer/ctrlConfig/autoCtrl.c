@@ -669,7 +669,7 @@ static bool  crackMeterConf(char **argv)
 //ÊäÈëµÄÖ¸ÕëÅäÖÃ
 void autoctrlInputcfg(char*argv[])
 {
-	  int i,j;
+	  int i;
 	  uint8_t limit ;
 	  bool ret=false;
 		for(i=0;i<sizeof(inName)/sizeof(inName[0]);i++){
@@ -683,7 +683,7 @@ void autoctrlInputcfg(char*argv[])
 								
 							
 							#ifndef     ANA_MASK
-								for(j=0;j<ANALOG_NUM;j++){
+								for(int j=0;j<ANALOG_NUM;j++){
 										if(rt_strcmp(argv[2],sheet.analog[j].name)==0){//find  name
 												if(rt_strcmp(argv[3],sheet.analog[j].ID)==0){//find ID
 													 //uint8_t subname = atoi16(argv[4],10);

@@ -207,7 +207,7 @@ void ch4Read2Send()
 //				rt_kprintf("%s打包采集的ch4数据\r\n",sign);
 //			  ch4JsonPack();
 //				if(netStat==RT_TRUE)
-//						rt_mb_send_wait(&mbNetSendData, (rt_ubase_t)&packBuf,RT_WAITING_FOREVER);
+//						packMqttSend();
 //		}
 }
 #endif

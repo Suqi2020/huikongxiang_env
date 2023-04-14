@@ -213,23 +213,17 @@ uint16_t crackMeterJsonPack(bool respFlag)
 		cJSON_AddStringToObject(root,"timestamp",sprinBuf);
 		// 打印JSON数据包  
 
-
-		//打包
-		int len=0;
-		packBuf[len]= (uint8_t)(HEAD>>8); len++;
-		packBuf[len]= (uint8_t)(HEAD);    len++;
-		len+=LENTH_LEN;//json长度最后再填写
 		
 		// 释放内存  
 		
 		
 		out = cJSON_Print(root);
-		rt_strcpy((char *)packBuf+len,out);
-		len+=rt_strlen(out);
+		rt_strcpy((char *)packBuf,out);
+//		len+=rt_strlen(out);
 		if(out!=NULL){
-				for(int i=0;i<rt_strlen(out);i++)
-						rt_kprintf("%c",out[i]);
-				rt_kprintf("\n");
+//				for(int i=0;i<rt_strlen(out);i++)
+//						rt_kprintf("%c",out[i]);
+//				rt_kprintf("\n");
 				rt_free(out);
 				out=NULL;
 		}
@@ -238,26 +232,14 @@ uint16_t crackMeterJsonPack(bool respFlag)
 			out=NULL;
 		}
 	
-
-		//lenth
-	  packBuf[2]=(uint8_t)((len-LENTH_LEN-HEAD_LEN)>>8);//更新json长度
-	  packBuf[3]=(uint8_t)(len-LENTH_LEN-HEAD_LEN);
-	  uint16_t jsonBodyCrc=RTU_CRC(packBuf+HEAD_LEN+LENTH_LEN,len-HEAD_LEN-LENTH_LEN);
-	  //crc
-	  packBuf[len]=(uint8_t)(jsonBodyCrc>>8); len++;//更新crc
-	  packBuf[len]=(uint8_t)(jsonBodyCrc);    len++;
-
-		//tail
-		packBuf[len]=(uint8_t)(TAIL>>8); len++;
-		packBuf[len]=(uint8_t)(TAIL);    len++;
-		packBuf[len]=0;//len++;//结尾 补0
 		if(respFlag==false){
 				mcu.repDataMessID =mcu.upMessID;
 				//mcu.devRegMessID =mcu.upMessID;
 				upMessIdAdd();
 		}
-		rt_kprintf("%s len:%d\r\n",sign,len);
-		rt_kprintf("\r\n%slen：%d str0:%x str1:%x str[2]:%d  str[3]:%d\r\n",sign,len,packBuf[0],packBuf[1],packBuf[2],packBuf[3]);
+		int len=strlen((char *)packBuf);
+//		rt_kprintf("%s len:%d %s\r\n",sign,len,packBuf);
+		//rt_kprintf("\r\n%slen：%d str0:%x str1:%x str[2]:%d  str[3]:%d\r\n",sign,len,packBuf[0],packBuf[1],packBuf[2],packBuf[3]);
 
 		rt_free(sprinBuf);
 		sprinBuf=RT_NULL;
@@ -332,18 +314,18 @@ bool modCrackMeterWarn2Send()
 		sprintf(sprinBuf,"%llu",utcTime());
 		cJSON_AddStringToObject(root,"timestamp",sprinBuf);
 		//打包
-		int len=0;
-		packBuf[len]= (uint8_t)(HEAD>>8); len++;
-		packBuf[len]= (uint8_t)(HEAD);    len++;
-		len+=LENTH_LEN;//json长度最后再填写
+//		int len=0;
+//		packBuf[len]= (uint8_t)(HEAD>>8); len++;
+//		packBuf[len]= (uint8_t)(HEAD);    len++;
+//		len+=LENTH_LEN;//json长度最后再填写
 		// 释放内存  
 		out = cJSON_Print(root);
-		rt_strcpy((char *)packBuf+len,out);
-		len+=rt_strlen(out);
+		rt_strcpy((char *)packBuf,out);
+//		len+=rt_strlen(out);
 		if(out!=NULL){
-				for(int i=0;i<rt_strlen(out);i++)
-						rt_kprintf("%c",out[i]);
-				rt_kprintf("\n");
+//				for(int i=0;i<rt_strlen(out);i++)
+//						rt_kprintf("%c",out[i]);
+//				rt_kprintf("\n");
 				rt_free(out);
 				out=NULL;
 		}
@@ -351,26 +333,45 @@ bool modCrackMeterWarn2Send()
 			cJSON_Delete(root);
 			out=NULL;
 		}
-		//lenth
-	  packBuf[2]=(uint8_t)((len-LENTH_LEN-HEAD_LEN)>>8);//更新json长度
-	  packBuf[3]=(uint8_t)(len-LENTH_LEN-HEAD_LEN);
-	  uint16_t jsonBodyCrc=RTU_CRC(packBuf+HEAD_LEN+LENTH_LEN,len-HEAD_LEN-LENTH_LEN);
-	  //crc
-	  packBuf[len]=(uint8_t)(jsonBodyCrc>>8); len++;//更新crc
-	  packBuf[len]=(uint8_t)(jsonBodyCrc);    len++;
-		//tail
-		packBuf[len]=(uint8_t)(TAIL>>8); len++;
-		packBuf[len]=(uint8_t)(TAIL);    len++;
-		packBuf[len]=0;//len++;//结尾 补0
-		mcu.repDataMessID =mcu.upMessID;
-		//mcu.devRegMessID =mcu.upMessID;
-		upMessIdAdd();
+
+		int len=strlen((char *)packBuf);
+
+		//rt_kprintf("\r\n%slen：%d str0:%x str1:%x str[2]:%d  str[3]:%d\r\n",sign,len,packBuf[0],packBuf[1],packBuf[2],packBuf[3]);
+
 		rt_free(sprinBuf);
 		sprinBuf=RT_NULL;
+
+
+		mcu.repDataMessID =mcu.upMessID;
+		upMessIdAdd();
+
 		return true;
 }
 
 
+//static char mqttPayload[2048];//=rt_malloc(strlen(topic.cstring)+lenth+1);
+	  
+void   packMqttSend()
+{
+
+	  static MQTTString topic= MQTTString_initializer;
+	  int sendBufLen=0;
+		topic.cstring = rt_malloc(100);
+		rt_sprintf(topic.cstring,"/acu/%s/up",packFlash.acuId);
+	  extern int MQTTSerialize_publish_suqi(int buflen,unsigned char dup, int qos, unsigned char retained, unsigned short packetid,
+		MQTTString topicName, unsigned char* payload, int payloadlen);
+		if((sendBufLen=MQTTSerialize_publish_suqi(sizeof(packBuf),0, 0, 0,0,topic, (unsigned char *)packBuf,strlen((char*)packBuf)))>0){ //qos=1????packetid
+				rt_kprintf("%sok publish pack\n",sign);
+			}
+		else
+			rt_kprintf("%serr publish pack\n",sign);
+		packBuf[sendBufLen]=0;
+		rt_free(topic.cstring);
+		topic.cstring=RT_NULL;
+		extern rt_bool_t gbNetState;
+		if(gbNetState==RT_TRUE)
+				transport_sendPacketBuffer( packBuf, sendBufLen);
+}
 
 
 //沉降仪读取并打包  供别的函数调用
@@ -386,13 +387,12 @@ void crackMeterRead2Send(rt_bool_t netStat,bool respFlag)
 		if(workFlag==RT_TRUE){
 				rt_kprintf("%s打包采集的CRACK_METER数据\r\n",sign);
 				crackMeterJsonPack(respFlag);
-				if(netStat==RT_TRUE)
-						rt_mb_send_wait(&mbNetSendData, (rt_ubase_t)&packBuf,RT_WAITING_FOREVER);
+			  packMqttSend();
+
 				rt_thread_mdelay(500);
 				if(modCrackMeterWarn2Send()==true){
 							resetCrackMeterWarnFlag();//每次判断后复位warnflag状态值
-							if(netStat==RT_TRUE)
-									rt_mb_send_wait(&mbNetSendData, (rt_ubase_t)&packBuf,RT_WAITING_FOREVER);
+							packMqttSend();
 				}
 		}
 }

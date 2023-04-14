@@ -204,7 +204,7 @@ void h2sRead2Send()
 //				rt_kprintf("%s打包采集的h2s数据\r\n",sign);
 //				h2sJsonPack();
 //				if(netStat==RT_TRUE)
-//						rt_mb_send_wait(&mbNetSendData, (rt_ubase_t)&packBuf,RT_WAITING_FOREVER);
+//						packMqttSend();
 //		}
 }
 #endif

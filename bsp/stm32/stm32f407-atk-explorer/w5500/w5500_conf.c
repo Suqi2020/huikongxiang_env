@@ -177,9 +177,9 @@ void iinchip_cson(void)
 void reset_w5500(void)
 {
 	HAL_GPIO_WritePin(W5500_RST_GPIO_Port, W5500_RST_Pin, GPIO_PIN_SET);
-	rt_thread_mdelay(200);
+	rt_thread_mdelay(500);
   HAL_GPIO_WritePin(W5500_RST_GPIO_Port, W5500_RST_Pin, GPIO_PIN_RESET);	
-	rt_thread_mdelay(200);
+	rt_thread_mdelay(500);
 	HAL_GPIO_WritePin(W5500_RST_GPIO_Port, W5500_RST_Pin, GPIO_PIN_SET);
 	rt_thread_mdelay(1600);
 }

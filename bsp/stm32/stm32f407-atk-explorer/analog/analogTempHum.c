@@ -280,10 +280,10 @@ void anaTempHumReadPack2Send(bool gbNetState,bool respFlag)
 		anaTempHumiReadAndSetFlag();
 	  analogTempHumJsonPack(respFlag);
 		if(gbNetState==RT_TRUE)
-						rt_mb_send_wait(&mbNetSendData, (rt_ubase_t)&packBuf,RT_WAITING_FOREVER);
+						packMqttSend();
 		if(true ==anaTempHumWarn2Send()){
 			    rt_thread_mdelay(500);//∞Î√Î÷’∫Û∑¢ÀÕ
-					rt_mb_send_wait(&mbNetSendData, (rt_ubase_t)&packBuf,RT_WAITING_FOREVER);	
+					packMqttSend();	
 		}
 }
 #endif

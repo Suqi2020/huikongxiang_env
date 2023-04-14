@@ -13,7 +13,7 @@ void senseTimeReadJsonResp(char *string,bool  modbusFlag)
 	  uint32_t caltime =0;
 		char* out = NULL;
 		//创建数组
-//		cJSON* Array = NULL;
+		cJSON* Array = NULL;
 		// 创建JSON Object  
 		cJSON* root = NULL;
 //		cJSON* nodeobj = NULL;
@@ -25,7 +25,13 @@ void senseTimeReadJsonResp(char *string,bool  modbusFlag)
 	  bool result=false;
 	  if(modbusFlag==true){
 			  //rt_kprintf("modbusFlag=%d\n",modbusFlag);
-				cJSON_AddStringToObject(root,"packetType","PROPERTIES_485TTIM_GET_RESP");
+					cJSON_AddStringToObject(root,"packetType","PROPERTIES_485TTIM_GET_RESP");
+					Array =cJSON_CreateArray();
+					cJSON_AddItemToObject(root,"params",Array);
+					cJSON* nodeobjp = cJSON_CreateObject();
+					cJSON_AddItemToArray(Array,nodeobjp); 
+			
+			 
 				  if(rt_strcmp(string,"partial_discharge_monitor")==0){
 							result=true;
 							caltime=sheet.partDischagColTime;
@@ -54,6 +60,14 @@ void senseTimeReadJsonResp(char *string,bool  modbusFlag)
 						result=true;
 						caltime=sheet.pressSetlColTime;
 					}
+					char *sprinBuf=RT_NULL;
+					sprinBuf=rt_malloc(20);//20个字符串长度 够用了
+          sprintf(sprinBuf,"%d",caltime);
+					cJSON_AddStringToObject(nodeobjp,"calTime",sprinBuf);
+
+
+					rt_free(sprinBuf);
+					sprinBuf=RT_NULL;
 		}
 		else{
 			#ifndef     ANA_MASK
@@ -84,16 +98,12 @@ void senseTimeReadJsonResp(char *string,bool  modbusFlag)
 		}
 		sprintf(sprinBuf,"%llu",utcTime());
 		cJSON_AddStringToObject(root,"timestamp",sprinBuf);
-		//打包
-		int len=0;
-		packBuf[len]= (uint8_t)(HEAD>>8); len++;
-		packBuf[len]= (uint8_t)(HEAD);    len++;
-		len+=LENTH_LEN;//json长度最后再填写
+
 		
 		// 释放内存  
 		out = cJSON_Print(root);
-		rt_strcpy((char *)packBuf+len,out);
-		len+=rt_strlen(out);
+		rt_strcpy((char *)packBuf,out);
+
 		if(out!=NULL){
 				for(int i=0;i<rt_strlen(out);i++)
 						rt_kprintf("%c",out[i]);
@@ -105,18 +115,7 @@ void senseTimeReadJsonResp(char *string,bool  modbusFlag)
 			cJSON_Delete(root);
 			out=NULL;
 		}
-		//lenth
-	  packBuf[2]=(uint8_t)((len-LENTH_LEN-HEAD_LEN)>>8);//更新json长度
-	  packBuf[3]=(uint8_t)(len-LENTH_LEN-HEAD_LEN);
-	  uint16_t jsonBodyCrc=RTU_CRC(packBuf+HEAD_LEN+LENTH_LEN,len-HEAD_LEN-LENTH_LEN);
-	  //crc
-	  packBuf[len]=(uint8_t)(jsonBodyCrc>>8); len++;//更新crc
-	  packBuf[len]=(uint8_t)(jsonBodyCrc);    len++;
 
-		//tail
-		packBuf[len]=(uint8_t)(TAIL>>8); len++;
-		packBuf[len]=(uint8_t)(TAIL);    len++;
-		packBuf[len]=0;//len++;//结尾 补0
 		rt_free(sprinBuf);
 		sprinBuf=RT_NULL;
 
@@ -216,15 +215,11 @@ void senseTimeJsonSet(cJSON   *Json,bool  modbusFlag)
 		sprintf(sprinBuf,"%llu",utcTime());
 		cJSON_AddStringToObject(root,"timestamp",sprinBuf);
 		//打包
-		int len=0;
-		packBuf[len]= (uint8_t)(HEAD>>8); len++;
-		packBuf[len]= (uint8_t)(HEAD);    len++;
-		len+=LENTH_LEN;//json长度最后再填写
+
 		
 		// 释放内存  
 		out = cJSON_Print(root);
-		rt_strcpy((char *)packBuf+len,out);
-		len+=rt_strlen(out);
+		rt_strcpy((char *)packBuf,out);
 		if(out!=NULL){
 				for(int i=0;i<rt_strlen(out);i++)
 						rt_kprintf("%c",out[i]);
@@ -236,18 +231,7 @@ void senseTimeJsonSet(cJSON   *Json,bool  modbusFlag)
 			cJSON_Delete(root);
 			out=NULL;
 		}
-		//lenth
-	  packBuf[2]=(uint8_t)((len-LENTH_LEN-HEAD_LEN)>>8);//更新json长度
-	  packBuf[3]=(uint8_t)(len-LENTH_LEN-HEAD_LEN);
-	  uint16_t jsonBodyCrc=RTU_CRC(packBuf+HEAD_LEN+LENTH_LEN,len-HEAD_LEN-LENTH_LEN);
-	  //crc
-	  packBuf[len]=(uint8_t)(jsonBodyCrc>>8); len++;//更新crc
-	  packBuf[len]=(uint8_t)(jsonBodyCrc);    len++;
 
-		//tail
-		packBuf[len]=(uint8_t)(TAIL>>8); len++;
-		packBuf[len]=(uint8_t)(TAIL);    len++;
-		packBuf[len]=0;//len++;//结尾 补0
 		rt_free(sprinBuf);
 		sprinBuf=RT_NULL;
 }

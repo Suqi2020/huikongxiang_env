@@ -42,7 +42,7 @@
 
 #define RT_USING_DEVICE
 #define RT_USING_CONSOLE
-#define RT_CONSOLEBUF_SIZE 128
+#define RT_CONSOLEBUF_SIZE 2048
 #define RT_CONSOLE_DEVICE_NAME "uart1"
 #define RT_VER_NUM 0x50000
 #define ARCH_ARM
@@ -73,6 +73,9 @@
 /* Device Drivers */
 
 #define RT_USING_DEVICE_IPC
+#define RT_USING_SYSTEM_WORKQUEUE
+#define RT_SYSTEM_WORKQUEUE_STACKSIZE 2048
+#define RT_SYSTEM_WORKQUEUE_PRIORITY 23
 #define RT_USING_SERIAL
 #define RT_USING_SERIAL_V1
 #define RT_SERIAL_USING_DMA
@@ -101,6 +104,19 @@
 
 /* Network */
 
+#define RT_USING_SAL
+#define SAL_INTERNET_CHECK
+
+/* Docking with protocol stacks */
+
+#define SAL_SOCKETS_NUM 16
+#define RT_USING_NETDEV
+#define NETDEV_USING_IFCONFIG
+#define NETDEV_USING_PING
+#define NETDEV_USING_NETSTAT
+#define NETDEV_USING_AUTO_DEFAULT
+#define NETDEV_IPV4 1
+#define NETDEV_IPV6 0
 
 /* Utilities */
 

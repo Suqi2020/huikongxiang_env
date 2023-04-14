@@ -61,6 +61,11 @@
 #include "stmflash.h"
 #include "7inchRegist.h"
 #include "ctrlConfig.h"
+
+
+#include "MQTTPacket.h"
+#include "cJSON.h"
+#include "stdlib.h"
 //#include "rs485ThreeAxis.h"
 //#include "rs485Circula.h"
 //#include "rs485PartDischag.h"
@@ -71,8 +76,9 @@
 #include "cJSON.h"
 #include "analogConfig.h"
 #include "modbusConfig.h"
+#include "transport.h"
 //#include "utf_8.h"
-
+//#define  USE_ALIYUN  1
 extern UART_HandleTypeDef huart4;
 extern UART_HandleTypeDef huart5;
 extern UART_HandleTypeDef huart1;

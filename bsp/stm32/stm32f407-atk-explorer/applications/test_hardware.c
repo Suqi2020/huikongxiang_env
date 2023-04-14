@@ -362,25 +362,12 @@ offLineStru offLine={0};
 //拔掉网线时候需要发送数据才能验证网络断开
 int offline()
 {
-	  int i=1;
-	  for( i=1;i<offLine.times;i++){ //下标从1开始
-				rt_kprintf("[offLine]c the %d time,relayTimer %d 秒\r\n",i,offLine.relayTimer[i]);
-		}
+	extern rt_bool_t gbNetState;
+if(gbNetState ==RT_FALSE)
+		rt_kprintf("[offLine]total %d Times\r\n",offLine.times);
+else
+		rt_kprintf("[onLine]offtotal %d Times\r\n",offLine.times);
 
-		if(offLine.times==0){
-				rt_kprintf("[offLine]On line OK\r\n");
-		}
-		else{
-				if(i==(offLine.times)){
-						extern rt_bool_t gbNetState;
-						if(gbNetState==RT_FALSE){
-								rt_kprintf("[offLine]a the %d Time,relayTimer %d 秒\r\n",i,(rt_tick_get()/1000-offLine.relayTimer[i]));
-						}
-						else{
-								rt_kprintf("[offLine]b the %d Times,relayTimer %d 秒\r\n",i,offLine.relayTimer[i]);
-						}
-				}
-		}
 		return 0;
 }
 //FINSH_FUNCTION_EXPORT(offline, offline finsh);//FINSH_FUNCTION_EXPORT_CMD

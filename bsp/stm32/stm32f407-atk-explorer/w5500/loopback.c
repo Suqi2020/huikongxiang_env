@@ -4,8 +4,9 @@
 uint8 I_STATUS[MAX_SOCK_NUM];
 uint8 ch_status[MAX_SOCK_NUM] = {0};/** 0:close, 1:ready, 2:connected */
 
-uint8_t  NetTxBuffer[TX_RX_MAX_BUF_SIZE]={0};
+//uint8_t  NetTxBuffer[TX_RX_MAX_BUF_SIZE]={0};
 uint8_t  NetRxBuffer[TX_RX_MAX_BUF_SIZE]={0};
+uint16_t netRxBufLen=0;
 const static char sign[]="[lookback]";
 void rstCh_status()
 {
@@ -184,10 +185,16 @@ void loopback_tcps(SOCKET s, uint16 port)
 }
 
 #endif
+
+
+
+
+#if 0
+bool test=false;
 void loopback_tcpc(SOCKET s, uint16 port)
 {
 	static rt_bool_t  offLineTimesGet=RT_FALSE;
-	uint16 len; 						
+	uint16 len=0; 						
 	//uint8 * data_buf = (uint8*) NetRxBuffer;
 	uint8	tmp = 0;
 	switch (I_STATUS[s])
@@ -201,13 +208,14 @@ void loopback_tcpc(SOCKET s, uint16 port)
 				connect(s, packFlash.netIpFlash.remoteIp,packFlash.netIpFlash.remotePort);
 				rt_kprintf("%sw5500 coning\r\n",sign);
 			}			
-//			rt_kprintf("w5500 cloes %d\r\n",I_STATUS[s]);
+			//rt_kprintf("w5500 cloes %d\r\n",I_STATUS[s]);
 			break;
 		case Sn_IR_CON: 
 			// connected
 			ch_status[s] = 2;
 			I_STATUS[s] &= ~(0x01);
 		  rt_kprintf("%sw5500 connected\r\n",sign);
+		test=true;
 		  extern rt_bool_t  gbNetState;
 			gbNetState =RT_TRUE;	
 			extern void  LCDDispNetOffline();
@@ -215,12 +223,11 @@ void loopback_tcpc(SOCKET s, uint16 port)
 		  offLineTimesGet =RT_FALSE;
 			offLine.relayTimer[offLine.times]=(rt_tick_get()/1000-offLine.relayTimer[offLine.times]);
 		
-						  rt_kprintf("%sw5500 con %d%d\r\n",offLine.times,offLine.relayTimer[offLine.times]);
-		  extern uint16_t heartUpJsonPack();
-			heartUpJsonPack();
-		  extern struct rt_mailbox mbNetSendData;
+						  rt_kprintf("%sw5500 offtimes[%d] relaytimes[%d]\r\n",sign,offLine.times,offLine.relayTimer[offLine.times]);
+
+//		  extern struct rt_mailbox mbNetSendData;
 //		  extern uint8_t   packBuf[TX_RX_MAX_BUF_SIZE];
-			rt_mb_send_wait(&mbNetSendData, (rt_ubase_t)&packBuf,RT_WAITING_FOREVER); 
+//			packMqttSend(); 
 			break;
 		case Sn_IR_DISCON: 
 			// discon
@@ -229,14 +236,11 @@ void loopback_tcpc(SOCKET s, uint16 port)
 				if (len > TX_RX_MAX_BUF_SIZE) len = TX_RX_MAX_BUF_SIZE; /* if Rx data size is lager than TX_RX_MAX_BUF_SIZE */
 				//uint8_t *data_buf = (uint8_t *)rt_malloc(len);
 				len = recv(s, NetRxBuffer, len);		/* read the received data */
-				
+				gu32RecDataLen=len;
 				NetRxBuffer[len]=0;  //防止多打印
+				gu32RecDataLen=len;
+				mqttRet=  netPhraseRecData(NetRxBuffer ,len);
 				
-				
-				extern struct rt_mailbox mbNetRecData;
-				rt_mb_send_wait(&mbNetRecData, (rt_ubase_t)&NetRxBuffer,RT_WAITING_FOREVER);  
-//				rt_kprintf("%s\r\n",data_buf);
-//				rt_free(data_buf);
 			}
 			SOCK_DISCON(s);
 			//rt_kprintf("w5500 discon\r\n");
@@ -273,11 +277,19 @@ void loopback_tcpc(SOCKET s, uint16 port)
 
 					len = recv(s, NetRxBuffer, len); /* read the received data */
 					NetRxBuffer[len]=0;  //防止多打印
-					extern struct rt_mailbox mbNetRecData;
-					rt_mb_send_wait(&mbNetRecData, (rt_ubase_t)&NetRxBuffer,RT_WAITING_FOREVER);  
+					
+					gu32RecDataLen=len;
+		rt_kprintf("rec:");
+	    for(int i=0;i<len ;i++)
+	rt_kprintf("%02x ",NetRxBuffer[i]);
+	rt_kprintf("\n");
+			  	mqttRet=  netPhraseRecData(NetRxBuffer ,len);
+
+//					extern struct rt_mailbox mbNetRecData;
+//					rt_mb_send_wait(&mbNetRecData, (rt_ubase_t)&NetRxBuffer,RT_WAITING_FOREVER);  
 					//send(s,data_buf,len);//
 //					rt_thread_mdelay(500); //延时后边再打印
-					rt_kprintf("%snet rec len:%d \r\n",sign,len);
+//				rt_kprintf("%snet rec len:%d \r\n",sign,len);
 //					rt_kprintf("[");
 //					for(int i=0;i<len;i++)
 //					   rt_kprintf("%02x",NetRxBuffer[i]);
@@ -290,7 +302,11 @@ void loopback_tcpc(SOCKET s, uint16 port)
 		case Sn_IR_SEND_OK: 
 			// send ok
 			I_STATUS[s] &= ~(0x10);
-		  //rt_kprintf("w5500 send ok\r\n"); //发送接口 send(s,data_buf,len);
+		  if(test==true)
+			{
+				test=false;
+		  rt_kprintf("w5500 send ok\r\n"); //发送接口 send(s,data_buf,len);
+			}
 			break;
 		default:
 			I_STATUS[s] =0;
@@ -299,6 +315,97 @@ void loopback_tcpc(SOCKET s, uint16 port)
 	}
 	//if(GPIO_ReadInputDataBit(GPIOC, GPIO_Pin_6) == 0x00) EXTI_GenerateSWInterrupt(EXTI_Line6);
 }
+
+#endif
+
+extern rt_bool_t gbNetState;
+ rt_bool_t  offLineTimesGet=RT_TRUE;
+
+//登记每次掉线的初次时间  通过offLineTimesGet标记登记一次即可
+//void offLineGetTimeStart()
+//{
+//		if(offLineTimesGet==RT_TRUE){//只获取一次
+//				offLineTimesGet =RT_FALSE;
+//				gbNetState = RT_FALSE;
+////				offLine.times++;
+////				offLine.relayTimer[offLine.times]=rt_tick_get()/1000;
+//			  extern void rstMqttStep();
+//				rstMqttStep();
+//		}
+//}
+//获取每次掉线额真正时间
+//当前时间减去了登记的最初时间
+//void offLineGettimesEnd()
+//{
+//		extern void  LCDDispNetOffline();
+//		LCDDispNetOffline();
+//		
+//		offLine.relayTimer[offLine.times]=(rt_tick_get()/1000-offLine.relayTimer[offLine.times]);
+//}
+uint32_t gu32RecDataLen=0;
+
+extern int  netPhraseRecData(uint8_t *recBuf ,int len);
+
+
+
+//extern int mqttRet;
+void loopback_tcp(uint16 port)
+{
+	// uint16 len=0;	
+	
+	switch(getSn_SR(SOCK_TCPC))								  				         /*获取socket的状态*/
+	{
+		case SOCK_CLOSED:											        		         /*socket处于关闭状态*/
+			socket(SOCK_TCPC,Sn_MR_TCP,port,Sn_MR_ND);
+		  rt_kprintf("SOCK_CLOSED\n");
+     // offLineGetTimeStart();
+			offLine.relayTimer[offLine.times]=(rt_tick_get()/1000-offLine.relayTimer[offLine.times]);
+		  break;
+		
+		case SOCK_INIT:													        	         /*socket处于初始化状态*/
+			connect(SOCK_TCPC,packFlash.netIpFlash.remoteIp,packFlash.netIpFlash.remotePort);               /*socket连接服务器*/ 
+		  rt_kprintf("SOCK_INIT\n");
+		  //gbNetState =RT_FALSE;	
+		  break;
+		
+		case SOCK_ESTABLISHED: 												             /*socket处于连接建立状态*/
+			if(getSn_IR(SOCK_TCPC) & Sn_IR_CON)
+			{
+				setSn_IR(SOCK_TCPC, Sn_IR_CON); 							         /*清除接收中断标志位*/
+			}
+		
+			netRxBufLen=getSn_RX_RSR(SOCK_TCPC); 								  	         /*定义len为已接收数据的长度*/
+			if(netRxBufLen>0)
+			{
+				extern rt_mutex_t netRec_mutex;
+				rt_mutex_take(netRec_mutex,RT_WAITING_FOREVER);
+				recv(SOCK_TCPC,NetRxBuffer,netRxBufLen); 							   		         /*接收来自Server的数据*/
+				NetRxBuffer[netRxBufLen]=0x00;  											                 /*添加字符串结束符*/
+				rt_mutex_release(netRec_mutex);
+				
+				rt_kprintf("rec:");
+				for(int i=0;i<netRxBufLen ;i++)
+				rt_kprintf("%02x ",NetRxBuffer[i]);
+				rt_kprintf("\n");
+			//	mqttRet=  netPhraseRecData(NetRxBuffer ,netRxBufLen);
+			//	send(SOCK_TCPC,NetRxBuffer,len);								     	         /*向Server发送数据*/
+			}		  
+			if(gbNetState!=RT_TRUE){
+					gbNetState =RT_TRUE;	
+					rt_kprintf("SOCK_ESTABLISHED\n");
+			}
+		  break;
+			
+		case SOCK_CLOSE_WAIT: 											    	         /*socket处于等待关闭状态*/
+			close(SOCK_TCPC);
+		  rt_kprintf("SOCK_CLOSE_WAIT\n");
+		  //gbNetState =RT_FALSE;	
+		
+		  break;
+
+	}
+}
+
 #if 0
 void loopback_udp(SOCKET s, uint16 port)
 {

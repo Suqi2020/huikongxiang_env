@@ -398,16 +398,12 @@ void senseTHGetJsonResp(cJSON   *Json,bool modbusFlag)
 		}
 		sprintf(sprinBuf,"%llu",utcTime());
 		cJSON_AddStringToObject(root,"timestamp",sprinBuf);
-		//打包
-		int len=0;
-		packBuf[len]= (uint8_t)(HEAD>>8); len++;
-		packBuf[len]= (uint8_t)(HEAD);    len++;
-		len+=LENTH_LEN;//json长度最后再填写
+
 		
 		// 释放内存  
 		out = cJSON_Print(root);
-		rt_strcpy((char *)packBuf+len,out);
-		len+=rt_strlen(out);
+		rt_strcpy((char *)packBuf,out);
+		rt_strlen(out);
 		if(out!=NULL){
 				for(int i=0;i<rt_strlen(out);i++)
 						rt_kprintf("%c",out[i]);
@@ -419,18 +415,7 @@ void senseTHGetJsonResp(cJSON   *Json,bool modbusFlag)
 			cJSON_Delete(root);
 			out=NULL;
 		}
-		//lenth
-	  packBuf[2]=(uint8_t)((len-LENTH_LEN-HEAD_LEN)>>8);//更新json长度
-	  packBuf[3]=(uint8_t)(len-LENTH_LEN-HEAD_LEN);
-	  uint16_t jsonBodyCrc=RTU_CRC(packBuf+HEAD_LEN+LENTH_LEN,len-HEAD_LEN-LENTH_LEN);
-	  //crc
-	  packBuf[len]=(uint8_t)(jsonBodyCrc>>8); len++;//更新crc
-	  packBuf[len]=(uint8_t)(jsonBodyCrc);    len++;
 
-		//tail
-		packBuf[len]=(uint8_t)(TAIL>>8); len++;
-		packBuf[len]=(uint8_t)(TAIL);    len++;
-		packBuf[len]=0;//len++;//结尾 补0
 		rt_free(sprinBuf);
 		sprinBuf=RT_NULL;
 }
@@ -729,16 +714,13 @@ void senseTHSetJsonResp(cJSON   *Json,bool  modbusFlag)
 		}
 		sprintf(sprinBuf,"%llu",utcTime());
 		cJSON_AddStringToObject(root,"timestamp",sprinBuf);
-		//打包
-		int len=0;
-		packBuf[len]= (uint8_t)(HEAD>>8); len++;
-		packBuf[len]= (uint8_t)(HEAD);    len++;
-		len+=LENTH_LEN;//json长度最后再填写
+
+
 		
 		// 释放内存  
 		out = cJSON_Print(root);
-		rt_strcpy((char *)packBuf+len,out);
-		len+=rt_strlen(out);
+		rt_strcpy((char *)packBuf,out);
+
 		if(out!=NULL){
 				for(int i=0;i<rt_strlen(out);i++)
 						rt_kprintf("%c",out[i]);
@@ -750,18 +732,7 @@ void senseTHSetJsonResp(cJSON   *Json,bool  modbusFlag)
 			cJSON_Delete(root);
 			out=NULL;
 		}
-		//lenth
-	  packBuf[2]=(uint8_t)((len-LENTH_LEN-HEAD_LEN)>>8);//更新json长度
-	  packBuf[3]=(uint8_t)(len-LENTH_LEN-HEAD_LEN);
-	  uint16_t jsonBodyCrc=RTU_CRC(packBuf+HEAD_LEN+LENTH_LEN,len-HEAD_LEN-LENTH_LEN);
-	  //crc
-	  packBuf[len]=(uint8_t)(jsonBodyCrc>>8); len++;//更新crc
-	  packBuf[len]=(uint8_t)(jsonBodyCrc);    len++;
 
-		//tail
-		packBuf[len]=(uint8_t)(TAIL>>8); len++;
-		packBuf[len]=(uint8_t)(TAIL);    len++;
-		packBuf[len]=0;//len++;//结尾 补0
 		rt_free(sprinBuf);
 		sprinBuf=RT_NULL;	
 }

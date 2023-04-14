@@ -552,7 +552,6 @@ bool   modbusThresholdConfig(int num,char *ID,int sensorSubName,float upLimit,fl
 						}
 				}
 			  break;
-			default:
 				
 			case CRACKMETER:
 				for(i=0;i<CRACKMETER_485_NUM;i++){
@@ -572,6 +571,7 @@ bool   modbusThresholdConfig(int num,char *ID,int sensorSubName,float upLimit,fl
 						}
 				}
 			  break;
+			default:
 				rt_kprintf("%s ERR:modbusThresholdConfig %d\n",sign,num);
 				break;
 		}
