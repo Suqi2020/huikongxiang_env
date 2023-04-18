@@ -79,7 +79,7 @@ void readTempHum(int num)
 	  uint8_t  *buf = RT_NULL;
 		buf = rt_malloc(LENTH);
 	  uint16_t len = modbusReadReg(sheet.tempHum[num].slaveAddr,0X0000,READ_04,2,buf);
-		rt_mutex_take(uartDev[sheet.tempHum[num].useUartNum].uartMutex,RT_WAITING_FOREVER);
+//		rt_mutex_take(.uartMessque[sheet.tempHum[num].useUartNum].uartMutex,RT_WAITING_FOREVER);
 	  //485发送buf  len  等待modbus回应
 		tempHumUartSend(num,(uint8_t *)buf,len);
 	  rt_kprintf("%stemphum send:",sign);
@@ -90,7 +90,7 @@ void readTempHum(int num)
     len=0;
 		memset(buf,0,LENTH);
 
-		while(rt_mq_recv(uartDev[sheet.tempHum[num].useUartNum].uartMessque, buf+len, 1, 500) == RT_EOK){//115200 波特率1ms 10个数据
+		while(rt_mq_recv(&uartmque[sheet.tempHum[num].useUartNum], buf+len, 1, 500) == RT_EOK){//115200 波特率1ms 10个数据
 				len++;
 		}
 		if(len!=0){
@@ -101,7 +101,7 @@ void readTempHum(int num)
 				rt_kprintf("\n");
 		}
 		//提取环流值 第一步判断crc 第二部提取
-		//uartDev[modbusFlash[TEMPHUM].useUartNum].offline=RT_FALSE;
+		//.uartMessque[modbusFlash[TEMPHUM].useUartNum].offline=RT_FALSE;
 		int ret2=modbusRespCheck(sheet.tempHum[num].slaveAddr,buf,len,RT_TRUE);
 		if(0 == ret2){//刷新读取到的值
         uint16_t read_temp	=(buf[offset]<<8)+buf[offset+1];offset+=2;
@@ -125,7 +125,7 @@ void readTempHum(int num)
 		else{//读不到给0
 				if(ret2==2){
 						//rt_kprintf("%sERR:请检查485接线或者供电\r\n",sign);
-//					  uartDev[modbusFlash[TEMPHUM].useUartNum].offline=RT_TRUE;
+//					  .uartMessque[modbusFlash[TEMPHUM].useUartNum].offline=RT_TRUE;
 				}
 				thum[num].respStat=0;
 				thum[num].temp=0;
@@ -133,7 +133,7 @@ void readTempHum(int num)
 			  rt_kprintf("%s read fail\n",sign);
 		}
 	//	tempHumCheckSetFlag(num);//TEST ONLY
-	  rt_mutex_release(uartDev[sheet.tempHum[num].useUartNum].uartMutex);
+//	  rt_mutex_release(.uartMessque[sheet.tempHum[num].useUartNum].uartMutex);
 		rt_free(buf);
 	  buf=RT_NULL;				
 }
@@ -307,7 +307,7 @@ bool modTempHumWarn2Send()
 
 
 //温湿度值读取并打包json格式
-void tempHumRead2Send(rt_bool_t netStat,bool respFlag)
+void tempHumRead2Send(bool respFlag)
 {
 	 int workFlag=RT_FALSE;
 	 for(int i=0;i<TEMPHUM_485_NUM;i++){
@@ -319,13 +319,11 @@ void tempHumRead2Send(rt_bool_t netStat,bool respFlag)
 	if(workFlag==RT_TRUE){
 			rt_kprintf("%s打包采集的temphum数据\r\n",sign);
 			tempHumJsonPack(respFlag);
-			if(netStat==RT_TRUE)
-					packMqttSend();
-					rt_thread_mdelay(500);
+			packMqttSend();
+			rt_thread_mdelay(500);
 			if(modTempHumWarn2Send()==true){
 					resetTempHumWarnFlag();//每次判断后复位warnflag状态值
-					if(netStat==RT_TRUE)
-							packMqttSend();
+					packMqttSend();
 			}
 	}
 }

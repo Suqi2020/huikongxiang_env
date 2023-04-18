@@ -82,16 +82,16 @@ static int timeOut()
 
 
 
-extern void pressSettRead2Send(rt_bool_t netStat,bool respFlag);
-extern void threeAxisRead2Send(rt_bool_t netStat,bool respFlag);
-extern void partDischagRead2Send(rt_bool_t netStat,bool respFlag);
-extern void circulaRead2Send(rt_bool_t netStat,bool respFlag);
-extern void waterDepthRead2Send(rt_bool_t netStat,bool respFlag);
-extern void tempHumRead2Send(rt_bool_t netStat,bool respFlag);
-extern void o2Read2Send(rt_bool_t netStat);
-extern void h2sRead2Send(rt_bool_t netStat);	
-extern void ch4Read2Send(rt_bool_t netStat);	
-extern void coRead2Send(rt_bool_t netStat);	
+extern void pressSettRead2Send(bool respFlag);
+extern void threeAxisRead2Send(bool respFlag);
+extern void partDischagRead2Send(bool respFlag);
+extern void circulaRead2Send(bool respFlag);
+extern void waterDepthRead2Send(bool respFlag);
+extern void tempHumRead2Send(bool respFlag);
+extern void o2Read2Send(void);
+extern void h2sRead2Send(void);	
+extern void ch4Read2Send(void);	
+extern void coRead2Send(void);	
 //void analogTempHumJsonPack(uint8_t chanl);
 #ifndef     ANA_MASK
 extern void anaTempHumReadPack2Send(bool gbNetState,bool respFlag);
@@ -99,60 +99,62 @@ extern void anaTempHumReadPack2Send(bool gbNetState,bool respFlag);
 extern  uint16_t devRegJsonPack(void);
 extern  uint16_t heartUpJsonPack(void);
 //extern uint8_t analogTemChanl;
-extern void gasJsonPack(rt_bool_t netStat,bool respFlag);
+extern void gasJsonPack(bool respFlag);
 extern  uint16_t digitalInputReport(void);
 extern  uint16_t digitalOutputReport(char *identify);
-extern  void crackMeterRead2Send(rt_bool_t netStat,bool respFlag);
+extern  void crackMeterRead2Send(bool respFlag);
 //定时时间到  执行相应事件
 static void  timeOutRunFun()
 {
-
+		rt_mutex_take(read485_mutex,RT_WAITING_FOREVER);
 //	  rt_bool_t workFlag=RT_FALSE;
 		switch(timeOut()){
 
 			case REG_TIME://注册 注册成功后定时器就关闭 输入输出状态跟谁注册信息上发
 			  if(gbRegFlag==RT_FALSE){
 					  devRegJsonPack();//devRegJsonPack();
-					  if(gbNetState==RT_TRUE)
-								packMqttSend(); 
-					  timeStop(REG_TIME);//正式使用时候需要去掉
-						if(gbNetState==RT_TRUE){
-							  digitalInputReport();//数字输入上报
-								rt_thread_delay(500);
-								
-								packMqttSend(); 
-								digitalOutputReport("3v3_output");
-								rt_thread_delay(500);
-								packMqttSend(); 
-								digitalOutputReport("5v_output");
-								rt_thread_delay(500);
-								packMqttSend(); 
-								digitalOutputReport("12v_output");
-								rt_thread_delay(500);
-								packMqttSend(); 
-								digitalOutputReport("digital_output");
-								rt_thread_delay(500);
-								packMqttSend(); 
-						}
+						packMqttSend(); 
+
+						timeStop(REG_TIME);//正式使用时候需要去掉
+						digitalInputReport();//数字输入上报
+						rt_thread_delay(500);
+
+						packMqttSend(); 
+						digitalOutputReport("3v3_output");
+						rt_thread_delay(500);
+
+						packMqttSend(); 
+						digitalOutputReport("5v_output");
+						rt_thread_delay(500);
+						packMqttSend(); 
+						digitalOutputReport("12v_output");
+						rt_thread_delay(500);
+
+						packMqttSend(); 
+						digitalOutputReport("digital_output");
+						rt_thread_delay(500);
+						packMqttSend(); 
+
+
 				}
 				else
 						timeStop(REG_TIME);
 				rt_kprintf("%sreg timer out\r\n",task);
 				break;
 			case CIRCULA_TIME://读取环流
-				circulaRead2Send(gbNetState,false);
+				circulaRead2Send(false);
 				rt_kprintf("%sCIRCULA_TIME out\r\n",task);
 				break;
 			case PARTDISCHAG_TIME://读取局放
-				partDischagRead2Send(gbNetState,false);
+				partDischagRead2Send(false);
 				rt_kprintf("%sPARTDISCHAG_TIME out\r\n",task);
 				break;
 			case PRESSSETTL_TIME:
-        pressSettRead2Send(gbNetState,false);
+        pressSettRead2Send(false);
 				rt_kprintf("%sPRESSSETTL_TIME out\r\n",task);
 				break;
 			case THREEAXIS_TIME:
-				threeAxisRead2Send(gbNetState,false);
+				threeAxisRead2Send(false);
 				rt_kprintf("%sTHREEAXIS_TIMEout\r\n",task);
 				break;
 
@@ -167,30 +169,31 @@ static void  timeOutRunFun()
 //				break;
 			case  GAS_TIME://4种气体在一起读取 所以前三个不使用 只在此处读取并打包发送  关闭时候只需要关闭CO就可以把所有气体全部关闭
 		#ifdef USE_4GAS 	
-   			ch4Read2Send(gbNetState);
-				o2Read2Send(gbNetState);
-				h2sRead2Send(gbNetState);
-			  coRead2Send(gbNetState);
-			  gasJsonPack(gbNetState,false);
+   			ch4Read2Send();
+				o2Read2Send();
+				h2sRead2Send();
+			  coRead2Send();
+			  gasJsonPack(false);
 		#endif
 				break;
 			case  TEMPHUM_TIME:
-				tempHumRead2Send(gbNetState,false);
+				tempHumRead2Send(false);
 				break;
 			case  WATERDEPTH_TIME:
-				waterDepthRead2Send(gbNetState,false);
+				waterDepthRead2Send(false);
 				break;
 			case CRACKMETER_TIME:
-				crackMeterRead2Send(gbNetState,false);
-				rt_kprintf("%sTHREEAXIS_TIMEout\r\n",task);
+				crackMeterRead2Send(false);
+				rt_kprintf("%sCRACKMETER_TIME out\r\n",task);
 				break;
 #ifndef     ANA_MASK
 			case  ANA_TEMPHUM_TIME:
 //				analogTempHumJsonPack(analogTemChanl);
-			  anaTempHumReadPack2Send(gbNetState,false);
+			  anaTempHumReadPack2Send(false);
 		
 				break;
 #endif
+			rt_mutex_release(read485_mutex);
 			default:
 				break;
 		}
@@ -250,7 +253,7 @@ void   upKeepStateTask(void *para)
 //	  extern void printfOutputList();
 //		extern void printfThresholdList();
 //		extern void printfCtrl();
-	  uartMutexQueueCfg();//根据flash存储重新配置串口
+	  //uartMutexQueueCfg();//根据flash存储重新配置mutex queue
 //		modbusPrintRead();//modbus配置从flash中读取
 	  uartReconfig();//串口重新配置
 		uartIrqEnaAfterQueue();//串口中断中用到了队列  开启中断需要放到后边
@@ -260,7 +263,11 @@ void   upKeepStateTask(void *para)
 		while(1){
 				timeOutRunFun();
 				timeInc();
+//			  rt_event_send(&WDTEvent,EVENT_WDT_UPTASK);
 				rt_thread_mdelay(1000);
+#ifdef  USE_WDT
+			  rt_event_send(&WDTEvent,EVENT_WDT_UPTASK);
+#endif		  
 		}
 }
 

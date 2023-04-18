@@ -52,7 +52,7 @@ void readCH4(int num)
 		buf = rt_malloc(LENTH);
 	  uint16_t len = modbusReadReg(sheet.ch4[num].slaveAddr,0X0002,READ_03,2,buf);
 	 //rt_kprintf("%sCH4 take %d\n",modbusFlash[CH4].useUartNum);
-		rt_mutex_take(uartDev[sheet.ch4[num].useUartNum].uartMutex,RT_WAITING_FOREVER);
+//		rt_mutex_take(.uartMessque[sheet.ch4[num].useUartNum].uartMutex,RT_WAITING_FOREVER);
 	  //485发送buf  len  等待modbus回应
 		ch4UartSend(num,buf,len);
 	  rt_kprintf("%sCH4 send:",sign);
@@ -63,7 +63,7 @@ void readCH4(int num)
     len=0;
 		memset(buf,0,LENTH);
 		
-		while(rt_mq_recv(uartDev[sheet.ch4[num].useUartNum].uartMessque, buf+len, 1, 500) == RT_EOK){//115200 波特率1ms 10个数据
+		while(rt_mq_recv(&uartmque[sheet.ch4[num].useUartNum], buf+len, 1, 500) == RT_EOK){//115200 波特率1ms 10个数据
 				len++;
 		}
 		if(len!=0){
@@ -92,7 +92,7 @@ void readCH4(int num)
 			  rt_kprintf("%s read fail\n",sign);
 		}
 		//ch4CheckSetFlag(num);
-	  rt_mutex_release(uartDev[sheet.ch4[num].useUartNum].uartMutex);
+//	  rt_mutex_release(.uartMessque[sheet.ch4[num].useUartNum].uartMutex);
 		rt_free(buf);
 	  buf=RT_NULL;
 
@@ -203,11 +203,6 @@ void ch4Read2Send()
 					//	workFlag=RT_TRUE;
 				}
 		}
-//		if(workFlag==RT_TRUE){
-//				rt_kprintf("%s打包采集的ch4数据\r\n",sign);
-//			  ch4JsonPack();
-//				if(netStat==RT_TRUE)
-//						packMqttSend();
-//		}
+
 }
 #endif

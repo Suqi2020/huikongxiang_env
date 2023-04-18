@@ -90,18 +90,19 @@ extern packIpUartStru packFlash;
 
 
 
-	
-typedef struct{
-	 // uint32_t bps;
-	//rt_bool_t offline;
-	  rt_mutex_t  uartMutex;
-	  struct  rt_messagequeue* uartMessque;
-}uartConfStru;
+//	
+//typedef struct{
+//	 // uint32_t bps;
+//	//rt_bool_t offline;
+//	  rt_mutex_t  uartMutex;
+//	  struct  rt_messagequeue* uartMessque;
+//}uartConfStru;
 
 
 /////////////////////////////////////////////////////////////////////////////////////////////////////
 
-extern uartConfStru  uartDev[];
+//extern uartConfStru  .uartMessque[];
+extern struct  rt_messagequeue uartmque[UART_NUM];
 extern void rs485UartSend(uint8_t chanl,uint8_t *buf,int len);
 extern void uartMutexQueueCfg(void);
 

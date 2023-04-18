@@ -7,12 +7,13 @@
 
 
 const static char sign[]="[uartRecfg]";
-uartConfStru  uartDev[UART_NUM];
+//uartConfStru  .uartMessque[UART_NUM];
+//struct  rt_messagequeue uartMessque;
 //uartChanlStru  chanl={USE_DIS_UART,USE_DIS_UART,USE_DIS_UART,USE_DIS_UART};
-static rt_mutex_t uartMutex[UART_NUM] ;//= {RT_NULL}; //创建4个串口的互斥量保护
+//static rt_mutex_t uartMutex[UART_NUM] ;//= {RT_NULL}; //创建4个串口的互斥量保护
 #define  MSGPOOL_LEN   1024 //485数据最大量  大于1k需要修改此处
 //队列的定义
-static struct  rt_messagequeue uartmque[UART_NUM];//= {RT_NULL} ;//创建4个串口的队列
+struct  rt_messagequeue uartmque[UART_NUM];//= {RT_NULL} ;//创建4个串口的队列
 static uint8_t uartQuePool[UART_NUM][MSGPOOL_LEN];  //创建4个串口的队列池
 
 
@@ -21,13 +22,13 @@ void  uartMutexQueueCreate()
 {
 		 for(int i=0;i<UART_NUM;i++){
 					char str[20]="";
-					sprintf(str,"urt%dMutex",i);
-					uartMutex[i] = rt_mutex_create(str, RT_IPC_FLAG_FIFO);
-					if (uartMutex[i] == RT_NULL)
-					{
-							rt_kprintf("%screate uart%dMutex failed.\n",sign,i);
-							return ;
-					}
+//					sprintf(str,"urt%dMutex",i);
+//					uartMutex[i] = rt_mutex_create(str, RT_IPC_FLAG_FIFO);
+//					if (uartMutex[i] == RT_NULL)
+//					{
+//							rt_kprintf("%screate uart%dMutex failed.\n",sign,i);
+//							return ;
+//					}
 //////////////////////////////////消息队列/////////////////////////////////
 					sprintf(str,"urt%dMsgque",i);
 					int result = rt_mq_init(&uartmque[i],str,uartQuePool+i,1,MSGPOOL_LEN,RT_IPC_FLAG_FIFO);       
@@ -44,7 +45,7 @@ void  uartMutexQueueCreate()
 rt_err_t uartDataRec(uartEnum uartNum,uint8_t dat)
 {
 	
-		return rt_mq_send(uartDev[uartNum].uartMessque, &dat, 1);  //收到数据后就往队列里丢
+		return rt_mq_send(&uartmque[uartNum], &dat, 1);  //收到数据后就往队列里丢
 }
 
 
@@ -96,15 +97,15 @@ void uartSingConf(int num,int bps)
 void uartMutexQueueCfg()
 {
 	
-		uartDev[USE_UART2].uartMutex	=uartMutex[USE_UART2];
-		uartDev[USE_UART3].uartMutex	=uartMutex[USE_UART3];
-		uartDev[USE_UART6].uartMutex	=uartMutex[USE_UART6];
-		uartDev[USE_UART4].uartMutex	=uartMutex[USE_UART4];
+////		.uartMessque[USE_UART2].uartMutex	=uartMutex[USE_UART2];
+//		.uartMessque[USE_UART3].uartMutex	=uartMutex[USE_UART3];
+//		.uartMessque[USE_UART6].uartMutex	=uartMutex[USE_UART6];
+//		.uartMessque[USE_UART4].uartMutex	=uartMutex[USE_UART4];
 
-		uartDev[USE_UART2].uartMessque	=&uartmque[USE_UART2];
-		uartDev[USE_UART3].uartMessque	=&uartmque[USE_UART3];
-		uartDev[USE_UART6].uartMessque	=&uartmque[USE_UART6];
-		uartDev[USE_UART4].uartMessque	=&uartmque[USE_UART4];
+//		.uartMessque[USE_UART2]	=&uartmque[USE_UART2];
+//		.uartMessque[USE_UART3]	=&uartmque[USE_UART3];
+//		.uartMessque[USE_UART6]	=&uartmque[USE_UART6];
+//		.uartMessque[USE_UART4]	=&uartmque[USE_UART4];
 	
 	  
 }
@@ -146,114 +147,6 @@ void rs485UartSend(uint8_t chanl,uint8_t *buf,int len)
 //modbus+huanliu（设备名称）+1(通道)+1（设备地址）
 uint16 atoi16(char* str,uint16 base); 
 //example--[modbus 环流 uart1 1]
-//////////////////////////////////////////////////////////////////////////////
-//modbusName 需要跟uartBps modbusChanl一一对应
-
-//const static char  modbusName[MODBUS_NUM][20] ={"接地环流","局放","沉降仪","三轴测振仪","备用"};
-//const static int   modbusBps[MODBUS_NUM]      ={115200,  115200  ,9600,9600,4800};
-//static uartEnum    *modbusChanl[MODBUS_NUM]   ={&modbusFlash[CIRCULA].useUartNum,&modbusFlash[PARTDISCHAG].useUartNum,&modbusFlash[PRESSSETTL].useUartNum,&modbusFlash[THREEAXIS].useUartNum};
-//////////////////////////////////////////////////////////////////////////////
-//同样 下边定义需要一一对应起来
-//const static char     UartName[UART_NUM][6] ={"port1", "port2",  "port3",  "port4"};//重映射一个名称
-//const static uartEnum UartNum[UART_NUM]     ={USE_UART2,USE_UART3,USE_UART6,USE_UART4};
-//////////////////////////////////////////////////////////////////////////////
-
-//		uartDev[USE_UART2].bps	=115200;
-//		uartDev[USE_UART3].bps	=115200;
-//		uartDev[USE_UART6].bps =9600;
-//		uartDev[USE_UART4].bps	=9600;
-//	
-//	  modbusFlash[CIRCULA].useUartNum		  =USE_UART3;//使用串口2
-//	  modbusFlash[PARTDISCHAG].useUartNum =USE_UART3;//使用串口3
-//	  modbusFlash[PRESSSETTL].useUartNum	=USE_UART4;//使用串口6
-//	  modbusFlash[THREEAXIS].useUartNum   =USE_UART4;//使用串口4
-
-//检查同类型设备用同一个设备地址用同一个端口
-//static rt_bool_t modbusSameTypeUseSameAddr()
-//{
-//		
-//		
-//		
-//		for(int i=0;i<MODBUS_NUM;i++){
-//				for(int j=i+1;j<MODBUS_NUM;j++){
-//						if(modbusFlash[i].useUartNum==modbusFlash[j].useUartNum){
-//								if(modbusFlash[i].workFlag==RT_TRUE){
-//										if(modbusFlash[j].workFlag==RT_TRUE){
-//												if(modbusType[i]==modbusType[j]){
-//														if(modbusFlash[i].slaveAddr  ==modbusFlash[j].slaveAddr){
-//																rt_kprintf("%sERR:%s %s 同类型同端口设备使用了相同地址\n",sign,modbusName[i],modbusName[j]);
-//																return RT_TRUE;
-//														}
-//												}
-//										}
-//								}
-//						}
-//				}
-//		}
-//		return  RT_FALSE;
-//}
-//检查不同类型设备用同一个端口
-//modbusType
-//static rt_bool_t modbusDifTypeUseSamePort(void)
-//{
-//		for(int i=0;i<MODBUS_NUM;i++){
-//				for(int j=i+1;j<MODBUS_NUM;j++){
-//						if(modbusFlash[i].useUartNum==modbusFlash[j].useUartNum){
-//								if(modbusFlash[i].workFlag==RT_TRUE){
-//										if(modbusFlash[j].workFlag==RT_TRUE){
-//												if(modbusType[i]!=modbusType[j]){
-//														rt_kprintf("%sERR:%s %s 不同类型设备使用了同一个端口\n",sign,modbusName[i],modbusName[j]);
-//														return RT_TRUE;
-//												}
-//										}
-//								}
-//						}
-//				}
-//		}
-//		return  RT_FALSE;
-//}
-
-//打印参数
-//void  modbusPrintRead()
-//{
-//		for(int i=0;i<MODBUS_NUM;i++){
-//				if(modbusFlash[i].workFlag	==RT_TRUE){//
-//						uartDev[modbusFlash[i].useUartNum].bps =modbusBps[i];
-//					  rt_kprintf("%s启动 %-10s 波特率%6d %s  slavAddr=%2d 采集间隔%d\n",sign,modbusName[i],modbusBps[i],UartName[modbusFlash[i].useUartNum],modbusFlash[i].slaveAddr,modbusFlash[i].colTime);
-//				}
-//				else
-//					 rt_kprintf("%s停止 %s\n",sign,modbusName[i]);
-//		}
-//}
-//存在配置错误-返回true 不存在-返回false
-//检查的目的 不要重复配置串口 有可能把正常的设备配置成错误的波特率 导致设备不能用
-// rt_bool_t errConfigCheck()
-//{
-//		rt_bool_t a=RT_FALSE,c=RT_FALSE;
-//		//检查同类型设备用同一个设备地址
-//		a	=	modbusSameTypeUseSameAddr();
-//		//检查不同类型设备用同一个端口
-//		c	=	modbusDifTypeUseSamePort();
-
-//		if((a==RT_TRUE)||(c==RT_TRUE)){
-//				for(int i=0;i<MODBUS_NUM;i++){
-//						rt_kprintf("%s 类型[%d],%-10s,port[%-03d],addr[%d]\n",sign,modbusType[i],modbusName[i],modbusFlash[i].useUartNum,modbusFlash[i].slaveAddr);
-//				}
-//			  return RT_TRUE;
-//		}
-//		return RT_FALSE;
-//}
-//modbus工作异常检测
-//void modbusWorkErrCheck()
-//{
-//		for(int i=0;i<MODBUS_NUM;i++){
-//				if(modbusFlash[i].workFlag	==RT_TRUE){  
-//						if(uartDev[modbusFlash[i].useUartNum].offline==RT_TRUE){
-//								rt_kprintf("%sERR:请检查<<%s>>%s 485接线或电源\n",sign,modbusName[i],UartName[modbusFlash[i].useUartNum]);
-//						}
-//				}
-//		}
-//}
 
 
 
@@ -263,7 +156,7 @@ void clearUartData()
 {
 	  uint8_t dat;
 	  for(int i=0;i<UART_NUM;i++){
-				while(rt_mq_recv(uartDev[i].uartMessque,&dat, 1, 1000) == RT_EOK){//115200 波特率1ms 10个数据
+				while(rt_mq_recv(&uartmque[i],&dat, 1, 1000) == RT_EOK){//115200 波特率1ms 10个数据
 				}
 		}
 }

@@ -47,6 +47,7 @@ static void MX_UART5_Init(void);
 //static void MX_USART6_UART_Init(void);
 static void MX_ADC1_Init(void);
 static void MX_SPI1_Init(void);
+static void MX_IWDG_Init(void);
 /* USER CODE BEGIN PFP */
 
 /**
@@ -67,6 +68,9 @@ void cubeHardWareInit(void)
 //  MX_USART6_UART_Init(9600);
   MX_ADC1_Init();
   MX_SPI1_Init();
+#ifdef USE_WDT
+	MX_IWDG_Init();
+#endif
   /* USER CODE BEGIN 2 */
 
   /* USER CODE END 2 */
@@ -74,6 +78,37 @@ void cubeHardWareInit(void)
   /* Infinite loop */
   /* USER CODE BEGIN WHILE */
   /* USER CODE END 3 */
+}
+
+
+/**
+  * @brief IWDG Initialization Function
+  * @param None
+  * @retval None
+  */
+//喂狗 HAL_IWDG_Refresh("&hiwdg");
+IWDG_HandleTypeDef hiwdg;  //看门狗最大32秒复位
+static void MX_IWDG_Init(void)
+{
+
+  /* USER CODE BEGIN IWDG_Init 0 */
+
+  /* USER CODE END IWDG_Init 0 */
+
+  /* USER CODE BEGIN IWDG_Init 1 */
+
+  /* USER CODE END IWDG_Init 1 */
+  hiwdg.Instance = IWDG;
+  hiwdg.Init.Prescaler = IWDG_PRESCALER_256;
+  hiwdg.Init.Reload = 4095;
+  if (HAL_IWDG_Init(&hiwdg) != HAL_OK)
+  {
+    Error_Handler();
+  }
+  /* USER CODE BEGIN IWDG_Init 2 */
+
+  /* USER CODE END IWDG_Init 2 */
+
 }
 /**
   * @brief System Clock Configuration
@@ -502,10 +537,10 @@ static void MX_GPIO_Init(void)
   HAL_GPIO_Init(LED_GPIO_Port, &GPIO_InitStruct);
 
   /*Configure GPIO pin : W5500_IRQ_Pin */
-  GPIO_InitStruct.Pin = W5500_IRQ_Pin;
-  GPIO_InitStruct.Mode = GPIO_MODE_IT_FALLING;
-  GPIO_InitStruct.Pull = GPIO_PULLUP;
-  HAL_GPIO_Init(W5500_IRQ_GPIO_Port, &GPIO_InitStruct);
+//  GPIO_InitStruct.Pin = W5500_IRQ_Pin;
+//  GPIO_InitStruct.Mode = GPIO_MODE_IT_FALLING;
+//  GPIO_InitStruct.Pull = GPIO_PULLUP;
+//  HAL_GPIO_Init(W5500_IRQ_GPIO_Port, &GPIO_InitStruct);
 
   /*Configure GPIO pins : SPAKER1_Pin SPAKER3_Pin SPAKER4_Pin SPAKER2_Pin
                            IO_OUT6_Pin IO_OUT5_Pin IO_OUT4_Pin IO_OUT3_Pin

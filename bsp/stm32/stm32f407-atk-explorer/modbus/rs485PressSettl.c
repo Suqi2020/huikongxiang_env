@@ -85,7 +85,7 @@ void readPSTempHeight(int num)
 	  uint8_t  *buf = RT_NULL;
 		buf = rt_malloc(LENTH);
 	  uint16_t len = tongHeModbusRead(sheet.pressSetl[num].slaveAddr,0X0001,2,buf);
-		rt_mutex_take(uartDev[sheet.pressSetl[num].useUartNum].uartMutex,RT_WAITING_FOREVER);
+
 	  //485发送buf  len  等待modbus回应
 		pressSettlUartSend(num,buf,len);
 	  rt_kprintf("%spressSettl send:",sign);
@@ -96,7 +96,7 @@ void readPSTempHeight(int num)
     len=0;
 		memset(buf,0,LENTH);
 		
-		while(rt_mq_recv(uartDev[sheet.pressSetl[num].useUartNum].uartMessque, buf+len, 1, 500) == RT_EOK){//115200 波特率1ms 10个数据
+		while(rt_mq_recv(&uartmque[sheet.pressSetl[num].useUartNum], buf+len, 1, 500) == RT_EOK){//115200 波特率1ms 10个数据
 				len++;
 		}
 		if(len!=0){
@@ -129,7 +129,7 @@ void readPSTempHeight(int num)
 			  rt_kprintf("%stemp height read fail\n",sign);
 		}
 //		pressStlCheckSetFlag(num);
-	  rt_mutex_release(uartDev[sheet.pressSetl[num].useUartNum].uartMutex);
+//	  rt_mutex_release(.uartMessque[sheet.pressSetl[num].useUartNum].uartMutex);
 		rt_free(buf);
 	  buf=RT_NULL;
 
@@ -366,7 +366,7 @@ bool modPressSetlWarn2Send()
 
 
 //沉降仪读取并打包  供别的函数调用
-void pressSettRead2Send(rt_bool_t netStat,bool respFlag)
+void pressSettRead2Send(bool respFlag)
 {
 	  int workFlag=RT_FALSE;
 		for(int i=0;i<PRESSSETTL_485_NUM;i++){
@@ -378,14 +378,11 @@ void pressSettRead2Send(rt_bool_t netStat,bool respFlag)
 		if(workFlag==RT_TRUE){
 				rt_kprintf("%s打包采集的PRESSSETTL数据\r\n",sign);
 				pressSettlJsonPack(respFlag);
-				if(netStat==RT_TRUE)
-						packMqttSend();
+				packMqttSend();
 				rt_thread_mdelay(500);
 				if(modPressSetlWarn2Send()==true){
 							resetPressSetlWarnFlag();//每次判断后复位warnflag状态值
-							//rt_thread_mdelay(500);
-							if(netStat==RT_TRUE)
-									packMqttSend();
+							packMqttSend();
 				}
 		}
 }

@@ -10,7 +10,7 @@
 //  6、读取采集间隔
 //调整RS485串口需要调整 UART5_IRQHandler以及HAL_UART_Transmit发送串口  
 //还需要更换对应串口的队列 调整 char num=0;
-// 9600波特率 注意修改此处 rt_mq_recv(uartDev[modbusFlash[CIRCULA].useUartNum].uartMessque, &buf, sizeof(buf), 2)
+// 9600波特率 注意修改此处 rt_mq_recv(uartDev[modbusFlash[CIRCULA].useUartNum], &buf, sizeof(buf), 2)
 //迅速切换其它485接口来使用 方法：只需要修改串口发送接口 和中断接收接口即可
 // rs485Circula.c-cirCurrUartSend(uint8_t *buf,int len) 和drv_uart.c-USART2_IRQHandler中
 // cirCurrUartSend(uint8_t *buf,int len)   cirCurrUartRec(uint8_t dat)
@@ -119,10 +119,10 @@ void readCirCurrAndWaring(int num)
 				rt_kprintf("%x ",buf[j]);
 		}
 		rt_kprintf("\n");
-	  rt_mutex_take(uartDev[sheet.cirCula[num].useUartNum].uartMutex,RT_WAITING_FOREVER);
+//	  rt_mutex_take(uartDev[sheet.cirCula[num].useUartNum].uartMutex,RT_WAITING_FOREVER);
 		memset(buf,0,LENTH);
     len=0;
-		while(rt_mq_recv(uartDev[sheet.cirCula[num].useUartNum].uartMessque, buf+len, 1, 500) == RT_EOK){//115200 波特率1ms 10个数据
+		while(rt_mq_recv(&uartmque[sheet.cirCula[num].useUartNum], buf+len, 1, 500) == RT_EOK){//115200 波特率1ms 10个数据
 				len++;
 		}
 		if(len!=0){
@@ -169,7 +169,7 @@ void readCirCurrAndWaring(int num)
 
 //		circulaCheckSetFlag(num);
 		//recFlag = RT_FALSE;
-	  rt_mutex_release(uartDev[sheet.cirCula[num].useUartNum].uartMutex);
+	//  rt_mutex_release(&uartmque[sheet.cirCula[num].useUartNum]);
 	//	 rt_kprintf("release\r\n");
 		rt_free(buf);
 	//	 rt_kprintf("free\r\n");
@@ -186,7 +186,7 @@ static uint16_t readPoint(int num)
 	  uint16_t len = modbusReadReg(sheet.cirCula[num].slaveAddr,0x000B,READ_03,1,buf);
 	  uint16_t ret =0;
 	//	recFlag = RT_TRUE;
-		rt_mutex_take(uartDev[sheet.cirCula[num].useUartNum].uartMutex,RT_WAITING_FOREVER);
+//		rt_mutex_take(uartDev[sheet.cirCula[num].useUartNum].uartMutex,RT_WAITING_FOREVER);
 	  //485发送buf  len  等待modbus回应
 		cirCurrUartSend(num,buf,len);
 	  rt_kprintf("%sreadPoint send:",sign);
@@ -196,7 +196,7 @@ static uint16_t readPoint(int num)
 		rt_kprintf("\n");
 		memset(buf,0,LENTH);
     len=0;
-		while(rt_mq_recv(uartDev[sheet.cirCula[num].useUartNum].uartMessque, buf+len, 1, 500) == RT_EOK){//115200 波特率1ms 10个数据
+		while(rt_mq_recv(&uartmque[sheet.cirCula[num].useUartNum], buf+len, 1, 500) == RT_EOK){//115200 波特率1ms 10个数据
 				len++;
 		}
 		rt_kprintf("%srec:",sign);
@@ -219,7 +219,7 @@ static uint16_t readPoint(int num)
 			  cirCurStru_p[num].point =100;//给个默认值
 
 		}
-	  rt_mutex_release(uartDev[sheet.cirCula[num].useUartNum].uartMutex);
+//	  rt_mutex_release(uartDev[sheet.cirCula[num].useUartNum].uartMutex);
 		rt_free(buf);
 	  buf=RT_NULL;
 		return ret;
@@ -318,9 +318,9 @@ uint16_t circulaJsonPack(bool respFlag)
 		out = cJSON_Print(root);
 		rt_strcpy((char *)packBuf,out);
 		if(out!=NULL){
-				for(int i=0;i<rt_strlen(out);i++)
-						rt_kprintf("%c",out[i]);
-				rt_kprintf("\n");
+//				for(int i=0;i<rt_strlen(out);i++)
+//						rt_kprintf("%c",out[i]);
+//				rt_kprintf("\n");
 				rt_free(out);
 				out=NULL;
 		}
@@ -475,7 +475,7 @@ bool modCirCurrWarn2Send()
 //环流读取并打包发送  仅仅做封装而已
 	//输入 respFlag 为true就是回应
 //              为false就是report数据
-void circulaRead2Send(rt_bool_t netStat,bool respFlag)
+void circulaRead2Send(bool respFlag)
 {					
 		int workFlag=RT_FALSE;
 		for(int i=0;i<CIRCULA_485_NUM;i++){
@@ -487,14 +487,11 @@ void circulaRead2Send(rt_bool_t netStat,bool respFlag)
 		if(workFlag==RT_TRUE){
 				rt_kprintf("%s打包采集的circula数据\r\n",sign);
 				circulaJsonPack(respFlag);
-				if(netStat==RT_TRUE)
-						packMqttSend();
+				packMqttSend();
 				rt_thread_mdelay(500);
 				if(modCirCurrWarn2Send()==true){
 							resetCirCurrlWarnFlag();//每次判断后复位warnflag状态值
-							//rt_thread_mdelay(500);
-							if(netStat==RT_TRUE)
-									packMqttSend();
+							packMqttSend();
 				}
 		}
 }

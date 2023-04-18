@@ -411,11 +411,13 @@ void  autoCtrlTask(void *para)
 	  extern void printAcuid();
 	  printAcuid();
 		printModbusDevList();
+
 	#ifndef     ANA_MASK
 	  prinfAnalogList();
 	#endif
 	  printfDIList();
 	  printfOutputList();
+
 		printfThresholdList();
 		printfCtrl();
 	  rt_kprintf("%sautoCtrlTask start\n",sign);
@@ -453,7 +455,11 @@ void  autoCtrlTask(void *para)
 			  diIOSetFlag();
 			  autoCtrlRun();
 			  ctrlOutSetIO();
+//				rt_event_send(&WDTEvent,EVENT_WDT_AUTOCTRL);
 				rt_thread_mdelay(1000);
+#ifdef  USE_WDT
+			  rt_event_send(&WDTEvent,EVENT_WDT_AUTOCTRL);
+#endif
 		}
 }
 

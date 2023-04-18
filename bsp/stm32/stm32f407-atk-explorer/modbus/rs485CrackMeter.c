@@ -84,7 +84,7 @@ void readCrackMeter(int num)
 	  uint8_t  *buf = RT_NULL;
 		buf = rt_malloc(LENTH);
 	  uint16_t len = tongHeModbusRead(sheet.crackMeter[num].slaveAddr,0x0001,2,buf);
-		rt_mutex_take(uartDev[sheet.crackMeter[num].useUartNum].uartMutex,RT_WAITING_FOREVER);
+//		rt_mutex_take(.uartMessque[sheet.crackMeter[num].useUartNum].uartMutex,RT_WAITING_FOREVER);
 	  //485发送buf  len  等待modbus回应
 		crackMeterUartSend(num,buf,len);
 	  rt_kprintf("%CrackMeter send:",sign);
@@ -95,7 +95,7 @@ void readCrackMeter(int num)
     len=0;
 		memset(buf,0,LENTH);
 		
-		while(rt_mq_recv(uartDev[sheet.crackMeter[num].useUartNum].uartMessque, buf+len, 1, 500) == RT_EOK){//115200 波特率1ms 10个数据
+		while(rt_mq_recv(&uartmque[sheet.crackMeter[num].useUartNum], buf+len, 1, 500) == RT_EOK){//115200 波特率1ms 10个数据
 				len++;
 		}
 		if(len!=0){
@@ -138,7 +138,7 @@ void readCrackMeter(int num)
 			  rt_kprintf("%stemp distance read fail\n",sign);
 		}
 //		pressStlCheckSetFlag(num);
-	  rt_mutex_release(uartDev[sheet.crackMeter[num].useUartNum].uartMutex);
+//	  rt_mutex_release(.uartMessque[sheet.crackMeter[num].useUartNum].uartMutex);
 		rt_free(buf);
 	  buf=RT_NULL;
 
@@ -351,31 +351,11 @@ bool modCrackMeterWarn2Send()
 
 //static char mqttPayload[2048];//=rt_malloc(strlen(topic.cstring)+lenth+1);
 	  
-void   packMqttSend()
-{
 
-	  static MQTTString topic= MQTTString_initializer;
-	  int sendBufLen=0;
-		topic.cstring = rt_malloc(100);
-		rt_sprintf(topic.cstring,"/acu/%s/up",packFlash.acuId);
-	  extern int MQTTSerialize_publish_suqi(int buflen,unsigned char dup, int qos, unsigned char retained, unsigned short packetid,
-		MQTTString topicName, unsigned char* payload, int payloadlen);
-		if((sendBufLen=MQTTSerialize_publish_suqi(sizeof(packBuf),0, 0, 0,0,topic, (unsigned char *)packBuf,strlen((char*)packBuf)))>0){ //qos=1????packetid
-				rt_kprintf("%sok publish pack\n",sign);
-			}
-		else
-			rt_kprintf("%serr publish pack\n",sign);
-		packBuf[sendBufLen]=0;
-		rt_free(topic.cstring);
-		topic.cstring=RT_NULL;
-		extern rt_bool_t gbNetState;
-		if(gbNetState==RT_TRUE)
-				transport_sendPacketBuffer( packBuf, sendBufLen);
-}
 
 
 //沉降仪读取并打包  供别的函数调用
-void crackMeterRead2Send(rt_bool_t netStat,bool respFlag)
+void crackMeterRead2Send(bool respFlag)
 {
 	  int workFlag=RT_FALSE;
 		for(int i=0;i<CRACKMETER_485_NUM;i++){

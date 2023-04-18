@@ -64,17 +64,59 @@ packTypeEnum  downLinkPackTpyeGet(cJSON  *TYPE)
 }
 
 
-//需要判断devid 和消息ID一致才认为心跳发送成功
-rt_bool_t heartRespFun(cJSON  *Json)
+////需要判断devid 和消息ID一致才认为心跳发送成功
+//rt_bool_t heartRespFun(cJSON  *Json)
+//{
+
+//		cJSON  *time =cJSON_GetObjectItem(Json,"timestamp");
+//	  rt_kprintf("%stime:%s\n\r",sign,time->valuestring);
+
+//	
+//		cJSON  *msg =cJSON_GetObjectItem(Json,"msg");
+//		rt_kprintf("%sheart msg %s\r\n",sign,msg->valuestring);
+//			
+//			
+//		static uint64_t u64getTick_p;
+
+//		u64getTick_p =atoll(time->valuestring);
+//		rt_kprintf("%stime:[%lu]s \r\n",sign, (uint32_t)((u64getTick_p)/1000));
+
+//		rt_kprintf("%stime:[%lu]ms\r\n",sign, (uint32_t)(u64getTick_p)%1000);
+//	  extern void  subTimeStampSet(uint64_t time);
+//	  if(utcTime()-u64getTick_p>=3000){
+//        subTimeStampSet(u64getTick_p);
+//			  rt_kprintf("%stime:RTC 误差大于3秒 校时\r\n",sign);
+//		}
+//	
+//		cJSON  *mid =cJSON_GetObjectItem(Json,"mid");
+//    if(mcu.upHeartMessID != mid->valueint){
+//				rt_kprintf("%sheart resp messID err %d %d\r\n",sign,mcu.upHeartMessID,mid->valueint);
+//			  return RT_FALSE;
+//			
+//		}
+//		cJSON  *code =cJSON_GetObjectItem(Json,"code");
+//		if(code->valueint!=0){
+//			  rt_kprintf("%sheart code err %d\r\n",sign,code->valueint);
+//				return RT_FALSE;
+//		}
+
+//		cJSON  *devid =cJSON_GetObjectItem(Json,"acuId");
+//		if(strcmp(packFlash.acuId,devid->valuestring)!=0){
+//				rt_kprintf("%sheart resp acuId err %s\r\n",sign,devid->valuestring);
+//			  return RT_FALSE;
+//		}
+
+//		return RT_TRUE;
+//}
+
+//RTC时钟校时
+rt_bool_t timeSetFun(cJSON  *Json)
 {
 
 		cJSON  *time =cJSON_GetObjectItem(Json,"timestamp");
 	  rt_kprintf("%stime:%s\n\r",sign,time->valuestring);
 
-	
-		cJSON  *msg =cJSON_GetObjectItem(Json,"msg");
-		rt_kprintf("%sheart msg %s\r\n",sign,msg->valuestring);
-			
+
 			
 		static uint64_t u64getTick_p;
 
@@ -110,14 +152,13 @@ rt_bool_t heartRespFun(cJSON  *Json)
 }
 
 
-
 //需要判断devid 和消息ID一致才认为注册成功
 rt_bool_t comRespFun(cJSON  *Json,uint32_t mesgID)
 {
 
 		cJSON  *msg =cJSON_GetObjectItem(Json,"msg");
 		rt_kprintf("%sheart msg %s\r\n",sign,msg->valuestring);
-	
+		timeSetFun(Json);
 
 		cJSON  *mid =cJSON_GetObjectItem(Json,"mid");
     if(mesgID!= mid->valueint){
@@ -168,11 +209,11 @@ void AllDownPhraseP(char *data)
 		 
 			  switch(downLinkPackTpyeGet(pkType)){
 
-					case	PROPERTIES_HEART_RESP:
-						if(RT_TRUE==heartRespFun(Json)){//收到心跳回应 怎么通知发送层
-								rt_kprintf("%srec heart resp\r\n",sign);
-						}
-						break;
+//					case	PROPERTIES_HEART_RESP:
+//						if(RT_TRUE==heartRespFun(Json)){//收到心跳回应 怎么通知发送层
+//								rt_kprintf("%srec heart resp\r\n",sign);
+//						}
+//						break;
 					case	PROPERTIES_REG_RESP:
 						if(RT_TRUE==comRespFun(Json,mcu.devRegMessID)){//收到注册回应 怎么通知发送层
 								rt_kprintf("%sreg dev succ\r\n",sign);
@@ -295,7 +336,69 @@ void AllDownPhraseP(char *data)
 			rt_kprintf("%serr:json cannot phrase\r\n",sign);	
 		}
 		cJSON_Delete(Json);
-
-		
 }
+
+//接收到的网络数据解析头部 判断类别
+void netRecSendEvent()
+{
+	   extern uint8_t  NetRxBuffer[TX_RX_MAX_BUF_SIZE];
+	   extern uint32_t netRxBufLen;
+	   extern struct rt_event mqttAckEvent;
+	   char headBuf[10]={0};	//根据手册得知剩余长度从第二个直接开始最大字段 4个字节  5个字节buf足够
+	   rt_memcpy(headBuf,NetRxBuffer,sizeof(headBuf));
+	//根据手册得知剩余长度从第二个直接开始最大字段 4个字节
+   
+	   int ret =MQTTPacket_read((uint8_t *)headBuf, sizeof(headBuf), transport_getdata);//作用确定头部以及剩余最大数量
+	   switch(ret)
+		 {
+			 case CONNACK:
+				 rt_event_send(&mqttAckEvent, EVENT_CONNACK);
+			   rt_kprintf("%seVent CONNACK\r\n",sign);
+					break;
+			 case SUBACK:{
+					unsigned short submsgid;
+					int subcount;
+					int granted_qos;
+				//	rt_kprintf("%smqttSub ack\r\n",sign);
+					MQTTDeserialize_suback(&submsgid, 1, &subcount, &granted_qos,(uint8_t *)NetRxBuffer, netRxBufLen);
+					if (granted_qos != 0)
+					{
+							rt_kprintf("%sERROR:granted qos != 0, 0x%02x\r\n", sign,granted_qos);
+					}
+				 rt_event_send(&mqttAckEvent, EVENT_SUBACK);
+					rt_kprintf("%seVent SUBACK\r\n",sign);
+				}
+				 break;
+			 case PINGRESP:
+				 rt_event_send(&mqttAckEvent, EVENT_PINGRESP);
+			   rt_kprintf("%sEVENT PINGRESP\r\n",sign);
+				 break;
+			 case PUBLISH:{
+				 extern bool mqttpubRead();
+				 rt_kprintf("%smqttPub ack begin\r\n",sign);
+				 mqttpubRead();
+				 rt_kprintf("%smqttPub ack end\r\n",sign);
+			  }
+				 break;
+			 default:
+				 rt_kprintf("%sphrase mqtthead err %d\n",sign,ret);
+				 break;
+			 
+		 }
+		 
+}
+
+
+
+//解析mqtt返回的消息头部类型
+//int  netPhraseHead()
+//{
+//	  char headBuf[10];	//根据手册得知剩余长度从第二个直接开始最大字段 4个字节  5个字节buf足够
+//	   rt_memcpy(headBuf,NetRxBuffer,sizeof(headBuf));
+//	//根据手册得知剩余长度从第二个直接开始最大字段 4个字节
+//   
+//	    int ret =MQTTPacket_read((uint8_t *)headBuf, sizeof(headBuf), transport_getdata);//作用确定头部以及剩余最大数量
+//	    return ret;
+//}
+
 

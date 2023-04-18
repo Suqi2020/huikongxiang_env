@@ -120,9 +120,6 @@ extern "C" {
 #define REALAY_CTRL4_GPIO_Port GPIOE
 #define LED_Pin GPIO_PIN_15
 #define LED_GPIO_Port GPIOE
-#define W5500_IRQ_Pin GPIO_PIN_11
-#define W5500_IRQ_GPIO_Port GPIOB
-#define W5500_IRQ_EXTI_IRQn EXTI15_10_IRQn
 #define SPAKER1_Pin GPIO_PIN_12
 #define SPAKER1_GPIO_Port GPIOB
 #define SPAKER3_Pin GPIO_PIN_13

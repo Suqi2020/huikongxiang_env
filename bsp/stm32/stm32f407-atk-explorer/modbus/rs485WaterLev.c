@@ -47,7 +47,7 @@ static void readWaterDepth(int num)
 	  uint8_t  *buf = RT_NULL;
 		buf = rt_malloc(LENTH);
 	  uint16_t len = modbusReadReg(sheet.waterDepth[num].slaveAddr,0X0002,READ_04,2,buf);
-		rt_mutex_take(uartDev[sheet.waterDepth[num].useUartNum].uartMutex,RT_WAITING_FOREVER);
+		//rt_mutex_take(.uartMessque[sheet.waterDepth[num].useUartNum].uartMutex,RT_WAITING_FOREVER);
 	  //485发送buf  len  等待modbus回应
 		waterDepthUartSend(num,buf,len);
 	  rt_kprintf("%swater send:",sign);
@@ -59,7 +59,7 @@ static void readWaterDepth(int num)
 		memset(buf,0,LENTH);
 		
 
-		while(rt_mq_recv(uartDev[sheet.waterDepth[num].useUartNum].uartMessque, buf+len, 1, 500) == RT_EOK){//115200 波特率1ms 10个数据
+		while(rt_mq_recv(&uartmque[sheet.waterDepth[num].useUartNum], buf+len, 1, 500) == RT_EOK){//115200 波特率1ms 10个数据
 				len++;
 		}
 		if(len!=0){
@@ -89,7 +89,7 @@ static void readWaterDepth(int num)
 			  rt_kprintf("%s read fail\n",sign);
 		}
 		//waterLevCheckSetFlag(num);
-	  rt_mutex_release(uartDev[sheet.waterDepth[num].useUartNum].uartMutex);
+	  //rt_mutex_release(.uartMessque[sheet.waterDepth[num].useUartNum].uartMutex);
 		rt_free(buf);
 	  buf=RT_NULL;
 
@@ -272,7 +272,7 @@ bool modPWaterLevWarn2Send()
 		return true;
 }
 //水位值的读取和打包发送  仅仅做封装 供别的函数来调用
-void waterDepthRead2Send(rt_bool_t netStat,bool respFlag)
+void waterDepthRead2Send(bool respFlag)
 {
 	 int workFlag=RT_FALSE;
 			for(int i=0;i<WATERDEPTH_485_NUM;i++){
@@ -284,15 +284,13 @@ void waterDepthRead2Send(rt_bool_t netStat,bool respFlag)
 			if(workFlag==RT_TRUE){
 					rt_kprintf("%s打包采集的waterdepth数据\r\n",sign);
 					waterDepthJsonPack(respFlag);
-					if(netStat==RT_TRUE)
-							packMqttSend();
+					
+					packMqttSend();
 					
 					rt_thread_mdelay(500);
 					if(modPWaterLevWarn2Send()==true){
 							resetWaterLevWarnFlag();//每次判断后复位warnflag状态值
-							//rt_thread_mdelay(500);
-							if(netStat==RT_TRUE)
-									packMqttSend();
+							packMqttSend();
 					}
 			}
 }

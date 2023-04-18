@@ -154,10 +154,16 @@
 //V0.92    裂缝仪厂家更改为标准modbus协议 代码加入测试 20230407
 //				 界面显示需要增加网关ip设置  连接远程服务器时候需要设置网关跟ip地址在同一个字段
 //V0.93    加入mqtt协议 测试
-#define APP_VER       ((0<<8)+93)//0x0105 表示1.5版本
+//         strcpy(MQTTDataPackt[topicNum].msg,(char *)payload_in);//此句可能导致(MEM_POOL(&small_mem->heap_ptr[mem->next]) == small_mem) assertion failed at function:rt_smem_free, line number:542 
+//V0.94    去掉心跳包发送，采用上行数据包的回应的时间提取出来进行校时
+//         去掉数据读取时候的信号量保护 没必要使用 同一个线程中起不到作用  不同线程中才有用 
+//	       rt_mutex_take(uartDev[sheet.pressSetl[num].useUartNum].uartMutex,RT_WAITING_FOREVER);
+//         rt_mutex_t uartMutex[UART_NUM]
+//V2.00    加入wdt和wdtevent事件  创建独立wdttask线程来监管其他5个线程实现某个线程死机后复位问题
+#define APP_VER       ((2<<8)+00)//0x0105 表示1.5版本
 //注：本代码中json格式解析非UTF8_格式代码（GB2312格式中文） 会导致解析失败
 //    打印log如下 “[dataPhrs]err:json cannot phrase”  20230403
-const char date[]="20230414";
+const char date[]="20230418";
 
 //static    rt_thread_t tid 	= RT_NULL;
 static    rt_thread_t tidW5500 	  = RT_NULL;
@@ -166,16 +172,32 @@ static    rt_thread_t tidNetSend 	= RT_NULL;
 static    rt_thread_t tidUpkeep 	= RT_NULL;
 static    rt_thread_t tidLCD      = RT_NULL;
 static    rt_thread_t tidAutoCtrl = RT_NULL;
-static    rt_thread_t tidMqtt    = RT_NULL;
+static    rt_thread_t tidMqtt     = RT_NULL;
+static    rt_thread_t tidWDT     = RT_NULL;
 //信号量的定义
 extern  rt_sem_t  w5500Iqr_semp;;//w5500有数据时候中断来临
-rt_mutex_t   netSend_mutex=RT_NULL;;
-rt_mutex_t   netRec_mutex=RT_NULL; //对读取的NetRxBuffer数组进行保护
+rt_mutex_t   netSend_mutex=RT_NULL;
+rt_mutex_t   read485_mutex=RT_NULL;//防止多个线程同事读取modbus数据
+//rt_mutex_t   netRec_mutex=RT_NULL; //对读取的NetRxBuffer数组进行保护
 //邮箱的定义
 //extern struct  rt_mailbox mbNetRecData;
 extern struct  rt_mailbox mbNetSendData;;
 //static char	 	 mbRecPool[20];//接收缓存20条
-static char 	 mbSendPool[20];//发送缓存20条
+//static char 	 mbSendPool[20];//发送缓存20条
+
+
+
+
+/* 事件控制块 */
+struct rt_event mqttAckEvent;
+ 
+
+#ifdef USE_WDT
+struct rt_event WDTEvent;
+#endif
+
+
+
 
 
 //队列的定义
@@ -190,6 +212,7 @@ extern  void   hardWareDriverTest(void);
 extern  void   LCDTask(void *parameter);
 extern  void   autoCtrlTask(void *para);
 extern  void   mqttTask(void *parameter);
+extern  void   WDTTask(void *parameter);
 const static char sign[]="[main]";
 //const char errStr[]="[ERR]";
 
@@ -221,38 +244,17 @@ static void timeout1(void *parameter)
 						alarmTick=100;// 1 2 3 最终10秒提醒一次
 				}
 
-//				modbusWorkErrCheck();//modbus 错误工作状态打印
-//				errConfigCheck();//	modbusWorkErrCheck();//errConfigCheck();
-				//modbusPrintRead();
-//				if(gbNetState ==RT_FALSE){
-//						rt_kprintf("%sERR:网络故障\n",sign);
-//				}
 		}
 }
 char *strnum="1234.5678";
-//double atof(const char *s);
 
-//char testNum[4]={1,2,3,4};
 void  outIOInit(void);
-struct rt_mutex  test_mutex;
+
 int main(void)
 {
 
-//		RELAY1_ON;
-//		RELAY2_ON;
-//		RELAY3_ON;
-//		RELAY4_ON;//上电后外部485全部供
-
-		
-		
 	  rt_kprintf("\n%\n",sign,date,(uint8_t)(APP_VER>>8),(uint8_t)APP_VER);
     rt_kprintf("\n%s%s  ver=%02d.%02d\n",sign,date,(uint8_t)(APP_VER>>8),(uint8_t)APP_VER);
-		if(1.00001==1)
-			rt_kprintf("(1.00001==1)\n");
-		if(1.0000000==1)
-			rt_kprintf("(1.00000==1)\n");
-	 // rt_kprintf("[%s %f]\n",strnum,atof(strnum));
-	  //rt_kprintf("name %s  %s\n",modbusName[0],modbusName_utf8[0]);
 	  rt_err_t result;
 		stm32_flash_read(FLASH_IP_SAVE_ADDR,    (uint8_t*)&packFlash,sizeof(packFlash));
 		stm32_flash_read(FLASH_MODBUS_SAVE_ADDR,(uint8_t*)&sheet,    sizeof(sheet));
@@ -260,26 +262,6 @@ int main(void)
 		if(packFlash.acuId[0]>=0x7F){
 				rt_strcpy(packFlash.acuId,"000000000000001");//必须加上 执行cJSON_AddStringToObject(root, "acuId",(char *)packFlash.acuId);
 		}                                                //会导致内存泄漏	
-	//		sheet.testFlag[0]=testNum+0;
-//		sheet.testFlag[1]=&testNum[1];
-//		sheet.testFlag[2]=&testNum[2];
-//		sheet.testFlag[3]=&testNum[3];
-//	  for(int i=0;i<4;i++){
-//				//rt_kprintf("%d ",testNum[i]);
-//			  rt_kprintf("%d ",*sheet.testFlag[i]);
-//		}
-//		rt_kprintf("\n");
-//		for(int i=0;i<4;i++){
-//				testNum[i]=i+10;
-//		}
-//		
-//		for(int i=0;i<4;i++){
-//				rt_kprintf("%d ",*sheet.testFlag[i]);
-//		}
-//		rt_kprintf("\n");
-//		stm32_flash_erase(FLASH_IP_SAVE_ADDR, sizeof(packFlash));//每次擦除128k字节数据 存储时候需要一起存储
-//		stm32_flash_write(FLASH_IP_SAVE_ADDR,(uint8_t*)&packFlash,sizeof(packFlash));
-//		stm32_flash_write(FLASH_MODBUS_SAVE_ADDR,(uint8_t*)&sheet,sizeof(sheet));
 		
 //////////////////////////////////////信号量//////////////////////////////
 	  w5500Iqr_semp = rt_sem_create("w5500Iqr_semp",0, RT_IPC_FLAG_FIFO);
@@ -293,23 +275,26 @@ int main(void)
     {
         rt_kprintf("%screate netSend_mutex failed\n",sign);
     }
-		netRec_mutex = rt_mutex_create("netRec_mutex", RT_IPC_FLAG_FIFO);
-		if (netRec_mutex == RT_NULL)
+		read485_mutex= rt_mutex_create("read485_mutex", RT_IPC_FLAG_FIFO);
+		if (read485_mutex == RT_NULL)
     {
-        rt_kprintf("%screate netRec_mutex failed\n",sign);
+        rt_kprintf("%screate read485_mutex failed\n",sign);
     }
-		
-//		test_mutex= rt_mutex_create("test_mutex", RT_IPC_FLAG_FIFO);
-//		if (test_mutex == RT_NULL)
-//    {
-//        rt_kprintf("%screate test_mutex failed\n",sign);
-//    }
-//		
-				//rt_mutex_init(&test_mutex,"test_mutex", RT_IPC_FLAG_FIFO);
-//		if (test_mutex == RT_NULL)
-//    {
-//        rt_kprintf("%screate test_mutex failed\n",sign);
-//    }
+
+///////////////////////////////////事件标志组////////////////////////////
+    if (rt_event_init(&mqttAckEvent, "mqttAckEvent", RT_IPC_FLAG_FIFO) != RT_EOK)
+    {
+        rt_kprintf("%sinit mqttAckEvent failed.\n",sign);
+
+    }
+
+#ifdef  USE_WDT   
+		if (rt_event_init(&WDTEvent, "WDTEvent", RT_IPC_FLAG_FIFO) != RT_EOK)
+    {
+        rt_kprintf("%sinit WDTEvent failed.\n",sign);
+
+    }
+#endif
 		  /* 创建定时器 周期定时器 */
     timer1 = rt_timer_create("timer1", timeout1,
                              RT_NULL, 100,
@@ -326,39 +311,19 @@ int main(void)
 		}
 		extern void 	uartMutexQueueCreate();
 		uartMutexQueueCreate();
-////////////////////////////////////邮箱//////////////////////////////////
+
 		
 
-//    result = rt_mb_init(&mbNetRecData,"mbRec",&mbRecPool[0],sizeof(mbRecPool)/4,RT_IPC_FLAG_FIFO);         
-//    if (result != RT_EOK)
-//    {
-//        rt_kprintf("%sinit mailbox NetRecData failed.\n",sign);
-//        return -1;
-//    }
-//    result = rt_mb_init(&mbNetSendData,"mbSend",&mbSendPool[0],sizeof(mbSendPool)/4,RT_IPC_FLAG_FIFO);         
-//    if (result != RT_EOK)
-//    {
-//        rt_kprintf("%sinit mailbox NetSend failed.\n",sign);
-//        return -1;
-//    }
 		
+extern IWDG_HandleTypeDef hiwdg;
 
+		HAL_IWDG_Refresh(&hiwdg);
 ////////////////////////////////任务////////////////////////////////////
-    tidW5500 =  rt_thread_create("w5500",w5500Task,RT_NULL,1024,3, 10 );
+    tidW5500 =  rt_thread_create("w5500",w5500Task,RT_NULL,1024*2,3, 10 );
 		if(tidW5500!=NULL){
 				rt_thread_startup(tidW5500);													 
 				rt_kprintf("%sRTcreat w5500Task task\r\n",sign);
 		}
-//		tidNetRec =  rt_thread_create("netRec",netDataRecTask,RT_NULL,1024,2, 10 );
-//		if(tidNetRec!=NULL){
-//				rt_thread_startup(tidNetRec);													 
-//				rt_kprintf("%sRTcreat netDataRecTask \r\n",sign);
-//		}
-//		tidNetSend =  rt_thread_create("netSend",netDataSendTask,RT_NULL,1024,2, 10 );
-//		if(tidNetSend!=NULL){
-//				rt_thread_startup(tidNetSend);													 
-//				rt_kprintf("%sRTcreat netDataSendTask \r\n",sign);
-//		}
 
 		tidMqtt = rt_thread_create("mqtt",mqttTask,RT_NULL,1024,4, 10 );
 		if(tidMqtt!=NULL){
@@ -368,7 +333,7 @@ int main(void)
 		else{
 				rt_kprintf("RTcreat mqtt ERR\r\n");
 		}		
-		
+
 		tidUpkeep 	=  rt_thread_create("upKeep",upKeepStateTask,RT_NULL,512*3,4, 10 );
 		if(tidUpkeep!=NULL){
 				rt_thread_startup(tidUpkeep);													 
@@ -379,30 +344,41 @@ int main(void)
 				rt_thread_startup(tidLCD);													 
 				rt_kprintf("%sRTcreat LCDStateTask \r\n",sign);
 		}
+
 		tidAutoCtrl =  rt_thread_create("autoCtrl",autoCtrlTask,RT_NULL,1024,5, 10 );
 		if(tidAutoCtrl!=NULL){
 				rt_thread_startup(tidAutoCtrl);													 
 				rt_kprintf("%sRTcreat autoCtrlTask\r\n",sign);
 		}
+#ifdef  USE_WDT
+		tidWDT =  rt_thread_create("tidWDT",WDTTask,RT_NULL,256,10, 10 );
+		if(tidWDT!=NULL){
+				rt_thread_startup(tidWDT);													 
+				rt_kprintf("%sRTcreat tidWDTTask\r\n",sign);
+		}
+	
+
+		HAL_IWDG_Refresh(&hiwdg);
+#endif	
+		
+//		extern void iwdg_regist(void);
+//		iwdg_regist();
 		//队列初始化之后再开启串口中断接收
-//		char test[50]={0};
-//			uint32_t a=4294967290;
-//			sprintf(test,"long:%u", a);//"monitoringTime":"1655172531937"
-//			rt_kprintf("%s %s \r\n",sign,test);
+
 //////////////////////////////结束//////////////////////////////////////
     while (0)//task用于测试 以及闪灯操作
     {
 				hardWareDriverTest();
 				HAL_GPIO_WritePin(LED_GPIO_Port, LED_Pin, GPIO_PIN_RESET);
 				rt_thread_mdelay(250);
-			  extern rt_bool_t gbNetState;
-			  if(gbNetState==RT_TRUE){
+			  extern rt_bool_t mqttState(void);
+			  if(mqttState()==RT_TRUE){
 					  rt_thread_mdelay(250);
 						
 				}
 				HAL_GPIO_WritePin(LED_GPIO_Port, LED_Pin, GPIO_PIN_SET);
 				rt_thread_mdelay(250);
-				if(gbNetState==RT_TRUE){
+				if(mqttState()==RT_TRUE){
 					  rt_thread_mdelay(250);	
 				}
     }

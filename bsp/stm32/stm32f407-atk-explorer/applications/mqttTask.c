@@ -20,7 +20,7 @@ extern rt_sem_t      MQTTDiscon_semp;
 extern rt_sem_t      wifiTcpOK_semp;
 //extern rt_mutex_t 		MQTTState_mutex ;
 MQTTDataPacktStru  MQTTDataPackt[MQTT_PACK_CNT]={NULL};
-extern rt_mutex_t netRec_mutex;
+//extern rt_mutex_t netRec_mutex;
 char deviceName[]="temp_0714_001";
 //static  char payload[]="{{\"sys\":{\"ack\":1},\"params\":{\"CurrentHumidity\":{\"value\":44},\"CurrentTemperature\":{\"value\":44.4}},\"method\":\"thing.event.property.post\"}";
 					
@@ -32,10 +32,11 @@ static bool MQTTState=false;// true con   false nocon
 #define  BROKER_RESP_TIMES    300
 
 void offLineGetTimeStart(void);
-int gu32OffLineTimes=0;
+//int gu32OffLineTimes=0;
 int gu32PingFailTimes=0;
 bool mqttState(void)
 {
+
 		return MQTTState;
 }
 
@@ -138,21 +139,10 @@ static int getSetJsoin(char *buf)
 }
 
 
-//解析mqtt返回的消息头部类型
-int  netPhraseHead()
-{
-	  char headBuf[10];	//根据手册得知剩余长度从第二个直接开始最大字段 4个字节  5个字节buf足够
-	   rt_memcpy(headBuf,NetRxBuffer,sizeof(headBuf));
-	//根据手册得知剩余长度从第二个直接开始最大字段 4个字节
-   
-	    int ret =MQTTPacket_read((uint8_t *)headBuf, sizeof(headBuf), transport_getdata);//作用确定头部以及剩余最大数量
-	    return ret;
-}
 
 
-
-
-
+uint32_t e;
+extern struct rt_event mqttAckEvent;
 
 int  dataPhrase(char *json)
 {
@@ -181,41 +171,23 @@ static void mqttSubFun()
 				
 	  for(int i=0;i<MQTT_PACK_CNT;i++){
 			  if(MQTTDataPackt[i].topic!=NULL){
-						rt_thread_delay(BROKER_RESP_TIMES);
 						topicString.cstring = MQTTDataPackt[i].topic;
 					  rt_kprintf("%smqttSub %s  %s\n\r",task,topicString.cstring,MQTTDataPackt[i].topic);
-					
-					
-				
+
 						rt_kprintf("%smqttSub %d topic\n\r",task,i);
 						sendBufLen = MQTTSerialize_subscribe((unsigned char*)sendBuf, sizeof(sendBuf), 0, 0, 1, &topicString, &req_qos);
-//						wifiUartSend( (uint8_t *)sendBuf,sendBufLen);
-//					  for(int k=0;k<sendBufLen;k++)
-//								packBuf[k]=sendBuf[k];
 					  transport_sendPacketBuffer((unsigned char*)sendBuf,sendBufLen);
-					  rt_thread_delay(BROKER_RESP_TIMES);//dalay for ack
-						rt_mutex_take(netRec_mutex,RT_WAITING_FOREVER);
-						if (netPhraseHead() == SUBACK) 	/* wait for suback */
-						{
-								unsigned short submsgid;
-								int subcount;
-								int granted_qos;
-							  rt_kprintf("%smqttSub ack\r\n",task);
-								MQTTDeserialize_suback(&submsgid, 1, &subcount, &granted_qos,(uint8_t *)NetRxBuffer, netRxBufLen);
-								if (granted_qos != 0)
-								{
-										rt_kprintf("%sERROR:granted qos != 0, 0x%02x\r\n", task,granted_qos);
-								}
-						}
-						memset(NetRxBuffer,0,sizeof(NetRxBuffer));
-						rt_mutex_release(netRec_mutex);
-				}
-//				else{
-//						rt_kprintf("%stopic is NULL %d \n\r",i);
-//				}
-		}
-//		mqttRet=-1;
 
+			
+					  if (rt_event_recv(&mqttAckEvent, (EVENT_SUBACK),
+                       RT_EVENT_FLAG_OR|RT_EVENT_FLAG_CLEAR,
+                      BROKER_RESP_TIMES, &e) == RT_EOK)
+						{
+								//rt_kprintf("thread1: OR recv event 0x%x\n", e);
+							  rt_kprintf("%smqttSub ack\r\n",task);
+						}
+				}
+		}
 }
 
 
@@ -224,9 +196,6 @@ static void mqttSubFun()
 bool  mqttpubRead()
 {
 
-			rt_mutex_take(netRec_mutex,RT_WAITING_FOREVER);
-			if (netPhraseHead()== PUBLISH)
-			{
 					unsigned char dup;
 					int qos;
 					unsigned char retained;
@@ -240,11 +209,12 @@ bool  mqttpubRead()
 					rt_kprintf("%srec topic: %.*s [%d]\r\n",task,receivedTopic.lenstring.len,receivedTopic.lenstring.data,receivedTopic.lenstring.len);
 					int topicNum = mqttFindTopic(receivedTopic.lenstring.data);
 				  if(topicNum>=0){
-						  rt_kprintf("%stopicNum >=0\r\n",task);
+						  rt_kprintf("%stopicNum =%d  payloadlen=%d\r\n",task,topicNum,payloadlen_in);
 							MQTTDataPackt[topicNum].msglen  = payloadlen_in;
 							MQTTDataPackt[topicNum].msg			= rt_malloc(payloadlen_in+1);//必须加1   是字符串
-
-							strcpy(MQTTDataPackt[topicNum].msg,(char *)payload_in);
+							//strcpy(MQTTDataPackt[topicNum].msg,(char *)payload_in);//此句可能导致(MEM_POOL(&small_mem->heap_ptr[mem->next]) == small_mem) assertion failed at function:rt_smem_free, line number:542 
+							strncpy(MQTTDataPackt[topicNum].msg,(char *)payload_in,payloadlen_in);
+							MQTTDataPackt[topicNum].msg[payloadlen_in]=0;//此句可能导致
 						  rt_kprintf("%stopicNum %d\r\n",task,topicNum);	
 						
 						  if(MQTTDataPackt[topicNum].fun!=NULL){
@@ -254,20 +224,17 @@ bool  mqttpubRead()
 							else{
 									rt_kprintf("%stopic fun is NULL\r\n",task);
 							}
-							rt_kprintf("%srec message: %.*s \r\n",task, MQTTDataPackt[topicNum].msglen, MQTTDataPackt[topicNum].msg);
+							rt_kprintf("%srec message: %.*s \r\n",task, MQTTDataPackt[topicNum].msglen, MQTTDataPackt[topicNum].msg);//
 						
 						  rt_free(MQTTDataPackt[topicNum].msg);
 
 						  MQTTDataPackt[topicNum].msg=NULL;
 						  MQTTDataPackt[topicNum].msglen=0;
-							//return true;
+
 					}
 					else
 							rt_kprintf("%snot find topic message arrived %.*s   topic:%s  %.*s [%d]\r\n",task, payloadlen_in, payload_in,receivedTopic.cstring,receivedTopic.lenstring.len,receivedTopic.lenstring.data,receivedTopic.lenstring.len);
-					//return false;
-			}
-			rt_memset(NetRxBuffer,0,sizeof(NetRxBuffer));
-			rt_mutex_release(netRec_mutex);
+
 			return false;
 }
 
@@ -284,28 +251,26 @@ void reFlashSendTime()
 {
 	sendTime = rt_tick_get();
 }
+
+extern rt_bool_t gbNetState;
 //mqtt状态的维持 数据收发
 int ping2Times=0;
 int pingRspTimes=0;
 int pingUnrspTimes=0;
+bool  mqttConStat=false;
 int  mqttLoopData(void)
 {
-  	
 
-//		static MQTTString topic= MQTTString_initializer;
 	  static int ret=0;
 	  static int conTimes=0;
 	  static uint8_t pingTimes=0;
 	  int  tep=0;
 
-
-//    char send[17];
-//	  int getUTCTimes;
 		switch(MQTTstep){
 			case  conMQTT_enum:
 				    //设备  humi_protect1
 
-#if USE_ALIYUN
+#ifdef USE_ALIYUN
 			 //阿里云ip 47.103.184.125 port 1883
 						connectData.clientID.lenstring.data	=	"a1S9kgxkc8w.humi_protect1|securemode=2,signmethod=hmacsha256,timestamp=1656924907170|";
 						connectData.clientID.lenstring.len	=	strlen(connectData.clientID.lenstring.data);
@@ -329,13 +294,14 @@ int  mqttLoopData(void)
 								rt_kprintf("%stry to con [%d]\r\n",task,sendBufLen);
 								transport_sendPacketBuffer((unsigned char*)sendBuf,sendBufLen);
 						}
-						rt_thread_delay(500);//dalay for ack
-						rt_mutex_take(netRec_mutex,RT_WAITING_FOREVER);
-						if(netPhraseHead()==CONNACK){//qos=0 
+//						rt_event_send(&WDTEvent,EVENT_WDT_MQTTTASK);
+						if (rt_event_recv(&mqttAckEvent,EVENT_CONNACK,RT_EVENT_FLAG_OR|RT_EVENT_FLAG_CLEAR, BROKER_RESP_TIMES, &e) == RT_EOK)
+						{//qos=0 
 								rt_kprintf("%sPUB reading CONNACK\r\n",task);//返回3 7 6 6的包
 							  MQTTstep	=	subMQTT_enum;
 							  mqttStateSet(true);
 							  conTimes=0;
+//							  rt_event_send(&WDTEvent,EVENT_WDT_MQTTTASK);
 						}
 						else{
 							  rt_kprintf("%sno connack\r\n",task);//返回3 7 6 6的包
@@ -344,14 +310,13 @@ int  mqttLoopData(void)
 										tep= -1;
 									  conTimes=0;
 								}
-
+								mqttConStat=true;
+								
 								rt_thread_delay(1000);
+//								rt_event_send(&WDTEvent,EVENT_WDT_MQTTTASK);
 						}
-						memset(NetRxBuffer,0,sizeof(NetRxBuffer));
-						rt_mutex_release(netRec_mutex);
 				break;
 			case 	subMQTT_enum:
-
 						mqttSubFun();
 			      MQTTstep	=	pubGetUtcMqtt_enum;
 				break;
@@ -365,39 +330,36 @@ int  mqttLoopData(void)
 						sendBufLen=MQTTSerialize_pingreq((uint8_t *)sendBuf, sizeof(sendBuf));			
 						rt_kprintf("%stry to ping [%d]\r\n",task,sendBufLen);			
 					  transport_sendPacketBuffer((unsigned char*)sendBuf,sendBufLen);
-						rt_thread_delay(BROKER_RESP_TIMES);
-						//reFlashSendTime();
-						rt_mutex_take(netRec_mutex,RT_WAITING_FOREVER);
-						if(netPhraseHead()== PINGRESP){
-							pingRspTimes++;
+						if (rt_event_recv(&mqttAckEvent, (EVENT_PINGRESP),
+                       RT_EVENT_FLAG_OR|RT_EVENT_FLAG_CLEAR,
+                      BROKER_RESP_TIMES, &e) == RT_EOK){
+								pingRspTimes++;
 								rt_kprintf("%sPong\r\n",task);
-		
 							  pingTimes=0;
 								MQTTstep=dealwithMQTT_enum;
 							  
 						}
 						else {
-							pingUnrspTimes++;
+								pingUnrspTimes++;
 								rt_kprintf("%sOOPS %d\r\n",task,ret);
 								gu32PingFailTimes++;
 							  if(pingTimes++>=2){//先判断后++
 									  MQTTstep	=	resetMQTT_enum;
-									  gu32OffLineTimes++;
-//										mqttStateSet(false);;
-//										offLineGetTimeStart();
-								}
-								//rt_thread_delay(10000);
-						}
-						memset(NetRxBuffer,0,sizeof(NetRxBuffer));
-						rt_mutex_release(netRec_mutex);
-						rt_kprintf("ping[%d],pingrsp[%d],pingUnrsp[%d]\n",ping2Times,pingRspTimes,pingUnrspTimes);
+//									  gu32OffLineTimes++;
+										mqttStateSet(false);
 
+										if(gbNetState==RT_TRUE){
+												gbNetState = RT_FALSE;
+												offLine.mqttTimes++;
+										}
+								}
+						}
+						rt_kprintf("ping[%d],pingrsp[%d],pingUnrsp[%d]\n",ping2Times,pingRspTimes,pingUnrspTimes);
 				break;
 			case  dealwithMQTT_enum://
 						if((rt_tick_get()-sendTime)>(MQTTKEEPALIVE_TIME_S)*1000){
 								MQTTstep=pingMQTT_enum;
 						}
-						mqttpubRead();
 				break;
 			case  resetMQTT_enum:
 				    mqttCleanTopic();
@@ -411,22 +373,24 @@ int  mqttLoopData(void)
 						else
 							  rt_kprintf("%sdis conn err\r\n");
 						MQTTstep=conMQTT_enum;
-						
+//						rt_event_send(&WDTEvent,EVENT_WDT_MQTTTASK);
 						mqttStateSet(false);;
-//						offLineGetTimeStart();
 						rt_thread_delay(1000);
 				break;
 		}
-		//mqttRet=-1;
 		return tep;
 }	
 
 void rstMqttStep()
 {
-		MQTTstep=resetMQTT_enum;
+		if(mqttConStat==true){
+			offLine.mqttTimes++;
+			mqttConStat=false;
+		}
+	  MQTTstep=resetMQTT_enum;
 }
 
-extern rt_bool_t gbNetState;
+
 extern struct rt_mutex  test_mutex;
 void  mqttTask(void *parameter)
 {
@@ -435,9 +399,13 @@ void  mqttTask(void *parameter)
 					rt_kprintf("test_mutex 002\n");
 					rt_thread_delay(2000);
 	}
+//	rt_event_send(&WDTEvent,EVENT_WDT_MQTTTASK);
 			while(1){
 				  if(gbNetState==RT_TRUE)
 						  mqttLoopData();
+#ifdef  USE_WDT
+					rt_event_send(&WDTEvent,EVENT_WDT_MQTTTASK);
+#endif
 					rt_thread_delay(1000);
 			}
 }
@@ -445,84 +413,6 @@ void  mqttTask(void *parameter)
 
 
 
-
-//接收到的数据在此函数进行处理  由net层接收数据后调用
-//记得每次处理完清buf
-//extern uint32_t gu32RecDataLen;
-
-//int  netPhraseRecData(uint8_t *Buf ,int len)
-//{
-////			rt_kprintf("rec1:");
-
-
-//	   rt_memcpy(headBuf,NetRxBuffer,sizeof(headBuf));
-//	//根据手册得知剩余长度从第二个直接开始最大字段 4个字节
-//   
-//	    int ret =MQTTPacket_read((uint8_t *)headBuf, sizeof(headBuf), transport_getdata);//作用确定头部以及剩余最大数量
-//	
-//	    switch(ret)
-//			{
-//				case SUBACK:
-//					break;
-//				case PUBLISH:
-//				 {
-//					unsigned char dup;
-//					int qos;
-//					unsigned char retained;
-//					unsigned short msgid;
-//					int payloadlen_in;
-//					unsigned char* payload_in;
-
-//					MQTTString receivedTopic;
-//					int rc = MQTTDeserialize_publish(&dup, &qos, &retained, &msgid, &receivedTopic,
-//							&payload_in, &payloadlen_in, (uint8_t *)Buf,  len);
-//					rt_kprintf("%srec topic: %.*s [%d]\r\n",task,receivedTopic.lenstring.len,receivedTopic.lenstring.data,receivedTopic.lenstring.len);
-//					int topicNum = mqttFindTopic(receivedTopic.lenstring.data);
-//				  if(topicNum>=0){
-//						  rt_kprintf("%s,topicNum >=0\r\n",task);	
-//							MQTTDataPackt[topicNum].msglen  = payloadlen_in;
-//							MQTTDataPackt[topicNum].msg			= rt_malloc(payloadlen_in+1);//必须加1   是字符串
-
-//							strcpy(MQTTDataPackt[topicNum].msg,(char *)payload_in);
-//						  rt_kprintf("%stopicNum %d\r\n",task,topicNum);	
-//						
-//						  if(MQTTDataPackt[topicNum].fun!=NULL){
-//								  
-//									MQTTDataPackt[topicNum].fun(MQTTDataPackt[topicNum].msg);//执行回调函数
-//							}
-//							else{
-//									rt_kprintf("%stopic fun is NULL\r\n",task);	
-//							}
-//							rt_kprintf("%srec len=%d message: %.*s \r\n",task, MQTTDataPackt[topicNum].msglen,MQTTDataPackt[topicNum].msglen, MQTTDataPackt[topicNum].msg);
-//						
-//						  rt_free(MQTTDataPackt[topicNum].msg);
-
-//						  MQTTDataPackt[topicNum].msg=NULL;
-//						  MQTTDataPackt[topicNum].msglen=0;
-//							return true;
-//					}
-//					else
-//							rt_kprintf("%snot find topic message arrived %.*s   topic:%s  %.*s [%d]\r\n",task, payloadlen_in, payload_in,receivedTopic.cstring,receivedTopic.lenstring.len,receivedTopic.lenstring.data,receivedTopic.lenstring.len);
-//				 }
-//					break;
-//				case CONNACK:
-//					{
-//					extern void offLineGettimesEnd();
-//				
-//					offLineGettimesEnd();
-//						//rt_kprintf("%sPUB reading CONNACK\r\n",task);//返回3 7 6 6的包
-//					}
-//					break;
-//				case PINGRESP:
-//						//rt_kprintf("%sPong\r\n",task);
-//					break;
-//				default:
-//					rt_kprintf("%s error:netPhraseRecData [%d]\n",task,ret);
-//				  break;
-//				
-//			}
-//			return ret;
-//}
 
 
 

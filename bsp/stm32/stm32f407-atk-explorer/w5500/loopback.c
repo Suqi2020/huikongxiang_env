@@ -98,250 +98,15 @@ void SOCK_DISCON(SOCKET s)
 	ch_status[s] = 0;
 	I_STATUS[s] &= ~(0x02);
 }
-#if 0
-void loopback_tcps(SOCKET s, uint16 port)
-{	
-	uint16 len = 0;//, cnt = 0;
-	uint8 * data_buf = (uint8*) TX_BUF;
-	uint8 tmp = 0;
 
-		if(I_STATUS[s] == SOCK_CLOSED)
-		{// cloes
-			if(!ch_status[s]) 
-			{
-				ch_status[s] = 1;
-				if(socket(s,Sn_MR_TCP,port,0x00) == 0)	  /* reinitialize the socket */
-				{
-					ch_status[s] = 0;
-				}
-				else	
-				{
-					listen(s);
-				}
-			}
-		}  
-		if(I_STATUS[s]&Sn_IR_CON)
-		{// connected
-			ch_status[s] = 2;
-			I_STATUS[s] &= ~(0x01);
-			//break;
-		}
-		if(I_STATUS[s]&Sn_IR_DISCON)
-		{// discon			
-			if ((getSn_RX_RSR(s)) > 0)		/* check Rx data */
-			{				
-				if (len > TX_RX_MAX_BUF_SIZE) 
-				len = TX_RX_MAX_BUF_SIZE; /* if Rx data size is lager than TX_RX_MAX_BUF_SIZE */
-			    recv(s, data_buf, len);		/* read the received data */
-						data_buf[len]=0x00;
-				rt_kprintf("%s\r\n",data_buf);
-			}
-			SOCK_DISCON(s);
-			//break;
-		}
-		if(I_STATUS[s]&Sn_IR_RECV)
-		{
-			IINCHIP_WRITE(IMR, 0x00);//开中断屏蔽IP,UNREACH,PPPoE,Magic Packet
-			IINCHIP_WRITE(SIMR, 0x00);//开socket中断屏蔽  
-			IINCHIP_ISR_DISABLE();
-			tmp = I_STATUS[s];
-			I_STATUS[s] &= ~(0x04); // RECV
-			IINCHIP_ISR_ENABLE();
- 
-			IINCHIP_WRITE(IMR, 0xF0);
-			IINCHIP_WRITE(SIMR, 0xFF);
-		// recv
-			if (tmp & Sn_IR_RECV)
-			{
-				if((len = getSn_RX_RSR(s)) > 0)		/* check Rx data */
-				{
-					if (len > TX_RX_MAX_BUF_SIZE) 
-					len = TX_RX_MAX_BUF_SIZE;	/* if Rx data size is lager than TX_RX_MAX_BUF_SIZE */
-					len = recv(s, data_buf, len); /* read the received data */
-					data_buf[len]=0;  //防止多打印
-					rt_kprintf("%s\r\n",data_buf);
-					send(s,data_buf,len);
-					tmp = I_STATUS[s];
-				}
-			 }
-			//break;
-		}
-		if(I_STATUS[s]&Sn_IR_SEND_OK)
-		{
-			// send ok
-			I_STATUS[s] &= ~(0x10);
-			//break;
-		}
-#if 0
-#if (__MCU_TYPE__ == __MCU_STM32F103__)
-		/**/
-		if(GPIO_ReadInputDataBit(GPIOC, GPIO_Pin_6) == 0x00) EXTI_GenerateSWInterrupt(EXTI_Line6);
-
-#endif
-
-
-#endif
 		
-}
-
-#endif
 
 
-
-
-#if 0
-bool test=false;
-void loopback_tcpc(SOCKET s, uint16 port)
-{
-	static rt_bool_t  offLineTimesGet=RT_FALSE;
-	uint16 len=0; 						
-	//uint8 * data_buf = (uint8*) NetRxBuffer;
-	uint8	tmp = 0;
-	switch (I_STATUS[s])
-	{
-		case SOCK_CLOSED://无中断
-			// cloes
-			if(!ch_status[s])
-			{				
-				ch_status[s] = 1;
-				socket(s, Sn_MR_TCP, port, 0x00);  			//connect(SOCK_TCPC,remote_ip,remote_port);                /*socket连接服务器*/ 
-				connect(s, packFlash.netIpFlash.remoteIp,packFlash.netIpFlash.remotePort);
-				rt_kprintf("%sw5500 coning\r\n",sign);
-			}			
-			//rt_kprintf("w5500 cloes %d\r\n",I_STATUS[s]);
-			break;
-		case Sn_IR_CON: 
-			// connected
-			ch_status[s] = 2;
-			I_STATUS[s] &= ~(0x01);
-		  rt_kprintf("%sw5500 connected\r\n",sign);
-		test=true;
-		  extern rt_bool_t  gbNetState;
-			gbNetState =RT_TRUE;	
-			extern void  LCDDispNetOffline();
-		  LCDDispNetOffline();
-		  offLineTimesGet =RT_FALSE;
-			offLine.relayTimer[offLine.times]=(rt_tick_get()/1000-offLine.relayTimer[offLine.times]);
-		
-						  rt_kprintf("%sw5500 offtimes[%d] relaytimes[%d]\r\n",sign,offLine.times,offLine.relayTimer[offLine.times]);
-
-//		  extern struct rt_mailbox mbNetSendData;
-//		  extern uint8_t   packBuf[TX_RX_MAX_BUF_SIZE];
-//			packMqttSend(); 
-			break;
-		case Sn_IR_DISCON: 
-			// discon
-			if ((len = getSn_RX_RSR(s)) > 0)		/* check Rx data */
-			{
-				if (len > TX_RX_MAX_BUF_SIZE) len = TX_RX_MAX_BUF_SIZE; /* if Rx data size is lager than TX_RX_MAX_BUF_SIZE */
-				//uint8_t *data_buf = (uint8_t *)rt_malloc(len);
-				len = recv(s, NetRxBuffer, len);		/* read the received data */
-				gu32RecDataLen=len;
-				NetRxBuffer[len]=0;  //防止多打印
-				gu32RecDataLen=len;
-				mqttRet=  netPhraseRecData(NetRxBuffer ,len);
-				
-			}
-			SOCK_DISCON(s);
-			//rt_kprintf("w5500 discon\r\n");
-			extern rt_bool_t gbNetState;
-			
-			if(offLineTimesGet==RT_FALSE){//只获取一次
-				  offLineTimesGet =RT_TRUE;
-					gbNetState = RT_FALSE;
-					offLine.times++;
-					offLine.relayTimer[offLine.times]=rt_tick_get()/1000;
-//				  rt_kprintf("w5500 discon %d  %d\r\n",offLine.times,offLine.relayTimer[offLine.times]);
-					extern void  LCDDispNetOffline();
-					LCDDispNetOffline();
-			}
-			rt_kprintf("%sw5500 discon\r\n",sign);
-			break;
-		case Sn_IR_RECV: 
-			IINCHIP_WRITE(IMR, 0x00);//开中断屏蔽IP,UNREACH,PPPoE,Magic Packet
-			IINCHIP_WRITE(SIMR, 0x00);//开socket中断屏蔽  
-			IINCHIP_ISR_DISABLE();
-			tmp = I_STATUS[s];
-			I_STATUS[s] &= ~(0x04); // RECV
-			IINCHIP_ISR_ENABLE();
- 
-			IINCHIP_WRITE(IMR, 0xF0);
-			IINCHIP_WRITE(SIMR, 0xFF);
-			if (tmp & Sn_IR_RECV)
-			{
-				if((len = getSn_RX_RSR(s)) > 0)		/* check Rx data */
-				{
-					if (len > TX_RX_MAX_BUF_SIZE) 
-					len = TX_RX_MAX_BUF_SIZE;	/* if Rx data size is lager than TX_RX_MAX_BUF_SIZE */
-				
-
-					len = recv(s, NetRxBuffer, len); /* read the received data */
-					NetRxBuffer[len]=0;  //防止多打印
-					
-					gu32RecDataLen=len;
-		rt_kprintf("rec:");
-	    for(int i=0;i<len ;i++)
-	rt_kprintf("%02x ",NetRxBuffer[i]);
-	rt_kprintf("\n");
-			  	mqttRet=  netPhraseRecData(NetRxBuffer ,len);
-
-//					extern struct rt_mailbox mbNetRecData;
-//					rt_mb_send_wait(&mbNetRecData, (rt_ubase_t)&NetRxBuffer,RT_WAITING_FOREVER);  
-					//send(s,data_buf,len);//
-//					rt_thread_mdelay(500); //延时后边再打印
-//				rt_kprintf("%snet rec len:%d \r\n",sign,len);
-//					rt_kprintf("[");
-//					for(int i=0;i<len;i++)
-//					   rt_kprintf("%02x",NetRxBuffer[i]);
-//					rt_kprintf("]\r\n");
-
-					tmp = I_STATUS[s];
-				}
-			 }
-			break;
-		case Sn_IR_SEND_OK: 
-			// send ok
-			I_STATUS[s] &= ~(0x10);
-		  if(test==true)
-			{
-				test=false;
-		  rt_kprintf("w5500 send ok\r\n"); //发送接口 send(s,data_buf,len);
-			}
-			break;
-		default:
-			I_STATUS[s] =0;
-		  ch_status[s] = 0;
-		  break;
-	}
-	//if(GPIO_ReadInputDataBit(GPIOC, GPIO_Pin_6) == 0x00) EXTI_GenerateSWInterrupt(EXTI_Line6);
-}
-
-#endif
 
 extern rt_bool_t gbNetState;
  rt_bool_t  offLineTimesGet=RT_TRUE;
 
-//登记每次掉线的初次时间  通过offLineTimesGet标记登记一次即可
-//void offLineGetTimeStart()
-//{
-//		if(offLineTimesGet==RT_TRUE){//只获取一次
-//				offLineTimesGet =RT_FALSE;
-//				gbNetState = RT_FALSE;
-////				offLine.times++;
-////				offLine.relayTimer[offLine.times]=rt_tick_get()/1000;
-//			  extern void rstMqttStep();
-//				rstMqttStep();
-//		}
-//}
-//获取每次掉线额真正时间
-//当前时间减去了登记的最初时间
-//void offLineGettimesEnd()
-//{
-//		extern void  LCDDispNetOffline();
-//		LCDDispNetOffline();
-//		
-//		offLine.relayTimer[offLine.times]=(rt_tick_get()/1000-offLine.relayTimer[offLine.times]);
-//}
+
 uint32_t gu32RecDataLen=0;
 
 extern int  netPhraseRecData(uint8_t *recBuf ,int len);
@@ -358,101 +123,39 @@ void loopback_tcp(uint16 port)
 		case SOCK_CLOSED:											        		         /*socket处于关闭状态*/
 			socket(SOCK_TCPC,Sn_MR_TCP,port,Sn_MR_ND);
 		  rt_kprintf("SOCK_CLOSED\n");
-     // offLineGetTimeStart();
-			offLine.relayTimer[offLine.times]=(rt_tick_get()/1000-offLine.relayTimer[offLine.times]);
 		  break;
-		
 		case SOCK_INIT:													        	         /*socket处于初始化状态*/
 			connect(SOCK_TCPC,packFlash.netIpFlash.remoteIp,packFlash.netIpFlash.remotePort);               /*socket连接服务器*/ 
 		  rt_kprintf("SOCK_INIT\n");
-		  //gbNetState =RT_FALSE;	
 		  break;
-		
 		case SOCK_ESTABLISHED: 												             /*socket处于连接建立状态*/
 			if(getSn_IR(SOCK_TCPC) & Sn_IR_CON)
 			{
 				setSn_IR(SOCK_TCPC, Sn_IR_CON); 							         /*清除接收中断标志位*/
 			}
-		
 			netRxBufLen=getSn_RX_RSR(SOCK_TCPC); 								  	         /*定义len为已接收数据的长度*/
 			if(netRxBufLen>0)
 			{
-				extern rt_mutex_t netRec_mutex;
-				rt_mutex_take(netRec_mutex,RT_WAITING_FOREVER);
 				recv(SOCK_TCPC,NetRxBuffer,netRxBufLen); 							   		         /*接收来自Server的数据*/
-				NetRxBuffer[netRxBufLen]=0x00;  											                 /*添加字符串结束符*/
-				rt_mutex_release(netRec_mutex);
-				
 				rt_kprintf("rec:");
 				for(int i=0;i<netRxBufLen ;i++)
 				rt_kprintf("%02x ",NetRxBuffer[i]);
 				rt_kprintf("\n");
-			//	mqttRet=  netPhraseRecData(NetRxBuffer ,netRxBufLen);
-			//	send(SOCK_TCPC,NetRxBuffer,len);								     	         /*向Server发送数据*/
+				void netRecSendEvent();		
+        netRecSendEvent();				//mqttLoopData();						     	         /*向Server发送数据*/
 			}		  
 			if(gbNetState!=RT_TRUE){
 					gbNetState =RT_TRUE;	
 					rt_kprintf("SOCK_ESTABLISHED\n");
 			}
 		  break;
-			
 		case SOCK_CLOSE_WAIT: 											    	         /*socket处于等待关闭状态*/
 			close(SOCK_TCPC);
 		  rt_kprintf("SOCK_CLOSE_WAIT\n");
-		  //gbNetState =RT_FALSE;	
-		
 		  break;
-
 	}
 }
 
-#if 0
-void loopback_udp(SOCKET s, uint16 port)
-{
-	uint16 len;
-	uint8 * data_buf = (u8*) TX_BUF;
-	uint32_t destip = 0;
-	uint16 destport;
-  uint8 tmp;
-	
-	switch (I_STATUS[s])
-	{
-		case SOCK_CLOSED:                                               /* if a socket is closed */
-			//printf("\r\n%d : Loop-Back UDP Started. port :%d", s, port);
-			if(socket(s,Sn_MR_UDP,port,0x00)== 0)    /* reinitialize the socket */
-				rt_kprintf("\a%d : Fail to create socket.",s);
-			break;
-		case Sn_IR_SEND_OK: 
-			// send ok
-			I_STATUS[s] &= ~(0x10);
-			break;
-		case Sn_IR_RECV: 			
-			IINCHIP_WRITE(IMR, 0x00);//开中断屏蔽IP,UNREACH,PPPoE,Magic Packet
-			IINCHIP_WRITE(SIMR, 0x00);//开socket中断屏蔽  
-			IINCHIP_ISR_DISABLE();
-			tmp = I_STATUS[s];
-			I_STATUS[s] &= ~(0x04); // RECV
-			IINCHIP_ISR_ENABLE();
- 
-			IINCHIP_WRITE(IMR, 0xF0);
-			IINCHIP_WRITE(SIMR, 0xFF);
-			if (tmp & Sn_IR_RECV)
-			{
-				if((len = getSn_RX_RSR(s)) > 0)		/* check Rx data */
-				{
-					if (len > TX_RX_MAX_BUF_SIZE) 
-					len = TX_RX_MAX_BUF_SIZE;	/* if Rx data size is lager than TX_RX_MAX_BUF_SIZE */
-					len = recvfrom(s, data_buf, len,(uint8*)&destip,&destport);/* read the received data */
-					data_buf[len]=0;  //防止多打印
-					rt_kprintf("%s\r\n",data_buf);
-					sendto(s, data_buf, len,(uint8*)&destip,destport) ;
-					tmp = I_STATUS[s];
-				}
-			 }
-			break;
-	}
-}
-#endif
 
 
 

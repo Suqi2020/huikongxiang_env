@@ -184,6 +184,10 @@ void senseTimeJsonSet(cJSON   *Json,bool  modbusFlag)
 						result=true;
 						sheet.pressSetlColTime = calTime;
 					}
+					else if(rt_strcmp(string,"crackmeter_monitor")==0){
+						result=true;
+						sheet.crackMeterColTime = calTime;
+					}
 		}
 		else{
 		#ifndef     ANA_MASK

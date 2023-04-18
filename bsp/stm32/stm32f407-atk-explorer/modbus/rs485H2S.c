@@ -50,7 +50,7 @@ void readH2S(int num)
 	  uint8_t  *buf = RT_NULL;
 		buf = rt_malloc(LENTH);
 	  uint16_t len = modbusReadReg(sheet.h2s[num].slaveAddr,0X0002,READ_03,2,buf);
-		rt_mutex_take(uartDev[sheet.h2s[num].useUartNum].uartMutex,RT_WAITING_FOREVER);
+//		rt_mutex_take(.uartMessque[sheet.h2s[num].useUartNum].uartMutex,RT_WAITING_FOREVER);
 	  //485发送buf  len  等待modbus回应
 		h2sUartSend(num,buf,len);
 	  rt_kprintf("%sh2s send:",sign);
@@ -61,7 +61,7 @@ void readH2S(int num)
     len=0;
 		memset(buf,0,LENTH);
 
-		while(rt_mq_recv(uartDev[sheet.h2s[num].useUartNum].uartMessque, buf+len, 1, 500) == RT_EOK){//115200 波特率1ms 10个数据
+		while(rt_mq_recv(&uartmque[sheet.h2s[num].useUartNum], buf+len, 1, 500) == RT_EOK){//115200 波特率1ms 10个数据
 				len++;
 		}
 		if(len!=0){
@@ -90,7 +90,7 @@ void readH2S(int num)
 			  rt_kprintf("%s read fail\n",sign);
 		}
 		//h2sCheckSetFlag(num);
-	  rt_mutex_release(uartDev[sheet.h2s[num].useUartNum].uartMutex);
+//	  rt_mutex_release(.uartMessque[sheet.h2s[num].useUartNum].uartMutex);
 		rt_free(buf);
 	  buf=RT_NULL;
 

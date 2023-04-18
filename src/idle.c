@@ -298,6 +298,10 @@ static void rt_thread_system_entry(void *parameter)
 }
 #endif
 
+
+
+
+
 /**
  * @brief This function will initialize idle thread, then start it.
  *
@@ -307,7 +311,7 @@ void rt_thread_idle_init(void)
 {
     rt_ubase_t i;
     char idle_thread_name[RT_NAME_MAX];
-
+//    rt_thread_idle_sethook(&wdg_feed_idle);
     for (i = 0; i < _CPUS_NR; i++)
     {
         rt_sprintf(idle_thread_name, "tidle%d", i);

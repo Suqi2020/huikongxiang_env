@@ -21,12 +21,12 @@ extern void uart6SendRecTest(void);
 
 #endif
 typedef struct{
-	 uint32_t times;
-	 uint32_t relayTimer[100];
+	 uint32_t netTimes;
+	 uint32_t mqttTimes;
 }offLineStru;
 
-extern uint32_t offLTimes;
-extern uint32_t onLTimes;
+//extern uint32_t offLTimes;
+//extern uint32_t onLTimes;
 extern offLineStru offLine;
 
 

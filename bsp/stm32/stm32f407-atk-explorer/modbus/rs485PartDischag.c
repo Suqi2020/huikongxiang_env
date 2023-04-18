@@ -146,7 +146,6 @@ void readPdFreqDischarge(int num)
 	  uint8_t  *buf = RT_NULL;
 		buf = rt_malloc(LENTH);
 	  uint16_t len = modbusReadReg(sheet.partDischag[num].slaveAddr,0x0300,READ_03,18,buf);
-		rt_mutex_take(uartDev[sheet.partDischag[num].useUartNum].uartMutex,RT_WAITING_FOREVER);
 	  //485发送buf  len  等待modbus回应
 		partDischagUartSend(num,buf,len);
 	  rt_kprintf("%sPdFreqDiach send:",sign);
@@ -156,10 +155,10 @@ void readPdFreqDischarge(int num)
 		rt_kprintf("\n");
 		memset(buf,0,LENTH);
     len=0;
-		if(rt_mq_recv(uartDev[sheet.partDischag[num].useUartNum].uartMessque, buf+len, 1, 3000) == RT_EOK){//第一次接收时间放长点  相应时间有可能比较久
+		if(rt_mq_recv(&uartmque[sheet.partDischag[num].useUartNum], buf+len, 1, 3000) == RT_EOK){//第一次接收时间放长点  相应时间有可能比较久
 				len++;
 		}
-		while(rt_mq_recv(uartDev[sheet.partDischag[num].useUartNum].uartMessque, buf+len, 1, 10) == RT_EOK){//115200 波特率1ms 10个数据
+		while(rt_mq_recv(&uartmque[sheet.partDischag[num].useUartNum], buf+len, 1, 10) == RT_EOK){//115200 波特率1ms 10个数据
 				len++;
 		}
 		if(len!=0){
@@ -206,7 +205,7 @@ void readPdFreqDischarge(int num)
 			  rt_kprintf("%sPdFreqDiach read fail\n",sign);
 		}
     //partDischCheckSetFlag(num);//test only
-	  rt_mutex_release(uartDev[sheet.partDischag[num].useUartNum].uartMutex);
+//	  rt_mutex_release(&uartmque[sheet.partDischag[num].useUartNum].uartMutex);
 		rt_free(buf);
 	  buf=RT_NULL;
 
@@ -222,7 +221,7 @@ rt_bool_t readPartDischgWarning(int num)
 	  uint8_t  *buf = RT_NULL;
 		buf = rt_malloc(LENTH);
 	  uint16_t len = modbusReadBitReg(sheet.partDischag[num].slaveAddr,0x0001,8,buf);//读取8个bit
-		rt_mutex_take(uartDev[sheet.partDischag[num].useUartNum].uartMutex,RT_WAITING_FOREVER);
+//		rt_mutex_take(&uartmque[sheet.partDischag[num].useUartNum].uartMutex,RT_WAITING_FOREVER);
 	  //485发送buf  len  等待modbus回应
 		partDischagUartSend(num,buf,len);
 	  rt_kprintf("%sreadPd send:",sign);
@@ -232,10 +231,10 @@ rt_bool_t readPartDischgWarning(int num)
 		rt_kprintf("\n");
 		memset(buf,0,LENTH);
     len=0;
-		if(rt_mq_recv(uartDev[sheet.partDischag[num].useUartNum].uartMessque, buf+len, 1, 2000) == RT_EOK){//第一次接收时间放长点  相应时间有可能比较久
+		if(rt_mq_recv(&uartmque[sheet.partDischag[num].useUartNum], buf+len, 1, 2000) == RT_EOK){//第一次接收时间放长点  相应时间有可能比较久
 				len++;
 		}
-		while(rt_mq_recv(uartDev[sheet.partDischag[num].useUartNum].uartMessque, buf+len, 1, 10) == RT_EOK){//115200 波特率1ms 10个数据
+		while(rt_mq_recv(&uartmque[sheet.partDischag[num].useUartNum], buf+len, 1, 10) == RT_EOK){//115200 波特率1ms 10个数据
 				len++;
 		}
 		rt_kprintf("%srec:",sign);
@@ -243,7 +242,7 @@ rt_bool_t readPartDischgWarning(int num)
 				rt_kprintf("%x ",buf[j]);
 		}
 		rt_kprintf("\n");
-//		uartDev[modbusFlash[PARTDISCHAG].useUartNum].offline=RT_FALSE;
+//		&uartmque[modbusFlash[PARTDISCHAG].useUartNum].offline=RT_FALSE;
 		//提取环流值 第一步判断crc 第二部提取
 		int ret2=modbusRespCheck(sheet.partDischag[num].slaveAddr,buf,len,RT_TRUE);
 		if(0 == ret2){//刷新读取到的值
@@ -264,7 +263,7 @@ rt_bool_t readPartDischgWarning(int num)
 			  rt_kprintf("%s提取alarm fail\r\n",sign);
 		}
    
-	  rt_mutex_release(uartDev[sheet.partDischag[num].useUartNum].uartMutex);
+//	  rt_mutex_release(&uartmque[sheet.partDischag[num].useUartNum].uartMutex);
 		rt_free(buf);
 	  buf=RT_NULL;
 		if(partDiscStru_p[num].alarm.a||partDiscStru_p[num].alarm.b||partDiscStru_p[num].alarm.c)
@@ -523,7 +522,7 @@ bool modPartDischagWarn2Send()
 }
 
 //局放的读取和发送  供其他函数来调用
-void partDischagRead2Send(rt_bool_t netStat,bool respFlag)
+void partDischagRead2Send(bool respFlag)
 {
 		int workFlag=RT_FALSE;
 		for(int i=0;i<PARTDISCHAG_485_NUM;i++){
@@ -536,13 +535,10 @@ void partDischagRead2Send(rt_bool_t netStat,bool respFlag)
 		if(workFlag==RT_TRUE){
 				rt_kprintf("%s打包采集的PARTDISCHAG数据\r\n",sign);
 				partDischagJsonPack(respFlag);//后期加入
-				if(netStat==RT_TRUE)
 						packMqttSend();
 				rt_thread_mdelay(500);
 				if(modPartDischagWarn2Send()==true){
 						resetPartDischagWarnFlag();//每次判断后复位warnflag状态值
-						//rt_thread_mdelay(500);
-						if(netStat==RT_TRUE)
 								packMqttSend();
 				}
 		}

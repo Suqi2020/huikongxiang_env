@@ -42,7 +42,7 @@
 
 #define RT_USING_DEVICE
 #define RT_USING_CONSOLE
-#define RT_CONSOLEBUF_SIZE 2048
+#define RT_CONSOLEBUF_SIZE 128
 #define RT_CONSOLE_DEVICE_NAME "uart1"
 #define RT_VER_NUM 0x50000
 #define ARCH_ARM
@@ -85,6 +85,7 @@
 #define RT_USING_PIN
 #define RT_USING_ADC
 #define RT_USING_SPI
+//#define RT_USING_WDT
 
 /* Using USB */
 

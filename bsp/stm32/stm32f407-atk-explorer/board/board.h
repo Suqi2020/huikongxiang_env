@@ -33,6 +33,12 @@
 #define   ANA_MASK       //屏蔽ana
 
 
+
+
+#define EVENT_CONNACK   (1 << 1)
+#define EVENT_SUBACK   (1 << 2)
+#define EVENT_PINGRESP (1 << 3)
+
 //#incude  <iconv.h>
 #include <rtthread.h>
 #include "stdbool.h"
@@ -40,6 +46,7 @@
 #include <stm32f4xx.h>
 #include "drv_common.h"
 #include "drv_gpio.h"
+//#include "drv_wdt.h"
 #include "drv_flash.h"
 #include "test_hardware.h"
 #include "main.h"
@@ -78,7 +85,24 @@
 #include "modbusConfig.h"
 #include "transport.h"
 //#include "utf_8.h"
-//#define  USE_ALIYUN  1
+#define  USE_ALIYUN  
+//#define  USE_WDT
+
+
+
+ 
+#ifdef  USE_WDT
+#define EVENT_WDT_AUTOCTRL   (1 << 1)
+#define EVENT_WDT_W5500      (1 << 2)
+#define EVENT_WDT_UPTASK     (1 << 3)
+#define EVENT_WDT_MQTTTASK   (1 << 4)
+#define EVENT_WDT_LCDTASK    (1 << 5)
+
+extern struct rt_event WDTEvent;
+#endif
+//阿里云ip 47.103.184.125 port 1883
+			      //设备 temp_test001
+//花生壳 内网穿透  115.236.153.174  15260
 extern UART_HandleTypeDef huart4;
 extern UART_HandleTypeDef huart5;
 extern UART_HandleTypeDef huart1;

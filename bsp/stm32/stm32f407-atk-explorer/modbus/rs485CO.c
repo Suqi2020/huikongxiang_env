@@ -50,7 +50,7 @@ void readCO(int num)
 	  uint8_t  *buf = RT_NULL;
 		buf = rt_malloc(LENTH);
 	  uint16_t len = modbusReadReg(sheet.co[num].slaveAddr,0X0002,READ_03,2,buf);
-		rt_mutex_take(uartDev[sheet.co[num].useUartNum].uartMutex,RT_WAITING_FOREVER);
+//		rt_mutex_take(.uartMessque[sheet.co[num].useUartNum].uartMutex,RT_WAITING_FOREVER);
 	  //485发送buf  len  等待modbus回应
 		coUartSend(num,buf,len);
 	  rt_kprintf("%sCO send:",sign);
@@ -62,7 +62,7 @@ void readCO(int num)
 		memset(buf,0,LENTH);
 		
 
-		while(rt_mq_recv(uartDev[sheet.co[num].useUartNum].uartMessque, buf+len, 1, 500) == RT_EOK){//115200 波特率1ms 10个数据
+		while(rt_mq_recv(&uartmque[sheet.co[num].useUartNum], buf+len, 1, 500) == RT_EOK){//115200 波特率1ms 10个数据
 				len++;
 		}
 		if(len!=0){
@@ -90,7 +90,7 @@ void readCO(int num)
 			  rt_kprintf("%s read fail\n",sign);
 		}
 //		coCheckSetFlag(num);
-	  rt_mutex_release(uartDev[sheet.co[num].useUartNum].uartMutex);
+//	  rt_mutex_release(.uartMessque[sheet.co[num].useUartNum].uartMutex);
 		rt_free(buf);
 	  buf=RT_NULL;
 }
@@ -424,17 +424,15 @@ bool modgasWarn2Send()
 		return true;
 }
 //4种气体json打包的二次封装
-void  gasJsonPack(rt_bool_t netStat,bool respFlag)
+void  gasJsonPack(bool respFlag)
 {
 		rt_kprintf("%s打包采集的gas数据\r\n",sign);
 
 				gasPack(respFlag);
-			if(netStat==RT_TRUE)
 				packMqttSend();
 				rt_thread_mdelay(500);
 				if(modgasWarn2Send()==true){
 						resetGasWarnFlag();//每次判断后复位warnflag状态值
-						if(netStat==RT_TRUE)
 								packMqttSend();
 				}
 //			rt_thread_mdelay(2000);//延时发送

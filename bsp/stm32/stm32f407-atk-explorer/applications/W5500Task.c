@@ -92,6 +92,9 @@ void  w5500Task(void *parameter)
 //  stm32_flash_read(FLASH_IP_SAVE_ADDR,(uint8_t*)&netIpFlash,sizeof(netIpFlash));
   while(1) 														/*循环执行的函数*/ 
   {
+#ifdef  USE_WDT
+		rt_event_send(&WDTEvent,EVENT_WDT_W5500);
+#endif
 		switch(W5500State)
 		{
 			case W5500InitEnum:
@@ -112,7 +115,6 @@ void  w5500Task(void *parameter)
 							      packFlash.netIpFlash.remoteIp[1],packFlash.netIpFlash.remoteIp[2],packFlash.netIpFlash.remoteIp[3]);
 								rt_kprintf("%sW5500 监听端口:%d \r\n",task,packFlash.netIpFlash.remotePort);
 								W5500State=W5500NetOKEnum;
-//							  rt_sem_release(w5500Iqr_semp);
 								break;
 						}
 						if(dhcpTick++>=5){//1秒基准  200*5
@@ -127,14 +129,9 @@ void  w5500Task(void *parameter)
 						rt_thread_mdelay(200);//不要修改 
 				break;
 			case W5500NetOKEnum:{
-//			      ret=rt_sem_take(w5500Iqr_semp,1000);//阻塞1秒 查询中断状态 等中断来//RT_WAITING_FOREVER
 			      static int count=0;      
-					//	if(ret==RT_EOK){
-							//	W5500ISR();//w5500
-				        void loopback_tcp(uint16 port);
-								loopback_tcp(packFlash.netIpFlash.remotePort);//W5500内部自动维护网络连接 此处只读寄存器
-					//	}
-
+						void loopback_tcp(uint16 port);
+						loopback_tcp(packFlash.netIpFlash.remotePort);//W5500内部自动维护网络连接 此处只读寄存器
 					  if(gbNetState ==RT_FALSE){//没联网  重新初始化
 								if(count++>5){ //5秒或者连续中断5次 还没联网 重启
 										W5500State=W5500InitEnum;
@@ -152,20 +149,26 @@ void  w5500Task(void *parameter)
 //封装外部调用发送 函数接口
 void netSend(uint8_t *data,int len)
 {
+	  static uint8_t sendTimes=0;
 
 		if(send(SOCK_TCPC,	data,len)==0){//启动个定时器来实现重发  2s内收不到回复
 			  if(gbNetState==RT_TRUE){
 						gbNetState = RT_FALSE;
-						offLine.times++;
+						offLine.netTimes++;
 				}
-			  extern void rstMqttStep();
-				rstMqttStep();
+
 				rt_kprintf("%snet send fail\n",task);
 				extern void  LCDDispNetOffline();
 				LCDDispNetOffline();
-
+			  //if(sendTimes++>=3){
+					//sendTimes=0;
+					extern void rstMqttStep();
+					rstMqttStep();
+					mqttStateSet(false);
+				//}
 		}
 		else{
+			  //sendTimes=0;
 				rt_kprintf("%snet send succ\n",task);
 						  extern void reFlashSendTime();
 			  reFlashSendTime();

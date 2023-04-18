@@ -103,7 +103,7 @@ void readThreeTempAcc(int num)
 	  uint8_t  *buf = RT_NULL;
 		buf = rt_malloc(LENTH);
 	  uint16_t len = tongHeModbusRead(sheet.threeAxiss[num].slaveAddr,0X0001,4,buf);
-		rt_mutex_take(uartDev[sheet.threeAxiss[num].useUartNum].uartMutex,RT_WAITING_FOREVER);
+//		rt_mutex_take(.uartMessque[sheet.threeAxiss[num].useUartNum].uartMutex,RT_WAITING_FOREVER);
 	  //485发送buf  len  等待modbus回应
 		threeAxisUartSend(num,buf,len);
 	  rt_kprintf("%sthreeAxis send:",sign);
@@ -113,7 +113,7 @@ void readThreeTempAcc(int num)
 		rt_kprintf("\n");
     len=0;
 		memset(buf,0,LENTH);
-		while(rt_mq_recv(uartDev[sheet.threeAxiss[num].useUartNum].uartMessque, buf+len, 1, 500) == RT_EOK){//115200 波特率1ms 10个数据
+		while(rt_mq_recv(&uartmque[sheet.threeAxiss[num].useUartNum], buf+len, 1, 500) == RT_EOK){//115200 波特率1ms 10个数据
 				len++;
 		}
 		if(len!=0){
@@ -123,7 +123,7 @@ void readThreeTempAcc(int num)
 				}
 				rt_kprintf("\n");
 		}
-//		uartDev[modbusFlash[THREEAXIS].useUartNum].offline=RT_FALSE;
+//		.uartMessque[modbusFlash[THREEAXIS].useUartNum].offline=RT_FALSE;
 		//提取环流值 第一步判断crc 第二部提取
 		int ret2=modbusRespCheck(sheet.threeAxiss[num].slaveAddr,buf,len,RT_TRUE);
 		if(0 ==  ret2){//刷新读取到的值
@@ -138,7 +138,7 @@ void readThreeTempAcc(int num)
 		} 
 		else{//读不到给0
 				if(ret2==2){
-//					  uartDev[modbusFlash[THREEAXIS].useUartNum].offline=RT_TRUE;
+//					  .uartMessque[modbusFlash[THREEAXIS].useUartNum].offline=RT_TRUE;
 				}
 				threeAxisp[num].respStat=0;
 				threeAxisp[num].temp=0;
@@ -148,7 +148,7 @@ void readThreeTempAcc(int num)
 			  rt_kprintf("%stemp height read fail\n",sign);
 		}
 //		threeAccCheckSetFlag(num);
-	  rt_mutex_release(uartDev[sheet.threeAxiss[num].useUartNum].uartMutex);
+//	  rt_mutex_release(.uartMessque[sheet.threeAxiss[num].useUartNum].uartMutex);
 		rt_free(buf);
 	  buf=RT_NULL;
 
@@ -456,7 +456,7 @@ bool modThreeAxisWarn2Send()
 
 
 //三轴读取modbus数据并打包发送 给其它函数调用
-void threeAxisRead2Send(rt_bool_t netStat,bool respFlag)
+void threeAxisRead2Send(bool respFlag)
 {					
 		int workFlag=RT_FALSE;
 		for(int i=0;i<THREEAXIS_485_NUM;i++){
@@ -468,13 +468,12 @@ void threeAxisRead2Send(rt_bool_t netStat,bool respFlag)
 			if(workFlag==RT_TRUE){
 					rt_kprintf("%s打包采集的THREEAXIS数据\r\n",sign);
 					threeAxisJsonPack(respFlag);//circulaJsonPack();
-					if(netStat==RT_TRUE)
-							packMqttSend();
+					packMqttSend();
 					rt_thread_mdelay(500);
 					if(modThreeAxisWarn2Send()==true){
 							resetThreeAxisWarnFlag();//每次判断后复位warnflag状态值
-							if(netStat==RT_TRUE)
-									packMqttSend();
+
+							packMqttSend();
 					}
 			}
 }

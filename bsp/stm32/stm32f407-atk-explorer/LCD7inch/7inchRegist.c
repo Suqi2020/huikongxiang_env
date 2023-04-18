@@ -218,8 +218,6 @@ void LCDDispMCUID()
 void LCDDispNetErrState()
 {
 	  extern rt_bool_t gbNetState;
-//	  static rt_bool_t state =RT_FALSE;//屏幕上电后默认显示也是掉线的
-//	  if(state!=gbNetState){//状态变更时候再去更新
 				uint8_t buf[10]={0};
 				buf[0]=0;
 				buf[1]=gbNetState;
@@ -233,12 +231,12 @@ void  LCDDispNetOffline()
 	  uint8_t buf[10]={0};
 		extern rt_bool_t gbNetState;
 		//显示总共掉线次数
-		buf[0]=(uint8_t)(offLine.times>>24);
-		buf[1]=(uint8_t)(offLine.times>>16);
-		buf[2]=(uint8_t)(offLine.times>>8);
-		buf[3]=(uint8_t)(offLine.times>>0);
+		buf[0]=(uint8_t)(offLine.mqttTimes>>24);
+		buf[1]=(uint8_t)(offLine.mqttTimes>>16);
+		buf[2]=(uint8_t)(offLine.mqttTimes>>8);
+		buf[3]=(uint8_t)(offLine.mqttTimes>>0);
 		LCDWtite(NET_OFFLINE_TOTALTIMES_ADDR,buf,2*2);
-		if(offLine.times==0){
+		if(offLine.mqttTimes==0){
 				//显示第几次掉线
 				buf[0]=0;
 				buf[1]=0;
@@ -264,14 +262,14 @@ void  LCDDispNetOffline()
 			  int offTime;
 				if(gbNetState==RT_FALSE){
 						//rt_kprintf("[offLine]a the %d Time,relayTimer %d %d秒\r\n",offLineIndex,rt_tick_get()/1000,offLine.relayTimer[offLineIndex]);
-						if(offLineIndex==offLine.times)
-								offTime=(rt_tick_get()/1000-offLine.relayTimer[offLineIndex]);//掉线了此次计数一直++
-						else
-								offTime=offLine.relayTimer[offLineIndex];
+//						if(offLineIndex==offLine.times)
+//								offTime=(rt_tick_get()/1000-offLine.relayTimer[offLineIndex]);//掉线了此次计数一直++
+//						else
+//								offTime=offLine.relayTimer[offLineIndex];
 				}
 				else{
 						//rt_kprintf("[offLine]b the %d Times,relayTimer %d 秒\r\n",offLineIndex,offLine.relayTimer[offLineIndex]);
-						offTime=offLine.relayTimer[offLineIndex];
+//						offTime=offLine.relayTimer[offLineIndex];
 				}
 				buf[0]=(uint8_t)(offTime>>24);
 				buf[1]=(uint8_t)(offTime>>16);

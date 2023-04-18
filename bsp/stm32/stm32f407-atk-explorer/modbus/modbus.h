@@ -10,7 +10,7 @@
 #define WRITE_MUL  		0x10
 
 
-
+extern  rt_mutex_t read485_mutex;
 
 uint8_t modbusReadReg(uint16_t slavAddr,uint16_t regAddr,uint8_t cmd,uint16_t len,uint8_t * out);
 uint8_t modbusReadBitReg(uint16_t slavAddr,uint16_t regAddr,uint16_t len,uint8_t * out);

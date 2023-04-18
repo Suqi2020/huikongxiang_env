@@ -869,13 +869,13 @@ void  offLineIndexLow()
 {
 		offLineIndex--;
 		if(offLineIndex==0){
-				offLineIndex = offLine.times;
+				offLineIndex = offLine.mqttTimes;
 		}
 }
 void  offLineIndexAdd()  
 {
 		offLineIndex++;
-		if(offLineIndex>offLine.times){
+		if(offLineIndex>offLine.mqttTimes){
 				offLineIndex = 1;
 		}
 }
