@@ -13,15 +13,11 @@ uint16_t resetMcuResp(cJSON *Json)
 {
 		char* out = NULL;
 		//创建数组
-//		cJSON* Array = NULL;
 		// 创建JSON Object  
 		cJSON* root = NULL;
-		//cJSON* nodeobj = NULL;
-		//cJSON* nodeobj_p = NULL;
 		root = cJSON_CreateObject();
 		if (root == NULL) return 0;
 		// 加入节点（键值对）
-//		bool rspFlag=false;
 		cJSON_AddNumberToObject(root, "mid",respMid);
 		cJSON_AddStringToObject(root, "packetType","SERVICES_ACU_REBOOT_RESP");
 		char *sprinBuf=RT_NULL;
@@ -36,7 +32,11 @@ uint16_t resetMcuResp(cJSON *Json)
 		
 		// 释放内存 
 		out = cJSON_Print(root);
-		rt_strcpy((char *)packBuf,out);
+		NetTxBuffer[0]=0xff;
+		NetTxBuffer[1]=0xff;
+		NetTxBuffer[2]=0xff;
+		NetTxBuffer[3]=0xff;
+		rt_strcpy((char *)NetTxBuffer+PACK_HEAD_LEN,out);
 		rt_strlen(out);
 		if(out!=NULL){
 				for(int i=0;i<rt_strlen(out);i++)
@@ -63,7 +63,6 @@ uint16_t resetDeviceResp(cJSON *Json,char *identify)
 	  int devRstNum=0;
 		char* out = NULL;
 		//创建数组
-//		cJSON* Array = NULL;
 		// 创建JSON Object  
 		cJSON* root = NULL;
 		root = cJSON_CreateObject();
@@ -223,11 +222,12 @@ uint16_t resetDeviceResp(cJSON *Json,char *identify)
 		// 打印JSON数据包  
 
 		// 释放内存  
-		
-		
 		out = cJSON_Print(root);
-		rt_strcpy((char *)packBuf,out);
-		rt_strlen(out);
+		NetTxBuffer[0]=0xff;
+		NetTxBuffer[1]=0xff;
+		NetTxBuffer[2]=0xff;
+		NetTxBuffer[3]=0xff;
+		rt_strcpy((char *)NetTxBuffer+PACK_HEAD_LEN,out);
 		if(out!=NULL){
 				for(int i=0;i<rt_strlen(out);i++)
 						rt_kprintf("%c",out[i]);
@@ -239,8 +239,6 @@ uint16_t resetDeviceResp(cJSON *Json,char *identify)
 			cJSON_Delete(root);
 			out=NULL;
 		}
-	
-
 		rt_free(sprinBuf);
 		sprinBuf=RT_NULL;
 	  return 1;
@@ -257,16 +255,11 @@ uint16_t saveMcuResp()
 	
 		char* out = NULL;
 		//创建数组
-//		cJSON* Array = NULL;
 		// 创建JSON Object  
 		cJSON* root = NULL;
-		//cJSON* nodeobj = NULL;
-		//cJSON* nodeobj_p = NULL;
 		root = cJSON_CreateObject();
 		if (root == NULL) return 0;
 		// 加入节点（键值对）
-//		bool rspFlag=false;
-
 		cJSON_AddNumberToObject(root, "mid",respMid);
 		cJSON_AddStringToObject(root, "packetType","SERVICES_SAVE_RESP");
 		char *sprinBuf=RT_NULL;
@@ -282,10 +275,12 @@ uint16_t saveMcuResp()
 
 		
 		// 释放内存  
-		
-		
 		out = cJSON_Print(root);
-		rt_strcpy((char *)packBuf,out);
+		NetTxBuffer[0]=0xff;
+		NetTxBuffer[1]=0xff;
+		NetTxBuffer[2]=0xff;
+		NetTxBuffer[3]=0xff;
+		rt_strcpy((char *)NetTxBuffer+PACK_HEAD_LEN,out);
 
 		if(out!=NULL){
 				for(int i=0;i<rt_strlen(out);i++)

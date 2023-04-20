@@ -43,7 +43,7 @@ const static char sign[]="[环流]";
 
 //#define   SLAVE_ADDR     0X02
 #define   LENTH          50  //工作环流用到的最大接收buf长度
-extern uint8_t packBuf[TX_RX_MAX_BUF_SIZE];
+extern uint8_t NetTxBuffer[TX_RX_MAX_BUF_SIZE];
 
  CIRCURStru  cirCurStru_p[CIRCULA_485_NUM];
 //static uint16_t readAcqInterv(int num);
@@ -316,7 +316,11 @@ uint16_t circulaJsonPack(bool respFlag)
 		
 		
 		out = cJSON_Print(root);
-		rt_strcpy((char *)packBuf,out);
+		NetTxBuffer[0]=0xff;
+		NetTxBuffer[1]=0xff;
+		NetTxBuffer[2]=0xff;
+		NetTxBuffer[3]=0xff;
+		rt_strcpy((char *)NetTxBuffer+PACK_HEAD_LEN,out);
 		if(out!=NULL){
 //				for(int i=0;i<rt_strlen(out);i++)
 //						rt_kprintf("%c",out[i]);
@@ -449,7 +453,11 @@ bool modCirCurrWarn2Send()
 
 		// 释放内存  
 		out = cJSON_Print(root);
-		rt_strcpy((char *)packBuf,out);
+		NetTxBuffer[0]=0xff;
+		NetTxBuffer[1]=0xff;
+		NetTxBuffer[2]=0xff;
+		NetTxBuffer[3]=0xff;
+		rt_strcpy((char *)NetTxBuffer+PACK_HEAD_LEN,out);
 		if(out!=NULL){
 				for(int i=0;i<rt_strlen(out);i++)
 						rt_kprintf("%c",out[i]);

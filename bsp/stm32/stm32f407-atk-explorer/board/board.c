@@ -14,17 +14,13 @@
 #include "stm32f4xx_hal_adc.h"
 /* Private variables ---------------------------------------------------------*/
 ADC_HandleTypeDef hadc1;
-
 SPI_HandleTypeDef hspi1;
-
 UART_HandleTypeDef huart4;
 UART_HandleTypeDef huart5;
 UART_HandleTypeDef huart1;
 UART_HandleTypeDef huart2;
 UART_HandleTypeDef huart3;
 UART_HandleTypeDef huart6;
-
-
 /* USER CODE BEGIN PV */
 void uartIrqEnaAfterQueue()
 {
@@ -40,14 +36,12 @@ void uartIrqEnaAfterQueue()
 void SystemClock_Config(void);
 static void MX_GPIO_Init(void);
 static void MX_USART1_UART_Init(void);
-//static void MX_UART4_Init(void);
 static void MX_UART5_Init(void);
-//static void MX_USART2_UART_Init(void);
-//static void MX_USART3_UART_Init(void);
-//static void MX_USART6_UART_Init(void);
 static void MX_ADC1_Init(void);
 static void MX_SPI1_Init(void);
+#ifdef USE_WDT
 static void MX_IWDG_Init(void);
+#endif
 /* USER CODE BEGIN PFP */
 
 /**
@@ -87,6 +81,7 @@ void cubeHardWareInit(void)
   * @retval None
   */
 //喂狗 HAL_IWDG_Refresh("&hiwdg");
+#ifdef USE_WDT
 IWDG_HandleTypeDef hiwdg;  //看门狗最大32秒复位
 static void MX_IWDG_Init(void)
 {
@@ -110,6 +105,7 @@ static void MX_IWDG_Init(void)
   /* USER CODE END IWDG_Init 2 */
 
 }
+#endif
 /**
   * @brief System Clock Configuration
   * @retval None

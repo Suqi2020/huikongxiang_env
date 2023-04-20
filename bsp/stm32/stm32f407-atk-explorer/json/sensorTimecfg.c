@@ -16,8 +16,6 @@ void senseTimeReadJsonResp(char *string,bool  modbusFlag)
 		cJSON* Array = NULL;
 		// 创建JSON Object  
 		cJSON* root = NULL;
-//		cJSON* nodeobj = NULL;
-//		cJSON* nodeobj_p = NULL;
 		root = cJSON_CreateObject();
 		if (root == NULL) return;
 	
@@ -102,7 +100,11 @@ void senseTimeReadJsonResp(char *string,bool  modbusFlag)
 		
 		// 释放内存  
 		out = cJSON_Print(root);
-		rt_strcpy((char *)packBuf,out);
+		NetTxBuffer[0]=0xff;
+		NetTxBuffer[1]=0xff;
+		NetTxBuffer[2]=0xff;
+		NetTxBuffer[3]=0xff;
+		rt_strcpy((char *)NetTxBuffer+PACK_HEAD_LEN,out);
 
 		if(out!=NULL){
 				for(int i=0;i<rt_strlen(out);i++)
@@ -223,7 +225,11 @@ void senseTimeJsonSet(cJSON   *Json,bool  modbusFlag)
 		
 		// 释放内存  
 		out = cJSON_Print(root);
-		rt_strcpy((char *)packBuf,out);
+		NetTxBuffer[0]=0xff;
+		NetTxBuffer[1]=0xff;
+		NetTxBuffer[2]=0xff;
+		NetTxBuffer[3]=0xff;
+		rt_strcpy((char *)NetTxBuffer+PACK_HEAD_LEN,out);
 		if(out!=NULL){
 				for(int i=0;i<rt_strlen(out);i++)
 						rt_kprintf("%c",out[i]);

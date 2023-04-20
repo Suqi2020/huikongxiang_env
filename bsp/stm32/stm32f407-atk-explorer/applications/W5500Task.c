@@ -149,28 +149,21 @@ void  w5500Task(void *parameter)
 //封装外部调用发送 函数接口
 void netSend(uint8_t *data,int len)
 {
-	  static uint8_t sendTimes=0;
-
 		if(send(SOCK_TCPC,	data,len)==0){//启动个定时器来实现重发  2s内收不到回复
 			  if(gbNetState==RT_TRUE){
 						gbNetState = RT_FALSE;
 						offLine.netTimes++;
 				}
-
 				rt_kprintf("%snet send fail\n",task);
 				extern void  LCDDispNetOffline();
 				LCDDispNetOffline();
-			  //if(sendTimes++>=3){
-					//sendTimes=0;
-					extern void rstMqttStep();
-					rstMqttStep();
-					mqttStateSet(false);
-				//}
+				extern void rstMqttStep();
+				rstMqttStep();
+				mqttStateSet(false);
 		}
 		else{
-			  //sendTimes=0;
 				rt_kprintf("%snet send succ\n",task);
-						  extern void reFlashSendTime();
+				extern void reFlashSendTime();
 			  reFlashSendTime();
 		}	
 }

@@ -63,9 +63,7 @@ void printfThresholdList()
 						rt_kprintf("%0.2f \n",sheet.modbusCircul[i].cirCurCUpLimit);
 						rt_kprintf("\n");
 				}
-				
 		}
-
 		for(i=0;i<PARTDISCHAG_485_NUM;i++){
 				if(sheet.partDischag[i].workFlag==RT_TRUE){//找到相同ID的
 						rt_kprintf("%s threshold ",sign);
@@ -163,10 +161,8 @@ void printfThresholdList()
 						rt_kprintf("%0.2f ",sheet.modbusPreSettl[i].heightLowLimit);
 						rt_kprintf("%0.2f \n",sheet.modbusPreSettl[i].heightUpLimit);
 						rt_kprintf("\n");
-
 				}
 		}
-
 		for(i=0;i<THREEAXIS_485_NUM;i++){
 				if(sheet.threeAxiss[i].workFlag==RT_TRUE){//找到相同ID的
 						rt_kprintf("%s threshold ",sign);
@@ -202,7 +198,6 @@ void printfThresholdList()
 						rt_kprintf("%0.2f \n",sheet.modbusThreAxis[i].accZUpLimit);
 						rt_kprintf("\n");
 				}
-
 		}
 
 #ifdef  USE_4GAS
@@ -228,7 +223,6 @@ void printfThresholdList()
 						rt_kprintf("1 ");
 						rt_kprintf("%0.2f ",sheet.modbusO2[i].o2LowLimit);
 						rt_kprintf("%0.2f \n",sheet.modbusO2[i].o2UpLimit);
-				
 						rt_kprintf("\n");
 				}
 		}
@@ -256,7 +250,6 @@ void printfThresholdList()
 						rt_kprintf("%0.2f \n",sheet.modbusCo[i].coUpLimit);
 					  rt_kprintf("\n");
 				}
-				
 		}
 #endif
 		for(i=0;i<TEMPHUM_485_NUM;i++){
@@ -270,7 +263,6 @@ void printfThresholdList()
 						rt_kprintf("%0.2f \n",sheet.modbusTempHum[i].tempUpLimit);
 					  rt_kprintf("\n");
 				}
-				//rt_kprintf("\n");
 		}
 		for(i=0;i<WATERDEPTH_485_NUM;i++){
 				if(sheet.waterDepth[i].workFlag==RT_TRUE){//找到相同ID的
@@ -283,7 +275,6 @@ void printfThresholdList()
 						rt_kprintf("%0.2f \n",sheet.modbusWaterDepth[i].depthUpLimit);
 					  rt_kprintf("\n");
 				}
-				//rt_kprintf("\n");
 		}
 		for(i=0;i<CRACKMETER_485_NUM;i++){
 				if(sheet.crackMeter[i].workFlag==RT_TRUE){//找到相同ID的
@@ -305,7 +296,6 @@ void printfThresholdList()
 						rt_kprintf("%0.2f \n",sheet.modbusCrackMeter[i].distancUpLimit);
 					  rt_kprintf("\n");
 				}
-				//rt_kprintf("\n");
 		}
 		//打印modbus设置的阈值
 }

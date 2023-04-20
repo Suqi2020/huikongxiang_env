@@ -7,38 +7,19 @@ extern void LCDDispUart(void);
 extern void LCDDispMCUID(void);
 extern void LCDDispModbusGet(void);
 extern void LDCDispMosbusInfo(void);
-//extern void LCDDispModInfoCpy(void);
 extern void LCDDispConfig(uint8_t *recBuf,int len);
 extern void firstNameDispInit(void);
 extern uint8_t  recLCDBuf[LCD_BUF_LEN];
 
 
 
-//char te1[5]={0xff,0xff,0xff,0xff,0xff};
-//char te2[5]={0xff,0xff,0xff,0xff,0};
-//char te3[5]={0xff,0xff,0xff,0xff,0};
-//char te4[5]={0xff,0xff,0xff,0xff,0};
-//char test[20];
-//int testfun(void)
-//{
-
-//    strcpy(test,te1);
-//	rt_kprintf("testfun:");
-//		for(int i=0;i<20;i++){
-
-//		rt_kprintf("%02x ",test[i]);
-//	}
-//		rt_kprintf("\n ");
-//}
 void  LCDTask(void *parameter)
 {
 	  rt_thread_mdelay(1000);//必须加入延时等待串口屏启动
-	//testfun();
 	  LCDDispIP();
 	  LCDDispUart();
 	  LCDDispMCUID();//LCD send:5a a5 15 82 12 10 ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff 
 	  LCDDispModbusGet();
-	  //firstNameDispInit();
   	LDCDispMosbusInfo();
 	  int revLen=0;
 		while(1){

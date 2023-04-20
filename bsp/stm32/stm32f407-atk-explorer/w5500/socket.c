@@ -198,30 +198,26 @@ uint16 send(SOCKET s, const uint8 * buf, uint16 len)
     if ((status != SOCK_ESTABLISHED) && (status != SOCK_CLOSE_WAIT))
     {
       ret = 0;
-			printf("SEND_ERR\r\n");
+			//printf("SEND_ERR%d %d\r\n",freesize,ret);//0 2048
       break;
     }
-		#if(MAX_SOCK_NUM==1)
-		 break;//不管有多大就跳出  add by suqi 20221017
-		#endif
+
   } while (freesize < ret);
-//printf("SEND 001 %d %d\r\n",ret,len);//0 2048
+//printf("SEND 002 %d %d %d\r\n",freesize,ret,len);//8192  8192
   // copy data
   send_data_processing(s, (uint8 *)buf, ret);
   IINCHIP_WRITE( Sn_CR(s) ,Sn_CR_SEND);
   /* wait to process the command... */
-  while( IINCHIP_READ(Sn_CR(s) ) );
-//	  int count =50000;
-//   while( IINCHIP_READ(Sn_CR(s) ) &&(count--))
-//		 ;
+
+
+   while( IINCHIP_READ(Sn_CR(s) ))
+		 ;
   while ( (IINCHIP_READ(Sn_IR(s) ) & Sn_IR_SEND_OK) != Sn_IR_SEND_OK )
   {
     status = IINCHIP_READ(Sn_SR(s));
-		
-		
     if ((status != SOCK_ESTABLISHED) && (status != SOCK_CLOSE_WAIT) )
     {
-      printf("SEND_OK Problem!!  0x%x\r\n",status);
+      printf("SEND_OK Problem!!\r\n");
       close(s);
       return 0;
     }
@@ -254,7 +250,7 @@ uint16 recv(SOCKET s, uint8 * buf, uint16 len)
       recv_data_processing(s, buf, len);
       IINCHIP_WRITE( Sn_CR(s) ,Sn_CR_RECV);
       /* wait to process the command... */
-		 	  int count =60000;
+		 	  int count =10000;
    while( IINCHIP_READ(Sn_CR(s) ) &&(count--))
 		 ;
 //      while( IINCHIP_READ(Sn_CR(s) ));

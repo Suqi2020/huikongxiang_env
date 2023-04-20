@@ -47,7 +47,6 @@ static void readWaterDepth(int num)
 	  uint8_t  *buf = RT_NULL;
 		buf = rt_malloc(LENTH);
 	  uint16_t len = modbusReadReg(sheet.waterDepth[num].slaveAddr,0X0002,READ_04,2,buf);
-		//rt_mutex_take(.uartMessque[sheet.waterDepth[num].useUartNum].uartMutex,RT_WAITING_FOREVER);
 	  //485发送buf  len  等待modbus回应
 		waterDepthUartSend(num,buf,len);
 	  rt_kprintf("%swater send:",sign);
@@ -57,8 +56,6 @@ static void readWaterDepth(int num)
 		rt_kprintf("\n");
     len=0;
 		memset(buf,0,LENTH);
-		
-
 		while(rt_mq_recv(&uartmque[sheet.waterDepth[num].useUartNum], buf+len, 1, 500) == RT_EOK){//115200 波特率1ms 10个数据
 				len++;
 		}
@@ -88,11 +85,8 @@ static void readWaterDepth(int num)
 			  waterDepth[num]	=0;
 			  rt_kprintf("%s read fail\n",sign);
 		}
-		//waterLevCheckSetFlag(num);
-	  //rt_mutex_release(.uartMessque[sheet.waterDepth[num].useUartNum].uartMutex);
 		rt_free(buf);
 	  buf=RT_NULL;
-
 }
 
 
@@ -102,8 +96,7 @@ static void readWaterDepth(int num)
 //              为false就是report数据
 uint16_t waterDepthJsonPack(bool respFlag)
 {
-//		char *sprinBuf=RT_NULL;
-//		sprinBuf=rt_malloc(20);//20个字符串长度 够用了
+
 		char* out = NULL;
 		//创建数组
 		cJSON* Array = NULL;
@@ -127,7 +120,6 @@ uint16_t waterDepthJsonPack(bool respFlag)
 		}
 		cJSON_AddStringToObject(root, "identifier","water_level_monitor");
 		cJSON_AddStringToObject(root, "acuId",(char *)packFlash.acuId);
-//	  cJSON_AddItemToObject(root,"acuId",cJSON_CreateString(packFlash.acuId));
 		char *sprinBuf=RT_NULL;
 		sprinBuf=rt_malloc(20);//20个字符串长度 够用了	
 		
@@ -141,7 +133,6 @@ uint16_t waterDepthJsonPack(bool respFlag)
 				nodeobj = cJSON_CreateObject();
 				cJSON_AddItemToArray(Array, nodeobj);
 			  cJSON_AddItemToObject(nodeobj,"deviceId",cJSON_CreateString(sheet.waterDepth[i].ID));
-				//sprintf(sprinBuf,"%d",respStat[i]);
 				cJSON_AddNumberToObject(nodeobj,"responseStatus",respStat[i]);
 				
 				nodeobj_p= cJSON_CreateObject();
@@ -158,13 +149,14 @@ uint16_t waterDepthJsonPack(bool respFlag)
 		sprintf(sprinBuf,"%llu",utcTime());
 		cJSON_AddStringToObject(root,"timestamp",sprinBuf);
 		// 打印JSON数据包  
-
 		
 		// 释放内存  
-		
-		
 		out = cJSON_Print(root);
-		rt_strcpy((char *)packBuf,out);
+		NetTxBuffer[0]=0xff;
+		NetTxBuffer[1]=0xff;
+		NetTxBuffer[2]=0xff;
+		NetTxBuffer[3]=0xff;
+		rt_strcpy((char *)NetTxBuffer+PACK_HEAD_LEN,out);
 		if(out!=NULL){
 				for(int i=0;i<rt_strlen(out);i++)
 						rt_kprintf("%c",out[i]);
@@ -176,16 +168,13 @@ uint16_t waterDepthJsonPack(bool respFlag)
 			cJSON_Delete(root);
 			out=NULL;
 		}
-	
 
 		if(respFlag==false){
 			mcu.repDataMessID =mcu.upMessID;
 			upMessIdAdd();
 		}
-
 		rt_free(sprinBuf);
 		sprinBuf=RT_NULL;
-
 		return 1;
 }
 
@@ -238,9 +227,6 @@ bool modPWaterLevWarn2Send()
 							cJSON_AddItemToObject(nodeobj, "data", nodeobj_p);
 							cJSON_AddNumberToObject(nodeobj_p,"depth_high_alarm",inpoutpFlag.modbusWaterDepth[i].depthUpFlag);//cJSON_CreateNumber("10"));
 							cJSON_AddNumberToObject(nodeobj_p,"depth_low_alarm",inpoutpFlag.modbusWaterDepth[i].depthLowFlag);
-//							cJSON_AddNumberToObject(nodeobj_p,"height_low_alarm",inpoutpFlag.modbusPreSettl[i].tempLowFlag);
-//							cJSON_AddNumberToObject(nodeobj_p,"height_high_alarm",inpoutpFlag.modbusPreSettl[i].tempUpFlag);		
-							
 							sprintf(sprinBuf,"%llu",utcTime());
 							cJSON_AddItemToObject(nodeobj_p,"monitoringTime",cJSON_CreateString(sprinBuf));
 						}
@@ -251,7 +237,11 @@ bool modPWaterLevWarn2Send()
 
 		// 释放内存  
 		out = cJSON_Print(root);
-		rt_strcpy((char *)packBuf,out);
+		NetTxBuffer[0]=0xff;
+		NetTxBuffer[1]=0xff;
+		NetTxBuffer[2]=0xff;
+		NetTxBuffer[3]=0xff;
+		rt_strcpy((char *)NetTxBuffer+PACK_HEAD_LEN,out);
 		if(out!=NULL){
 				for(int i=0;i<rt_strlen(out);i++)
 						rt_kprintf("%c",out[i]);
@@ -286,7 +276,6 @@ void waterDepthRead2Send(bool respFlag)
 					waterDepthJsonPack(respFlag);
 					
 					packMqttSend();
-					
 					rt_thread_mdelay(500);
 					if(modPWaterLevWarn2Send()==true){
 							resetWaterLevWarnFlag();//每次判断后复位warnflag状态值

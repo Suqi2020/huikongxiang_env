@@ -402,7 +402,11 @@ void senseTHGetJsonResp(cJSON   *Json,bool modbusFlag)
 		
 		// 释放内存  
 		out = cJSON_Print(root);
-		rt_strcpy((char *)packBuf,out);
+		NetTxBuffer[0]=0xff;
+		NetTxBuffer[1]=0xff;
+		NetTxBuffer[2]=0xff;
+		NetTxBuffer[3]=0xff;
+		rt_strcpy((char *)NetTxBuffer+PACK_HEAD_LEN,out);
 		rt_strlen(out);
 		if(out!=NULL){
 				for(int i=0;i<rt_strlen(out);i++)
@@ -719,7 +723,11 @@ void senseTHSetJsonResp(cJSON   *Json,bool  modbusFlag)
 		
 		// 释放内存  
 		out = cJSON_Print(root);
-		rt_strcpy((char *)packBuf,out);
+		NetTxBuffer[0]=0xff;
+		NetTxBuffer[1]=0xff;
+		NetTxBuffer[2]=0xff;
+		NetTxBuffer[3]=0xff;
+		rt_strcpy((char *)NetTxBuffer+PACK_HEAD_LEN,out);
 
 		if(out!=NULL){
 				for(int i=0;i<rt_strlen(out);i++)

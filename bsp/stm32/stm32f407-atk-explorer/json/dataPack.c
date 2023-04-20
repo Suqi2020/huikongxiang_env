@@ -5,14 +5,6 @@ const static char sign[]="[dataPack]";
 
 
 
-//char  string[]="{\
-//\"mid\":1234,\
-//\"packetType\":\"PROPERTIES_485DATA_RESP\",\
-//\"identifier\":\"partial_discharge_monitor\",\
-//\"acuId\":\"1000000000001\",\
-//\"timestamp\":\"1655172531937\"\
-//}";
-
 
 
 extern void pressSettRead2Send(bool respFlag);
@@ -26,11 +18,11 @@ extern void h2sRead2Send(void);
 extern void ch4Read2Send(void);	
 extern void coRead2Send(void);	
 extern void crackMeterRead2Send(bool respFlag);
-//void analogTempHumJsonPack(uint8_t chanl);
+
 #ifndef     ANA_MASK
 extern void anaTempHumReadPack2Send(bool gbNetState,bool respFlag);
 #endif
-//extern uint8_t analogTemChanl;
+
 extern void gasJsonPack(bool respFlag);
 
 //485数据读取进行打包
@@ -85,6 +77,8 @@ void  readAnaDataResp(char *monitor)
 		}
 }
 #endif
+
+//函数作用 在原有的json函数基础上NetTxBuffer 加入mqtt的头部 topic头部
 void   packMqttSend()
 {
 		extern bool  mqttState(void);
@@ -100,14 +94,18 @@ void   packMqttSend()
 		rt_sprintf(topic.cstring,"/acu/%s/up",packFlash.acuId);
 	  extern int MQTTSerialize_publish_suqi(int buflen,unsigned char dup, int qos, unsigned char retained, unsigned short packetid,
 		MQTTString topicName, unsigned char* payload, int payloadlen);
-		if((sendBufLen=MQTTSerialize_publish_suqi(sizeof(packBuf),0, 0, 0,0,topic, (unsigned char *)packBuf,strlen((char*)packBuf)))>0){ //qos=1????packetid
+		if((sendBufLen=MQTTSerialize_publish_suqi(sizeof(NetTxBuffer),0, 0, 0,0,topic, (unsigned char *)NetTxBuffer+PACK_HEAD_LEN,strlen((char*)NetTxBuffer)-PACK_HEAD_LEN))>0){ //qos=1????packetid
 				rt_kprintf("%sok publish pack\n",sign);
 			}
 		else
 			rt_kprintf("%serr publish pack\n",sign);
-		packBuf[sendBufLen]=0;
+		NetTxBuffer[sendBufLen]=0;
 		rt_free(topic.cstring);
 		topic.cstring=RT_NULL;
-
-		transport_sendPacketBuffer( packBuf, sendBufLen);
+		NetTxBuffer[0]=(uint8_t)(sendBufLen>>24);
+		NetTxBuffer[1]=(uint8_t)(sendBufLen>>16);
+		NetTxBuffer[2]=(uint8_t)(sendBufLen>>8);
+		NetTxBuffer[3]=(uint8_t)sendBufLen;
+		rt_mb_send_wait(&mbNetSendData, (rt_ubase_t)&NetTxBuffer,RT_WAITING_FOREVER); 
+	
 }

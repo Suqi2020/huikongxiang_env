@@ -95,7 +95,7 @@ exit:
 int MQTTSerialize_publish_suqi(int buflen,unsigned char dup, int qos, unsigned char retained, unsigned short packetid,
 		MQTTString topicName, unsigned char* payload, int payloadlen)
 {
-	int len=0;
+
 	unsigned char *ptr = payload;
 	MQTTHeader header = {0};
 	int rem_len = 0;

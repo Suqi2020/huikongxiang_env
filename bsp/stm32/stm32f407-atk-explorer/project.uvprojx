@@ -438,6 +438,11 @@
               <FileType>1</FileType>
               <FilePath>.\applications\wdtTask.c</FilePath>
             </File>
+            <File>
+              <FileName>NetJsonDataSendTask.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>.\applications\NetJsonDataSendTask.c</FilePath>
+            </File>
           </Files>
         </Group>
         <Group>

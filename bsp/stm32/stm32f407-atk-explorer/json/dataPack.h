@@ -36,7 +36,7 @@ extern mcuParazStru mcu;
 //    	
 //}rs485ParaStru;
 
-extern uint8_t packBuf[TX_RX_MAX_BUF_SIZE];
+extern uint8_t NetTxBuffer[TX_RX_MAX_BUF_SIZE];
 //extern  rs485ParaStru devi[];
 extern  uint64_t  utcTime(void);
 extern  uint32_t upMessIdAdd(void);

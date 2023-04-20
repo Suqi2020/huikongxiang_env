@@ -4,7 +4,7 @@
 
 rt_bool_t gbRegFlag = RT_FALSE;
 extern struct rt_mailbox mbNetSendData;
-extern uint8_t   packBuf[TX_RX_MAX_BUF_SIZE];
+extern uint8_t   NetTxBuffer[TX_RX_MAX_BUF_SIZE];
 extern rt_bool_t gbNetState;
 const static char task[]="[dataUp]";
 
@@ -113,26 +113,30 @@ static void  timeOutRunFun()
 			case REG_TIME://注册 注册成功后定时器就关闭 输入输出状态跟谁注册信息上发
 			  if(gbRegFlag==RT_FALSE){
 					  devRegJsonPack();//devRegJsonPack();
-						packMqttSend(); 
+						packMqttSend(); rt_thread_delay(500);
 
-						timeStop(REG_TIME);//正式使用时候需要去掉
+//int sendBufLen=jsonBufPackTest();
+//						packMqttSend();
+
+
+						//timeStop(REG_TIME);//正式使用时候需要去掉
 						digitalInputReport();//数字输入上报
-						rt_thread_delay(500);
+						rt_thread_delay(5000);
 
 						packMqttSend(); 
 						digitalOutputReport("3v3_output");
-						rt_thread_delay(500);
+						rt_thread_delay(5000);
 
 						packMqttSend(); 
 						digitalOutputReport("5v_output");
-						rt_thread_delay(500);
+						rt_thread_delay(5000);
 						packMqttSend(); 
 						digitalOutputReport("12v_output");
-						rt_thread_delay(500);
+						rt_thread_delay(5000);
 
 						packMqttSend(); 
 						digitalOutputReport("digital_output");
-						rt_thread_delay(500);
+						rt_thread_delay(5000);
 						packMqttSend(); 
 
 
@@ -193,10 +197,11 @@ static void  timeOutRunFun()
 		
 				break;
 #endif
-			rt_mutex_release(read485_mutex);
+			
 			default:
 				break;
 		}
+		rt_mutex_release(read485_mutex);
 }
 
 modbusFunStru modbusFun[MODBUS_NUM];
@@ -242,19 +247,10 @@ void startTimeList()
 //上行数据的维护以及重发
 void   upKeepStateTask(void *para)
 {
-		//extern void modbusPrintRead();
 		extern void uartReconfig();
 		extern void uartIrqEnaAfterQueue();
 	  extern void clearUartData();
-//	  extern void printModbusDevList();
 	  extern void readMultiCirCulaPoint();
-//	  extern void prinfAnalogList();
-//	  extern void printfDIList();
-//	  extern void printfOutputList();
-//		extern void printfThresholdList();
-//		extern void printfCtrl();
-	  //uartMutexQueueCfg();//根据flash存储重新配置mutex queue
-//		modbusPrintRead();//modbus配置从flash中读取
 	  uartReconfig();//串口重新配置
 		uartIrqEnaAfterQueue();//串口中断中用到了队列  开启中断需要放到后边
     startTimeList();//开启计时器列表

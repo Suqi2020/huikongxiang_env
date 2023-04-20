@@ -96,18 +96,18 @@ char  string[]="{\
 }";
 
 
-unsigned char packBuf[1000];
+unsigned char NetTxBuffer[1000];
 void pack()
 {
 	int len=0;
-		packBuf[len]= 0xAA; len++;
-		packBuf[len]= 0XCC;    len++;
+		NetTxBuffer[len]= 0xAA; len++;
+		NetTxBuffer[len]= 0XCC;    len++;
 		len+=2;//json长度最后再填写
 		
 		// 释放内存  
 		
 	
-		strcpy((char *)packBuf+len,string);
+		strcpy((char *)NetTxBuffer+len,string);
 		len+=strlen(string);
 
 
@@ -116,19 +116,19 @@ void pack()
 	
 
 		//lenth
-	  packBuf[2]=(uint8_t)((len-2-2)>>8);//更新json长度
-	  packBuf[3]=(uint8_t)(len-2-2);
-	  uint16_t jsonBodyCrc=RTU_CRC(packBuf+2+2,len-2-2);
+	  NetTxBuffer[2]=(uint8_t)((len-2-2)>>8);//更新json长度
+	  NetTxBuffer[3]=(uint8_t)(len-2-2);
+	  uint16_t jsonBodyCrc=RTU_CRC(NetTxBuffer+2+2,len-2-2);
 	  //crc
-	  packBuf[len]=(uint8_t)(jsonBodyCrc>>8); len++;//更新crc
-	  packBuf[len]=(uint8_t)(jsonBodyCrc);    len++;
+	  NetTxBuffer[len]=(uint8_t)(jsonBodyCrc>>8); len++;//更新crc
+	  NetTxBuffer[len]=(uint8_t)(jsonBodyCrc);    len++;
 
 		//tail
-		packBuf[len]=0xcc; len++;
-		packBuf[len]=0xaa;    len++;
-		packBuf[len]=0;//len++;//结尾 补0
+		NetTxBuffer[len]=0xcc; len++;
+		NetTxBuffer[len]=0xaa;    len++;
+		NetTxBuffer[len]=0;//len++;//结尾 补0
 					for(int i=0;i<len;i++)
-						printf("%02x ",packBuf[i]);
+						printf("%02x ",NetTxBuffer[i]);
 
 }
 int main(int argc, char* argv[])

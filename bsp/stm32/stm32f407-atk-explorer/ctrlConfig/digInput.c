@@ -29,12 +29,10 @@ void diIOSetFlag()
 						if(diReadFun(i)==true){
 								inpoutpFlag.digInput[i].upFlag =true;
 							  inpoutpFlag.digInput[i].lowFlag =false; 
-							  //rt_kprintf("%s diIOSet upFlag %d\n",sign,i);
 						}
 						else {
 							  inpoutpFlag.digInput[i].upFlag =false;
 								inpoutpFlag.digInput[i].lowFlag=true;
-							  //rt_kprintf("%s diIOSet lowFlag %d\n",sign,i);
 						}
 				}
 		}
@@ -46,15 +44,10 @@ void printfDIList()
 		for(int j=0;j<DI_NUM;j++){//查一遍 找到 GYNJLXSD000000499  如果
 				if(packFlash.diginput[j].workFlag==RT_TRUE){//打开
 						rt_kprintf("%s digInput ",sign);
-
 						rt_kprintf("%s ",packFlash.diginput[j].name);
 						rt_kprintf("%s ",packFlash.diginput[j].devID);
-						
 						rt_kprintf("%s ",packFlash.diginput[j].model);
 						rt_kprintf("%d \n",packFlash.diginput[j].port);
-
-
-
 				}
 		}
 }
@@ -72,7 +65,6 @@ static void digInput(int argc, char *argv[])
 				goto ERR;
 		}
 		port = atoi16(argv[4],10);
-
 		if((port<=DI_NUM)&&(port>0)){//添加
 				packFlash.diginput[port-1].workFlag=RT_TRUE;
 				rt_strcpy(packFlash.diginput[port-1].name, argv[1]);

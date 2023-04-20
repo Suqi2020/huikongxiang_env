@@ -51,6 +51,7 @@
 #include "test_hardware.h"
 #include "main.h"
 //#include "W5500p.h"	
+#include "mqttTask.h"
 #include "W5500Task.h"
 #include "w5500_conf.h"
 #include "w5500.h"
@@ -88,7 +89,7 @@
 #define  USE_ALIYUN  
 //#define  USE_WDT
 
-
+#define  PACK_HEAD_LEN  4
 
  
 #ifdef  USE_WDT

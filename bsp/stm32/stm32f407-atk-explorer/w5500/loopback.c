@@ -4,7 +4,7 @@
 uint8 I_STATUS[MAX_SOCK_NUM];
 uint8 ch_status[MAX_SOCK_NUM] = {0};/** 0:close, 1:ready, 2:connected */
 
-//uint8_t  NetTxBuffer[TX_RX_MAX_BUF_SIZE]={0};
+uint8_t  NetTxBuffer[TX_RX_MAX_BUF_SIZE]={0};
 uint8_t  NetRxBuffer[TX_RX_MAX_BUF_SIZE]={0};
 uint16_t netRxBufLen=0;
 const static char sign[]="[lookback]";
@@ -12,8 +12,7 @@ void rstCh_status()
 {
 		rt_memset(ch_status,0,MAX_SOCK_NUM);
 }
-//					len = recvfrom(s, data_buf, len,(uint8*)&destip,&destport);/* read the received data */
-//					sendto(s, data_buf, len,(uint8*)&destip,destport) ;
+
 
 void W5500ISR(void)
 {
@@ -104,20 +103,12 @@ void SOCK_DISCON(SOCKET s)
 
 
 extern rt_bool_t gbNetState;
- rt_bool_t  offLineTimesGet=RT_TRUE;
-
+rt_bool_t  offLineTimesGet=RT_TRUE;
 
 uint32_t gu32RecDataLen=0;
-
 extern int  netPhraseRecData(uint8_t *recBuf ,int len);
-
-
-
-//extern int mqttRet;
 void loopback_tcp(uint16 port)
 {
-	// uint16 len=0;	
-	
 	switch(getSn_SR(SOCK_TCPC))								  				         /*获取socket的状态*/
 	{
 		case SOCK_CLOSED:											        		         /*socket处于关闭状态*/
@@ -137,10 +128,11 @@ void loopback_tcp(uint16 port)
 			if(netRxBufLen>0)
 			{
 				recv(SOCK_TCPC,NetRxBuffer,netRxBufLen); 							   		         /*接收来自Server的数据*/
-				rt_kprintf("rec:");
-				for(int i=0;i<netRxBufLen ;i++)
-				rt_kprintf("%02x ",NetRxBuffer[i]);
-				rt_kprintf("\n");
+				NetRxBuffer[netRxBufLen]=0;
+				rt_kprintf("reclen: %d",netRxBufLen);
+//				for(int i=0;i<netRxBufLen ;i++)
+//				rt_kprintf("%02x ",NetRxBuffer[i]);
+//				rt_kprintf("\n");
 				void netRecSendEvent();		
         netRecSendEvent();				//mqttLoopData();						     	         /*向Server发送数据*/
 			}		  

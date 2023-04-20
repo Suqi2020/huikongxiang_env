@@ -160,12 +160,15 @@
 //	       rt_mutex_take(uartDev[sheet.pressSetl[num].useUartNum].uartMutex,RT_WAITING_FOREVER);
 //         rt_mutex_t uartMutex[UART_NUM]
 //V2.00    加入wdt和wdtevent事件  创建独立wdttask线程来监管其他5个线程实现某个线程死机后复位问题
-#define APP_VER       ((2<<8)+00)//0x0105 表示1.5版本
+//         wdt最大复位时间30多秒   WDTTASK中 最大10秒喂狗一次
+//V2.01    mqtt数据包重新封装为头部4字节+头部+mqtttopic+mqttjson格式
+//         多线程调用send直接发送导致mqtt连接老是掉线，改用单独线程来发送比较稳定
+#define APP_VER       ((2<<8)+01)//0x0105 表示1.5版本
 //注：本代码中json格式解析非UTF8_格式代码（GB2312格式中文） 会导致解析失败
 //    打印log如下 “[dataPhrs]err:json cannot phrase”  20230403
-const char date[]="20230418";
+const char date[]="20230420";
 
-//static    rt_thread_t tid 	= RT_NULL;
+
 static    rt_thread_t tidW5500 	  = RT_NULL;
 static    rt_thread_t tidNetRec 	= RT_NULL;
 static    rt_thread_t tidNetSend 	= RT_NULL;
@@ -173,17 +176,13 @@ static    rt_thread_t tidUpkeep 	= RT_NULL;
 static    rt_thread_t tidLCD      = RT_NULL;
 static    rt_thread_t tidAutoCtrl = RT_NULL;
 static    rt_thread_t tidMqtt     = RT_NULL;
-static    rt_thread_t tidWDT     = RT_NULL;
+//static    rt_thread_t tidWDT      = RT_NULL;
 //信号量的定义
 extern  rt_sem_t  w5500Iqr_semp;;//w5500有数据时候中断来临
-rt_mutex_t   netSend_mutex=RT_NULL;
 rt_mutex_t   read485_mutex=RT_NULL;//防止多个线程同事读取modbus数据
-//rt_mutex_t   netRec_mutex=RT_NULL; //对读取的NetRxBuffer数组进行保护
 //邮箱的定义
-//extern struct  rt_mailbox mbNetRecData;
 extern struct  rt_mailbox mbNetSendData;;
-//static char	 	 mbRecPool[20];//接收缓存20条
-//static char 	 mbSendPool[20];//发送缓存20条
+static char 	 mbSendPool[20];//发送缓存20条
 
 
 
@@ -204,7 +203,6 @@ struct rt_event WDTEvent;
 struct  rt_messagequeue LCDmque;//= {RT_NULL} ;//创建LCD队列
 uint8_t LCDQuePool[LCD_BUF_LEN];  //创建lcd队列池
 //任务的定义
-//extern  void   netDataRecTask(void *para);//网络数据接收
 extern  void   netDataSendTask(void *para);//网络数据发送
 extern  void   upKeepStateTask(void *para);//定时打包数据 后期可能加入定时读取modbus
 extern  void   w5500Task(void *parameter);//w5500网络状态的维护
@@ -213,21 +211,19 @@ extern  void   LCDTask(void *parameter);
 extern  void   autoCtrlTask(void *para);
 extern  void   mqttTask(void *parameter);
 extern  void   WDTTask(void *parameter);
-const static char sign[]="[main]";
-//const char errStr[]="[ERR]";
-
+const  static char sign[]="[main]";
+extern rt_bool_t gbNetState;
 
 /* 定时器的控制块 */
 static rt_timer_t timer1;
 
-//static int cnt = 0;
 /* 定时器1超时函数 */
 //10秒提醒一次 uart offline状态
 static void timeout1(void *parameter)
 {
 		static int count=0;
 	  static int alarmTick=10;
-		extern rt_bool_t gbNetState;
+		
 	  extern void modbusWorkErrCheck(void);
 	  count++;
 	  
@@ -249,7 +245,6 @@ static void timeout1(void *parameter)
 char *strnum="1234.5678";
 
 void  outIOInit(void);
-
 int main(void)
 {
 
@@ -270,24 +265,24 @@ int main(void)
         rt_kprintf("%screate w5500Iqr_semp failed\n",sign);
     }
 //////////////////////////////////////互斥量//////////////////////////////
-		netSend_mutex= rt_mutex_create("netSend_mutex", RT_IPC_FLAG_FIFO);
-		if (netSend_mutex == RT_NULL)
-    {
-        rt_kprintf("%screate netSend_mutex failed\n",sign);
-    }
 		read485_mutex= rt_mutex_create("read485_mutex", RT_IPC_FLAG_FIFO);
 		if (read485_mutex == RT_NULL)
     {
         rt_kprintf("%screate read485_mutex failed\n",sign);
     }
-
+////////////////////////////////////邮箱//////////////////////////////////
+    result = rt_mb_init(&mbNetSendData,"mbSend",&mbSendPool[0],sizeof(mbSendPool)/4,RT_IPC_FLAG_FIFO);         
+    if (result != RT_EOK)
+    {
+        rt_kprintf("%sinit mailbox NetSend failed.\n",sign);
+        return -1;
+    }
 ///////////////////////////////////事件标志组////////////////////////////
     if (rt_event_init(&mqttAckEvent, "mqttAckEvent", RT_IPC_FLAG_FIFO) != RT_EOK)
     {
         rt_kprintf("%sinit mqttAckEvent failed.\n",sign);
 
     }
-
 #ifdef  USE_WDT   
 		if (rt_event_init(&WDTEvent, "WDTEvent", RT_IPC_FLAG_FIFO) != RT_EOK)
     {
@@ -312,20 +307,14 @@ int main(void)
 		extern void 	uartMutexQueueCreate();
 		uartMutexQueueCreate();
 
-		
-
-		
-extern IWDG_HandleTypeDef hiwdg;
-
-		HAL_IWDG_Refresh(&hiwdg);
 ////////////////////////////////任务////////////////////////////////////
-    tidW5500 =  rt_thread_create("w5500",w5500Task,RT_NULL,1024*2,3, 10 );
+    tidW5500 =  rt_thread_create("w5500",w5500Task,RT_NULL,256*6,3, 10 );
 		if(tidW5500!=NULL){
 				rt_thread_startup(tidW5500);													 
 				rt_kprintf("%sRTcreat w5500Task task\r\n",sign);
 		}
 
-		tidMqtt = rt_thread_create("mqtt",mqttTask,RT_NULL,1024,4, 10 );
+		tidMqtt = rt_thread_create("mqtt",mqttTask,RT_NULL,256*2,4, 10 );
 		if(tidMqtt!=NULL){
 				rt_thread_startup(tidMqtt);													 
 				rt_kprintf("RTcreat mqtt task\r\n");
@@ -334,23 +323,28 @@ extern IWDG_HandleTypeDef hiwdg;
 				rt_kprintf("RTcreat mqtt ERR\r\n");
 		}		
 
-		tidUpkeep 	=  rt_thread_create("upKeep",upKeepStateTask,RT_NULL,512*3,4, 10 );
+		tidUpkeep 	=  rt_thread_create("upKeep",upKeepStateTask,RT_NULL,256*5,4, 10 );
 		if(tidUpkeep!=NULL){
 				rt_thread_startup(tidUpkeep);													 
 				rt_kprintf("%sRTcreat upKeepStateTask \r\n",sign);
 		}
-		tidLCD    =  rt_thread_create("LCD",LCDTask,RT_NULL,512*3,2, 10 );
+		tidLCD    =  rt_thread_create("LCD",LCDTask,RT_NULL,256*2,2, 10 );
 		if(tidLCD!=NULL){
 				rt_thread_startup(tidLCD);													 
 				rt_kprintf("%sRTcreat LCDStateTask \r\n",sign);
 		}
-
-		tidAutoCtrl =  rt_thread_create("autoCtrl",autoCtrlTask,RT_NULL,1024,5, 10 );
+		tidNetSend =  rt_thread_create("netSend",netDataSendTask,RT_NULL,1024,2, 10 );
+		if(tidNetSend!=NULL){
+				rt_thread_startup(tidNetSend);													 
+				rt_kprintf("%sRTcreat netDataSendTask \r\n",sign);
+		}
+		tidAutoCtrl =  rt_thread_create("autoCtrl",autoCtrlTask,RT_NULL,256*3,5, 10 );
 		if(tidAutoCtrl!=NULL){
 				rt_thread_startup(tidAutoCtrl);													 
 				rt_kprintf("%sRTcreat autoCtrlTask\r\n",sign);
 		}
 #ifdef  USE_WDT
+		static    rt_thread_t tidWDT      = RT_NULL;
 		tidWDT =  rt_thread_create("tidWDT",WDTTask,RT_NULL,256,10, 10 );
 		if(tidWDT!=NULL){
 				rt_thread_startup(tidWDT);													 
@@ -360,9 +354,6 @@ extern IWDG_HandleTypeDef hiwdg;
 
 		HAL_IWDG_Refresh(&hiwdg);
 #endif	
-		
-//		extern void iwdg_regist(void);
-//		iwdg_regist();
 		//队列初始化之后再开启串口中断接收
 
 //////////////////////////////结束//////////////////////////////////////
@@ -371,7 +362,7 @@ extern IWDG_HandleTypeDef hiwdg;
 				hardWareDriverTest();
 				HAL_GPIO_WritePin(LED_GPIO_Port, LED_Pin, GPIO_PIN_RESET);
 				rt_thread_mdelay(250);
-			  extern rt_bool_t mqttState(void);
+			  extern bool mqttState(void);
 			  if(mqttState()==RT_TRUE){
 					  rt_thread_mdelay(250);
 						
