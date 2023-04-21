@@ -289,6 +289,8 @@ void netRecSendEvent()
 				 extern bool mqttpubRead();
 				 rt_kprintf("%smqttPub ack begin\r\n",sign);
 				 mqttpubRead();
+				 extern void getMqttRespTime();
+			   getMqttRespTime();
 				 rt_kprintf("%smqttPub ack end\r\n",sign);
 			  }
 				 break;

@@ -222,10 +222,10 @@ bool  mqttpubRead()
 
 static MQTTEnum MQTTstep=conMQTT_enum; 
 
-static uint32_t sendTime ;
-void reFlashSendTime()
+static uint32_t respTime ;
+void getMqttRespTime()
 {
-	sendTime = rt_tick_get();
+	respTime = rt_tick_get();
 }
 
 extern rt_bool_t gbNetState;
@@ -233,7 +233,7 @@ extern rt_bool_t gbNetState;
 int ping2Times=0;
 int pingRspTimes=0;
 int pingUnrspTimes=0;
-bool  mqttConStat=false;
+//bool  mqttConStat=false;
 int  mqttLoopData(void)
 {
 
@@ -280,15 +280,17 @@ int  mqttLoopData(void)
 							  MQTTstep	=	subMQTT_enum;
 							  mqttStateSet(true);
 							  conTimes=0;
+								extern void LCDDispNetOffline();
+								LCDDispNetOffline();
 						}
 						else{
+
 							  rt_kprintf("%sno connack\r\n",task);//返回3 7 6 6的包
 							  if(++conTimes>=3){//  dis conn 后  con了3次才连上
 										MQTTstep	=	resetMQTT_enum;
 										tep= -1;
 									  conTimes=0;
 								}
-								mqttConStat=true;
 								rt_thread_delay(1000);
 						}
 				break;
@@ -317,7 +319,8 @@ int  mqttLoopData(void)
 								rt_kprintf("%sPong\r\n",task);
 							  pingTimes=0;
 								MQTTstep=dealwithMQTT_enum;
-							  
+								getMqttRespTime();
+//							  respTime=rt_tick_get();
 						}
 						else {
 								pingUnrspTimes++;
@@ -335,7 +338,7 @@ int  mqttLoopData(void)
 						rt_kprintf("ping[%d],pingrsp[%d],pingUnrsp[%d]\n",ping2Times,pingRspTimes,pingUnrspTimes);
 				break;
 			case  dealwithMQTT_enum://
-						if((rt_tick_get()-sendTime)>(MQTTKEEPALIVE_TIME_S)*1000){
+						if((rt_tick_get()-respTime)>(MQTTKEEPALIVE_TIME_S)*1000){
 								MQTTstep=pingMQTT_enum;
 						}
 				break;
@@ -365,9 +368,9 @@ int  mqttLoopData(void)
 
 void rstMqttStep()
 {
-		if(mqttConStat==true){
+		if(mqttState()==true){
 			offLine.mqttTimes++;
-			mqttConStat=false;
+			mqttStateSet(false);
 		}
 	  MQTTstep=resetMQTT_enum;
 }

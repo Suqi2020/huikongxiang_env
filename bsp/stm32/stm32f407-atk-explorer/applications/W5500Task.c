@@ -159,12 +159,11 @@ void netSend(uint8_t *data,int len)
 				LCDDispNetOffline();
 				extern void rstMqttStep();
 				rstMqttStep();
-				mqttStateSet(false);
+				//mqttStateSet(false);
 		}
 		else{
 				rt_kprintf("%snet send succ\n",task);
-				extern void reFlashSendTime();
-			  reFlashSendTime();
+
 		}	
 }
 

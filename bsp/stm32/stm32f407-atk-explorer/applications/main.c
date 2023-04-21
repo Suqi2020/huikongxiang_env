@@ -163,10 +163,12 @@
 //         wdt最大复位时间30多秒   WDTTASK中 最大10秒喂狗一次
 //V2.01    mqtt数据包重新封装为头部4字节+头部+mqtttopic+mqttjson格式
 //         多线程调用send直接发送导致mqtt连接老是掉线，改用单独线程来发送比较稳定
-#define APP_VER       ((2<<8)+01)//0x0105 表示1.5版本
+//         note 上电后交换机联网需要45秒左右才能获取到IP地址
+//V2.02    mqtt联网后发送联网成功到LCD显示屏上 更改显示亮起的逻辑
+#define APP_VER       ((2<<8)+02)//0x0105 表示1.5版本
 //注：本代码中json格式解析非UTF8_格式代码（GB2312格式中文） 会导致解析失败
 //    打印log如下 “[dataPhrs]err:json cannot phrase”  20230403
-const char date[]="20230420";
+const char date[]="20230421";
 
 
 static    rt_thread_t tidW5500 	  = RT_NULL;

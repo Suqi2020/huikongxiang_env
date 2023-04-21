@@ -339,12 +339,9 @@ void  hardWareDriverTest(void)
 //不能打印 uint64_t 数据  拆分成32位打印
 int tick()
 {
-	  uint32_t tick=rt_tick_get();
-	  extern uint64_t subTimeStampGet();
-	  uint64_t time =subTimeStampGet()+tick;
 
-	  rt_kprintf("[tick][%lu]\r\n", tick);
-//		rt_kprintf("[utc][%lu]\r\n",time);//打印失败
+	  uint64_t time =utcTime();
+
 	  uint32_t rtc_s=time/1000;
 	  uint32_t rtc_ms=time%1000;
 		rt_kprintf("[tick][%lu]-s\r\n",rtc_s);//不能同时打印需要分开打印才正确

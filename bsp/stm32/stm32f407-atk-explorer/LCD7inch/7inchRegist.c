@@ -20,13 +20,9 @@ uint8_t  recLCDBuf[LCD_BUF_LEN];
 //往LCD屏幕发送数据 调用底层串口发送函数
 static void LCDDataSend(uint8_t *buf,int lenth)
 {
-	 //rt_kprintf("%s LCD send:",sign);
 	 for(int i=0;i<lenth;i++){
 		 HAL_UART_Transmit(&huart5,buf+i,1,1000); 
-		 //rt_kprintf("%02x ",buf[i]);
 	 }
-	 //rt_kprintf("\n");
-	
 }
 //结果 return 0-回应错误  1-回复正确
 //5A A5 03 82 4F 4B 
@@ -217,10 +213,10 @@ void LCDDispMCUID()
 //更新lcd网络状态 上下线或者触摸按键时候调用
 void LCDDispNetErrState()
 {
-	  extern rt_bool_t gbNetState;
+	  extern bool mqttState();
 				uint8_t buf[10]={0};
 				buf[0]=0;
-				buf[1]=gbNetState;
+				buf[1]=mqttState();
 				LCDWtite(NET_ERR_DISPLAY_ADDR,buf,1*2);
 
 }
@@ -229,7 +225,7 @@ int offLineIndex=1;
 void  LCDDispNetOffline()
 {
 	  uint8_t buf[10]={0};
-		extern rt_bool_t gbNetState;
+		//extern rt_bool_t gbNetState;
 		//显示总共掉线次数
 		buf[0]=(uint8_t)(offLine.mqttTimes>>24);
 		buf[1]=(uint8_t)(offLine.mqttTimes>>16);
@@ -244,13 +240,13 @@ void  LCDDispNetOffline()
 				buf[3]=0;
 				LCDWtite(NET_OFFLINE_TIMES_ADDR,buf,2*2);
 						//显示总共掉线的时长
-				if(gbNetState==RT_FALSE){
-					  int tick = rt_tick_get()/1000;
-						buf[0]=(uint8_t)(tick>>24);
-						buf[1]=(uint8_t)(tick>>16);
-						buf[2]=(uint8_t)(tick>>8);
-						buf[3]=(uint8_t)(tick>>0);
-				}
+//				if(gbNetState==RT_FALSE){
+//					  int tick = rt_tick_get()/1000;
+//						buf[0]=(uint8_t)(tick>>24);
+//						buf[1]=(uint8_t)(tick>>16);
+//						buf[2]=(uint8_t)(tick>>8);
+//						buf[3]=(uint8_t)(tick>>0);
+//				}
 				LCDWtite(NET_OFFLINE_RELAYTIME_ADDR,buf,2*2);
 		}
 		else{ 
@@ -260,17 +256,17 @@ void  LCDDispNetOffline()
 				buf[3]=(uint8_t)(offLineIndex>>0);
 				LCDWtite(NET_OFFLINE_TIMES_ADDR,buf,2*2);
 			  int offTime;
-				if(gbNetState==RT_FALSE){
-						//rt_kprintf("[offLine]a the %d Time,relayTimer %d %d秒\r\n",offLineIndex,rt_tick_get()/1000,offLine.relayTimer[offLineIndex]);
-//						if(offLineIndex==offLine.times)
-//								offTime=(rt_tick_get()/1000-offLine.relayTimer[offLineIndex]);//掉线了此次计数一直++
-//						else
-//								offTime=offLine.relayTimer[offLineIndex];
-				}
-				else{
-						//rt_kprintf("[offLine]b the %d Times,relayTimer %d 秒\r\n",offLineIndex,offLine.relayTimer[offLineIndex]);
-//						offTime=offLine.relayTimer[offLineIndex];
-				}
+//				if(gbNetState==RT_FALSE){
+//						//rt_kprintf("[offLine]a the %d Time,relayTimer %d %d秒\r\n",offLineIndex,rt_tick_get()/1000,offLine.relayTimer[offLineIndex]);
+////						if(offLineIndex==offLine.times)
+////								offTime=(rt_tick_get()/1000-offLine.relayTimer[offLineIndex]);//掉线了此次计数一直++
+////						else
+////								offTime=offLine.relayTimer[offLineIndex];
+//				}
+//				else{
+//						//rt_kprintf("[offLine]b the %d Times,relayTimer %d 秒\r\n",offLineIndex,offLine.relayTimer[offLineIndex]);
+////						offTime=offLine.relayTimer[offLineIndex];
+//				}
 				buf[0]=(uint8_t)(offTime>>24);
 				buf[1]=(uint8_t)(offTime>>16);
 				buf[2]=(uint8_t)(offTime>>8);
