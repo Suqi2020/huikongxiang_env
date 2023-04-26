@@ -7,7 +7,7 @@
 const static char sign[]="[氧气]";
 
 //#define   SLAVE_ADDR     0X01 
-#define   LENTH          50  //工作环流用到的最大接收buf长度
+//#define   LENTH          50  //工作环流用到的最大接收buf长度
 
 
 float  o2[O2_485_NUM];

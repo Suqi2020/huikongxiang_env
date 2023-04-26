@@ -7,7 +7,7 @@
 const static char sign[]="[甲烷]";
 
 //#define   SLAVE_ADDR     0X01 
-#define   LENTH          50  //工作环流用到的最大接收buf长度
+//#define   LENTH          50  //工作环流用到的最大接收buf长度
 
 
 //concentrationStru gas;

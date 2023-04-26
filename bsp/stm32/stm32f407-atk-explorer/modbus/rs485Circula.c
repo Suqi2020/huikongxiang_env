@@ -42,7 +42,7 @@ typedef struct
 const static char sign[]="[环流]";
 
 //#define   SLAVE_ADDR     0X02
-#define   LENTH          50  //工作环流用到的最大接收buf长度
+//#define   LENTH          50  //工作环流用到的最大接收buf长度
 extern uint8_t NetTxBuffer[TX_RX_MAX_BUF_SIZE];
 
  CIRCURStru  cirCurStru_p[CIRCULA_485_NUM];

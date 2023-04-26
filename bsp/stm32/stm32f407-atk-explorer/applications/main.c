@@ -168,10 +168,12 @@
 //         同禾修改地址 修改设备地址 FF FF 03 0A＋设备完整的长地址＋FF(01)＋短地址   沉降仪和裂缝仪用FF  三轴测振仪01
 
 //V2.03    修复下行设置逻辑控制超过20条导致程序死机 logCrtlAddResp(cJSON *Json)加入逻辑控制总数判断
-#define APP_VER       ((2<<8)+02)//0x0105 表示1.5版本
+//V2.04    修复串口数据过多导致rt_smem_free err的问题  LENTH <MSGPOOL_LEN 导致buf溢出  
+//         增加一分钟刷新一次传感器状态和网络状态的显示 LCDTask.C中
+#define APP_VER       ((2<<8)+03)//0x0105 表示1.5版本
 //注：本代码中json格式解析非UTF8_格式代码（GB2312格式中文） 会导致解析失败
 //    打印log如下 “[dataPhrs]err:json cannot phrase”  20230403
-const char date[]="20230425";
+const char date[]="20230426";
 
 
 static    rt_thread_t tidW5500 	  = RT_NULL;

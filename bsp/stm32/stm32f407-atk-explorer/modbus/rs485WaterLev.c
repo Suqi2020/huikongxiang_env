@@ -5,7 +5,7 @@
 const static char sign[]="[水位]";
 
 //#define   SLAVE_ADDR     0X01 
-#define   LENTH          50  //工作环流用到的最大接收buf长度
+//#define   LENTH          50  //工作环流用到的最大接收buf长度
 
 float waterDepth[WATERDEPTH_485_NUM];
 static uint8_t respStat[WATERDEPTH_485_NUM];

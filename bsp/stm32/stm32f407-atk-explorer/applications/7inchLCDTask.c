@@ -15,6 +15,10 @@ extern uint8_t  recLCDBuf[LCD_BUF_LEN];
 
 void  LCDTask(void *parameter)
 {
+		extern void LCDDispErrMosbusState();
+    extern void LCDDispNetErrState();
+	  extern void LCDDispErrModbusGet();
+		extern void LDCDispErrMosbusInfo();
 	  rt_thread_mdelay(1000);//必须加入延时等待串口屏启动
 	  LCDDispIP();
 	  LCDDispUart();
@@ -22,6 +26,7 @@ void  LCDTask(void *parameter)
 	  LCDDispModbusGet();
   	LDCDispMosbusInfo();
 	  int revLen=0;
+	 int dispCount=0;
 		while(1){
 			
 			if(rt_mq_recv(&LCDmque, recLCDBuf+revLen, 1, 1000) == RT_EOK){
@@ -33,6 +38,13 @@ void  LCDTask(void *parameter)
 			if(revLen){
 					 LCDDispConfig(recLCDBuf,revLen);
 					 revLen=0;
+			}
+			if(++dispCount>=60){
+				  dispCount=0;
+					LCDDispNetErrState();
+					LCDDispErrModbusGet();
+					LDCDispErrMosbusInfo();
+					LCDDispErrMosbusState();
 			}
 #ifdef  USE_WDT
 			rt_event_send(&WDTEvent,EVENT_WDT_LCDTASK);

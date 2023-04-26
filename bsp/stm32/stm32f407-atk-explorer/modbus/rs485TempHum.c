@@ -5,7 +5,7 @@
 const static char sign[]="[温湿度]";
 
 //#define   SLAVE_ADDR     0X01 
-#define   LENTH          50  //工作环流用到的最大接收buf长度
+//#define   LENTH          50  //工作环流用到的最大接收buf长度
 static bool alarmFLag=false;
 typedef struct{
 	float temp;

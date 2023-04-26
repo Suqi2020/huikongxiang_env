@@ -9,7 +9,7 @@
 const static char sign[]="[一氧化碳]";
 
 //#define   SLAVE_ADDR     0X01 
-#define   LENTH          50  //工作环流用到的最大接收buf长度
+//#define   LENTH          50  //工作环流用到的最大接收buf长度
 
 
 static float co[CO_485_NUM];

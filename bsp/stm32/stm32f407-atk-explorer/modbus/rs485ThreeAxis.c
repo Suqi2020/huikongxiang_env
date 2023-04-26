@@ -32,7 +32,7 @@ int threeAxisState(int i)
 		return threeAxisp[i].respStat;
 }
 //#define   SLAVE_ADDR     0X02 
-#define   LENTH          50  //工作环流用到的最大接收buf长度
+//#define   LENTH          50  //工作环流用到的最大接收buf长度
 
 static  bool alarmFLag=false;
 //打包串口发送 

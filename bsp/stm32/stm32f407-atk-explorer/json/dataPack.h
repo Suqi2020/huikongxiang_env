@@ -4,7 +4,7 @@
 #include   "board.h"
 //#define   ACUID_LEN  18
 //#define   HEAD_LEN   2
-//#define   LENTH_LEN  2
+////#define   LENTH_LEN  2
 //#define   CRC_LEN    2
 //#define   TAIL_LEN   2
 //#define   HEAD      0XAACC

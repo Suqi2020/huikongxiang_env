@@ -11,7 +11,7 @@ const static char sign[]="[uartRecfg]";
 //struct  rt_messagequeue uartMessque;
 //uartChanlStru  chanl={USE_DIS_UART,USE_DIS_UART,USE_DIS_UART,USE_DIS_UART};
 //static rt_mutex_t uartMutex[UART_NUM] ;//= {RT_NULL}; //创建4个串口的互斥量保护
-#define  MSGPOOL_LEN   1024 //485数据最大量  大于1k需要修改此处
+//#define  MSGPOOL_LEN   1024 //485数据最大量  大于1k需要修改此处
 //队列的定义
 struct  rt_messagequeue uartmque[UART_NUM];//= {RT_NULL} ;//创建4个串口的队列
 static uint8_t uartQuePool[UART_NUM][MSGPOOL_LEN];  //创建4个串口的队列池

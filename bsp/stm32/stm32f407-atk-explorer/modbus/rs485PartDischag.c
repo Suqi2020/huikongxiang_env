@@ -127,7 +127,7 @@ int partDisState(int i)
 		return partDiscStru_p[i].respStat;
 }
 //#define   SLAVE_ADDR     0X01
-#define   LENTH          1024  //工作环流用到的最大接收buf长度
+//#define   LENTH          1024  //工作环流用到的最大接收buf长度
 
 //局放读取数据的发送  调用485串口
 static void partDischagUartSend(int num,uint8_t *buf,int len)

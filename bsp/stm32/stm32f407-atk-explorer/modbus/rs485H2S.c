@@ -7,7 +7,7 @@
 const static char sign[]="[硫化氢]";
 
 //#define   SLAVE_ADDR     0X01 
-#define   LENTH          50  //工作环流用到的最大接收buf长度
+//#define   LENTH          50  //工作环流用到的最大接收buf长度
 
  float h2s[H2S_485_NUM];
 static uint8_t respStat[H2S_485_NUM];

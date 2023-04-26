@@ -5,7 +5,7 @@
 const static char sign[]="[裂缝仪]";
 
 //#define   SLAVE_ADDR     0X02 
-#define   LENTH          50  //工作环流用到的最大接收buf长度
+//#define   LENTH          50  //工作环流用到的最大接收buf长度
 
 typedef struct{
 	   union {

@@ -9,9 +9,9 @@
 //								 3/数字,模拟传感器阈值存储
 
 
-
+#define  LENTH          500
  
-
+#define  MSGPOOL_LEN   LENTH 
 //typedef struct{
 ////		uint32_t bps;
 ////    uint16_t calTime;	
