@@ -124,10 +124,13 @@ static int getSetJsoin(char *buf)
 uint32_t e;
 extern struct rt_event mqttAckEvent;
 
+//注册了回调函数
 int  dataPhrase(char *json)
 {
+	rt_mutex_take(read485_mutex,RT_WAITING_FOREVER);
 	extern void AllDownPhraseP(char *data);
 	AllDownPhraseP(json);
+	rt_mutex_release(read485_mutex);
 	return 1;
 }
 //int mqttRet=-1;

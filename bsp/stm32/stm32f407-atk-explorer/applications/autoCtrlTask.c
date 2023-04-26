@@ -372,7 +372,14 @@ void  ctrlOutSetIO()
 extern void diIOSetFlag(void);
 void  autoCtrlTask(void *para)
 {
-	
+//		IOOUT1_OFF;
+//		IOOUT2_OFF;
+//		IOOUT3_OFF;
+//		IOOUT4_OFF;
+//		IOOUT5_OFF;
+//		IOOUT6_OFF;
+//		IOOUT7_OFF;
+//		IOOUT8_OFF;
 	  extern void printModbusDevList();
 	#ifndef     ANA_MASK
 	  extern void prinfAnalogList();

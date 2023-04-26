@@ -405,10 +405,12 @@ void levelSet(char level)
 							if(packFlash.digoutput[k].workFlag==RT_TRUE){//´ò¿ª
 								if(level==0){
 										digOutputOFFFun(SwitchPortIndexY);
+									  
 								}
 								else{
 										digOutputONFun(SwitchPortIndexY);
 								}
+								rt_kprintf("%sDO[%d]=%d",sign,SwitchPortIndexY,level);
 							}
 							break;
 						}

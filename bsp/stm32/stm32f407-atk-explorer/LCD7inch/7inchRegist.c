@@ -116,6 +116,15 @@ void LCDDispIP()
 		LCDWtite(REMOTE_IP3_ADDR,buf,1*2);
 		buf[1]=packFlash.netIpFlash.remoteIp[3];
 		LCDWtite(REMOTE_IP4_ADDR,buf,1*2);
+		//网关IP
+		buf[1]=packFlash.netIpFlash.gateway[0];
+		LCDWtite(GATEWAY_IP1_ADDR,buf,1*2);
+		buf[1]=packFlash.netIpFlash.gateway[1];
+		LCDWtite(GATEWAY_IP2_ADDR,buf,1*2);
+		buf[1]=packFlash.netIpFlash.gateway[2];
+		LCDWtite(GATEWAY_IP3_ADDR,buf,1*2);
+		buf[1]=packFlash.netIpFlash.gateway[3];
+		LCDWtite(GATEWAY_IP4_ADDR,buf,1*2);
 		//远端port
 		buf[0]=0;
 		buf[1]=0;
@@ -231,14 +240,21 @@ void  LCDDispNetOffline()
 		buf[1]=(uint8_t)(offLine.mqttTimes>>16);
 		buf[2]=(uint8_t)(offLine.mqttTimes>>8);
 		buf[3]=(uint8_t)(offLine.mqttTimes>>0);
-		LCDWtite(NET_OFFLINE_TOTALTIMES_ADDR,buf,2*2);
-		if(offLine.mqttTimes==0){
-				//显示第几次掉线
-				buf[0]=0;
-				buf[1]=0;
-				buf[2]=0;
-				buf[3]=0;
-				LCDWtite(NET_OFFLINE_TIMES_ADDR,buf,2*2);
+		LCDWtite(MQTT_OFFLINE_TIMES_ADDR,buf,2*2);
+		
+		
+		buf[0]=(uint8_t)(offLine.netTimes>>24);
+		buf[1]=(uint8_t)(offLine.netTimes>>16);
+		buf[2]=(uint8_t)(offLine.netTimes>>8);
+		buf[3]=(uint8_t)(offLine.netTimes>>0);
+		LCDWtite(NET_OFFLINE_RECONTIMES_ADDR,buf,2*2);
+//		if(offLine.mqttTimes==0){
+//				//显示第几次掉线
+//				buf[0]=0;
+//				buf[1]=0;
+//				buf[2]=0;
+//				buf[3]=0;
+//				LCDWtite(NET_OFFLINE_TIMES_ADDR,buf,2*2);
 						//显示总共掉线的时长
 //				if(gbNetState==RT_FALSE){
 //					  int tick = rt_tick_get()/1000;
@@ -247,15 +263,15 @@ void  LCDDispNetOffline()
 //						buf[2]=(uint8_t)(tick>>8);
 //						buf[3]=(uint8_t)(tick>>0);
 //				}
-				LCDWtite(NET_OFFLINE_RELAYTIME_ADDR,buf,2*2);
-		}
-		else{ 
-				buf[0]=(uint8_t)(offLineIndex>>24);
-				buf[1]=(uint8_t)(offLineIndex>>16);
-				buf[2]=(uint8_t)(offLineIndex>>8);
-				buf[3]=(uint8_t)(offLineIndex>>0);
-				LCDWtite(NET_OFFLINE_TIMES_ADDR,buf,2*2);
-			  int offTime;
+//				LCDWtite(NET_OFFLINE_RELAYTIME_ADDR,buf,2*2);
+//		}
+//		else{ 
+//				buf[0]=(uint8_t)(offLineIndex>>24);
+//				buf[1]=(uint8_t)(offLineIndex>>16);
+//				buf[2]=(uint8_t)(offLineIndex>>8);
+//				buf[3]=(uint8_t)(offLineIndex>>0);
+//				LCDWtite(NET_OFFLINE_TIMES_ADDR,buf,2*2);
+//			  int offTime;
 //				if(gbNetState==RT_FALSE){
 //						//rt_kprintf("[offLine]a the %d Time,relayTimer %d %d秒\r\n",offLineIndex,rt_tick_get()/1000,offLine.relayTimer[offLineIndex]);
 ////						if(offLineIndex==offLine.times)
@@ -267,12 +283,12 @@ void  LCDDispNetOffline()
 //						//rt_kprintf("[offLine]b the %d Times,relayTimer %d 秒\r\n",offLineIndex,offLine.relayTimer[offLineIndex]);
 ////						offTime=offLine.relayTimer[offLineIndex];
 //				}
-				buf[0]=(uint8_t)(offTime>>24);
-				buf[1]=(uint8_t)(offTime>>16);
-				buf[2]=(uint8_t)(offTime>>8);
-				buf[3]=(uint8_t)(offTime>>0);
-				LCDWtite(NET_OFFLINE_RELAYTIME_ADDR,buf,2*2);
-		}
+//				buf[0]=(uint8_t)(offTime>>24);
+//				buf[1]=(uint8_t)(offTime>>16);
+//				buf[2]=(uint8_t)(offTime>>8);
+//				buf[3]=(uint8_t)(offTime>>0);
+//				LCDWtite(NET_OFFLINE_RELAYTIME_ADDR,buf,2*2);
+//		}
 		LCDDispNetErrState();
 }
 

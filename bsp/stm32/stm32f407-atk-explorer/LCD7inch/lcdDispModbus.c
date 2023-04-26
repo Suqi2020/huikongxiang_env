@@ -474,44 +474,7 @@ void LDCDispMosbusInfo()
 				j++;
 		}
 	  LCDWtite(MODBUSDISP_NAME_ADDR,buf,sizeof(modbusName[0]));
-		//显示ID
-		 Len=strlen(modbusLCDRead.ID);
-		for(int i=0;i<Len;i++){
-				buf[i]=modbusLCDRead.ID[i];
-		}
-		 j=0;
-		while((Len+j)<MODBID_LEN-2){
-				buf[Len+j]=0xff;
-				j++;
-			  if(j>=2)
-					break;
-		}
-	  LCDWtite(MODBUSDISP_ID_ADDR,buf,MODBID_LEN-2);//7寸屏显示18
-		//显示model
-		Len=strlen(modbusLCDRead.model);
-		for(int i=0;i<Len;i++){
-				buf[i]=modbusLCDRead.model[i];
-		}
-		 j=0;
-		while((Len+j)<MODL_LEN-2){
-				buf[Len+j]=0xff;
-				j++;
-		}
-	  LCDWtite(MODBUSDISP_TYPE_ADDR,buf,MODL_LEN-2);
-		//显示PORT
-		buf[0]=0;
-		buf[1]=modbusLCDRead.port+1;
-		LCDWtite(MODBUSDISP_PORT_ADDR,buf,2);
-		//显示addr
-		buf[0]=0;
-		buf[1]=modbusLCDRead.addr;
-		LCDWtite(MODBUSDISP_ADDR_ADDR,buf,2);
-	  //显示colTime
-		buf[0]=(uint8_t)(modbusLCDRead.colTime>>24);
-		buf[1]=(uint8_t)(modbusLCDRead.colTime>>16);
-		buf[2]=(uint8_t)(modbusLCDRead.colTime>>8);
-		buf[3]=(uint8_t)(modbusLCDRead.colTime>>0);
-		LCDWtite(MODBUSDISP_TIME_ADDR,buf,4);
+		
 		//显示总共页
 		buf[0]=0;
 		buf[1]=modbTotalIndex;
@@ -519,12 +482,91 @@ void LDCDispMosbusInfo()
 		rt_kprintf("%s total %d\n",sign,modbTotalIndex);
 		//显示当前页
 		buf[0]=0;
-		if(modbTotalIndex==0)
+		if(modbTotalIndex==0){
 				buf[1]=0;
+				LCDWtite(MODBUSDISP_NOWNUM_ADDR,buf,2);
+							 Len=strlen(modbusLCDRead.ID);
+				for(int i=0;i<Len;i++){
+						buf[i]='0';
+				}
+				 j=0;
+				while((Len+j)<MODBID_LEN-2){
+						buf[Len+j]=0xff;
+						j++;
+						if(j>=2)
+							break;
+				}
+				LCDWtite(MODBUSDISP_ID_ADDR,buf,MODBID_LEN-2);//7寸屏显示18
+				//显示model
+				Len=strlen(modbusLCDRead.model);
+				for(int i=0;i<Len;i++){
+						buf[i]='0';
+				}
+				 j=0;
+				while((Len+j)<MODL_LEN-2){
+						buf[Len+j]=0xff;
+						j++;
+				}
+				LCDWtite(MODBUSDISP_TYPE_ADDR,buf,MODL_LEN-2);
+				//显示PORT
+				buf[0]=0;
+				buf[1]=0;
+				LCDWtite(MODBUSDISP_PORT_ADDR,buf,2);
+				//显示addr
+				buf[0]=0;
+				buf[1]=0;
+				LCDWtite(MODBUSDISP_ADDR_ADDR,buf,2);
+				//显示colTime
+				buf[0]=0;
+				buf[1]=0;
+				buf[2]=0;
+				buf[3]=0;
+				LCDWtite(MODBUSDISP_TIME_ADDR,buf,4);
+
+		}
 		else{
 				buf[1]=modbDevReadIndex+1;
+				LCDWtite(MODBUSDISP_NOWNUM_ADDR,buf,2);
+			//显示ID
+				 Len=strlen(modbusLCDRead.ID);
+				for(int i=0;i<Len;i++){
+						buf[i]=modbusLCDRead.ID[i];
+				}
+				 j=0;
+				while((Len+j)<MODBID_LEN-2){
+						buf[Len+j]=0xff;
+						j++;
+						if(j>=2)
+							break;
+				}
+				LCDWtite(MODBUSDISP_ID_ADDR,buf,MODBID_LEN-2);//7寸屏显示18
+				//显示model
+				Len=strlen(modbusLCDRead.model);
+				for(int i=0;i<Len;i++){
+						buf[i]=modbusLCDRead.model[i];
+				}
+				 j=0;
+				while((Len+j)<MODL_LEN-2){
+						buf[Len+j]=0xff;
+						j++;
+				}
+				LCDWtite(MODBUSDISP_TYPE_ADDR,buf,MODL_LEN-2);
+				//显示PORT
+				buf[0]=0;
+				buf[1]=modbusLCDRead.port+1;
+				LCDWtite(MODBUSDISP_PORT_ADDR,buf,2);
+				//显示addr
+				buf[0]=0;
+				buf[1]=modbusLCDRead.addr;
+				LCDWtite(MODBUSDISP_ADDR_ADDR,buf,2);
+				//显示colTime
+				buf[0]=(uint8_t)(modbusLCDRead.colTime>>24);
+				buf[1]=(uint8_t)(modbusLCDRead.colTime>>16);
+				buf[2]=(uint8_t)(modbusLCDRead.colTime>>8);
+				buf[3]=(uint8_t)(modbusLCDRead.colTime>>0);
+				LCDWtite(MODBUSDISP_TIME_ADDR,buf,4);
 		}
-		LCDWtite(MODBUSDISP_NOWNUM_ADDR,buf,2);
+		
 		
 		
 		rt_free(buf);
@@ -539,7 +581,7 @@ void LDCDispErrMosbusInfo()
 	  uint8_t *buf=NULL;
 	  buf=rt_malloc(50);
 	  //显示中文名
-	 
+	 if(modbErrTotalIndex!=0){
 		int Len=strlen(modbusLCDErrRead.name);
 		for(int i=0;i<Len;i++){
 				buf[i]=modbusLCDErrRead.name[i];
@@ -595,11 +637,74 @@ void LDCDispErrMosbusInfo()
 		rt_kprintf("%s total %d\n",sign,modbErrTotalIndex);
 		//显示当前页
 		buf[0]=0;
-		if(modbErrTotalIndex==0)
-				buf[1]=0;
-		else
-				buf[1]=modbErrDevReadIndex+1;
+		buf[1]=modbErrDevReadIndex+1;
 		LCDWtite(MODBUSDISP_ERRNOWNUM_ADDR,buf,2);
+	}
+	 else
+	 {
+		 
+			int Len=0;
+			for(int i=0;i<Len;i++){
+					buf[i]=modbusLCDErrRead.name[i];
+			}
+			int j=0;
+			while((Len+j)<sizeof(modbusName[0])){
+					buf[Len+j]=0xff;
+					j++;
+			}
+			LCDWtite(MODBUSDISP_ERRNAME_ADDR,buf,sizeof(modbusName[0]));
+			//显示ID
+			 Len=0;
+			for(int i=0;i<Len;i++){
+					buf[i]=modbusLCDErrRead.ID[i];
+			}
+			 j=0;
+			while((Len+j)<MODBID_LEN-2){
+					buf[Len+j]=0xff;
+					j++;
+					if(j>=2)
+						break;
+			}
+			LCDWtite(MODBUSDISP_ERRID_ADDR,buf,MODBID_LEN-2);//7寸屏显示18
+			//显示model
+			Len=0;
+			for(int i=0;i<Len;i++){
+					buf[i]=modbusLCDErrRead.model[i];
+			}
+			 j=0;
+			while((Len+j)<MODL_LEN-2){
+					buf[Len+j]=0xff;
+					j++;
+			}
+			LCDWtite(MODBUSDISP_ERRTYPE_ADDR,buf,MODL_LEN-2);
+			//显示PORT
+			buf[0]=0;
+			buf[1]=0;
+			LCDWtite(MODBUSDISP_ERRPORT_ADDR,buf,2);
+			//显示addr
+			buf[0]=0;
+			buf[1]=0;
+			LCDWtite(MODBUSDISP_ERRADDR_ADDR,buf,2);
+			//显示colTime
+			buf[0]=0;
+			buf[1]=0;
+			buf[2]=0;
+			buf[3]=0;
+			LCDWtite(MODBUSDISP_ERRTIME_ADDR,buf,4);
+			//显示总共页
+			buf[0]=0;
+			buf[1]=0;
+			LCDWtite(MODBUSDISP_ERRTOTALNUM_ADDR,buf,2);
+			rt_kprintf("%s total %d\n",sign,modbErrTotalIndex);
+			//显示当前页
+			buf[0]=0;
+			buf[1]=0;
+			LCDWtite(MODBUSDISP_ERRNOWNUM_ADDR,buf,2);
+			buf[0]=0;
+			buf[1]=0;
+			LCDWtite(MODBUSDISP_ERRNOWNUM_ADDR,buf,2);
+	 }
+
 		
 		
 		rt_free(buf);
@@ -852,7 +957,7 @@ void  modbDevReadIndexLow()
 }
 void  	modbErrDevReadIndexAdd()
 {
-	if(modbErrDevReadIndex+1==modbErrTotalIndex)
+	if(modbErrDevReadIndex+1>=modbErrTotalIndex)
 		 modbErrDevReadIndex=0;
 	else 
 		 modbErrDevReadIndex++;
@@ -887,4 +992,19 @@ void keyModbusCfgSure()
 {
 		modbusConfIDCheck(LCDInput.ID);
 		singlModbConf(chinaNameIndex);
+}
+
+
+
+
+void  LCDDispErrMosbusState()
+{
+	  uint8_t buf[2]={0};
+			buf[0]=0;
+		if(modbErrTotalIndex==0)
+				buf[1]=1;
+		else
+				buf[1]=0;
+		LCDWtite(MODBUS_ERR_DISPLAY_ADDR,buf,2);
+		
 }

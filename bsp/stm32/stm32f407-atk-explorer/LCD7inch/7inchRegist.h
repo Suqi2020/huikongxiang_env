@@ -26,6 +26,11 @@
 #define   REMOTE_PORT_ADDR   		 0X1012
 #define   KEY_IP_SURE_ADDR			 0X1014
 #define   KEY_IP_READ_ADDR			 0X1016
+
+#define   GATEWAY_IP1_ADDR        0X1018
+#define   GATEWAY_IP2_ADDR        0X101A
+#define   GATEWAY_IP3_ADDR        0X101C
+#define   GATEWAY_IP4_ADDR    		 0X101E
 //波特率
 #define   PORT1_ADDR     		 			0X1100
 #define   PORT2_ADDR     		 			0X1102
@@ -70,11 +75,11 @@
 #define   KEY_MODBUSDISP_DEL_ADDR   0X1410
 
 //netoffline 显示界面地址
-#define		NET_OFFLINE_TOTALTIMES_ADDR  0X1600
-#define		NET_OFFLINE_TIMES_ADDR       0X1602
-#define   NET_OFFLINE_RELAYTIME_ADDR   0X1604
-#define		NET_OFFLINE_LAST_ADDR        0X1606
-#define   NET_OFFLINE_NEXT_ADDR        0X1608
+#define		NET_OFFLINE_RECONTIMES_ADDR   0X1600
+#define		MQTT_OFFLINE_TIMES_ADDR       0X1602
+//#define   NET_OFFLINE_RELAYTIME_ADDR   0X1604
+//#define		NET_OFFLINE_LAST_ADDR        0X1606
+//#define   NET_OFFLINE_NEXT_ADDR        0X1608
 
 
 

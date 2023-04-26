@@ -121,7 +121,7 @@ uint16_t logCrtlAddResp(cJSON *Json)
 		// 加入节点（键值对）
 		cJSON_AddNumberToObject(root, "mid",respMid);
 		cJSON_AddStringToObject(root, "packetType","SERVICES_CTRLCFG_ADD_RESP");
-		cJSON_AddNumberToObject(root, "code",0);
+
 	
 
 		cJSON_AddStringToObject(root, "acuId",(char *)packFlash.acuId);
@@ -133,7 +133,13 @@ uint16_t logCrtlAddResp(cJSON *Json)
 			
 		void checkIndex();
 		checkIndex();
-		for(int i=0;i<arrayGet_size;i++){
+		int findCtrlIndex();
+		if(findCtrlIndex()==255){
+			cJSON_AddNumberToObject(root, "code",1);
+		}
+		else{
+			cJSON_AddNumberToObject(root, "code",0);
+			for(int i=0;i<arrayGet_size;i++){
 				cJSON *itemp=cJSON_GetArrayItem(arrayGet,i);
 			
 				cJSON  *arrayInputGet =cJSON_GetObjectItem(itemp,"inputCtrl");
@@ -145,22 +151,21 @@ uint16_t logCrtlAddResp(cJSON *Json)
 						argv[1]=cJSON_GetObjectItem(itemIn,"sort")->valuestring;
 						argv[2]=cJSON_GetObjectItem(itemIn,"name")->valuestring;
 						argv[3]=cJSON_GetObjectItem(itemIn,"deviceId")->valuestring;
-					  int a =cJSON_GetObjectItem(itemIn,"subSort")->valueint;
+					  argv[4] =cJSON_GetObjectItem(itemIn,"subSort")->valuestring;
 					  int b =cJSON_GetObjectItem(itemIn,"level")->valueint;
-						argv[4]=rt_malloc(3);
+	
 						argv[5]=rt_malloc(3);
-					  snprintf(argv[4],sizeof(argv[4])-1,"%d",a);
+
 					  snprintf(argv[5],sizeof(argv[5])-1,"%d",b);
 						extern  void autoctrlInputcfg(char*argv[]);
 					  rt_kprintf("%s %s \n",cJSON_GetObjectItem(itemIn,"sort")->valuestring,argv[1]);
 						rt_kprintf("%s %s \n",cJSON_GetObjectItem(itemIn,"name")->valuestring,argv[2]);
 						rt_kprintf("%s %s \n",cJSON_GetObjectItem(itemIn,"deviceId")->valuestring,argv[3]);
-						rt_kprintf("%d %s\n",cJSON_GetObjectItem(itemIn,"subSort")->valueint,argv[4]);
+						rt_kprintf("%s %s\n",cJSON_GetObjectItem(itemIn,"subSort")->valuestring,argv[4]);
 						rt_kprintf("%d %s\n",cJSON_GetObjectItem(itemIn,"level")->valueint,argv[5]);
 						rt_kprintf(" \n");
 						autoctrlInputcfg(argv); 
-						rt_free(argv[4]);
-						argv[4]=NULL;
+
 						rt_free(argv[5]);
 						argv[5]=NULL;
 
@@ -173,25 +178,25 @@ uint16_t logCrtlAddResp(cJSON *Json)
 						argv[1]=cJSON_GetObjectItem(itemOut,"sort")->valuestring;
 						argv[2]=cJSON_GetObjectItem(itemOut,"name")->valuestring;
 						argv[3]=cJSON_GetObjectItem(itemOut,"deviceId")->valuestring;
-						int a =cJSON_GetObjectItem(itemOut,"subSort")->valueint;
+						argv[4] =cJSON_GetObjectItem(itemOut,"subSort")->valuestring;
 						int b =cJSON_GetObjectItem(itemOut,"level")->valueint;
-						argv[4]=rt_malloc(3);
+			
 						argv[5]=rt_malloc(3);
-						snprintf(argv[4],sizeof(argv[4])-1,"%d",a);
+		
 						snprintf(argv[5],sizeof(argv[5])-1,"%d",b);
 						extern  void autoctrlOutputcfg(char*argv[]);
 						autoctrlOutputcfg(argv);
 
-						rt_free(argv[4]);
-						argv[4]=NULL;
+
 						rt_free(argv[5]);
 						argv[5]=NULL;
-						void  autoCfgSure();
-						autoCfgSure();
+
 
 				}
-				
+					void  autoCfgSure();
+					autoCfgSure();
 				}
+			}
 		}
 		sprintf(sprinBuf,"%llu",utcTime());
 		cJSON_AddStringToObject(root,"timestamp",sprinBuf);

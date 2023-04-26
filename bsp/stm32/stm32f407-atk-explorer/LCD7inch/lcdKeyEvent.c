@@ -164,19 +164,21 @@ void  keyReturn(uint16_t keyAddr)
 				//rt_kprintf("%s°´¼ü°´ÏÂ\n",sign);
 				LCDDispNetOffline();
 				break;
-			case  KEY_MODBUSERR_ADDR:
+			case  KEY_MODBUSERR_ADDR:{
 				LCDDispErrModbusGet();
 				LDCDispErrMosbusInfo();
+				void  LCDDispErrMosbusState();
+				LCDDispErrMosbusState();}
 				break;
-			case	NET_OFFLINE_LAST_ADDR:
-				offLineIndexLow();
-				LCDDispNetOffline();
-				break;
-			case  NET_OFFLINE_NEXT_ADDR:
+//			case	NET_OFFLINE_LAST_ADDR:
+//				offLineIndexLow();
+//				LCDDispNetOffline();
+//				break;
+//			case  NET_OFFLINE_NEXT_ADDR:
 
-				offLineIndexAdd();
-				LCDDispNetOffline();
-				break;
+//				offLineIndexAdd();
+//				LCDDispNetOffline();
+//				break;
 			case  KEY_SWITCH_INTERFACE_ADDR:
 				rt_kprintf("%sKEY_SWITCH_INTERFACE_ADDR \n",sign);
 				dispInterFaceIndexFun();
@@ -450,6 +452,19 @@ void LCDDispConfig(uint8_t *recBuf,int len)
 			case REMOTE_IP4_ADDR:
 				packFlash.netIpFlash.remoteIp[3]=recBuf[8];
 				break;    		 
+			case   GATEWAY_IP1_ADDR:
+				packFlash.netIpFlash.gateway[0]=recBuf[8];
+				break;
+			case   GATEWAY_IP2_ADDR:
+				packFlash.netIpFlash.gateway[1]=recBuf[8];
+				break;
+			case   GATEWAY_IP3_ADDR:
+				packFlash.netIpFlash.gateway[2]=recBuf[8];
+				break;
+			case   GATEWAY_IP4_ADDR:
+				packFlash.netIpFlash.gateway[3]=recBuf[8];
+				break;
+
 			case REMOTE_PORT_ADDR:
 				packFlash.netIpFlash.remotePort=(uint16_t)(recBuf[9]<<8)+recBuf[10];
 				break;   		 
@@ -500,7 +515,7 @@ void LCDDispConfig(uint8_t *recBuf,int len)
 				}
 				break;  		
 			case MODBUS_CFG_PORT_ADDR:
-				LCDInput.useUartNum=(uartEnum)recBuf[8];
+				LCDInput.useUartNum=(uartEnum)recBuf[8]-1;
 				break;  		
 			case MODBUS_CFG_ADDR_ADDR:
 				LCDInput.slaveAddr=recBuf[8];

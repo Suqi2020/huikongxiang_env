@@ -44,7 +44,7 @@ uint8_t pindex=0;//×Ü¹²ÅäÖÃ¹ıÕâÃ´¶à¿ØÖÆÌõÊı Ã¿ÅäÖÃ»òÕßÉ¾³ıÍêÒ»ÌõÒÔ¼°ÉÏµçÊ±ºò ĞèÒ
 //Èç¹ûÊÇÕıÔÚÅäÖÃ½çÃæ ²¢Ã»ÓĞÅäÖÃÍê³É  µã»÷É¾³ı ´ËÊ±²»ÄÜ¸üĞÂpindex
 bool configFlag=false;//×ö¸ö±ê¼ÇÀ´ÅĞ¶ÏÊÇ²»ÊÇÕıÔÚÅäÖÃ
 //¼ì²éÒ»ÏÂÃ»ÓĞÉèÖÃ¹ıµÄIndex 
-static uint8_t findCtrlIndex()
+int findCtrlIndex()
 {
 		for(int i=0;i<CRTL_TOTAL_NUM;i++){
 				if(sheet.autoctrl[i].workFlag!=1){
@@ -519,8 +519,6 @@ void autoctrlInputcfg(char*argv[])
 						}
 						switch(i){
 							case 0://AI
-								
-							
 							#ifndef     ANA_MASK
 								for(int j=0;j<ANALOG_NUM;j++){
 										if(rt_strcmp(argv[2],sheet.analog[j].name)==0){//find  name

@@ -119,7 +119,7 @@ static void  timeOutRunFun()
 //						packMqttSend();
 
 
-						//timeStop(REG_TIME);//正式使用时候需要去掉
+						timeStop(REG_TIME);//正式使用时候需要去掉
 						digitalInputReport();//数字输入上报
 						rt_thread_delay(5000);
 
@@ -213,7 +213,8 @@ void startTimeList()
 		}
 		//timeInit(HEART_TIME,      0xFFFF,2);//心跳定时  定时30秒 第一次28秒就来
 		timeInit(REG_TIME,        5,0);//注册 注册成功后定时器就关闭
-		timeInit(CIRCULA_TIME, 		sheet.cirCulaColTime,5);
+	//	timeInit(CIRCULA_TIME, 		sheet.cirCulaColTime,5);
+		timeInit(CIRCULA_TIME, 		60,5);
 		timeInit(PARTDISCHAG_TIME,sheet.partDischagColTime,10);
 		timeInit(PRESSSETTL_TIME, sheet.pressSetlColTime,15);
 		timeInit(THREEAXIS_TIME,  sheet.threeAxissColTime,20);
@@ -225,7 +226,8 @@ void startTimeList()
 
 		timeInit(TEMPHUM_TIME, 		sheet.tempHumColTime,40);
 		timeInit(WATERDEPTH_TIME, sheet.waterDepthColTime,45);
-		timeInit(CRACKMETER_TIME, sheet.crackMeterColTime,50);
+	  timeInit(CRACKMETER_TIME, sheet.crackMeterColTime,50);
+		//timeInit(CRACKMETER_TIME, 60,50);
 	  //启动温湿度
 #ifndef     ANA_MASK
 	  for(int i=0;i<ANALOG_NUM;i++){

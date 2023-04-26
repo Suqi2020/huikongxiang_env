@@ -108,6 +108,7 @@ int MQTTSerialize_publish_suqi(int buflen,unsigned char dup, int qos, unsigned c
 	if (MQTTPacket_len(rem_len = MQTTSerialize_publishLength(qos, topicName, payloadlen)) > buflen)
 	{
 		rc = MQTTPACKET_BUFFER_TOO_SHORT;
+		rt_kprintf("too short\n");
 		goto exit;
 	}
 
@@ -133,6 +134,7 @@ exit:
 	FUNC_EXIT_RC(rc);
 	 rt_free(payLoad_p);
 	 payLoad_p=NULL;
+	rt_kprintf("mqtt publish\n");
 	return rc;
 }
 

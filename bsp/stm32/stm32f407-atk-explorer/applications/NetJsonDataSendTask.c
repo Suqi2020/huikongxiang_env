@@ -15,7 +15,7 @@ void   netDataSendTask(void *para)
         { 
 						uint32_t lenth = (str[0]<<24)+(str[1]<<16)+(str[2]<<8)+str[3];
 						if((lenth!=0)&&(gbNetState ==RT_TRUE)){
-								netSend(str+PACK_HEAD_LEN,lenth);
+							netSend(str+PACK_HEAD_LEN,lenth);//头部不发送
 						}
 						else
 							rt_kprintf("%sERR:net offline drop data\r\n",task);

@@ -164,11 +164,14 @@
 //V2.01    mqtt数据包重新封装为头部4字节+头部+mqtttopic+mqttjson格式
 //         多线程调用send直接发送导致mqtt连接老是掉线，改用单独线程来发送比较稳定
 //         note 上电后交换机联网需要45秒左右才能获取到IP地址
-//V2.02    mqtt联网后发送联网成功到LCD显示屏上 更改显示亮起的逻辑
+//V2.02    mqtt联网后发送联网成功到LCD显示屏上 更改显示亮起的逻辑 去掉掉线时长 从服务器端可以看到掉线时间
+//         同禾修改地址 修改设备地址 FF FF 03 0A＋设备完整的长地址＋FF(01)＋短地址   沉降仪和裂缝仪用FF  三轴测振仪01
+
+//V2.03    修复下行设置逻辑控制超过20条导致程序死机 logCrtlAddResp(cJSON *Json)加入逻辑控制总数判断
 #define APP_VER       ((2<<8)+02)//0x0105 表示1.5版本
 //注：本代码中json格式解析非UTF8_格式代码（GB2312格式中文） 会导致解析失败
 //    打印log如下 “[dataPhrs]err:json cannot phrase”  20230403
-const char date[]="20230421";
+const char date[]="20230425";
 
 
 static    rt_thread_t tidW5500 	  = RT_NULL;
@@ -182,6 +185,7 @@ static    rt_thread_t tidMqtt     = RT_NULL;
 //信号量的定义
 extern  rt_sem_t  w5500Iqr_semp;;//w5500有数据时候中断来临
 rt_mutex_t   read485_mutex=RT_NULL;//防止多个线程同事读取modbus数据
+//rt_mutex_t   txBuf_mutex =RT_NULL;
 //邮箱的定义
 extern struct  rt_mailbox mbNetSendData;;
 static char 	 mbSendPool[20];//发送缓存20条
@@ -267,11 +271,17 @@ int main(void)
         rt_kprintf("%screate w5500Iqr_semp failed\n",sign);
     }
 //////////////////////////////////////互斥量//////////////////////////////
+		
 		read485_mutex= rt_mutex_create("read485_mutex", RT_IPC_FLAG_FIFO);
 		if (read485_mutex == RT_NULL)
     {
         rt_kprintf("%screate read485_mutex failed\n",sign);
     }
+//	  txBuf_mutex= rt_mutex_create("txBuf_mutex", RT_IPC_FLAG_FIFO);
+//		if (txBuf_mutex == RT_NULL)
+//    {
+//        rt_kprintf("%screate txBuf_mutex failed\n",sign);
+//    }
 ////////////////////////////////////邮箱//////////////////////////////////
     result = rt_mb_init(&mbNetSendData,"mbSend",&mbSendPool[0],sizeof(mbSendPool)/4,RT_IPC_FLAG_FIFO);         
     if (result != RT_EOK)

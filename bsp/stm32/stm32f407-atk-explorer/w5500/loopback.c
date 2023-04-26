@@ -135,6 +135,7 @@ void loopback_tcp(uint16 port)
 //				rt_kprintf("\n");
 				void netRecSendEvent();		
         netRecSendEvent();				//mqttLoopData();						     	         /*向Server发送数据*/
+				rt_kprintf("reclenend\n");
 			}		  
 			if(gbNetState!=RT_TRUE){
 					gbNetState =RT_TRUE;	

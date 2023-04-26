@@ -1,6 +1,7 @@
 #include "board.h"
 //<<TH-DCM数字式裂缝计串口通讯协议说明-20210622>>
 //  24+红色，24-黑色，A+蓝色，B-绿色
+// 同禾修改地址 修改设备地址 FF FF 03 0A＋设备完整的长地址＋FF(01)＋短地址   沉降仪和裂缝仪用FF  三轴测振仪01
 const static char sign[]="[裂缝仪]";
 
 //#define   SLAVE_ADDR     0X02 
@@ -68,7 +69,7 @@ void readCrackMeter(int num)
 	  uint16_t len = tongHeModbusRead(sheet.crackMeter[num].slaveAddr,0x0001,2,buf);
 	  //485发送buf  len  等待modbus回应
 		crackMeterUartSend(num,buf,len);
-	  rt_kprintf("%CrackMeter send:",sign);
+	  rt_kprintf("%s send:",sign);
 		for(int j=0;j<len;j++){
 				rt_kprintf("%x ",buf[j]);
 		}

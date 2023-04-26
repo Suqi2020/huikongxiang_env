@@ -1,8 +1,8 @@
 #include "board.h"
 //参考 《H-STC系列压差式沉降仪Modbus RTU协议说明-20191031》
 //<<压差式沉降仪 GY-STC-2000>> 默认波特率9600  modbus地址 0xb1(有误) 见机身标签后2位  协议文档有误
-//修改设备地址 FF FF 03 0A＋设备完整的长地址＋01＋短地址 
-//   FF FF 03 0A 6E 01 20 21 09 08 00 B1 01 01
+//// 同禾修改地址 修改设备地址 FF FF 03 0A＋设备完整的长地址＋FF(01)＋短地址   沉降仪和裂缝仪用FF  三轴测振仪01
+//   FF FF 03 0A 6E 01 20 21 09 08 00 B1 FF 01
 //  24+红色，24-黑色，A+蓝色，B-绿色
 const static char sign[]="[沉降仪]";
 static  bool alarmFLag=false;

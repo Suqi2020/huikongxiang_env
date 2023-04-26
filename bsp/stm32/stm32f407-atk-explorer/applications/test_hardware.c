@@ -361,9 +361,9 @@ int offline()
 {
 	extern rt_bool_t gbNetState;
 if(gbNetState ==RT_FALSE)
-		rt_kprintf("[offLine]offtotal net[%d] mqtt[%d]Times\r\n",offLine.netTimes,offLine.mqttTimes);
+		rt_kprintf("[offLine]offtotal net recon[%d] mqtt[%d]Times\r\n",offLine.netTimes,offLine.mqttTimes);
 else
-		rt_kprintf("[onLine]offtotal net[%d] mqtt[%d]Times\r\n",offLine.netTimes,offLine.mqttTimes);
+		rt_kprintf("[onLine]offtotal net recon[%d] mqtt[%d]Times\r\n",offLine.netTimes,offLine.mqttTimes);
 
 		return 0;
 }

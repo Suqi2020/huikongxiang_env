@@ -28,7 +28,7 @@ extern void gasJsonPack(bool respFlag);
 //485数据读取进行打包
 void  readModbusDataResp(char *monitor)
 {
-		rt_mutex_take(read485_mutex,RT_WAITING_FOREVER);
+
 		if(0==rt_strcmp(monitor,"partial_discharge_monitor")){
 				partDischagRead2Send(true);
 		}
@@ -62,7 +62,7 @@ void  readModbusDataResp(char *monitor)
 		else{
 				rt_kprintf("%sget 485 type err[%s]\r\n",sign,monitor);
 		}
-		rt_mutex_release(read485_mutex);
+//		rt_mutex_release(read485_mutex);
 }
 #ifndef     ANA_MASK
 
@@ -79,8 +79,11 @@ void  readAnaDataResp(char *monitor)
 #endif
 
 //函数作用 在原有的json函数基础上NetTxBuffer 加入mqtt的头部 topic头部
+//extern rt_mutex_t txBuf_mutex;
 void   packMqttSend()
 {
+//		rt_mutex_take(txBuf_mutex,RT_WAITING_FOREVER);
+	 
 		extern bool  mqttState(void);
 	  extern rt_bool_t  gbNetState;
 	  rt_kprintf("%smqttstat[%d],netsate[%d]\n",sign,mqttState(),gbNetState);
@@ -88,6 +91,7 @@ void   packMqttSend()
 			return;
 		if(gbNetState!=RT_TRUE)
 			return;
+
 	  static MQTTString topic= MQTTString_initializer;
 	  int sendBufLen=0;
 		topic.cstring = rt_malloc(100);
@@ -107,5 +111,5 @@ void   packMqttSend()
 		NetTxBuffer[2]=(uint8_t)(sendBufLen>>8);
 		NetTxBuffer[3]=(uint8_t)sendBufLen;
 		rt_mb_send_wait(&mbNetSendData, (rt_ubase_t)&NetTxBuffer,RT_WAITING_FOREVER); 
-	
+//	  rt_mutex_release(txBuf_mutex);
 }

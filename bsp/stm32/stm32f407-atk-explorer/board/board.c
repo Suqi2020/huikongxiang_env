@@ -465,11 +465,11 @@ static void MX_GPIO_Init(void)
   HAL_GPIO_WritePin(GPIOA, UART2_485_Pin|UART4_485_Pin, GPIO_PIN_RESET);
 
   /*Configure GPIO pin Output Level */
-  HAL_GPIO_WritePin(GPIOA, W5500_CS_Pin|IO_OUT8_Pin|IO_OUT7_Pin, GPIO_PIN_SET);
+  HAL_GPIO_WritePin(GPIOA, W5500_CS_Pin|IO_OUT8_Pin|IO_OUT7_Pin, GPIO_PIN_RESET);
 
   /*Configure GPIO pin Output Level */
   HAL_GPIO_WritePin(GPIOB, W5500_RST_Pin|IO_OUT6_Pin|IO_OUT5_Pin|IO_OUT4_Pin
-                          |IO_OUT3_Pin|IO_OUT2_Pin|IO_OUT1_Pin, GPIO_PIN_SET);
+                          |IO_OUT3_Pin|IO_OUT2_Pin|IO_OUT1_Pin, GPIO_PIN_RESET);
 
   /*Configure GPIO pin Output Level */
   HAL_GPIO_WritePin(GPIOE, REALAY_CTRL2_Pin|REALAY_CTRL1_Pin|REALAY_CTRL3_Pin|REALAY_CTRL4_Pin, GPIO_PIN_RESET);

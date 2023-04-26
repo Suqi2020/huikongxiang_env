@@ -121,7 +121,10 @@ void AllDownPhraseP(char *data)
 		if(Json!=RT_NULL){//½âÎöjsonÊý¾Ý
 				cJSON  *pkType = cJSON_GetObjectItem(Json,"packetType");
 			  cJSON  *pkIdentf = cJSON_GetObjectItem(Json,"identifier");
-			
+			  cJSON  *acuId = cJSON_GetObjectItem(Json,"acuId");
+			  if(strcmp(acuId->valuestring,packFlash.acuId)!=0){
+					rt_kprintf("%sERR:acuid   %s\n",sign,acuId->valuestring);
+				}
 				cJSON  *mid =cJSON_GetObjectItem(Json,"mid");
 			  respMid = mid->valueint;
 		 
