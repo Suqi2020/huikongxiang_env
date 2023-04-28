@@ -277,6 +277,9 @@
 
 #define   KEY_SAVE_ADDR             0X1700
 #define   KEY_RESET_ADDR            0X1702
+#define   KEY_SAVEOK_ADDR             0X1708
+#define   KEY_RESETOK_ADDR            0X1714
+#define   KEY_RETURN_ADDR             0X1706
 //Ö÷½çÃæ
 #define   KEY_NETERROR_ADDR         0X1A00
 #define   KEY_MODBUSERR_ADDR        0X1A02

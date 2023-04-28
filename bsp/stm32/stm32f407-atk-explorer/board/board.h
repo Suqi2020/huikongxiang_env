@@ -87,7 +87,7 @@
 #include "transport.h"
 //#include "utf_8.h"
 #define  USE_ALIYUN  
-//#define  USE_WDT
+#define  USE_WDT
 
 #define  PACK_HEAD_LEN  4
 
@@ -98,7 +98,8 @@
 #define EVENT_WDT_UPTASK     (1 << 3)
 #define EVENT_WDT_MQTTTASK   (1 << 4)
 #define EVENT_WDT_LCDTASK    (1 << 5)
-
+#define EVENT_WDT_RECTASK    (1 << 6)
+#define EVENT_WDT_SENDTASK   (1 << 7)
 extern struct rt_event WDTEvent;
 #endif
 //°¢ÀïÔÆip 47.103.184.125 port 1883

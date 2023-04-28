@@ -5,8 +5,8 @@ uint8 I_STATUS[MAX_SOCK_NUM];
 uint8 ch_status[MAX_SOCK_NUM] = {0};/** 0:close, 1:ready, 2:connected */
 
 uint8_t  NetTxBuffer[TX_RX_MAX_BUF_SIZE]={0};
-uint8_t  NetRxBuffer[TX_RX_MAX_BUF_SIZE]={0};
-uint16_t netRxBufLen=0;
+static uint8_t  NetRxBuffer[TX_RX_MAX_BUF_SIZE]={0};
+static uint16_t netRxBufLen=0;
 const static char sign[]="[lookback]";
 void rstCh_status()
 {
@@ -127,15 +127,22 @@ void loopback_tcp(uint16 port)
 			netRxBufLen=getSn_RX_RSR(SOCK_TCPC); 								  	         /*定义len为已接收数据的长度*/
 			if(netRxBufLen>0)
 			{
-				recv(SOCK_TCPC,NetRxBuffer,netRxBufLen); 							   		         /*接收来自Server的数据*/
-				NetRxBuffer[netRxBufLen]=0;
+				recv(SOCK_TCPC,NetRxBuffer+PACK_HEAD_LEN,netRxBufLen); 							   		         /*接收来自Server的数据*/
+				NetRxBuffer[netRxBufLen+PACK_HEAD_LEN]=0;
+				NetRxBuffer[0]=(uint8_t)(netRxBufLen>>24);
+				NetRxBuffer[0]=(uint8_t)(netRxBufLen>>16);
+				NetRxBuffer[0]=(uint8_t)(netRxBufLen>>8);
+				NetRxBuffer[0]=(uint8_t)(netRxBufLen>>0);//填充头部
 				rt_kprintf("reclen: %d",netRxBufLen);
+				
+				
+				extern struct rt_mailbox mbNetRecData;
+				rt_mb_send_wait(&mbNetRecData, (rt_ubase_t)&NetRxBuffer,RT_WAITING_FOREVER);  
 //				for(int i=0;i<netRxBufLen ;i++)
 //				rt_kprintf("%02x ",NetRxBuffer[i]);
 //				rt_kprintf("\n");
-				void netRecSendEvent();		
-        netRecSendEvent();				//mqttLoopData();						     	         /*向Server发送数据*/
-				rt_kprintf("reclenend\n");
+
+
 			}		  
 			if(gbNetState!=RT_TRUE){
 					gbNetState =RT_TRUE;	

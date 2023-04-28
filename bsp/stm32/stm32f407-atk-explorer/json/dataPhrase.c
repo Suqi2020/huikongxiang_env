@@ -254,13 +254,14 @@ void AllDownPhraseP(char *data)
 }
 
 //接收到的网络数据解析头部 判断类别
-void netRecSendEvent()
+void netRecSendEvent(uint8_t *recBuf,int len)
 {
-	   extern uint8_t  NetRxBuffer[TX_RX_MAX_BUF_SIZE];
-	   extern uint32_t netRxBufLen;
+//	   extern uint8_t  NetRxBuffer[TX_RX_MAX_BUF_SIZE];
+	   uint8_t *bufp=recBuf;
+	   int rxLen=len;
 	   extern struct rt_event mqttAckEvent;
 	   char headBuf[10]={0};	//根据手册得知剩余长度从第二个直接开始最大字段 4个字节  5个字节buf足够
-	   memcpy(headBuf,NetRxBuffer,sizeof(headBuf));
+	   memcpy(headBuf,bufp,sizeof(headBuf));
 	//根据手册得知剩余长度从第二个直接开始最大字段 4个字节
    
 	   int ret =MQTTPacket_read((uint8_t *)headBuf, sizeof(headBuf), transport_getdata);//作用确定头部以及剩余最大数量
@@ -275,7 +276,7 @@ void netRecSendEvent()
 					int subcount;
 					int granted_qos;
 				//	rt_kprintf("%smqttSub ack\r\n",sign);
-					MQTTDeserialize_suback(&submsgid, 1, &subcount, &granted_qos,(uint8_t *)NetRxBuffer, netRxBufLen);
+					MQTTDeserialize_suback(&submsgid, 1, &subcount, &granted_qos,(uint8_t *)bufp, rxLen);
 					if (granted_qos != 0)
 					{
 							rt_kprintf("%sERROR:granted qos != 0, 0x%02x\r\n", sign,granted_qos);
@@ -289,9 +290,9 @@ void netRecSendEvent()
 			   rt_kprintf("%sEVENT PINGRESP\r\n",sign);
 				 break;
 			 case PUBLISH:{
-				 extern bool mqttpubRead();
+				 extern bool mqttpubRead(uint8_t *rxbuf,int len);
 				 rt_kprintf("%smqttPub ack begin\r\n",sign);
-				 mqttpubRead();
+				 mqttpubRead(recBuf,len);
 				 extern void getMqttRespTime();
 			   getMqttRespTime();
 				 rt_kprintf("%smqttPub ack end\r\n",sign);

@@ -443,6 +443,11 @@
               <FileType>1</FileType>
               <FilePath>.\applications\NetJsonDataSendTask.c</FilePath>
             </File>
+            <File>
+              <FileName>NetJsonDataRecTask.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>.\applications\NetJsonDataRecTask.c</FilePath>
+            </File>
           </Files>
         </Group>
         <Group>

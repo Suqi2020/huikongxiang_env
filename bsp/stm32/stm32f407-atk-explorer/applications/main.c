@@ -166,14 +166,16 @@
 //         note 上电后交换机联网需要45秒左右才能获取到IP地址
 //V2.02    mqtt联网后发送联网成功到LCD显示屏上 更改显示亮起的逻辑 去掉掉线时长 从服务器端可以看到掉线时间
 //         同禾修改地址 修改设备地址 FF FF 03 0A＋设备完整的长地址＋FF(01)＋短地址   沉降仪和裂缝仪用FF  三轴测振仪01
-
+//         修改默认波特率 沉降仪参考老版本《TH-STC系列压差式沉降仪Modbus RTU协议说明-老版本.pdf》
+//         裂缝仪和三轴 01 06 01 01 00 01 +crc 9600
 //V2.03    修复下行设置逻辑控制超过20条导致程序死机 logCrtlAddResp(cJSON *Json)加入逻辑控制总数判断
 //V2.04    修复串口数据过多导致rt_smem_free err的问题  LENTH <MSGPOOL_LEN 导致buf溢出  
 //         增加一分钟刷新一次传感器状态和网络状态的显示 LCDTask.C中
-#define APP_VER       ((2<<8)+03)//0x0105 表示1.5版本
+//V2.05    增加LCD显示复位和保存成功窗口
+#define APP_VER       ((2<<8)+05)//0x0105 表示1.5版本
 //注：本代码中json格式解析非UTF8_格式代码（GB2312格式中文） 会导致解析失败
 //    打印log如下 “[dataPhrs]err:json cannot phrase”  20230403
-const char date[]="20230426";
+const char date[]="20230428";
 
 
 static    rt_thread_t tidW5500 	  = RT_NULL;
@@ -191,7 +193,8 @@ rt_mutex_t   read485_mutex=RT_NULL;//防止多个线程同事读取modbus数据
 //邮箱的定义
 extern struct  rt_mailbox mbNetSendData;;
 static char 	 mbSendPool[20];//发送缓存20条
-
+static char 	 mbRecPool[20];//发送缓存20条
+extern struct rt_mailbox mbNetRecData;
 
 
 
@@ -211,6 +214,7 @@ struct rt_event WDTEvent;
 struct  rt_messagequeue LCDmque;//= {RT_NULL} ;//创建LCD队列
 uint8_t LCDQuePool[LCD_BUF_LEN];  //创建lcd队列池
 //任务的定义
+extern  void   netDataRecTask(void *para);//网络数据接收
 extern  void   netDataSendTask(void *para);//网络数据发送
 extern  void   upKeepStateTask(void *para);//定时打包数据 后期可能加入定时读取modbus
 extern  void   w5500Task(void *parameter);//w5500网络状态的维护
@@ -285,6 +289,13 @@ int main(void)
 //        rt_kprintf("%screate txBuf_mutex failed\n",sign);
 //    }
 ////////////////////////////////////邮箱//////////////////////////////////
+
+    result = rt_mb_init(&mbNetRecData,"mbRec",&mbRecPool[0],sizeof(mbRecPool)/4,RT_IPC_FLAG_FIFO);         
+    if (result != RT_EOK)
+    {
+        rt_kprintf("%sinit mailbox NetRecData failed.\n",sign);
+        return -1;
+    }
     result = rt_mb_init(&mbNetSendData,"mbSend",&mbSendPool[0],sizeof(mbSendPool)/4,RT_IPC_FLAG_FIFO);         
     if (result != RT_EOK)
     {
@@ -352,12 +363,18 @@ int main(void)
 				rt_thread_startup(tidNetSend);													 
 				rt_kprintf("%sRTcreat netDataSendTask \r\n",sign);
 		}
+		tidNetRec =  rt_thread_create("netRec",netDataRecTask,RT_NULL,1024,2, 10 );
+		if(tidNetRec!=NULL){
+				rt_thread_startup(tidNetRec);													 
+				rt_kprintf("%sRTcreat netDataRecTask \r\n",sign);
+		}
 		tidAutoCtrl =  rt_thread_create("autoCtrl",autoCtrlTask,RT_NULL,256*3,5, 10 );
 		if(tidAutoCtrl!=NULL){
 				rt_thread_startup(tidAutoCtrl);													 
 				rt_kprintf("%sRTcreat autoCtrlTask\r\n",sign);
 		}
 #ifdef  USE_WDT
+		extern IWDG_HandleTypeDef hiwdg;
 		static    rt_thread_t tidWDT      = RT_NULL;
 		tidWDT =  rt_thread_create("tidWDT",WDTTask,RT_NULL,256,10, 10 );
 		if(tidWDT!=NULL){

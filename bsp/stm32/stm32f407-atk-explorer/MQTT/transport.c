@@ -66,7 +66,7 @@ to know the caller or other indicator (the socket id): int (*getfn)(unsigned cha
 
 
 extern uint32_t gu32RecDataLen;
-extern uint8_t  NetRxBuffer[TX_RX_MAX_BUF_SIZE];
+//extern uint8_t  NetRxBuffer[TX_RX_MAX_BUF_SIZE];
 int transport_getdata(unsigned char* buf, int count)
 {
 	int len=0;

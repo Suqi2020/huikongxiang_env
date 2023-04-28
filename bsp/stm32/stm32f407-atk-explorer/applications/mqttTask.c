@@ -10,10 +10,10 @@
  "port":1883}
 */
 static char task[]="[mqtt]";
-extern uint8_t  NetRxBuffer[TX_RX_MAX_BUF_SIZE];
+//extern uint8_t  NetRxBuffer[TX_RX_MAX_BUF_SIZE];
 static char sendBuf[1024];//用于mqtt状态维护发送  不要破坏NetTxBuffer的数据
 static char sendBufLen;
-extern uint16_t netRxBufLen;
+//extern uint16_t netRxBufLen;
 extern rt_sem_t      MQTTDiscon_semp;
 extern rt_sem_t      wifiTcpOK_semp;
 MQTTDataPacktStru  MQTTDataPackt[MQTT_PACK_CNT]={NULL};
@@ -179,7 +179,7 @@ static void mqttSubFun()
 
 
 //mqtt收到订阅的消息过来
-bool  mqttpubRead()
+bool  mqttpubRead(uint8_t *rxbuf,int len)
 {
 
 					unsigned char dup;
@@ -188,10 +188,11 @@ bool  mqttpubRead()
 					unsigned short msgid;
 					int payloadlen_in;
 					unsigned char* payload_in;
-
+          uint8_t *rxbufP=rxbuf;
+	        int rxLen=len;
 					MQTTString receivedTopic;
 					int rc = MQTTDeserialize_publish(&dup, &qos, &retained, &msgid, &receivedTopic,
-							&payload_in, &payloadlen_in, (uint8_t *)NetRxBuffer,  netRxBufLen);
+							&payload_in, &payloadlen_in, (uint8_t *)rxbufP,  rxLen);
 					rt_kprintf("%srec topic: %.*s [%d]\r\n",task,receivedTopic.lenstring.len,receivedTopic.lenstring.data,receivedTopic.lenstring.len);
 					int topicNum = mqttFindTopic(receivedTopic.lenstring.data);
 				  if(topicNum>=0){
