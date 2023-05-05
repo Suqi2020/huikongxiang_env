@@ -23,6 +23,7 @@ static void LCDDataSend(uint8_t *buf,int lenth)
 	 for(int i=0;i<lenth;i++){
 		 HAL_UART_Transmit(&huart5,buf+i,1,1000); 
 	 }
+	  rt_thread_mdelay(5);//两个相邻数据包 分包
 }
 //结果 return 0-回应错误  1-回复正确
 //5A A5 03 82 4F 4B 
@@ -52,6 +53,8 @@ static int LCDWriteResp(uint8_t *recBuf,int lenth)
 //结果 return 0 无响应  1 正常响应 
 int LCDWtite(uint16_t addr,uint8_t *data,uint8_t dataLen)
 {
+		extern rt_mutex_t   lcdSend_mutex;
+		rt_mutex_take(lcdSend_mutex,RT_WAITING_FOREVER);
 	  //data pack
 	  int len=0;
 		rt_memset(sendLCDBuf,0,LCD_BUF_LEN);
@@ -65,26 +68,10 @@ int LCDWtite(uint16_t addr,uint8_t *data,uint8_t dataLen)
 	  for (int i=0;i<dataLen;i++){
 				sendLCDBuf[len++]=data[i];
 		}
-    int repTimes=2;
-		while(repTimes--){
-			//data send
-				LCDDataSend(sendLCDBuf,len);
-//		for(int i=0;i<len;i++){//ACUID_LEN
-//			 	rt_kprintf("%0x ",sendLCDBuf[i]);
-//		}
-//		rt_kprintf("%\n ");
-			//data rec
-				int revLen=0;
-				if(rt_mq_recv(&LCDmque, recLCDBuf+revLen, 1, 25) == RT_EOK){
-					revLen++;
-				}
-				while(rt_mq_recv(&LCDmque, recLCDBuf+revLen, 1, 2) == RT_EOK){
-					revLen++;
-				}
-				if(revLen){
-					return LCDWriteResp(recLCDBuf,revLen);
-				}
-		}
+
+		LCDDataSend(sendLCDBuf,len);
+		rt_mutex_release(lcdSend_mutex);
+
 		return 0;
 }
 
