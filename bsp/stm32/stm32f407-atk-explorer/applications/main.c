@@ -176,10 +176,11 @@
 //V2.06    修复内存溢出导致的(rt_object_get_type(&mq->parent.parent) == RT_Object_Class_MessageQueue) assertion failed at function:rt_mq_recv,
 //         增加LCDWtite 互斥信号量保护
 //         LCDDataSend中发送完毕增加5ms延时 将2个相邻数据包分包 否则lcd屏识别不出
-#define APP_VER       ((2<<8)+06)//0x0105 表示1.5版本
+//V2.07    加入timeQuckIncSet() 给传感器一个初始值，快速测试传感器状态 2分钟内可以监测出故障传感器并显示
+#define APP_VER       ((2<<8)+07)//0x0105 表示1.5版本
 //注：本代码中json格式解析非UTF8_格式代码（GB2312格式中文） 会导致解析失败
 //    打印log如下 “[dataPhrs]err:json cannot phrase”  20230403
-const char date[]="20230505";
+const char date[]="20230509";
 
 
 static    rt_thread_t tidW5500 	  = RT_NULL;

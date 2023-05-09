@@ -28,7 +28,7 @@ static timerStru tim[TIM_NUM];
 
 
 //启动从0开始计时
-static void timeStart(upDataTimEnum num)
+static void timeRestart(upDataTimEnum num)
 {
 		tim[num].count=0;
 }
@@ -54,7 +54,14 @@ static void timeInc()
 						tim[i].count++;
 		}
 }
+//上电后快速读取modbus数据初始值设置 
+static void timeQuckIncSet()
+{
+	  for(int i=0;i<TIM_NUM;i++){
+			  tim[i].count=0xF000+i*2;
 
+		}
+}
 //停止
  void timeStop(upDataTimEnum num)
 {
@@ -69,13 +76,15 @@ static void timeInc()
 static int timeOut()
 {
 	  for(int i=0;i<TIM_NUM;i++){
+			if(tim[i].threshoVal!=0){
 				if(tim[i].count!=0xFFFF){
 						if(tim[i].count>=tim[i].threshoVal){
-							timeStart((upDataTimEnum)i);
+							timeRestart((upDataTimEnum)i);
 							//rt_kprintf("tim out %d %d\n",i,tim[i].threshoVal);
 							return i;
 						}
 				}
+			}
 		}
 		return 0xff;
 }
@@ -241,6 +250,7 @@ void startTimeList()
 				}
 		}
 #endif
+		timeQuckIncSet();
 }
 
 //char nihao[]="你好局放防沉降防外破";
